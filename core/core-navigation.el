@@ -40,6 +40,7 @@ insert `%'."
 
 ;----{Nav Shift}----;
 
+(drag-stuff-global-mode 1)
 
 ;; Shift the selected region right if distance is positive, left if
 ;; negative
@@ -186,6 +187,14 @@ point reaches the beginning or end of the buffer, stop there."
             (setq avy-background t)))
             ;(key-chord-define-global "jj"  #'avy-goto-word-1)
 
+
+;-----{Buffers}-----;
+
+(defun malb/switch-to-previous-buffer ()
+  "Switch to previously open buffer.
+Repeated invocations toggle between the two most recently open buffers."
+  (interactive)
+  (switch-to-buffer (other-buffer (current-buffer) 1)))
 
 ;------{Window}-----;
 
@@ -397,6 +406,10 @@ one, an error is signaled."
   ("M-+" . sk/move-text-down))
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-c w") 'rotate-windows)
+  
+(global-set-key (kbd "C-c 3") 'my-switch-to-buffer)
+(global-set-key (kbd "C-c 2") 'next-buffer)
+(global-set-key (kbd "C-c 1") 'previous-buffer)
 ;(global-set-key (kbd "%") 'match-paren)
 
 
