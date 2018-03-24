@@ -283,6 +283,26 @@ If there's no region, the current line will be duplicated."
 
 ;------{Toggle}-----;
 
+;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html  
+(package-install 'origami)
+(try-require 'origami)
+
+(eval-after-load 'origami
+    '(progn
+       (defun rb-show-only (buffer point)
+         (interactive (list (current-buffer) (point)))
+         (progn (origami-show-only-node buffer point)
+                (minimap-new-minimap)))
+
+       (defun rb-toggle-rec (buffer point)
+         (interactive (list (current-buffer) (point)))
+         (progn (origami-recursively-toggle-node buffer point)
+                (minimap-new-minimap)))
+
+
+   ))
+(global-origami-mode 1)
+
 (use-package vimish-fold
   :straight t
   :ensure t
@@ -490,6 +510,9 @@ region if active."
 (define-key global-map (kbd "C-+") 'duplicate-current-line-or-region)
 (global-set-key (kbd "C-M-y") 'browse-kill-ring)
 (global-set-key (kbd "C-d") 'sdev/del-beg-line)
+
+(define-key global-map (kbd "C-c m") 'origami-toggle-node)
+(define-key global-map (kbd "C-c M") 'my-toggle-indent-fold)
 
 (global-set-key (kbd "C-S-d") 'sdev/del-end-line)
 (global-set-key (kbd "C-c q") 'toggle-quotes)

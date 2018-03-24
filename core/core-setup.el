@@ -12,10 +12,14 @@
   (require module))
 
 (straight-require 'use-package)
+(straight-require 'spaceline)
+(straight-require 'spaceline-all-the-icons)
 (straight-require 'hydra)
 (straight-require 'ido)
 (straight-require 'delight)
 (straight-require 'find-dired)
+(straight-require 'magit)
+(straight-require 'git-gutter-fringe)
 (straight-require 'beacon)
 (straight-require 'scratch)
 (straight-require 'auto-complete)
@@ -31,6 +35,8 @@
 (straight-require 'column-enforce-mode)
 (straight-require 'region-state)
 (straight-require 'diminish)
+(straight-require 'minimap)
+(straight-require 'projectile)
 (straight-require 'all-the-icons)
 (straight-require 'stripe-buffer)
 (straight-require 'flycheck)
@@ -55,8 +61,11 @@
 (straight-require 'compile)
 (straight-require 'helpful)
 (straight-require 'flycheck-rust)
+(straight-require 'semantic)
+(straight-require 'stickyfunc-enhance)
 (straight-require 'which-key)
 (straight-require 'hydra) ;; hydras
+(straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
 (straight-require 'ac-helm) ;; Interactive ac with Helm
 (straight-require 'helm-dash) ;; Dash Documentation Support
 (straight-require 'helm-pydoc) ;; Helm Python documentation
