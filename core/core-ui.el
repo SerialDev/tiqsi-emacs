@@ -26,11 +26,24 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+
+;-{NO middle mouse}-;
+
+; no screwing with my middle mouse button
+(global-unset-key [mouse-2])
+
+
+;--{Smooth Scroll}--;
+
+(setq scroll-step 3)
+
+
 ;-{Show Keystrokes}-;
 
 (setq echo-keystrokes 0.0001)             
 
 ;{buffer performance};
+
 
 ;; - Casey
 ;; Stop Emacs from losing undo information by
@@ -49,6 +62,7 @@
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
+(setq redisplay-dont-pause t)
 
 ;-{Brigth red TODO}-;
 
@@ -190,14 +204,79 @@
 (diminish 'volatile-highlights-mode)
 (diminish 'highlight-parentheses-mode)
 
+;------{Clock}------;
+
+(display-time)
+
+
+;; "Never, ever split a window.  Why would anyone EVER want you to do that??"
+(setq split-window-preferred-function nil)
+
+
 (use-package diminish
   :ensure t) ;; to use as :diminish in use packages
+
+
+;;; TODO Will highlight when cursor on closing parenthesis, however leaves afterglow... fix that
+(defadvice mic-paren-highlight (around cursorOnClosing activate)
+  "Dirty hack to highlight sexps with closing delim below cursor"
+  (if (eq (char-syntax (following-char)) ?\) )
+      (let ((paren-priority 'close))
+        (save-excursion
+          (forward-char)
+          ad-do-it))
+    ad-do-it))
+
+
+;------{Ediff}------;
+
+(defun tiqsi-ediff-setup-windows (buffer-A buffer-B buffer-C control-buffer)
+  (ediff-setup-windows-plain buffer-A buffer-B buffer-C control-buffer)
+)
+(setq ediff-window-setup-function 'tiqsi-ediff-setup-windows)
+(setq ediff-split-window-function 'split-window-horizontally)
+
+
+;------{Paren}------;
+
+(global-highlight-parentheses-mode 1)
+
+(when (try-require 'paren)
+    (GNUEmacs
+        (show-paren-mode t)
+        (setq show-paren-ring-bell-on-mismatch t))
+    (XEmacs
+        (paren-set-mode 'paren)))
+
+
+;; if the matching paren is offscreen, show the matching line in the echo area
+;; + many other useful things
+(when window-system
+  ;; advanced highlighting of matching parentheses
+  (when (try-require 'mic-paren)
+
+      ;; activating
+      (paren-activate)))
+; TODO    
+;; highlight sexp look into implementing http://superuser.com/questions/304848/highlight-the-matching-content-of-a-pair-of-braces-in-emacs 
+
+
+(defun flash-region (start end)
+ "Temporarily highlight region from START to END."
+ (interactive)
+ (let ((overlay (make-overlay start end)))
+   (overlay-put overlay 'face 'secondary-selection)
+   (overlay-put overlay 'priority 100)
+   (run-with-timer 0.2 nil 'delete-overlay overlay)))
+
 
 ;---{Keybindings}---;
 (global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
+
+(global-set-key (kbd "C-c f") 'flash-region)
 
 
 (provide 'core-ui)
