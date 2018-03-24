@@ -69,6 +69,11 @@
 
 ;----{Inserting}----;
 
+(defun my-copy-rectangle (start end)
+  "Copy the region-rectangle instead of `kill-rectangle'."
+  (interactive "r")
+  (setq killed-rectangle (extract-rectangle start end)))
+
 (defun add-full-stop ()
   "Terminate each line with a full stop."
   (interactive "*")
@@ -171,6 +176,35 @@ If there's no region, the current line will be duplicated."
 
 ;---{Modification}--;
 
+
+;; unrelated, but a nice spot for it
+(defun uniquify-all-lines-region (start end)
+  "Find duplicate lines in region START to END keeping first occurrence."
+  (interactive "*r")
+  (save-excursion
+    (let ((end (copy-marker end)))
+      (while
+          (progn
+            (goto-char start)
+            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
+        (replace-match "\\1\n\\2")))))
+
+(defun uniquify-all-lines-buffer ()
+  "Delete duplicate lines in buffer and keep first occurrence."
+  (interactive "*")
+  (uniquify-all-lines-region (point-min) (point-max)))
+
+
+(defun my-narrow-to-region-indirect (start end)
+  "Restrict editing in this buffer to the current region, indirectly."
+  (interactive "r")
+  (when (fboundp 'evil-exit-visual-state) ; There's probably a nicer way to do this
+    (evil-exit-visual-state))
+  (let ((buf (clone-indirect-buffer nil nil)))
+    (with-current-buffer buf
+      (narrow-to-region start end))
+    (switch-to-buffer buf)))
+
 (defun sk/goto-closest-number ()
   (interactive)
   (let ((closest-behind (save-excursion (search-backward-regexp "[0-9]" nil t)))
@@ -248,6 +282,26 @@ If there's no region, the current line will be duplicated."
 
 
 ;------{Toggle}-----;
+
+(use-package vimish-fold
+  :straight t
+  :ensure t
+  :commands (vimish-fold-toggle
+             vimish-fold))
+ 
+;; Fold indentation https://stackoverflow.com/questions/1587972/how-to-display-indentation-guides-in-emacs/4459159#4459159
+;; Quite nice for python mode TODO: fix for using with ipynb buffers in EIN
+(defun my-toggle-indent-fold ()
+  "Toggle fold all lines larger than indentation on current line"
+  (interactive)
+  (let ((col 1))
+    (save-excursion
+      (back-to-indentation)
+      (setq col (+ 1 (current-column)))
+      (set-selective-display
+       (if selective-display nil (or col 1))))))
+(add-hook 'python-mode-hook
+  (lambda () (define-key python-mode-map (kbd "C-c f") 'my-toggle-indent-fold)))
 
 ; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
 
@@ -327,13 +381,58 @@ If there's no region, the current line will be duplicated."
 
 ;-----{Deleting}----;
 
+
+(defun sdev/del-beg-line()
+ (interactive)
+(let ((beg(point ))) (sk/smarter-move-beginning-of-line())
+ (delete-region beg(point))))
+
+(defun sdev/del-end-line()
+ (interactive)
+(let ((beg(point ))) (move-end-of-line())
+ (delete-region beg(point))))
+
+;; Kill whitespace
+(defun kill-whitespace ()
+          "Kill the whitespace between two non-whitespace characters"
+          (interactive "*")
+          (save-excursion
+            (save-restriction
+              (save-match-data
+                (progn
+                  (re-search-backward "[^ \t\r\n]" nil t)
+                  (re-search-forward "[ \t\r\n]+" nil t)
+                  (replace-match "" nil nil))))))
+
 (defun remove-blank-lines ()
   "Delete blank lines from the current buffer."
   (interactive "*")
   (while (re-search-forward "^$")
     (kill-line)))
 
+(defun flush-kill-lines (regex)
+  "Flush lines matching REGEX and append to kill ring.  Restrict to \
+region if active."
+  (interactive "sFlush kill regex: ")
+  (save-excursion
+    (save-restriction
+      (when (use-region-p)
+        (narrow-to-region (point) (mark))
+        (goto-char 0))
+      (while (search-forward-regexp regex nil t)
+        (move-beginning-of-line nil)
+        (kill-whole-line))))) 
+
 ;----{Kill Ring}----;
+
+(use-package undo-tree
+  :straight t
+  :diminish undo-tree-mode
+  :config
+  (progn
+    (global-undo-tree-mode)
+    (setq undo-tree-visualizer-timestamps t)
+    (setq undo-tree-visualizer-diff t)))
 
 (defun pre-process-kill-ring-element (element)
   (replace-regexp-in-string "^[[:space:]]+" ""
@@ -390,10 +489,17 @@ If there's no region, the current line will be duplicated."
 (define-key global-map (kbd "S-<right>") 'new-line-in-between)
 (define-key global-map (kbd "C-+") 'duplicate-current-line-or-region)
 (global-set-key (kbd "C-M-y") 'browse-kill-ring)
+(global-set-key (kbd "C-d") 'sdev/del-beg-line)
 
+(global-set-key (kbd "C-S-d") 'sdev/del-end-line)
 (global-set-key (kbd "C-c q") 'toggle-quotes)
 (global-set-key (kbd "C-c t t") 'sdev/timestamp)
+(global-set-key (kbd "C-c <deletechar>") 'kill-whitespace)
+(global-set-key (kbd "C-c <up>") 'drag-stuff-up)
+(global-set-key (kbd "C-c <down>") 'drag-stuff-down)
 ;(bind-key "<tab>" #'malb/indent-or-complete)
+; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
+; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
 
 (provide 'core-editing)
 
