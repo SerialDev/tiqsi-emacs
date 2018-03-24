@@ -1,0 +1,62 @@
+CWARN
+Written by Anders Lindgren <andersl@andersl.com>
+
+CWarn is released under the terms of the GNU General Public License.
+
+Description
+
+CWarn is a package that highlights suspicious C and C++ constructions.
+
+For example, take a look at the following piece of C code:
+
+    if (x = 0);
+      foo();
+The code contains two, possibly fatal, bugs. The first is that the assignment operator "=" is used as part of the test; the user probably ment to use the comparison operator "==".
+
+The second problem is that an extra semicolon is placed after closing parenthesis of the test expression. This makes the body of the if statement to be an empty statement, not the call to the function "foo", as the user probably intended.
+
+This package is capable of highlighting the following C and C++ constructions:
+
+Assignments inside expressions, including variations like "+=".
+Semicolon following immediately after if, for, and while (except, of course, after a `do .. while' statement).
+C++ functions with reference parameters.
+Note that none of the constructions highlighted (especially not C++ reference parameters) are considered errors by the langauage definitions.
+
+Usage
+
+CWarn is implemented as two minor modes: cwarn-mode and global-cwarn-mode. The former can be applied to individual buffers and the latter to all (future) buffers. (Buffers loaded when the global mode is activated are not affected; this may change in the future.)
+
+Activate this package by Customize, or by placing the following line into the appropriate init file:
+
+   (global-cwarn-mode 1)
+Also, font-lock mode must be enabled.
+
+Unfortunately, there is no way to turn deactivate the CWarn highlighting. The reason is that CWarn use font-lock mode for the highlighting, and there is no way to remove font-lock keywords.
+
+XEmacs
+
+The font-lock package of XEmacs is a bit outdated compared to the one that comes with GNU Emacs. In particular the font-lock-add-keywords function is missing. Since the operation of this package rely on this function it can't run under a standard XEmacs.
+
+Fortunately, I have a quick fix for this: xemacs-font-lock-fix.el .
+
+Afterthought
+
+After using this package for several weeks it feels as though I find stupid typo-style bugs while editing rather than at compile- ot run-time, if I ever find them.
+
+On the other hand, I find myself using assignments inside expressions much more often than I used to do. The reason is that there is no risk of interpreting an assignment operator as a comparison ("hey, the assignment operator is red, duh!").
+
+Reporting bugs
+
+Out of the last ten bugs you found, how many did you report?
+
+When reporting a bug, please:
+
+Send a mail the maintainer of the package, or to the author if no maintainer exists.
+Include the name of the package in the title of the mail, to simplify for the recipient.
+State exactly what you did, what happened, and what you expected to see when you found the bug.
+If the bug cause an error, set the variable debug-on-error to t, repreat the operations that triggered the error and include the backtrace in the letter.
+If possible, include an example that activates the bug.
+Should you speculate about the cause of the problem, please state explicitly that you are guessing.
+Source code
+
+Click here for the source code.

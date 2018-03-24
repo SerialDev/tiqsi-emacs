@@ -1,0 +1,137 @@
+CTYPES
+Written by Anders Lindgren <andersl@andersl.com>
+
+Ctypes is released under the terms of the GNU General Public License.
+
+Background
+
+As most Emacs users know, Emacs can fontify source code buffers using the font-lock package. Most of the time it does a really good job. Unfortunately, the syntax of one of the most widespread languages, C, makes it difficult to fontify variable declarations. For example, what does the following line mean:
+
+hello(foo * bar);
+
+A new function hello that takes one argument bar that is a pointer to a foo, or;
+call the function hello with the result of foo multiplied by bar.
+To answer the question correctly you must know whether foo is a type or not. Unfortunately, font-lock has no way of knowing this.
+
+This package
+
+This package can search through source files hunting down typedefs. When found, font-lock is informed and your source code will be even more beautifully colored than before.
+
+Each major mode has its own set of types. It is possible for one major mode to inherit the types of another mode.
+
+Currently, this package can parse C and C++ files. (However, since I do not use C++, the probability is high (about 12, on a scale from 1 to 12) that I've missed something). By default C++ inherits the types defined for C mode.
+
+Installation
+
+Place this file in any directory in the emacs load path and add the following line to your init file:
+
+ (require 'ctypes)
+Or, if you should prefer to load ctypes only when needed:
+
+(defun my-activate-ctypes () (require 'ctypes))
+(add-hook 'c-mode-hook 'my-activate-ctypes)
+(add-hook 'c++-mode-hook 'my-activate-ctypes)
+Of course, you must also activate font-lock. I also recomend using lazy-lock since adding types requires refontification of all buffers. (Should you use many small buffers, consider lowering lazy-lock-minimum-size as well.)
+
+Defining types
+
+The following commands are available to define and remove types:
+
+Function	Description
+ctypes-define-type	Add a type.
+ctypes-define-type-in-mode	Add a type to another major mode..
+ctypes-buffer	Scan a buffer for types..
+ctypes-all-buffer	Scan all buffer for types..
+ctypes-tags	Search through all files in a TAGS table..
+ctypes-dir	Search a directory hierarchy for files..
+ctypes-file	Search in a file for types..
+ctypes-remove-type	Remove one type..
+ctypes-remove-type-in-mode	Remove one type in another mode..
+ctypes-clear-types	Forget all types..
+ctypes-clear-types-all-modes	Forget all types in all major modes..
+Edit types
+
+If you would like to view or change the types found you can use the function ctypes-edit. When done press C-c C-c. Should you like do discard your changes just kill the buffer with C-x k.
+
+To edit the types for another major mode use the command ctypes-edit-types-for-mode.
+
+Saving types
+
+The commands ctypes-write-file and ctypes-read-file can be used to save your hard-earned collection of types to a file and to retrieve it later.
+
+The default file name is stored in the variable ctypes-file-name.
+
+Note that only one collection of types are managed. Should you prefer to keep one type file per project, remember to clear the set of known types (using the command ctypes-clear-types-all-modes) before each new set is generated.
+
+At Load
+
+It is possible to automatically add new types, or read specific type files, when Emacs opens a file.
+
+By adding a "Local Variables" section to the end of the file containing the variables ctypes-add-types-at-load and/or ctypes-read-files-at-load this can be accomplished.
+
+For example
+
+/*
+ * Local Variables:
+ * ctypes-add-types-at-load: ("MyType" "YourType")
+ * ctypes-read-files-at-load: (".ctypes")
+ * End:
+ */
+The `Auto Parse' mode
+
+This package can automatically search for new types in all visited files. Activate the minor mode ctypes-auto-parse-mode to enable this feature.
+
+Add the following line to your startup file to automatically scan all visited files:
+
+ (ctypes-auto-parse-mode 1)
+Example 1
+
+The following setup is for the really lazy person. The keywords collected during one session will be kept for the next, and all visited files will be parsed in the boldly search for new types. I would recomend using this approach only when you are keeping all your types in one file.
+
+(require 'ctypes)
+(setq ctypes-write-types-at-exit t)
+(ctypes-read-file nil nil t t)
+(ctypes-auto-parse-mode 1)
+Example 2
+
+In this example, ctypes will not be not loaded until either c-mode or c++-mode is activated. When loaded, ctypes will read the type file "~/.ctypes_std_c" (containing, for example, all types defined in the standard C header files).
+
+(defun my-c-mode-hook ()
+  (require 'ctypes)
+  (turn-on-font-lock))
+(add-hook 'c-mode-hook 'my-c-mode-hook)
+(add-hook 'c++-mode-hook 'my-c-mode-hook)
+
+(defun my-ctypes-load-hook ()
+  (ctypes-read-file "~/.ctypes_std_c" nil t t))
+(add-hook 'ctypes-load-hook 'my-ctypes-load-hook)
+
+Reporting bugs
+
+Out of the last ten bugs you found, how many did you report?
+
+When reporting a bug, please:
+
+Send a mail the maintainer of the package, or to the author if no maintainer exists.
+Include the name of the package in the title of the mail, to simplify for the recipient.
+State exactly what you did, what happened, and what you expected to see when you found the bug.
+If possible, include an example that activates the bug.
+Should you speculate about the cause of the problem, please state explicitly that you are guessing.
+CTypes, the true story
+
+Well, brave reader, are you willing to learn what this package really is capable of?
+
+Basically, it is a general purpose parsing package. The default settings just happened to specify a parser that looks for C typedefs, and that the default action is to add the types found to font-lock.
+
+Be redefining the variable ctypes-mode-descriptor you can change the behavior totally. For example, you can use it to search for all occurrences of XX (replace XX with whatever you like) in all files edited in major mode YY (ditto for YY) and to perform ZZ-top whenever a new XX is found. (However, it might be difficult for Emacs to grow a beard).
+
+I will, however, in the document string, write "search for types" when I really mean "Call the parser routine as specified by ctypes-mode-descriptor". Also, I write "Informing font-lock" whenever I mean "Performing the default action as specified in ctypes-mode-descriptor".
+
+The future
+
+Should this package be included in future versions of Emacs almost all of the font-lock code could be removed. Also there will be no need to load font-lock to determine which version of ctypes-mode-descriptor to use.
+
+Source code
+
+Click here for the source code.
+

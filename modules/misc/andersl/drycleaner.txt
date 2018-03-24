@@ -1,0 +1,17 @@
+Drycleaner is a package designed to remove any visible or invisble stains from your files. The stains that this package can handle are, for example, whitespace at inappropriate places, misplaced or missing tabs. Other type of stains - either coffe stains on your monitor or badly named variables - you have to deal with yourself.
+
+This package is designed to work similarly to the built-in feature require-final-newline.
+
+This package can be used in three ways:
+
+Applied explicitly to a buffer.
+A minor mode, drycleaner-mode, could be activated for individual buffers. This mode checks the status of the buffer each time it is saved.
+A second minor mode, global-drycleaner-mode, exists that enables the check every time any buffer is saved.
+The following type of stains are handled:
+
+Extraneous whitespace at end of lines and the end of the file.
+Tabs in files that shouldn't contain tabs.
+Missing or misplaced tabs in files that should contain them.
+The default settings of this package it adopts itself to the minor mode indent-tabs-mode. In practice this means that when the indent-tabs-mode is enabled, the drycleaner package will ensure that all indentaion is done using a perfect combination of tabs and spaces. When it is disabled this package will make sure that no tabs are used at all.
+
+This link points to the source code.
