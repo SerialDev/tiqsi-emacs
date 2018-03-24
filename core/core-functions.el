@@ -138,12 +138,80 @@ Return:
            (insert (current-kill 0)))))
 
 
+;--{Introspection}--;
+
+(defun my/show-functions-in-buffer ()
+  "Show the functions defined in the current buffer"
+  (interactive)
+  (let ((current (current-buffer))
+	(buffer (get-buffer-create "*Function Definitions*")))
+    (save-excursion
+      (goto-char 0)
+      (while (re-search-forward "(defun \\([^(|^ ]*\\)" nil t)
+	(progn
+	  (set-buffer buffer)
+	  (insert (format "Found : %s\n" (match-string 1)))
+	  (set-buffer current)
+	))
+      )
+    (pop-to-buffer buffer)))
+
+;          TODO Base an implementation on this for Peek at definition          ;
+
+
+;--{Display defun}--;
+
+(defun chunyang-elisp-function-or-variable-quickhelp (symbol)
+  "Display summary of function or variable at point.
+
+Adapted from `describe-function-or-variable'."
+  (interactive
+   (let* ((v-or-f (variable-at-point))
+          (found (symbolp v-or-f))
+          (v-or-f (if found v-or-f (function-called-at-point))))
+     (list v-or-f)))
+  (if (not (and symbol (symbolp symbol)))
+      (message "You didn't specify a function or variable")
+    (let* ((fdoc (when (fboundp symbol)
+                   (or (documentation symbol t) "Not documented.")))
+           (fdoc-short (and (stringp fdoc)
+                            (substring fdoc 0 (string-match "\n" fdoc))))
+           (vdoc (when  (boundp symbol)
+                   (or (documentation-property symbol 'variable-documentation t)
+                       "Not documented as a variable.")))
+           (vdoc-short (and (stringp vdoc)
+                            (substring vdoc 0 (string-match "\n" vdoc)))))
+      (and (require 'popup nil 'no-error)
+           (popup-tip
+            (or
+             (and fdoc-short vdoc-short
+                  (concat fdoc-short "\n\n"
+                          (make-string 30 ?-) "\n" (symbol-name symbol)
+                          " is also a " "variable." "\n\n"
+                          vdoc-short))
+             fdoc-short
+             vdoc-short)
+            :margin t)))))
+
+;                    TODO make a defun for this with python                    ;
+
+
+;--{Key completion}-;
+
+(which-key-mode 1)
+(setq which-key-idle-delay 0.5)
+
+
 ;---{Keybindings}---;
 
 (with-eval-after-load 'emacs
     (define-key global-map (kbd "C-x C-c") nil)
 	(define-key global-map (kbd "C-x C-x") #'save-buffers-kill-terminal)
 	)
+
+(global-set-key (kbd "C-M-<return>") 'chunyang-elisp-function-or-variable-quickhelp)
+(global-set-key (kbd "M-<return>") 'xref-find-definitions-other-window)
+(define-key emacs-lisp-mode-map  (kbd "M-h") 'helpful-at-point)
 
 (provide 'core-functions)
 
