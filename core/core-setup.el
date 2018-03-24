@@ -23,14 +23,23 @@
 (straight-require 'highlight-indentation)
 (straight-require 'highlight-thing)
 (straight-require 'highlight-symbol)
+(straight-require 'highlight-parentheses)
+(straight-require 'paren)
+(straight-require 'mic-paren)
 (straight-require 'column-enforce-mode)
 (straight-require 'region-state)
 (straight-require 'diminish)
 (straight-require 'all-the-icons)
-
-
-;================================={From ~lisp}=================================;
-
+(straight-require 'stripe-buffer)
+(straight-require 'flycheck)
+(straight-require 'dumb-jump)
+(straight-require 'ivy)
+(straight-require 'bind-key)
+(straight-require 'avy)
+(straight-require 's)
+(straight-require 'windmove)
+(straight-require 'expand-region) ;; Select a code region
+(straight-require 'pcre2el) ;; Regexp syntax converter
 
 ;-----{From git}----;
 
@@ -41,6 +50,25 @@
    :repo "k-talo/volatile-highlights.el"
 ))
 
-(provide 'core-setup)
 
+(straight-use-package
+ '(fuzzy-format
+   :type git
+   :host github
+   :repo "emacsmirror/fuzzy-format"
+))
+
+
+;---{Requirements}--;
+
+(require 'uniquify)
+
+
+;----{From ~Lisp}---;
+
+(load-relative "../modules/misc/andersl/demax") ;; restore congif when maximized
+(try-require 'demax)
+
+
+(provide 'core-setup)
 ;;; core-setup.el ends here
