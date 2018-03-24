@@ -137,30 +137,34 @@
 
 ;----{spaceline}----;
 
-(use-package spaceline
-  :straight t
-  :ensure t
-  :config
-  (use-package spaceline-config
-    :config
-    (spaceline-toggle-minor-modes-off)
-    (spaceline-toggle-buffer-encoding-off)
-    (spaceline-toggle-buffer-encoding-abbrev-off)
-    (setq powerline-default-separator 'arrow-fade)
-    (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
-    (spaceline-define-segment line-column
-      "The current line and column numbers."
-      "l:%l c:%2c")
-    (spaceline-define-segment time
-      "The current time."
-      (format-time-string "%H:%M"))
-    (spaceline-define-segment date
-      "The current date."
-      (format-time-string "%h %d"))
-    (spaceline-toggle-time-on)
-    (spaceline-emacs-theme 'date 'time)
-	(spaceline-helm-mode)))
+;; (use-package spaceline
+;;   :straight t
+;;   :ensure t
+;;   :config
+;;   (use-package spaceline-config
+;;     :config
+;;     (spaceline-toggle-minor-modes-off)
+;;     (spaceline-toggle-buffer-encoding-off)
+;;     (spaceline-toggle-buffer-encoding-abbrev-off)
+;;     (setq powerline-default-separator 'arrow-fade)
+;;     (setq spaceline-highlight-face-func 'spaceline-highlight-face-evil-state)
+;;     (spaceline-define-segment line-column
+;;       "The current line and column numbers."
+;;       "l:%l c:%2c")
+;;     (spaceline-define-segment time
+;;       "The current time."
+;;       (format-time-string "%H:%M"))
+;;     (spaceline-define-segment date
+;;       "The current date."
+;;       (format-time-string "%h %d"))
+;;     (spaceline-toggle-time-on)
+;;     (spaceline-emacs-theme 'date 'time)
+;; 	(spaceline-helm-mode)))
 
+(use-package spaceline-all-the-icons 
+  :straight t
+  :after spaceline
+  :config (spaceline-all-the-icons-theme))
 
 ;-{Colour str repr}-;
 
@@ -268,6 +272,9 @@
    (overlay-put overlay 'face 'secondary-selection)
    (overlay-put overlay 'priority 100)
    (run-with-timer 0.2 nil 'delete-overlay overlay)))
+
+(add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
+(semantic-mode 1)
 
 
 ;---{Keybindings}---;

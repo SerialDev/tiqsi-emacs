@@ -8,6 +8,10 @@
 (load-require 'modes-helm)
 (load-require 'modes-ido)
 (load-require 'modes-dired)
+(load-require 'modes-magit)
+(load-require 'modes-minimap)
+(load-require 'modes-dash)
+(load-require 'modes-ag)
 
 (provide 'modes)
 
