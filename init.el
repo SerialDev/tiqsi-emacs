@@ -114,4 +114,6 @@ buffer-setting or buffer changing operations."
 (load-relative "core/core")
 (require 'core)
 
+(load-relative "modules/modes/modes")
+(require 'modes)
 ;;; init.el ends here

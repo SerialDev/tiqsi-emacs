@@ -34,6 +34,9 @@
 (straight-require 'flycheck)
 (straight-require 'dumb-jump)
 (straight-require 'ivy)
+(straight-require 'helm)
+(straight-require 'helm-flx)
+(straight-require 'helm-smex)
 (straight-require 'bind-key)
 (straight-require 'avy)
 (straight-require 's)
@@ -46,8 +49,20 @@
 (straight-require 'vimish-fold)
 (straight-require 'corral)
 (straight-require 'xref)
+(straight-require 'cc-mode)
+(straight-require 'compile)
 (straight-require 'helpful)
+(straight-require 'flycheck-rust)
 (straight-require 'which-key)
+(straight-require 'hydra) ;; hydras
+(straight-require 'ac-helm) ;; Interactive ac with Helm
+(straight-require 'helm-dash) ;; Dash Documentation Support
+(straight-require 'helm-pydoc) ;; Helm Python documentation
+(straight-require 'helm-swoop) ;; Swoop Editing
+(straight-require 'helm-descbinds) ;; Keybindings interactive search
+(straight-require 'helm-eshell) ;; Eshell History support
+(straight-require 'helm-w32-launcher) ;; Start Menu Support
+(straight-require 'helm-chrome) ;; Chrome Bookmarks support
 (straight-require 'expand-region) ;; Select a code region
 (straight-require 'pcre2el) ;; Regexp syntax converter
 

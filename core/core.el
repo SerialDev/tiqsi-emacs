@@ -27,6 +27,7 @@
 ;; https://sriramkswamy.github.io/dotemacs/#orgheadline222
 ;; http://stackoverflow.com/questions/21955162/emacs-how-to-display-a-buffer-without-switching-window-and-without-raising-fram
 ;; https://github.com/emacsmirror/diminish
+;; https://gist.github.com/antifuchs/9238468
 ;; http://sriramkswamy.github.io/dotemacs/
 ;; http://xenodium.com/#fishing-with-emacs
 ;; https://github.com/rejeep/emacs/blob/master/defuns.el
@@ -41,6 +42,7 @@
 ;; https://github.com/domtronn/all-the-icons.el all the icons 
 ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
 ;; https://www.emacswiki.org/emacs/DelightedModes Delight to change line names, diminish does not have this functionality
+;; Amit P
 ;; Chris Hecker
 ;; Casey Muratory
 
