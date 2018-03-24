@@ -5,6 +5,7 @@
 
 (load-require 'modes-compilation)
 (load-require 'modes-flycheck)
+(load-require 'modes-helm)
 
 (provide 'modes)
 

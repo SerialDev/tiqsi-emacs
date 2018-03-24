@@ -60,7 +60,6 @@
 (straight-require 'helm-pydoc) ;; Helm Python documentation
 (straight-require 'helm-swoop) ;; Swoop Editing
 (straight-require 'helm-descbinds) ;; Keybindings interactive search
-(straight-require 'helm-eshell) ;; Eshell History support
 (straight-require 'helm-w32-launcher) ;; Start Menu Support
 (straight-require 'helm-chrome) ;; Chrome Bookmarks support
 (straight-require 'expand-region) ;; Select a code region
@@ -87,6 +86,7 @@
 ;---{Requirements}--;
 
 (require 'uniquify)
+(require 'helm-eshell) ;; Eshell History support
 
 
 ;----{From ~Lisp}---;
