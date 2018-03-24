@@ -13,7 +13,9 @@
 
 (straight-require 'use-package)
 (straight-require 'hydra)
+(straight-require 'ido)
 (straight-require 'delight)
+(straight-require 'find-dired)
 (straight-require 'beacon)
 (straight-require 'scratch)
 (straight-require 'auto-complete)
@@ -82,6 +84,13 @@
    :repo "emacsmirror/fuzzy-format"
 ))
 
+
+(straight-use-package
+ '(dired-details
+   :type git
+   :host github
+   :repo "emacsmirror/dired-details"
+))
 
 ;---{Requirements}--;
 

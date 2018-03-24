@@ -9,6 +9,7 @@
 ;; https://sites.google.com/site/steveyegge2/effective-emacs
 ;; https://github.com/ieure/scratch-el
 ;; http://sachachua.com
+;; https://www.wisdomandwonder.com/article/10395/hide-uninteresting-files-in-dired-mode - Hiding unnecesary files in dired mode
 ;; http://www.mygooglest.com/fni/dot-emacs.html
 ;; https://github.com/sjrmanning/.emacs.d/blob/master/core/sm-defuns.el
 ;; https://github.com/xuchunyang/region-state.el
@@ -40,6 +41,8 @@
 ;; https://github.com/codemac/config/blob/master/emacs.d/boot.org ;; TODO: further edit this to do it for one buffer
 ;; https://github.com/sabof/stripe-buffer stripe buffer to read tables better [this: https://github.com/sabof/stripe-buffer/pull/14 applied for performance]
 ;; https://github.com/domtronn/all-the-icons.el all the icons 
+;; https://github.com/howardabrams/dot-files/blob/master/emacs.org
+;; http://chrishecker.com/images/4/4b/Remove_me.emacs
 ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
 ;; https://www.emacswiki.org/emacs/DelightedModes Delight to change line names, diminish does not have this functionality
 ;; Amit P
