@@ -38,6 +38,16 @@
 (straight-require 'avy)
 (straight-require 's)
 (straight-require 'windmove)
+(straight-require 'auto-complete)
+(straight-require 'focus)
+(straight-require 'drag-stuff)
+(straight-require 'undo-tree)
+(straight-require 'indent-tools)
+(straight-require 'vimish-fold)
+(straight-require 'corral)
+(straight-require 'xref)
+(straight-require 'helpful)
+(straight-require 'which-key)
 (straight-require 'expand-region) ;; Select a code region
 (straight-require 'pcre2el) ;; Regexp syntax converter
 

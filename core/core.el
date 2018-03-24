@@ -19,10 +19,16 @@
 ;; https://github.com/nschum/highlight-symbol.el
 ;; https://github.com/jordonbiondo/column-enforce-mode
 ;; https://github.com/xuchunyang/region-state.el
+;; http://demonastery.org/2013/04/emacs-narrow-to-region-indirect/
+;; https://github.com/codemac/config/blob/master/emacs.d/boot.org
+;; https://gitlab.com/emacs-stuff/indent-tools
+;; https://github.com/malb/emacs.d/blob/master/malb.org
+;; stackoverflow http://emacs.stackexchange.com/questions/18771/pop-up-documentation-with-pos-tip-or-popup
 ;; https://sriramkswamy.github.io/dotemacs/#orgheadline222
 ;; http://stackoverflow.com/questions/21955162/emacs-how-to-display-a-buffer-without-switching-window-and-without-raising-fram
 ;; https://github.com/emacsmirror/diminish
 ;; http://sriramkswamy.github.io/dotemacs/
+;; http://xenodium.com/#fishing-with-emacs
 ;; https://github.com/rejeep/emacs/blob/master/defuns.el
 ;; https://www.emacswiki.org/emacs/move-text.el and sk's init file
 ;; https://github.com/magnars/expand-region.el Magnars Expand Region
@@ -95,6 +101,7 @@ of an error, just add the package to a list of missing packages."
 (load-require  'core-files)
 (load-require  'core-functionality)
 (load-require  'core-functions)
+(load-require  'core-completion)
 
 (provide 'core)
 
