@@ -19,8 +19,21 @@
 ;; https://github.com/nschum/highlight-symbol.el
 ;; https://github.com/jordonbiondo/column-enforce-mode
 ;; https://github.com/xuchunyang/region-state.el
+;; https://sriramkswamy.github.io/dotemacs/#orgheadline222
+;; http://stackoverflow.com/questions/21955162/emacs-how-to-display-a-buffer-without-switching-window-and-without-raising-fram
 ;; https://github.com/emacsmirror/diminish
+;; http://sriramkswamy.github.io/dotemacs/
+;; https://github.com/rejeep/emacs/blob/master/defuns.el
+;; https://www.emacswiki.org/emacs/move-text.el and sk's init file
+;; https://github.com/magnars/expand-region.el Magnars Expand Region
+;; https://github.com/abo-abo/avy ;; still need to get used to it.
+;; http://www.wilfred.me.uk/.emacs.d/init.html
+;; http://wayback.archive.org/web/20010802153839/http://www.andersl.com:80/emacs/
+;; https://github.com/codemac/config/blob/master/emacs.d/boot.org
+;; https://github.com/codemac/config/blob/master/emacs.d/boot.org ;; TODO: further edit this to do it for one buffer
+;; https://github.com/sabof/stripe-buffer stripe buffer to read tables better [this: https://github.com/sabof/stripe-buffer/pull/14 applied for performance]
 ;; https://github.com/domtronn/all-the-icons.el all the icons 
+;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
 ;; https://www.emacswiki.org/emacs/DelightedModes Delight to change line names, diminish does not have this functionality
 ;; Chris Hecker
 ;; Casey Muratory
@@ -80,6 +93,8 @@ of an error, just add the package to a list of missing packages."
 (load-require  'core-os)
 (load-require  'core-ui)
 (load-require  'core-files)
+(load-require  'core-functionality)
+(load-require  'core-functions)
 
 (provide 'core)
 
