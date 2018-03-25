@@ -92,10 +92,11 @@
 ;; that way the CSS of the HTML theme will be used instead which is better
 (setq org-html-htmlize-output-type 'css)
 
-
-(custom-set-variables
- '(ispell-program-name 'secrets-ispell))
-
+(when (require 'core-secrets nil 'noerror) 
+  
+  (custom-set-variables
+   '(ispell-program-name 'secrets-ispell))
+  )
 ;; Enable Flyspell for text modes
 (add-hook 'text-mode-hook 'flyspell-mode)
 
