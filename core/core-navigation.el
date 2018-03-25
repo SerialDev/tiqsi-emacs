@@ -40,6 +40,19 @@ insert `%'."
 
 ;----{Nav Shift}----;
 
+
+(defun un-indent-by-removing-4-spaces ()
+  "remove 4 spaces from beginning of of line"
+  (interactive)
+  (save-excursion
+    (save-match-data
+      (beginning-of-line)
+      ;; get rid of tabs at beginning of line
+      (when (looking-at "^\\s-+")
+        (untabify (match-beginning 0) (match-end 0)))
+      (when (looking-at "^    ")
+        (replace-match "")))))
+
 (drag-stuff-global-mode 1)
 
 ;; Shift the selected region right if distance is positive, left if
@@ -357,6 +370,7 @@ one, an error is signaled."
 (global-set-key (kbd "C-c g") 'my-toggle-window-split)
 
 (global-set-key (kbd "C-x b")  'helm-mini)
+(global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
 
 
 (global-set-key (kbd "C-c l") 'buf-move-left)

@@ -88,8 +88,11 @@
 (straight-require 'pos-tip)
 (straight-require 'disaster)
 (straight-require '0xc)
+(straight-require 'cl)
+(straight-require 'dabbrev)
 (straight-require 'elf-mode)
 (straight-require 'popup-pos-tip)
+(straight-require 'irony) ;; C & CPP completion support
 (straight-require 'hydra) ;; hydras
 (straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
 (straight-require 'ac-helm) ;; Interactive ac with Helm
