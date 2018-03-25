@@ -453,6 +453,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
     (ac-start)))
 
 ;; (setq ac-auto-start nil)
+(setq tab-always-indent 'complete)
 
 ;---{Keybindings}---;
 
@@ -464,19 +465,13 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (define-key ac-complete-mode-map (kbd "C-n") 'ac-next)
 (define-key ac-complete-mode-map (kbd "C-p") 'ac-previous)
 (define-key ac-complete-mode-map (kbd "C-g") 'ac-stop)
-
 (define-key ac-complete-mode-map "\t" 'ac-complete)
 (define-key ac-complete-mode-map "\r" 'ac-complete)
-
 (define-key global-map "\em" 'make-without-asking)
-
 (global-set-key [C-f1] 'show-file-name) ; Or any other key you want
 (define-key c++-mode-map (kbd "C-?") 'irony-get-type)
 (global-set-key (kbd "C-?" ) nil)
-
 (global-set-key "\C-ci" 'ewd-insert-new-method)
-
-(setq tab-always-indent 'complete)
 (define-key c++-mode-map [f12] 'casey-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'casey-find-corresponding-file-other-window)
 ; Alternate bindings for F-keyless setups (ie MacOS X terminal)

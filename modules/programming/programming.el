@@ -3,6 +3,12 @@
 ;;; Commentary:
 ;; 
 
+(load-require  'programming-bnfc)
+(load-require  'programming-assembly)
+(load-require  'programming-c)
+(load-require  'programming-rust)
+(load-require  'programming-python)
+(load-require  'programming-text)
 
 (provide 'programming)
 

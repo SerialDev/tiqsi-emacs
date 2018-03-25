@@ -13,6 +13,11 @@
 
 (straight-require 'use-package)
 (straight-require 'spaceline)
+(straight-require 'py-isort)
+(straight-require 'typing)
+(straight-require 'flymake)
+(straight-require 'flymake-rust)
+(straight-require 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
 (straight-require 'etags-select)
@@ -92,6 +97,9 @@
 (straight-require 'dabbrev)
 (straight-require 'elf-mode)
 (straight-require 'popup-pos-tip)
+(straight-require 'racer)
+(straight-require 'cargo)
+(straight-require 'ac-racer)
 (straight-require 'irony) ;; C & CPP completion support
 (straight-require 'hydra) ;; hydras
 (straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
@@ -148,6 +156,7 @@
 
 ;---{Requirements}--;
 
+(require 'browse-url) ; part of gnu emacs
 (require 'uniquify)
 (require 'dired-x)
 (require 'helm-eshell) ;; Eshell History support
