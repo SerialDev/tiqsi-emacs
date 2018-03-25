@@ -13,6 +13,11 @@
 
 (straight-require 'use-package)
 (straight-require 'spaceline)
+(straight-require 'textx-mode)
+(straight-require 'bnfc)
+(straight-require 'etags-select)
+(straight-require 'ctags-update)
+(straight-require 'helm-etags-plus) ;; Helm Etags support
 (straight-require 'spaceline-all-the-icons)
 (straight-require 'hydra)
 (straight-require 'ido)
@@ -47,7 +52,23 @@
 (straight-require 'helm-smex)
 (straight-require 'bind-key)
 (straight-require 'avy)
+(straight-require 'ace-jump-buffer)
+(straight-require 'ace-window)
 (straight-require 's)
+(straight-require 'erc)
+(straight-require 'org)
+(straight-require 'adaptive-wrap)
+(straight-require 'htmlize)
+(straight-require 'cider)
+(straight-require 'company-quickhelp)
+(straight-require 'ob-ipython)
+(straight-require 'docker)
+(straight-require 'docker-api)
+(straight-require 'jedi)
+(straight-require 'parinfer)
+(straight-require 'docker-compose-mode)
+(straight-require 'dockerfile-mode)
+(straight-require 'camcorder)
 (straight-require 'windmove)
 (straight-require 'auto-complete)
 (straight-require 'focus)
@@ -64,6 +85,11 @@
 (straight-require 'semantic)
 (straight-require 'stickyfunc-enhance)
 (straight-require 'which-key)
+(straight-require 'pos-tip)
+(straight-require 'disaster)
+(straight-require '0xc)
+(straight-require 'elf-mode)
+(straight-require 'popup-pos-tip)
 (straight-require 'hydra) ;; hydras
 (straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
 (straight-require 'ac-helm) ;; Interactive ac with Helm
@@ -87,6 +113,14 @@
 
 
 (straight-use-package
+ '(sdev-mypy
+   :type git
+   :host github
+   :repo "SerialDev/mypy-mode"
+))
+
+
+(straight-use-package
  '(fuzzy-format
    :type git
    :host github
@@ -101,9 +135,18 @@
    :repo "emacsmirror/dired-details"
 ))
 
+
+(straight-use-package
+ '(wakatime
+   :type git
+   :host github
+   :repo "wakatime/wakatime-mode"
+))
+
 ;---{Requirements}--;
 
 (require 'uniquify)
+(require 'dired-x)
 (require 'helm-eshell) ;; Eshell History support
 
 
@@ -111,6 +154,13 @@
 
 (load-relative "../modules/misc/andersl/demax") ;; restore congif when maximized
 (try-require 'demax)
+
+(load-relative "../modules/misc/tuhdo/org-recipes") ;; Org mode recipes
+(try-require 'org-recipes)
+
+; Does not have a melpa source: http://www.hczim.de/software/gas-mode.html
+(load-relative "../modules/misc/hczim/gas-mode") ;; Assembly
+(try-require 'gas-mode)
 
 
 (provide 'core-setup)

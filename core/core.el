@@ -110,6 +110,7 @@ of an error, just add the package to a list of missing packages."
 (load-require  'core-functionality)
 (load-require  'core-functions)
 (load-require  'core-completion)
+(load-require  'core-secrets)
 
 (provide 'core)
 
