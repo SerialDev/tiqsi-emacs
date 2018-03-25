@@ -87,7 +87,7 @@
     'company-backends 'company-rtags))
 
 (setq rtags-autostart-diagnostics t)
-(rtags-enable-standard-keybindings)
+(setq rtags-enable-standard-keybindings t)
 
 (setq rtags-use-helm t)
 

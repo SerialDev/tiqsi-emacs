@@ -269,7 +269,7 @@ else:
 
 (add-hook 'python-mode-hook 'my-ac-jedi-setup)
 (add-hook 'inferior-python-mode-hook 'my-ac-jedi-setup)
-(inferior-python-mode)
+;; (inferior-python-mode)
 
 (setq ac-auto-show-menu    0)
 (setq ac-delay             0)

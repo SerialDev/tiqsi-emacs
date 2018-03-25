@@ -117,9 +117,9 @@ buffer-setting or buffer changing operations."
 (load-relative "modules/modes/modes")
 (require 'modes)
 
-(load-relative "modules/programming")
+(load-relative "modules/programming/programming")
 (require 'programming)
 
-(load-relative "modules/private")
+(load-relative "modules/private/private")
 (require 'private)
 ;;; init.el ends here

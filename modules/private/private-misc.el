@@ -304,10 +304,10 @@ sEnter flag: ")
     (widen)
     (message "%s characters" (1- (point-max)))))
 
-(when casey-tiqsi
-(defun repo-stats()
-  (interactive)
-(async-shell-command "\
+(when tiqsi-linux
+  (defun repo-stats()
+    (interactive)
+    (async-shell-command "\
 git ls-tree -r HEAD | sed -Ee 's/^.{53}//' | \
 while read filename; do file \"$filename\"; done | \
 grep -E ': .*text' | sed -E -e 's/: .*//' | \
