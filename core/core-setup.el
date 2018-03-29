@@ -17,6 +17,7 @@
 (straight-require 'typing)
 (straight-require 'flymake)
 (straight-require 'flymake-rust)
+(straight-require 'flymake-easy)
 (straight-require 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
