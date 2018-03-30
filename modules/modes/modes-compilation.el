@@ -4,15 +4,15 @@
 ;; 
 
 ; Setup my compilation mode
-(defun casey-big-fun-compilation-hook ()
+(defun tiqsi-big-fun-compilation-hook ()
   (make-local-variable 'truncate-lines)
   (setq truncate-lines nil)
 )
-(add-hook 'compilation-mode-hook 'casey-big-fun-compilation-hook)
+(add-hook 'compilation-mode-hook 'tiqsi-big-fun-compilation-hook)
 
 ; devenv.com error parsing
-(add-to-list 'compilation-error-regexp-alist 'casey-devenv)
-(add-to-list 'compilation-error-regexp-alist-alist '(casey-devenv
+(add-to-list 'compilation-error-regexp-alist 'tiqsi-devenv)
+(add-to-list 'compilation-error-regexp-alist-alist '(tiqsi-devenv
  "*\\([0-9]+>\\)?\\(\\(?:[a-zA-Z]:\\)?[^:(\t\n]+\\)(\\([0-9]+\\)) : \\(?:see declaration\\|\\(?:warnin\\(g\\)\\|[a-z ]+\\) C[0-9]+:\\)"
   2 3 nil (4)))
 
@@ -26,7 +26,7 @@
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
   (interactive)
-  (if (file-exists-p casey-makescript) t
+  (if (file-exists-p tiqsi-makescript) t
       (cd "../")
       (find-project-directory-recursive)))
 
@@ -55,7 +55,7 @@
 (defun make-without-asking ()
   "Make the current build."
   (interactive)
-  (if (find-project-directory) (compile casey-makescript))
+  (if (find-project-directory) (compile tiqsi-makescript))
   (other-window 1))
 (define-key global-map [M-m] 'make-without-asking)
 

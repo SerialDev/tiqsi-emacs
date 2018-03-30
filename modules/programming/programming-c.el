@@ -32,10 +32,10 @@
 ;----{Formatting}---;
 
 ;;  (cond ((file-exists-p buffer-file-name) t)
-;;         ((string-match "[.]hin" buffer-file-name) (casey-source-format))
-;;         ((string-match "[.]cin" buffer-file-name) (casey-source-format))
-;;         ((string-match "[.]h" buffer-file-name) (casey-header-format))
-;;         ((string-match "[.]cpp" buffer-file-name) (casey-source-format)))
+;;         ((string-match "[.]hin" buffer-file-name) (tiqsi-source-format))
+;;         ((string-match "[.]cin" buffer-file-name) (tiqsi-source-format))
+;;         ((string-match "[.]h" buffer-file-name) (tiqsi-header-format))
+;;         ((string-match "[.]cpp" buffer-file-name) (tiqsi-source-format)))
 
 ;----{Navigation}---;
 
@@ -50,7 +50,7 @@
 )))
 
 
-(defun casey-find-corresponding-file ()
+(defun tiqsi-find-corresponding-file ()
   "Find the file that corresponds to this one."
   (interactive)
   (setq CorrespondingFileName nil)
@@ -69,11 +69,11 @@
   (if CorrespondingFileName (find-file CorrespondingFileName)
     (error "Unable to find a corresponding file")))
 
-(defun casey-find-corresponding-file-other-window ()
+(defun tiqsi-find-corresponding-file-other-window ()
   "Find the file that corresponds to this one."
   (interactive)
   (find-file-other-window buffer-file-name)
-  (casey-find-corresponding-file)
+  (tiqsi-find-corresponding-file)
   (other-window -1))
 
 
@@ -155,7 +155,7 @@
 (setq c-default-style "microsoft")
 
 ; C++ indentation style
-(defconst casey-big-fun-c-style
+(defconst tiqsi-big-fun-c-style
   '(;(c-electric-pound-behavior   . t)
     (c-tab-always-indent         . t)
     (c-comment-only-line-offset  . 0)
@@ -202,7 +202,7 @@
     (c-echo-syntactic-information-p . t))
     "Casey's Big Fun C++ Style")
 
-(add-hook 'c-mode-common-hook 'casey-big-fun-c-hook)
+(add-hook 'c-mode-common-hook 'tiqsi-big-fun-c-hook)
 
 
 (defun my-c++-mode-hook ()
@@ -230,7 +230,7 @@
 
 ;----{Insertions}---;
 
-(defun casey-header-format ()
+(defun tiqsi-header-format ()
   "Format the given file as a header file."
   (interactive)
   (setq BaseFileName (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
@@ -258,7 +258,7 @@
   )
 
 
-  (defun casey-source-format ()
+  (defun tiqsi-source-format ()
      "Format the given file as a source file."
      (interactive)
      (setq BaseFileName (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
@@ -349,17 +349,17 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (global-cwarn-mode 1)
 
 ; Setup my compilation mode
-(defun casey-big-fun-compilation-hook ()
+(defun tiqsi-big-fun-compilation-hook ()
   (make-local-variable 'truncate-lines)
   (setq truncate-lines nil))
 
-(add-hook 'compilation-mode-hook 'casey-big-fun-compilation-hook)
+(add-hook 'compilation-mode-hook 'tiqsi-big-fun-compilation-hook)
 
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
   (interactive)
-  (if (file-exists-p casey-makescript) t
+  (if (file-exists-p tiqsi-makescript) t
       (cd "../")
       (find-project-directory-recursive)))
 
@@ -403,7 +403,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun make-without-asking ()
   "Make the current build."
   (interactive)
-  (if (find-project-directory) (compile casey-makescript))
+  (if (find-project-directory) (compile tiqsi-makescript))
   (other-window 1))
 
 ;; Define + active modification to compile that locally sets
@@ -472,12 +472,12 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (define-key c++-mode-map (kbd "C-?") 'irony-get-type)
 (global-set-key (kbd "C-?" ) nil)
 (global-set-key "\C-ci" 'ewd-insert-new-method)
-(define-key c++-mode-map [f12] 'casey-find-corresponding-file)
-(define-key c++-mode-map [M-f12] 'casey-find-corresponding-file-other-window)
+(define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
+(define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
 ; Alternate bindings for F-keyless setups (ie MacOS X terminal)
-(define-key c++-mode-map "\ec" 'casey-find-corresponding-file)
-(define-key c++-mode-map "\eC" 'casey-find-corresponding-file-other-window)
-(define-key c++-mode-map "\es" 'casey-save-buffer)
+(define-key c++-mode-map "\ec" 'tiqsi-find-corresponding-file)
+(define-key c++-mode-map "\eC" 'tiqsi-find-corresponding-file-other-window)
+(define-key c++-mode-map "\es" 'tiqsi-save-buffer)
 ;; (define-key c++-mode-map [S-tab] 'indent-for-tab-command)
 (define-key c++-mode-map "\t" 'indent-for-tab-command)
 (define-key c++-mode-map (kbd "<backtab>")'un-indent-by-removing-4-spaces)

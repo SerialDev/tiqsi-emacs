@@ -213,7 +213,7 @@
 
 ;; (package-install 'helm-mt)
 ;; (try-require 'helm-mt)
-;; (when casey-linux
+;; (when tiqsi-linux
 ;;   (helm-mt/reroute-terminal-functions t))
 
 ;; (define-key global-map (kbd "C-c ho") 'helm-occur)
@@ -457,18 +457,18 @@ _j_: jedi:related-names
 
 ;-{TODO re include}-;
 
-;; (when casey-win32
+;; (when tiqsi-win32
 ;;   (global-set-key (kbd "C-c hwl") 'helm-w32-launcher)
 ;;   (global-set-key (kbd "C-c hwe") 'helm-w32-launcher-elevated)
 ;;   (global-set-key (kbd "C-c hwd") 'helm-w32-launcher-open-shortcut-directory)
 ;;   ;; (global-set-key (kbd "C-c hwp") 'helm-w32-launcher-open-shortcut-properties)
 ;;   (global-set-key (kbd "C-c hwr") 'helm-w32-launcher-flush-cache)
 ;;   )
-;; (when casey-win32 
+;; (when tiqsi-win32 
 
 ;-{TODO re include}-;
 
-;; (when casey-linux
+;; (when tiqsi-linux
 ;;   (define-key global-map (kbd "C-c ht") (helm-mt "multi-term")))
 
 ;----{imenu tags}---;

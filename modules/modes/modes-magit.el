@@ -3,13 +3,9 @@
 ;;; Commentary:
 ;; 
 
-(use-package magit
-  :straight t
-  :bind
-  (("C-x M-g" . magit-dispatch-popup))
-  :init
-  (setq magit-completing-read-function 'ivy-completing-read)
-  (global-magit-file-mode t))
+(setq magit-completing-read-function 'ivy-completing-read)
+(global-magit-file-mode t)
+
 
 (use-package git-gutter-fringe
   :straight t
@@ -44,7 +40,8 @@
 ;---{Keybindings}---;
 
 (define-key magit-mode-map "\C-cc" 'magit-commit)
- ;(define-key python-mode-map (kbd "C-c c") 'sdev/magit-stage-and-commit)
+(define-key magit-mode-map "C-x M-g" 'magit-dispatch-popup)
+;(define-key python-mode-map (kbd "C-c c") 'sdev/magit-stage-and-commit)
 
 (provide 'modes-magit)
 

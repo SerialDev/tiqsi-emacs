@@ -35,7 +35,7 @@
 ;----{Replacing}----;
 
 
-(defun casey-replace-in-region (old-word new-word)
+(defun tiqsi-replace-in-region (old-word new-word)
   "Perform a replace-string in the current region."
   (interactive "sReplace: \nsReplace: %s  With: ")
   (save-excursion (save-restriction
@@ -46,7 +46,7 @@
   )
 
 
-(defun casey-replace-string (FromString ToString)
+(defun tiqsi-replace-string (FromString ToString)
   "Replace a string without moving point."
   (interactive "sReplace: \nsReplace: %s  With: ")
   (save-excursion
@@ -57,7 +57,7 @@
 ;------{Saving}-----;
 
 
-(defun casey-save-buffer ()
+(defun tiqsi-save-buffer ()
   "Save the buffer after untabifying it."
   (interactive)
   (save-excursion
@@ -479,7 +479,7 @@ region if active."
 
 
 ;---{Keybindings}---;
-(define-key global-map [f8] 'casey-replace-string)
+(define-key global-map [f8] 'tiqsi-replace-string)
 
 ; Editting
 (define-key global-map (kbd "C-q" )'copy-region-as-kill)
@@ -490,9 +490,9 @@ region if active."
 (define-key global-map "\e6" 'upcase-word)
 (define-key global-map "\e^" 'captilize-word)
 (define-key global-map "\e." 'fill-paragraph)
-(define-key global-map "\el" 'casey-replace-in-region)
+(define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
-(define-key global-map "\eO" 'casey-replace-string)
+(define-key global-map "\eO" 'tiqsi-replace-string)
 ; \377 is alt-backspace
 (define-key global-map "\377" 'backward-kill-word)
 (define-key global-map [M-delete] 'kill-word)

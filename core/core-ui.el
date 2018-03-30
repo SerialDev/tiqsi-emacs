@@ -86,7 +86,7 @@
 
 ;-----{Set Font}----;
 
-(setq casey-font "PragmataPro")
+(setq tiqsi-font "PragmataPro")
 ;; Font cosmetic edits
 (add-to-list 'default-frame-alist '(font . "PragmataPro"))
 (set-face-attribute 'default t :font "PragmataPro")

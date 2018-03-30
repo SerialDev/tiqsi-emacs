@@ -12,7 +12,7 @@
 
 (defun load-todo ()
   (interactive)
-  (find-file casey-todo-file))
+  (find-file tiqsi-todo-file))
 
 ;---{LOG related}---;
 
@@ -20,7 +20,7 @@
 
 (defun load-log ()
   (interactive)
-  (find-file casey-log-file)
+  (find-file tiqsi-log-file)
   (if (boundp 'longlines-mode) ()
     (longlines-mode 1)
     (longlines-show-hard-newlines))
