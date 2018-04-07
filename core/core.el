@@ -112,6 +112,7 @@ of an error, just add the package to a list of missing packages."
 (load-require  'core-completion)
 (load-require  'core-debug)
 (load-require  'core-secrets)
+(load-require  'core-performance)
 
 (provide 'core)
 

@@ -4,6 +4,15 @@
 ;; 
 
 
+;--{Disable modes}--;
+
+(defun global-disable-mode (mode-fn)
+  "Disable `MODE-FN' in ALL buffers."
+  (interactive "a")
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (funcall mode-fn -1))))
+
 ;-----{Strings}-----;
 
 ;; truncate if long

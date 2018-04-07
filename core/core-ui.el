@@ -42,28 +42,6 @@
 
 (setq echo-keystrokes 0.0001)             
 
-;{buffer performance};
-
-
-;; - Casey
-;; Stop Emacs from losing undo information by
-;; setting very high limits for undo buffers
-(setq undo-limit 20000000)
-(setq undo-strong-limit 40000000)
-
-(setq gc-cons-threshold 20000000)
-
-(defun my-minibuffer-setup-hook ()
-  (setq gc-cons-threshold most-positive-fixnum))
-
-(defun my-minibuffer-exit-hook ()
-  (setq gc-cons-threshold 20000000))
-
-(add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-(add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
-
-(setq redisplay-dont-pause t)
-
 ;-{Brigth red TODO}-;
 
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode python-mode))

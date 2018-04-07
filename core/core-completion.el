@@ -8,10 +8,11 @@
 (setq tab-always-indent 'complete)
 (add-to-list 'completion-styles 'initials t)
 
+;; TODO mode specific enable since I use AC alot instead of company
 ;(eval-after-load 'company
 ;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
-(company-quickhelp-mode 1)
-(setq company-quickhelp-delay 0.01)
+;; (company-quickhelp-mode 1)
+;; (setq company-quickhelp-delay 0.01)
 
 
  (defun my-describe-function (function)

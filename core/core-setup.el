@@ -13,8 +13,11 @@
 
 (straight-require 'use-package)
 (straight-require 'spaceline)
+(straight-require 'rtags)
 (straight-require 'py-isort)
+(straight-require 'py-autopep8)
 (straight-require 'typing)
+(straight-require 'ensime)
 (straight-require 'flymake)
 (straight-require 'flymake-easy)
 (straight-require 'flymake-rust)
@@ -100,6 +103,8 @@
 (straight-require 'popup-pos-tip)
 (straight-require 'racer)
 (straight-require 'cargo)
+(straight-require 'clojure-mode)
+(straight-require 'cider)
 (straight-require 'ac-racer)
 (straight-require 'irony) ;; C & CPP completion support
 (straight-require 'hydra) ;; hydras

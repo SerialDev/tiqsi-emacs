@@ -8,6 +8,8 @@
 (load-require  'programming-c)
 (load-require  'programming-rust)
 (load-require  'programming-python)
+(load-require  'programming-scala)
+(load-require  'programming-clojure)
 (load-require  'programming-text)
 
 (provide 'programming)

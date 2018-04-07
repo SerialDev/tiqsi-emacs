@@ -78,7 +78,7 @@
 
 
 (when tiqsi-linux
-  (setq rtags-path "/mnt/rtags/bin")
+  (setq rtags-path "/rtags/bin")
   )
 
 (setq rtags-completions-enabled t)
@@ -124,10 +124,6 @@
 
 (when
     (require 'rtags nil :noerror)
-  (define-key c++-mode-map (kbd "C-.") 'rtags:jump-to-definition)
-  (define-key c++-mode-map (kbd "C-,") 'rtags:jump-back)
-  (define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
-  (define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
    ;; company completion setup
   (setq rtags-autostart-diagnostics t)
   (rtags-diagnostics)
@@ -140,7 +136,6 @@
   ;; c-mode-common-hook is also called by c++-mode
   (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)
 )
-
 
 ;---{Indentation}---;
 
@@ -202,7 +197,7 @@
     (c-echo-syntactic-information-p . t))
     "Casey's Big Fun C++ Style")
 
-(add-hook 'c-mode-common-hook 'tiqsi-big-fun-c-hook)
+;; (add-hook 'c-mode-common-hook 'tiqsi-big-fun-c-hook)
 
 
 (defun my-c++-mode-hook ()
@@ -215,6 +210,14 @@
  (c-set-offset 'substatement-open 0)
  ;; other customizations can go here
 
+ (setq
+  ;; use gdb-many-windows by default
+  gdb-many-windows t
+  ;; Non-nil means display source file containing the main routine at startup
+  gdb-show-main t
+  )
+
+ (cwarn-mode 1)
  (setq c++-tab-always-indent t)
  (setq c-basic-offset 4)                  ;; Default is 2
  (setq c-indent-level 4)                  ;; Default is 2
@@ -345,8 +348,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 ;---{Compilation}---;
-
-(global-cwarn-mode 1)
 
 ; Setup my compilation mode
 (defun tiqsi-big-fun-compilation-hook ()
@@ -492,6 +493,12 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (define-key c++-mode-map "\eq" 'append-as-kill)
 (define-key c++-mode-map "\ea" 'yank)
 (define-key c++-mode-map "\ez" 'kill-region)
+
+
+(define-key c++-mode-map (kbd "C-.") 'rtags:jump-to-definition)
+(define-key c++-mode-map (kbd "C-,") 'rtags:jump-back)
+(define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
+(define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
 
 
 (provide 'programming-c)

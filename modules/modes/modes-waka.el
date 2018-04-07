@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;; 
 (when (require 'core-secrets nil 'noerror) 
-  (global-wakatime-mode 1)
+  (global-wakatime-mode 0)
   (setq wakatime-cli-path (eshell-command-result "which wakatime"))
   ) 
 
