@@ -284,7 +284,6 @@ If there's no region, the current line will be duplicated."
 ;------{Toggle}-----;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html  
-(package-install 'origami)
 (try-require 'origami)
 
 (eval-after-load 'origami
@@ -298,10 +297,8 @@ If there's no region, the current line will be duplicated."
          (interactive (list (current-buffer) (point)))
          (progn (origami-recursively-toggle-node buffer point)
                 (minimap-new-minimap)))
-
-
+       (global-origami-mode 1)
    ))
-(global-origami-mode 1)
 
 (use-package vimish-fold
   :straight t

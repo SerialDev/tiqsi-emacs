@@ -22,7 +22,6 @@
 (add-hook 'irony-mode-hook 'my-irony-mode-hook)
 (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
-(package-install 'company-irony-c-headers)
 (require 'company-irony-c-headers)
 (eval-after-load 'company
   '(add-to-list
@@ -132,7 +131,7 @@
   '(add-to-list
     'company-backends 'company-rtags))
   ;; use rtags flycheck mode -- clang warnings shown inline
-  (require 'flycheck-rtags)
+  (try-require 'flycheck-rtags)
   ;; c-mode-common-hook is also called by c++-mode
   (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)
 )

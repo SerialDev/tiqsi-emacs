@@ -13,6 +13,8 @@
 
 (straight-require 'use-package)
 (straight-require 'spaceline)
+(straight-require 'origami)
+(straight-require 'bug-hunter)
 (straight-require 'rtags)
 (straight-require 'py-isort)
 (straight-require 'py-autopep8)
@@ -30,6 +32,7 @@
 (straight-require 'spaceline-all-the-icons)
 (straight-require 'hydra)
 (straight-require 'ido)
+(straight-require 'ido-completing-read+)
 (straight-require 'delight)
 (straight-require 'find-dired)
 (straight-require 'magit)
@@ -54,6 +57,7 @@
 (straight-require 'all-the-icons)
 (straight-require 'stripe-buffer)
 (straight-require 'flycheck)
+(straight-require 'flycheck-title)
 (straight-require 'dumb-jump)
 (straight-require 'ivy)
 (straight-require 'helm)
@@ -120,6 +124,23 @@
 (straight-require 'pcre2el) ;; Regexp syntax converter
 
 ;-----{From git}----;
+
+
+(straight-use-package
+ '(flycheck-rtags
+   :type git
+   :host github
+   :repo "Andersbakken/rtags"
+))
+
+
+;; C & CPP Header completion 
+(straight-use-package
+ '(company-irony-c-headers
+   :type git
+   :host github
+   :repo "hotpxl/company-irony-c-headers"
+))
 
 (straight-use-package
  '(volatile-highlights

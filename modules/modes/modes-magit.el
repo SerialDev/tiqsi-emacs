@@ -27,7 +27,6 @@
 ;;Combined with ido completion this allows pushing a new branch with P P RET:
 
 ;; NOTE: requires ido-completing-read+
-(package-install 'ido-completing-read+)
 (setq magit-completing-read-function #'magit-ido-completing-read)
 
 (defun sdev/magit-stage-and-commit()

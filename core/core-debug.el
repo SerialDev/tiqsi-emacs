@@ -93,7 +93,6 @@ No more \"End of file during parsing\" horrors!"
 
 ;; Debug startup failures. If your Emacs init file signals an error during startup, but you don’t know why,
 ;; simply issue M-x bug-hunter-init-file RET RET and The Bug Hunter will find it for you.
-(package-install 'bug-hunter)
 ;(use-package bug-hunter
 ;  :ensure t)
 

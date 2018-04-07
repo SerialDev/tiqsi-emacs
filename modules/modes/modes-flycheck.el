@@ -17,7 +17,6 @@
 
 
 ;        Make some good use of screen realstate in the windows title bar       ;
-(package-install 'flycheck-title)
 (with-eval-after-load 'flycheck
   (flycheck-title-mode))
 
