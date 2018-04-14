@@ -122,6 +122,7 @@
 (straight-require 'helm-chrome) ;; Chrome Bookmarks support
 (straight-require 'expand-region) ;; Select a code region
 (straight-require 'pcre2el) ;; Regexp syntax converter
+(straight-require 'emacs-async) ;; Asynchronous execution
 
 ;-----{From git}----;
 
