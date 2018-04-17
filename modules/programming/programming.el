@@ -11,6 +11,7 @@
 (load-require  'programming-scala)
 (load-require  'programming-clojure)
 (load-require  'programming-text)
+(load-require  'programming-lisp)
 
 (provide 'programming)
 

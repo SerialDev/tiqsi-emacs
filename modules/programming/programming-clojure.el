@@ -31,7 +31,6 @@
   ;;    (cider-connect "127.0.0.1" (message "%s" result))))
   )
 
-
 (defun lein-connect-repl()
   "Start Leiningen repl."
   (interactive)
@@ -101,7 +100,64 @@
 ;; error buffer not popping up
 (setq cider-show-error-buffer nil)
 
+(lambda()  )
+
+(defun move-to-close-paren()
+  )
+  (looking-at ")")
+
+;; TODO Dynamic dispatch all possible <> [] {} ()
+
+(defun move-forward-paren (&optional arg)
+  "Move forward parenthesis"
+  (interactive "P")
+  (if (looking-at ")") (forward-char 1))
+  (while (not (looking-at ")")) (forward-char 1))
+  ) 
+
+(defun move-backward-paren (&optional arg)
+  "Move backward parenthesis"
+  (interactive "P")
+  (if (looking-at "(") (forward-char -1))
+  (while (not (looking-at "(")) (backward-char 1))
+) 
+
+     
+(defun move-forward-sqrParen (&optional arg)
+  "Move forward square brackets"
+  (interactive "P")
+  (if (looking-at "]") (forward-char 1))
+  (while (not (looking-at "]")) (forward-char 1))
+  ) 
+      
+(defun move-backward-sqrParen (&optional arg)
+  "Move backward square brackets"
+  (interactive "P")
+  (if (looking-at "[[]") (forward-char -1))
+  (while (not (looking-at "[[]")) (backward-char 1))
+  ) 
+      
+(defun move-forward-curlyParen (&optional arg)
+  "Move forward curly brackets"
+  (interactive "P")
+  (if (looking-at "}") (forward-char 1))
+  (while (not (looking-at "}")) (forward-char 1))
+  ) 
+      
+(defun move-backward-curlyParen (&optional arg)
+  "Move backward curly brackets"
+  (interactive "P")
+  (if (looking-at "{") (forward-char -1))
+  (while (not (looking-at "{")) (backward-char 1))
+  ) 
+
+(define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)
+(define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
+(define-key clojure-mode-map (kbd "C-c <right>") 'paredit-forward-slurp-sexp)
+(define-key clojure-mode-map (kbd "C-c <left>") 'paredit-forward-barf-sexp)
 (define-key clojure-mode-map (kbd "C-c C-s") 'cider-eval-last-sexp)
+(define-key clojure-mode-map (kbd "C-c (") 'paredit-wrap-round)
+(define-key clojure-mode-map (kbd "C-c )") 'paredit-splice-sexp)
 
 
 (provide 'programming-clojure)

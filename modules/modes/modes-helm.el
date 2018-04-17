@@ -60,6 +60,13 @@
 (setq helm-buffers-fuzzy-matching t
       helm-recentf-fuzzy-match t)
 
+(setq helm-boring-buffer-regexp-list
+        '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+
+
+(setq helm-boring-file-regexp-list
+        '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+
 ;------{Google}-----;
 ;TODO helm-youtube support                                                                          ;
 
