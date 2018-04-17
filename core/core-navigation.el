@@ -387,6 +387,7 @@ one, an error is signaled."
 (define-key global-map [pgdown] 'backward-page)
 (define-key global-map [C-next] 'scroll-other-window)
 (define-key global-map [C-prior] 'scroll-other-window-down)
+
 ;; Navigation
 (global-set-key [C-S-right] 'shift-right)
 (global-set-key [C-S-left] 'shift-left)
@@ -413,11 +414,10 @@ one, an error is signaled."
 (define-key global-map "\egl" 'goto-line)
 (define-key global-map "\ej" 'imenu)
 ;; remap C-a to `smarter-move-beginning-of-line'
+
 (global-set-key [remap move-beginning-of-line]
                 'sk/smarter-move-beginning-of-line)
-(bind-keys*
-  ("M-_" . sk/move-text-up)
-  ("M-+" . sk/move-text-down))
+
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-c w") 'rotate-windows)
   

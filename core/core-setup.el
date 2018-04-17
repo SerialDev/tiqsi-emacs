@@ -78,7 +78,8 @@
 (straight-require 'docker)
 (straight-require 'docker-api)
 (straight-require 'jedi)
-(straight-require 'parinfer)
+(straight-require 'paredit)
+;; (straight-require 'parinfer)
 (straight-require 'docker-compose-mode)
 (straight-require 'dockerfile-mode)
 (straight-require 'camcorder)
@@ -122,9 +123,31 @@
 (straight-require 'helm-chrome) ;; Chrome Bookmarks support
 (straight-require 'expand-region) ;; Select a code region
 (straight-require 'pcre2el) ;; Regexp syntax converter
-(straight-require 'emacs-async) ;; Asynchronous execution
 
 ;-----{From git}----;
+
+;; Asynchronous execution
+
+(straight-use-package
+ '(dired-async
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
+
+(straight-use-package
+ '(async-bytecomp
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
+
+(straight-use-package
+ '(async
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
 
 
 (straight-use-package
