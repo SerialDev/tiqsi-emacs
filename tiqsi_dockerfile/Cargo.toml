@@ -1,0 +1,8 @@
+[package]
+name = "tiqsi_dockerfile"
+version = "0.1.0"
+authors = ["SerialDev"]
+
+[dependencies]
+clap = "2.31.2"
+
