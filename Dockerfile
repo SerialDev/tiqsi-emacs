@@ -1,39 +1,5 @@
 FROM serialdev/sdev-ide
 
-
-# RUN conda update conda && \
-#     conda install gxx_linux-64 && \
-#     conda install -c r r-nloptr && \
-#     conda install -c r r-igraph && \
-#     conda install -c r r-pki && \
-#     conda install -c r r-hmisc && \
-#     conda install -c r r-aer 
-
-# RUN conda install -c r r-cairo && \
-#     conda install -c r r-udunits2 && \
-#     conda install -c r r-rodbc && \
-#     conda install -c r r-essentials && \
-#     conda install libgfortran  && \
-#     conda install gfortran_linux-64 
-
-# RUN git clone --recursive https://github.com/Wilfred/remacs.git && \
-#     cd remacs && ./autogen.sh && ./configure --enable-rust-debug && \
-#     make
-
-
-# RUN apt-get update && \		    
-#     apt-get install default-jdk -y && \
-#     echo "deb https://dl.bintray.com/sbt/debian /" | tee -a /etc/apt/sources.list.d/sbt.list && \
-#     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2EE0EA64E40A89B84B2DF73499E82A75642AC823 && \
-#     apt-get update && \
-#     apt-get install sbt && \
-#     apt-get install scala -y
-
-# RUN echo 'addSbtPlugin("org.ensime" % "sbt-ensime" % "2.5.1")' >> ~/.sbt/1.0/plugins/plugins.sbt
-
-
-RUN apt-get install ninja-build -y
-
 ADD ./ /tiqsi-emacs
 
 
