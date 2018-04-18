@@ -2,3 +2,4 @@
 *.el#
 *.elc
 /core/core-secrets.el
+/tiqsi_dockerfile/target

@@ -274,7 +274,6 @@ sEnter flag: ")
   (insert "(")
   (goto-char (string-to-number (message "%d" end)))
   (right-char 1)
-  (right-char 1)
   (insert ")")
   (pop-mark))
 
@@ -336,6 +335,170 @@ sort | uniq -c | sort -rn")))
   (global-set-key (kbd "C-c C-r c") 'cd-to-config)
 )
 
+
+;--{python defuns}--;
+
+
+
+(defun re-seq (regexp string)
+  "Get a list of all regexp matches in a string"
+  (save-match-data
+    (let ((pos 0)
+          matches)
+      (while (string-match regexp string pos)
+        (push (match-string 0 string) matches)
+        (setq pos (match-end 0)))
+      matches)))
+
+(defun sdev-r-match-curly (val)
+  (re-seq "[[{].+?[]}]" val ))
+
+
+(defun sdev-r-fstring(beginning end)
+  (interactive "r")
+  (goto-char (string-to-number (message "%d" end)))
+  (insert ".format(")
+  (setq list (nreverse(sdev-r-match-curly (buffer-substring-no-properties beginning end))))
+  (while list
+    (insert
+     (s-prepend (s-append "=" (s-replace "{" "" (s-replace "}" ""(car list))))
+     (s-append ", "
+      (s-replace "{" ""
+       (s-replace "}" ""
+		  (car list))))))
+    (setq list (cdr list)))
+  (delete-char -2)
+  (insert ")"))
+
+
+(defun sdev-r-slotted(beginning end)
+  (interactive "r")
+
+  (setq val(buffer-substring-no-properties beginning end))
+  (newline-and-indent)
+  (insert "class ")
+  (insert(s-append "(object):"(s-upper-camel-case(s-trim(car(s-split "=" val)))) ) )
+  (s-split ","
+	   (s-replace "{" ""
+	   (s-replace "}" ""
+		      (car (cdr(s-split "=" val)))))
+	   )
+  (newline-and-indent)
+
+
+  (_sdev-s-slot
+   (s-split ","
+   (s-replace "{" ""
+   (s-replace "}" ""
+   (car (cdr(s-split "=" val)))))))
+
+  (newline-and-indent)
+  (newline-and-indent)
+
+  (_sdev-s-init
+   (s-split ","
+   (s-replace "{" ""
+   (s-replace "}" ""
+   (car (cdr(s-split "=" val)))))))
+
+  (newline-and-indent)
+
+  (_sdev-s-init-body
+   (s-split ","
+   (s-replace "{" ""
+   (s-replace "}" ""
+   (car (cdr(s-split "=" val)))))))
+
+  )
+
+
+(defun _sdev-s-init-body(list)
+  (while list
+    ;; (print  (s-append ", "(s-trim(s-replace "\"" ""(s-replace "\'" ""(car(s-split ":" (car list)))))))
+    ;; (setq list1 list)
+    ;; (setq list2 list)
+    (insert (s-append " = "(s-prepend "self."(s-trim(s-replace "\"" ""(s-replace "\'" ""(car(s-split ":" (car list)))))))))
+    (insert (s-trim (car(cdr(s-split ":" (car list))))))
+    (newline-and-indent)
+    
+    (setq list (cdr list))))
+
+
+(defun _sdev-s-init(list)
+  (insert "def __init__(self, ")
+  (while list
+    (insert  (s-append ", "(s-trim(s-replace "\"" ""(s-replace "\'" ""(car(s-split ":" (car list)))))))
+	     )  (setq list (cdr list)))
+  (delete-char -2)
+  (insert "):"))
+
+(defun _sdev-s-slot(list)
+  (insert "__slots__ = [")
+  (while list
+    (insert  (s-append ", "(s-prepend "'"(s-append "'"(s-trim(s-replace "\"" ""(s-replace "\'" ""(car(s-split ":" (car list)))))))))
+	     )  (setq list (cdr list)))
+  (delete-char -2)
+  (insert "]"))
+
+
+
+;; where run_shell = #!/bin/bash \n docker.exe exec -it <c089f602d9bb> python3 || docker.exe exec -it <c089f602d9bb> bash -c "python3; bash" 
+(defun sdev-use-docker-cpython (&optional cpython)
+  "Set defaults to use the standard interpreter instead of IPython.
+
+With prefix arg, prompt for the command to use."
+  (interactive (list (when current-prefix-arg
+                       (read-file-name "Python command: "))))
+  (when (not cpython)
+    (setq cpython "C:/Users/Carlos/Desktop/Workspace/emacs_dir/NewEmacs/tools/run_shell"))
+  (when (not (executable-find cpython))
+    (error "Command %S not found" cpython))
+  (cond
+   ;; Emacs 24 until 24.3
+   ((boundp 'python-python-command)
+    (setq python-python-command cpython))
+   ;; Emacs 24.3 and onwards.
+   ((and (version<= "24.3" emacs-version)
+         (not (boundp 'python-shell-interpreter-interactive-arg)))
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"
+          python-shell-prompt-regexp ">>> "
+          python-shell-prompt-output-regexp ""
+          python-shell-completion-setup-code
+          "try:
+    import readline
+except ImportError:
+    def __COMPLETER_all_completions(text): []
+else:
+    import rlcompleter
+    readline.set_completer(rlcompleter.Completer().complete)
+    def __COMPLETER_all_completions(text):
+        import sys
+        completions = []
+        try:
+            i = 0
+            while True:
+                res = readline.get_completer()(text, i)
+                if not res: break
+                i += 1
+                completions.append(res)
+        except NameError:
+            pass
+        return completions"
+          python-shell-completion-module-string-code ""
+          python-shell-completion-string-code
+          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+   ;; Emacs 24.4
+   ((boundp 'python-shell-interpreter-interactive-arg)
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"))
+   (t
+    (error "I don't know how to set ipython settings for this Emacs"))))
+
+
+
+
+
 ;---{Keybindings}---;
 
 (global-set-key (kbd "C-;") 'sdev/line-to-msg)
@@ -354,6 +517,12 @@ sort | uniq -c | sort -rn")))
 (global-set-key (kbd "C-'") 'sdev/insert-end)
 
 
+
+
+
 (provide 'private-misc)
 
 ;;; private-misc.el ends here
+
+
+
