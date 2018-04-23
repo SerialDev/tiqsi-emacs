@@ -19,6 +19,7 @@
 (load-require 'modes-org)
 (load-require 'modes-spotify)
 (load-require 'modes-parinfer)
+(load-require 'modes-neotree)
 
 (provide 'modes)
 

@@ -13,9 +13,11 @@
 
 (straight-require 'use-package)
 (straight-require 'spaceline)
+(straight-require 'neotree)
 (straight-require 'origami)
 (straight-require 'bug-hunter)
 (straight-require 'rtags)
+(straight-require 'jdee)
 (straight-require 'py-isort)
 (straight-require 'py-autopep8)
 (straight-require 'typing)
