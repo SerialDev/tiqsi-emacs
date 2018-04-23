@@ -407,6 +407,13 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (if (find-project-directory) (compile tiqsi-makescript))
   (other-window 1))
 
+(defun run-without-asking ()
+  "run the current build."
+  (interactive)
+  (compile "./build-clang/demo")
+  (other-window 1))
+
+
 ;; Define + active modification to compile that locally sets
 ;; shell-command-switch to "-ic".
 (defadvice compile (around use-bashrc activate)
@@ -469,6 +476,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (define-key ac-complete-mode-map "\t" 'ac-complete)
 (define-key ac-complete-mode-map "\r" 'ac-complete)
 (define-key global-map "\em" 'make-without-asking)
+(define-key global-map (kbd "M-n") 'run-without-asking)
 (global-set-key [C-f1] 'show-file-name) ; Or any other key you want
 (define-key c++-mode-map (kbd "C-?") 'irony-get-type)
 (global-set-key (kbd "C-?" ) nil)
