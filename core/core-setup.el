@@ -21,7 +21,6 @@
 (straight-require 'py-isort)
 (straight-require 'py-autopep8)
 (straight-require 'typing)
-(straight-require 'ensime)
 (straight-require 'flymake)
 (straight-require 'flymake-easy)
 (straight-require 'flymake-rust)
@@ -205,6 +204,14 @@
    :type git
    :host github
    :repo "wakatime/wakatime-mode"
+))
+
+
+(straight-use-package
+ '(wakatime
+   :type git
+   :host github
+   :repo "ensime/ensime-emacs"
 ))
 
 ;---{Requirements}--;
