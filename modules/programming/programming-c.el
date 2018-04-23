@@ -133,7 +133,8 @@
   ;; use rtags flycheck mode -- clang warnings shown inline
   (try-require 'flycheck-rtags)
   ;; c-mode-common-hook is also called by c++-mode
-  (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)
+  (add-hook 'c-mode-hook #'setup-flycheck-rtags)
+  (add-hook 'c++-mode-common-hook #'setup-flycheck-rtags)
 )
 
 ;---{Indentation}---;
