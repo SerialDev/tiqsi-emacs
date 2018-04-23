@@ -208,7 +208,7 @@
 
 
 (straight-use-package
- '(wakatime
+ '(ensime
    :type git
    :host github
    :repo "ensime/ensime-emacs"
