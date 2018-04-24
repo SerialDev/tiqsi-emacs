@@ -495,7 +495,64 @@ else:
    (t
     (error "I don't know how to set ipython settings for this Emacs"))))
 
+(defun insert-and-newline(values)
+  (insert values)
+  (newline-and-indent)
+  )
 
+(defun sdev/insert-flasgger (description tag params json-field response-desc extra  )
+					;(interactive "sString for \\f:")
+  (interactive "sEnter description def:
+sEnter Tag: 
+sEnter Param names csv :
+sEnter json-field names csv :
+sEnter response description :
+sEnter Extra information :")
+  (insert-and-newline "    \"\"\"")
+  (insert-and-newline description)
+  (insert-and-newline "This is using docstrings for specifications")
+  
+  (insert-and-newline "---")
+  (insert-and-newline "tags:")
+  (insert-and-newline (s-prepend "  - " tag))
+  
+  (insert-and-newline "parameters:")
+  (mapc (lambda (x)
+	  (insert-and-newline (s-prepend "  - " (s-prepend "name: " x)))
+	  (insert-and-newline (s-prepend "    " "in: path"))
+	  (insert-and-newline (s-prepend "    " "type: string"))
+	  (insert-and-newline (s-prepend "    " "required: true"))
+	  (insert-and-newline (s-prepend "    " "default: all"))
+	  ) (s-split "," params))
+
+	  (insert-and-newline "  - name: body")
+	  (insert-and-newline "    in: body")
+	  (insert-and-newline "    schema:")
+	  (insert-and-newline "      type: object")
+	  (insert-and-newline "      properties:")
+  (mapc (lambda (x)
+	  (insert-and-newline (s-prepend "        " (s-append ":" x)))
+          (insert-and-newline "          type: string")
+	  (insert-and-newline "          required: true")
+	  (insert-and-newline "          enum: ['','']")
+	  (insert-and-newline "          example: [1,2,3]") 
+	  ) (s-split "," json-field) )
+	  
+  (insert-and-newline "definitions:")
+  (insert-and-newline "  Response:")
+  (insert-and-newline "    type: object")
+  (insert-and-newline "    properties:")
+  (insert-and-newline "      Boolean:")
+  (insert-and-newline "        type: bool")
+  (insert-and-newline "responses:")
+  (insert-and-newline "  200:")
+  (insert-and-newline (s-prepend "    description: " response-desc))
+  (insert-and-newline "    schema:")
+  (insert-and-newline "      $ref: '#/definitions/Response'")
+  (insert-and-newline "    examples:")
+  (insert-and-newline (s-prepend "      result: " extra))
+  (newline-and-indent)
+  (insert "\"\"\""))
 
 
 
