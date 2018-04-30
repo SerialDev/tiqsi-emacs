@@ -508,7 +508,8 @@ sEnter Param names csv :
 sEnter json-field names csv :
 sEnter response description :
 sEnter Extra information :")
-  (insert-and-newline "    \"\"\"")
+  (insert "    \"\"\"")
+  (newline-and-indent)
   (insert-and-newline description)
   (insert-and-newline "This is using docstrings for specifications")
   

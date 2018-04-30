@@ -475,6 +475,7 @@ region if active."
 
 
 
+
 ;---{Keybindings}---;
 (define-key global-map [f8] 'tiqsi-replace-string)
 

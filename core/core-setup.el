@@ -127,6 +127,15 @@
 
 ;-----{From git}----;
 
+
+(straight-use-package
+ '(evil
+   :type git
+   :host github
+   :repo "emacs-evil/evil"
+))
+
+
 ;; Asynchronous execution
 
 (straight-use-package

@@ -62,9 +62,9 @@ view [
 	   print form ip]]
 
 	   attempt [if any-string? form win32 [
-	   write %run.bat "^""
+	   write %run.bat ""
 	   write/append %run.bat form win32
-	   write/append %run.bat "^"-q -l init.el"]]
+	   write/append %run.bat " -q -l init.el"]]
 
 	   attempt[if any-string? form unix [
 	   write %run.sh form unix

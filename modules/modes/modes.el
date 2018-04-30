@@ -20,6 +20,7 @@
 (load-require 'modes-spotify)
 (load-require 'modes-parinfer)
 (load-require 'modes-neotree)
+(load-require 'modes-evil)
 
 (provide 'modes)
 
