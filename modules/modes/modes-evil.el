@@ -7,7 +7,7 @@
 ;-{Initialize evil}-;
 
 ;; (evil-mode 1)
-
+(require 'evil)
 ;-----{HYDRAS!}-----;
 
 ;;                                                                         ╭──────┐
@@ -91,7 +91,7 @@
   ;------{Insert}-----;
   ("i" nil :color blue)
   ("I" sk/smarter-move-beginning-of-line :color blue)
-  ("a" evil-forward-charevil- :color blue)
+  ("a" evil-forward-char :color blue)
   ("A" move-end-of-line :color blue)
   ("o" open-line-below :color blue)
   ("O" open-line-above :color blue)
@@ -190,7 +190,7 @@ _zz_: center cursor         _;_/_,_: Repeat f,t,F,T fwd/back
   ;------{Insert}-----;
   ("i" nil :color blue)
   ("I" sk/smarter-move-beginning-of-line :color blue)
-  ("a" evil-forward-charevil- :color blue)
+  ("a" evil-forward-char :color blue)
   ("A" move-end-of-line :color blue)
   ("o" open-line-below :color blue)
   ("O" open-line-above :color blue)
@@ -288,7 +288,7 @@ _o_: Open /n below              _n_/_N_: Repeat search fwd/back
   ;------{Insert}-----;
   ("i" nil :color blue)
   ("I" sk/smarter-move-beginning-of-line :color blue)
-  ("a" evil-forward-charevil- :color blue)
+  ("a" evil-forward-char :color blue)
   ("A" move-end-of-line :color blue)
   ("o" open-line-below :color blue)
   ("O" open-line-above :color blue)
@@ -388,7 +388,7 @@ _._: Repeat last command         ^ ^
   ;------{Insert}-----;
   ("i" nil :color blue)
   ("I" sk/smarter-move-beginning-of-line :color blue)
-  ("a" evil-forward-charevil- :color blue)
+  ("a" evil-forward-char :color blue)
   ("A" move-end-of-line :color blue)
   ("o" open-line-below :color blue)
   ("O" open-line-above :color blue)
@@ -416,7 +416,7 @@ _._: Repeat last command         ^ ^
   ("<escape>" nil "cancel" :color blue)
 )
 
-(global-set-key (kbd "<escape>") 'hydra-vim-find-mode/body) 
+(global-set-key (kbd "<escape>") 'hydra-vim-move-mode/body) 
 
 
 
