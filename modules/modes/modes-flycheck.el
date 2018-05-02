@@ -56,6 +56,9 @@ is at least as severe as this one.  If nil, navigate all errors."
  '(flymake-warnline ((((class color)) (:underline "Orange")))))
 
 
+
+;--------------{Flyspell}--------------;
+
 ;------{Hydras}-----;
 
 (defhydra hydra-flycheck

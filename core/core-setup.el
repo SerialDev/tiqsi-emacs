@@ -14,6 +14,7 @@
 (straight-require 'use-package)
 (straight-require 'spaceline)
 (straight-require 'neotree)
+(straight-require 'flyspell)
 (straight-require 'origami)
 (straight-require 'bug-hunter)
 (straight-require 'rtags)

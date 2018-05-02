@@ -22,6 +22,7 @@
 (load-require 'modes-neotree)
 (load-require 'modes-evil)
 (load-require 'modes-company)
+(load-require 'modes-flyspell)
 
 (provide 'modes)
 
