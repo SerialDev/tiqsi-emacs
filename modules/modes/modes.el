@@ -21,6 +21,7 @@
 (load-require 'modes-parinfer)
 (load-require 'modes-neotree)
 (load-require 'modes-evil)
+(load-require 'modes-company)
 
 (provide 'modes)
 

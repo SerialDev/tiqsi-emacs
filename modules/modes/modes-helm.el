@@ -234,6 +234,36 @@
 
 ;-----{HYDRAS!}-----;
 
+(defhydra hydra-helm-ag (:color blue :hint nil)
+  "
+^Search^                 ^Interactive^
+------------------------------------------------------
+_A_: Search              _a_: Interactive search
+_F_: Search this file    _f_: Interactive search this file
+_S_: Search project      _s_: Interactive search project
+_B_: Search buffers      _b_: Interactive search buffers
+"
+  ("A" helm-ag)
+  ("F" helm-ag-this-file)
+  ("S" helm-ag-project-root)
+  ("B" helm-ag-buffers)
+  ("a" helm-do-ag)
+  ("f" helm-do-ag-this-file)
+  ("s" helm-do-ag-project-root)
+  ("b" helm-do-ag-buffers)
+  ("ESC" nil "Exit"))
+
+
+(use-package helm-ag
+  :defer t
+  :straight t
+  )
+
+(defun enable-ag ()
+  (interactive)
+  (leader-set-key-for-mode major-mode "s" 'hydra-helm-ag/body)
+  (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Ag"))
+
 (defhydra hydra-window-stuff (:hint nil)
     "
           Split: _v_ert  _s_:horz
