@@ -56,6 +56,21 @@ is at least as severe as this one.  If nil, navigate all errors."
  '(flymake-warnline ((((class color)) (:underline "Orange")))))
 
 
+;------{Hydras}-----;
+
+(defhydra hydra-flycheck
+  (:pre (progn (setq hydra-lv t) (flycheck-list-errors))
+   :post (progn (setq hydra-lv nil) (quit-windows-on "*Flycheck errors*"))
+   :color red
+   :hint nil)
+  "Flycheck"
+  ("f"  flycheck-error-list-set-filter                            "Filter")
+  ("j"  flycheck-next-error                                       "Next")
+  ("k"  flycheck-previous-error                                   "Previous")
+  ("gg" flycheck-first-error                                      "First")
+  ("G"  (progn (goto-char (point-max)) (flycheck-previous-error)) "Last")
+  ("ESC"  nil "Exit"))
+
 ;---{Keybindings}---;
 
 ;;(add-hook 'python-mode-hook ' sdev-python-mode-hook)
