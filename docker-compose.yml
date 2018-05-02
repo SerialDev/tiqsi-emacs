@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  ide:
+    image: serialdev/sdev-ide:latest
+    volumes:
+      - .:/tiqsi-emacs
+      - C:\\Users\andre\Desktop\SerialDev:/mnt
+    stdin_open: true
+
+    environment:
+      - DISPLAY=172.22.215.129:0
+    entrypoint: /tiqsi-emacs/tiqsi-services.sh
+    read_only: false
+    privileged: true
+    tty: true
+    restart: on-failure
+
