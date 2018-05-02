@@ -234,6 +234,29 @@
 
 ;-----{HYDRAS!}-----;
 
+(defhydra hydra-gtags (:color blue :hint nil)
+  "
+^Symbols^                      ^History^
+-----------------------------------------------------------
+_t_: Find tags                 _h_: Show tags stack
+_T_: Find tags other window    _n_: Next tag in history
+_r_: Find rtag                 _p_: Previous tag in history
+_s_: Select tag
+_x_: Xref find
+_l_: List tags in this function
+"
+  ("r" helm-gtags-find-rtag)
+  ("t" helm-gtags-find-tag)
+  ("T" helm-gtags-find-tag-other-window)
+  ("s" helm-gtags-select)
+  ("x" xref-find-apropos)
+  ("h" helm-gtags-show-stack)
+  ("p" helm-gtags-previous-history)
+  ("n" helm-gtags-next-history)
+  ("l" helm-gtags-tags-in-this-function)
+  ("ESC" nil "Exit"))
+
+
 (defhydra hydra-helm-ag (:color blue :hint nil)
   "
 ^Search^                 ^Interactive^
