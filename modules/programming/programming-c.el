@@ -463,6 +463,34 @@ foo.cpp and in the same directory as the current header file, foo.h."
 ;; (setq ac-auto-start nil)
 (setq tab-always-indent 'complete)
 
+
+;------{Hydras}-----;
+
+(defhydra hydra-rtags (:color pink :hint nil)
+  "
+^Symbols^                        ^Location Stack^   ^Fix it^
+-------------------------------------------------------------------------------
+_s_: Find symbol at point        _>_: Forward       _t_: Fix it at point
+_r_: Find references at point    _<_: Backward      _T_: Fix it
+_f_: Find File                                    _i_: Add include for symbol
+_S_: Find symbol                 ^RDM^
+_R_: Find refrences              _b_: Start process
+_v_: Find virtuals at point
+"
+  ("s" rtags-find-symbol-at-point :color blue)
+  ("r" rtags-find-references-at-point :color blue)
+  ("f" rtags-find-file :color blue)
+  ("S" rtags-find-symbol :color blue)
+  ("R" rtags-find-references :color blue)
+  ("v" rtags-find-virtuals-at-point :color blue)
+  (">" rtags-location-stack-back :color blue)
+  ("<" rtags-location-stack-forward :color blue)
+  ("t" rtags-fix-fixit-at-point :color blue)
+  ("T" rtags-fixit :color blue)
+  ("i" rtags-get-include-file-for-symbol :color blue)
+  ("b" rtags-start-process-unless-running :color blue)
+  ("ESC" nil "Exit"))
+
 ;---{Keybindings}---;
 
 

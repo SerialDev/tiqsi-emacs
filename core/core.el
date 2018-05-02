@@ -46,6 +46,7 @@
 ;; http://chrishecker.com/images/4/4b/Remove_me.emacs
 ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command
 ;; https://www.emacswiki.org/emacs/DelightedModes Delight to change line names, diminish does not have this functionality
+;; https://github.com/afonso360/dotconf/  ;; Great Hydras
 ;; Amit P
 ;; Chris Hecker
 ;; Casey Muratory
