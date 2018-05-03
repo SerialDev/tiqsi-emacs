@@ -9,6 +9,7 @@
 (setq tiqsi-aquamacs (featurep 'aquamacs))
 (setq tiqsi-linux (featurep 'x))
 (setq tiqsi-win32 (not (or tiqsi-aquamacs tiqsi-linux)))
+(setq tiqsi-console (eq (symbol-value 'window-system) nil))
 
 ;-{Determine Emacs}-;
 
