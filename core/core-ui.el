@@ -190,6 +190,22 @@
 
 (display-time)
 
+;---{Line numbers}--;
+
+(global-linum-mode)
+
+;---{col numbers}---;
+
+(column-number-mode t) 
+
+
+;--{show file-size}-;
+
+(size-indication-mode t)
+
+;; don't commit trailing whitespace
+(setq-default show-trailing-whitespace t)
+(setq-default default-indicate-empty-lines t)
 
 ;; "Never, ever split a window.  Why would anyone EVER want you to do that??"
 (setq split-window-preferred-function nil)

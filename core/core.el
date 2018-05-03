@@ -8,6 +8,7 @@
 ;; http://www.wisdomandwonder.com/wordpress/wp-content/uploads/2014/03/C3F.html
 ;; https://sites.google.com/site/steveyegge2/effective-emacs
 ;; https://github.com/ieure/scratch-el
+;; https://github.com/jopecko/dotfiles
 ;; http://sachachua.com
 ;; https://www.wisdomandwonder.com/article/10395/hide-uninteresting-files-in-dired-mode - Hiding unnecesary files in dired mode
 ;; http://www.mygooglest.com/fni/dot-emacs.html
