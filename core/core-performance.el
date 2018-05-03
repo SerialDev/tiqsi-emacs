@@ -46,6 +46,11 @@
   (setq-default line-spacing nil)   ; no extra heigh between lines
   ))
 
+
+(when (require-soft 'jit-lock)    ; enable JIT to make font-lock faster
+  (setq jit-lock-stealth-time 1)) ; new with emacs21
+
+
 (global-disable-mode 'async-bytecomp-package-mode)
 (global-disable-mode 'auto-composition-mode)
 (global-disable-mode 'auto-compression-mode)
