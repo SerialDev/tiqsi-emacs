@@ -297,6 +297,7 @@ else:
     (company-mode 1)
     (auto-complete-mode 0))
   (add-hook 'python-mode-hook 'config/enable-company-jedi))
+(global-auto-complete-mode 0)
 
 ;-----------{Code generation}----------;
 

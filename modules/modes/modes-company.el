@@ -70,10 +70,29 @@
   (company-statistics-mode)
     (company-quickhelp-mode))
 
+(defun indent-or-expand (arg)
+  "Either indent according to mode, or expand the word preceding
+point."
+  (interactive "*P")
+  (if (and
+       (or (bobp) (= ?w (char-syntax (char-before))))
+       (or (eobp) (not (= ?w (char-syntax (char-after))))))
+      (dabbrev-expand arg)
+    (indent-according-to-mode)))
+
+
+(defun tiqsi/indent-or-complete (arg)
+  (interactive "*P")
+  (if (company-manual-begin)
+      (company-complete-common)
+    (indent-or-expand arg)))
+
+
+
 (enable-company)
 (global-auto-complete-mode 0)
 (define-key company-mode-map "!" 'company-quickhelp-manual-begin)
-
+(define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
 
 
 
