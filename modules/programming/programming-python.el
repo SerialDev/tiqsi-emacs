@@ -3,10 +3,10 @@
 ;;; Commentary:
 ;; 
 
- (setq jedi:setup-keys nil)
- (setq jedi:tooltip-method nil)
- (autoload 'jedi:setup "jedi" nil t)
- (add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:setup-keys nil)
+(setq jedi:tooltip-method nil)
+(autoload 'jedi:setup "jedi" nil t)
+(add-hook 'python-mode-hook 'jedi:setup)
 
 (defvar jedi:goto-stack '())
 
@@ -72,12 +72,10 @@ FORM is checked at compile time."
    "from IPython.core.completerlib import module_completion"
  python-shell-completion-string-code
  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
- )
-
-
-(setq python-shell-completion-module-string-code
+ python-shell-completion-module-string-code
    "';'.join(module_completion('''%s'''))\n"
  )
+
 
 ;;; smartrep
 (pyt--eval-after-load (smartrep python)
@@ -90,7 +88,7 @@ FORM is checked at compile time."
       ("<"   . python-indent-shift-left))))
 
 (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
-(setq py-autopep8-options '("--max-line-length=100"))
+(setq py-autopep8-options '("--max-line-length=110"))
 
 
 (defun sdev-use-ipython (&optional ipython)
@@ -262,21 +260,44 @@ else:
 
 (add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
 
-(defun my-ac-jedi-setup ()
-  (jedi:setup)
-  ;; override `ac-sources':
-  (setq ac-sources '(ac-source-jedi-direct)))
 
-(add-hook 'python-mode-hook 'my-ac-jedi-setup)
-(add-hook 'inferior-python-mode-hook 'my-ac-jedi-setup)
-;; (inferior-python-mode)
 
-(setq ac-auto-show-menu    0)
-(setq ac-delay             0)
-(setq ac-menu-height       5)
-(setq ac-auto-start t)
-(setq ac-show-menu-immediately-on-auto-complete 0)
-(setq ac-quick-help-delay 0)
+;-----------------{Ac}-----------------;
+
+;; (defun my-ac-jedi-setup ()
+;;   (jedi:setup)
+;;   ;; override `ac-sources':
+;;   (setq ac-sources '(ac-source-jedi-direct)))
+
+;; (add-hook 'python-mode-hook 'my-ac-jedi-setup)
+;; (add-hook 'inferior-python-mode-hook 'my-ac-jedi-setup)
+;; ;; (inferior-python-mode)
+
+;; (setq ac-auto-show-menu    0)
+;; (setq ac-delay             0)
+;; (setq ac-menu-height       5)
+;; (setq ac-auto-start t)
+;; (setq ac-show-menu-immediately-on-auto-complete 0)
+;; (setq ac-quick-help-delay 0)
+
+
+
+;---------------{Company}--------------;
+
+(use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
+  :straight t
+  :ensure t
+  :config
+  ;; (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
+  (add-hook 'python-mode-hook 'jedi:setup)
+  ;; (setq jedi:complete-on-dot t)
+  (setq jedi:use-shortcuts t)
+  (defun config/enable-company-jedi ()
+    (add-to-list 'company-backends 'company-jedi)
+    (company-mode 1)
+    (auto-complete-mode 0))
+  (add-hook 'python-mode-hook 'config/enable-company-jedi))
+
 ;-----------{Code generation}----------;
 
 ;; (package-install 'pygen)

@@ -1,7 +1,7 @@
 ;;; core-setup.el --- Tiqsi setup
 
 ;;; Commentary:
-;; 
+;;
 
 (setq straight-use-package-by-default t)
 (setq use-package-verbose t
@@ -53,6 +53,7 @@
 (straight-require 'color)
 (straight-require 'company-statistics)
 (straight-require 'company-quickhelp)
+(straight-require 'company-jedi)
 (straight-require 'mic-paren)
 (straight-require 'column-enforce-mode)
 (straight-require 'region-state)
@@ -172,7 +173,7 @@
 ))
 
 
-;; C & CPP Header completion 
+;; C & CPP Header completion
 (straight-use-package
  '(company-irony-c-headers
    :type git
@@ -247,6 +248,21 @@
 (load-relative "../modules/misc/hczim/gas-mode") ;; Assembly
 (try-require 'gas-mode)
 
+
+;{Ensure Executables};
+;; Add any executables that must be found
+
+(defun ensure-executable (exec)
+  (unless (executable-find exec)
+    (message (concat exec " not found in exec-path"))))
+
+(ensure-executable "clang")
+(ensure-executable "gdb")
+(ensure-executable "ctags")
+(ensure-executable "cmake")
+(ensure-executable "make")
+(ensure-executable "rdm")
+(ensure-executable "ag")
 
 (provide 'core-setup)
 ;;; core-setup.el ends here

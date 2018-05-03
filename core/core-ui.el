@@ -255,6 +255,7 @@
 (semantic-mode 1)
 
 
+
 ;---{Keybindings}---;
 (global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)
