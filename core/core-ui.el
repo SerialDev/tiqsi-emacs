@@ -87,14 +87,14 @@
   (defvar me/font-size-header       140       "The font size to use for headers.")
   (defvar me/font-size-mode-line    120       "The font size to use for the mode line."))
 
+;; BUG: bugs out posframe
+;; (when tiqsi-linux
+;;   (defvar me/font-size-default      420       "The font size to use for default text.")
+;;   (defvar me/font-size-header       440       "The font size to use for headers.")
+;;   (defvar me/font-size-mode-line    420       "The font size to use for the mode line."))
 
-(when tiqsi-linux
-  (defvar me/font-size-default      420       "The font size to use for default text.")
-  (defvar me/font-size-header       440       "The font size to use for headers.")
-  (defvar me/font-size-mode-line    420       "The font size to use for the mode line."))
-
-(when tiqsi-linux
-   (set-face-attribute 'default nil :height 200))
+;; (when tiqsi-linux
+;;    (set-face-attribute 'default nil :height 200))
 
 (defun post-load-stuff ()
   (interactive)
@@ -177,7 +177,7 @@
 
 ;{Marked region info};
 
-(add-hook 'rectangle-mark-mode 'region-state-mode)
+;; (add-hook 'rectangle-mark-mode 'region-state-mode)
 (add-hook 'text-mode 'region-state-mode)
 
 
