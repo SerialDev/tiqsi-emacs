@@ -1,12 +1,22 @@
 ;;; programming-python.el --- Tiqsi python programming support
 
 ;;; Commentary:
-;; 
+;;
 
 (setq jedi:setup-keys nil)
 (setq jedi:tooltip-method nil)
 (autoload 'jedi:setup "jedi" nil t)
 (add-hook 'python-mode-hook 'jedi:setup)
+
+;; (defun install-traad ()
+;;   (if (equal (shell-command-to-string "which traad") "")
+;;       (shell-command "pip install traad")
+;;     (print "traad already installed"))
+;;   (setq traad-server-program (shell-command-to-string "which traad")))
+
+;; (install-traad)
+
+
 
 (defvar jedi:goto-stack '())
 
@@ -195,7 +205,7 @@ else:
   (interactive)
   (setq-local py-temp (string-to-number(message "%d" (point))))
   (next-line 1 1)
-  (python-shell-send-region py-temp (point) nil t)) 
+  (python-shell-send-region py-temp (point) nil t))
 
 ;-----------{I-menu merging}-----------;
 
@@ -231,7 +241,7 @@ else:
   (message
   (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
 
-  
+
 ;;; Indentation for python
 
 ;; Ignoring electric indentation
@@ -306,6 +316,45 @@ else:
 ;; (add-hook 'python-mode-hook 'pygen-mode)
 ;(shell-command "pip install rope")
 
+
+;----{debugging}----;
+
+; Highlight the call to ipdb
+; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/
+(defun annotate-pdb ()
+  (interactive)
+  (highlight-lines-matching-regexp "import ipdb")
+  (highlight-lines-matching-regexp "ipdb.set_trace()"))
+(add-hook 'python-mode-hook 'annotate-pdb)
+
+(defun ipdb-add-breakpoint ()
+  "Add a break point"
+  (interactive)
+  (newline-and-indent)
+  (insert "import ipdb; ipdb.set_trace()")
+  (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
+
+(defun ipdb-cleanup ()
+    (interactive)
+    (save-excursion
+      (replace-regexp ".*ipdb.set_trace().*\n" "" nil (point-min) (point-max))
+      ;; (save-buffer)
+      ))
+
+;-------{mypy}------;
+
+(flycheck-define-checker
+    python-mypy ""
+    :command ("mypy"
+              "--ignore-missing-imports" "--fast-parser"
+              "--python-version" "3.6"
+              source-original)
+    :error-patterns
+    ((error line-start (file-name) ":" line ": error:" (message) line-end))
+    :modes python-mode)
+
+(add-to-list 'flycheck-checkers 'python-mypy t)
+(flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
 
 ;---{Keybindings}---;

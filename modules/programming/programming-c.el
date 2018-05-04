@@ -473,8 +473,8 @@ foo.cpp and in the same directory as the current header file, foo.h."
 _s_: Find symbol at point        _>_: Forward       _t_: Fix it at point
 _r_: Find references at point    _<_: Backward      _T_: Fix it
 _f_: Find File                                    _i_: Add include for symbol
-_S_: Find symbol                 ^RDM^
-_R_: Find refrences              _b_: Start process
+_S_: Find symbol                 ^RDM^              _<right>_: Next diagnostic
+_R_: Find refrences              _b_: Start process _<left>_: Prev diagnostic
 _v_: Find virtuals at point
 "
   ("s" rtags-find-symbol-at-point :color blue)
@@ -483,8 +483,10 @@ _v_: Find virtuals at point
   ("S" rtags-find-symbol :color blue)
   ("R" rtags-find-references :color blue)
   ("v" rtags-find-virtuals-at-point :color blue)
-  (">" rtags-location-stack-back :color blue)
-  ("<" rtags-location-stack-forward :color blue)
+  (">" rtags-location-stack-back :color red)
+  ("<" rtags-location-stack-forward :color red)
+  ("<right>" rtags-next-diag :color red)
+  ("<left>" rtags-previous-diag :color red)
   ("t" rtags-fix-fixit-at-point :color blue)
   ("T" rtags-fixit :color blue)
   ("i" rtags-get-include-file-for-symbol :color blue)
