@@ -27,6 +27,7 @@
   :defer t
   :diminish company-mode)
 
+;; (insert(color-lighten-name "#161616" 10))#2f992f992f99
 ;; (eval-after-load "company" '(let ((bg (face-attribute 'default :background)))
 (eval-after-load "company" '(let ((bg "#161616"))
   (custom-set-faces
@@ -88,13 +89,18 @@ point."
     (indent-or-expand arg)))
 
 
+;; Performance bug: disable until resolved also affects helm-posframe
+;; (company-childframe-mode 1)
+(company-childframe-mode 0)
+
+;; (face-attribute 'company-tooltip :background)
 
 (enable-company)
 (global-auto-complete-mode 0)
 (define-key company-mode-map "!" 'company-quickhelp-manual-begin)
 (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
 
-
+(rectangle-mark-mode 0)
 
 (provide 'modes-company)
 

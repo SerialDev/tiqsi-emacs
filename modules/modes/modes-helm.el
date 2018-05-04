@@ -4,6 +4,38 @@
 ;; 
 
 
+;-{Posframe render}-;
+
+(defun helm-posframe()
+  (interactive)
+  (setq helm-display-function #'helm-posframe-display)
+
+  (defvar helm-posframe-buffer nil)
+
+  (defun helm-posframe-display (buffer &optional _resume)
+    (setq helm-posframe-buffer buffer)
+    (posframe-show
+     buffer
+     :background-color "#161616"
+     :foreground-color "#DAB98F"
+     :poshandler #'posframe-poshandler-frame-bottom-left-corner
+     ;; :width (/ (window-width) 2)
+     :width (+ (window-width) 2)
+     ;; :height helm-display-buffer-height
+     :height (/ helm-display-buffer-height 3)
+     :respect-header-line t))
+
+  (defun helm-posframe-cleanup ()
+    (posframe-hide helm-posframe-buffer))
+
+  (add-hook 'helm-cleanup-hook #'helm-posframe-cleanup))
+
+(defun helm-posframe-cleanup()
+  (interactive)
+  (setq helm-display-function 'helm-default-display-buffer))
+
+;; (helm-posframe)
+
 ;---{Fuzzy Search}--;
 
 (helm-flx-mode 1)

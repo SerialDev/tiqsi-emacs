@@ -1,7 +1,7 @@
 ;;; modes-avy.el --- Tiqsi avy configuration
 
 ;;; Commentary:
-;; 
+;;
 
 (defun count-unique-visible-buffers (&optional frame)
   "Count how many buffers are currently being shown.  Defaults to
