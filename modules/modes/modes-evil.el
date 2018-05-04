@@ -1,7 +1,7 @@
 ;;; modes-evil.el --- Tiqsi Evil vim emulation support
 
 ;;; Commentary:
-;; 
+;;
 
 
 ;-{Initialize evil}-;
@@ -26,15 +26,20 @@
                                                                                            ╭──────┐
  Move              ^ ^        Jump      ^ ^        ^ ^                                	   │ Ukhu │
 ╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
-^^                         	                                                                                             
-     ^_k_^         _H_     [_w_/_W_]: Forward Start   [_$_]: End Line         
-     ^^↑^^         ^↑^     [_e_/_E_]: Forward End     [_g__]: Last char Line [bug]  
- _h_ ←   → _l_     _M_     [_b_/_B_]: Backwards Start [_gg_]: 1st line Doc    
-     ^^↓^^         ^↓^     [_0_]: Start Line          [_G_]: Last line Doc    
-     ^_j_^         _L_     [_\\^_]: 1st char-Line                               
-  
+^^
+     ^_k_^         _H_     [_w_/_W_]: Forward Start   [_$_]: End Line
+     ^^↑^^         ^↑^     [_e_/_E_]: Forward End     [_g__]: Last char Line [bug]
+ _h_ ←   → _l_     _M_     [_b_/_B_]: Backwards Start [_gg_]: 1st line Doc
+     ^^↓^^         ^↓^     [_0_]: Start Line          [_G_]: Last line Doc
+     ^_j_^         _L_     [_\\^_]: 1st char-Line     [_<up>_/_<down>_/_<left>_/_<right>_: move window
+
 "
 ;                                                Move                                               ;
+  ;---{Window move}---;
+  ("<up>" windmove-up)
+  ("<down>" windmove-down)
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
   ;-------{Char}------;
   ("h" evil-backward-char :color red)
   ("l" evil-forward-char :color red)
@@ -45,7 +50,7 @@
   ("M" evil-window-middle :color red)
   ("L" evil-window-bottom :color red)
 ;                                                Jump                                               ;
-  
+
   ;-------{word}------;
   ("w" evil-forward-word-begin :color red)
   ("W" evil-forward-WORD-begin :color red)
@@ -111,14 +116,14 @@
   ("." evil-repeat :color red)
   ("u" undo-tree-undo :color red)
   ("C-r" undo-tree-redo :color red)
-  
+
   ("<f1>" hydra-vim-move-mode/body "Hydra Mov" :color blue)
   ("<f2>" hydra-vim-find-mode/body "Hydra Mov" :color blue)
   ("<f3>" hydra-vim-insert-mode/body "Hydra Insert" :color blue)
   ("<f4>" hydra-vim-edit-mode/body "Hydra Edit" :color blue)
   ("<escape>" nil "cancel" :color blue)
 )
-               
+
 
 (defhydra hydra-vim-find-mode (:color pink
 					:hint nil)
@@ -126,15 +131,20 @@
                                                                                            ╭──────┐
  Find in Buffer                                                                        	   │ Ukhu │
 ╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
-^^                         	                                                                                             
+^^
 _f_/_F_: next/prev <x>               _C-u_: Move back 1/2 screen
-_t_/_T_: before next/prev <x>        _C-b_: Move back 1 screen         
-_}_: next function/block    _C-f_: Move fwd 1 screen          
-_{_: prev function/block    _C-d_: Move fwd 1/2 screen        
+_t_/_T_: before next/prev <x>        _C-b_: Move back 1 screen
+_}_: next function/block    _C-f_: Move fwd 1 screen
+_{_: prev function/block    _C-d_: Move fwd 1/2 screen
 _zz_: center cursor         _;_/_,_: Repeat f,t,F,T fwd/back
 
 "
 ;                                                Move                                               ;
+  ;---{Window move}---;
+  ("<up>" windmove-up)
+  ("<down>" windmove-down)
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
   ;-------{Char}------;
   ("h" evil-backward-char :color red)
   ("l" evil-forward-char :color red)
@@ -145,7 +155,7 @@ _zz_: center cursor         _;_/_,_: Repeat f,t,F,T fwd/back
   ("M" evil-window-middle :color red)
   ("L" evil-window-bottom :color red)
 ;                                                Jump                                               ;
-  
+
   ;-------{word}------;
   ("w" evil-forward-word-begin :color red)
   ("W" evil-forward-WORD-begin :color red)
@@ -210,7 +220,7 @@ _zz_: center cursor         _;_/_,_: Repeat f,t,F,T fwd/back
   ("." evil-repeat :color red)
   ("u" undo-tree-undo :color red)
   ("C-r" undo-tree-redo :color red)
-  
+
   ("<f1>" hydra-vim-move-mode/body "Hydra Mov" :color blue)
   ("<f2>" hydra-vim-find-mode/body "Hydra Mov" :color blue)
   ("<f3>" hydra-vim-insert-mode/body "Hydra Insert" :color blue)
@@ -224,15 +234,20 @@ _zz_: center cursor         _;_/_,_: Repeat f,t,F,T fwd/back
                                                                                            ╭──────┐
  Move              ^ ^        Jump      ^ ^                                           	   │ Ukhu │
 ╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
-^^                         	                                                                                             
-_i_: Insert before cursor	_O_: Open /n above 
-_I_: Insert beg line	        _ea_: append at the end of word [bug] 
-_a_: Append after cursor	_/_: Search Forward		   	   
-_A_: Append at EOL		_?_: Search Backward		   	   
-_o_: Open /n below              _n_/_N_: Repeat search fwd/back                                 
+^^
+_i_: Insert before cursor	_O_: Open /n above
+_I_: Insert beg line	        _ea_: append at the end of word [bug]
+_a_: Append after cursor	_/_: Search Forward
+_A_: Append at EOL		_?_: Search Backward
+_o_: Open /n below              _n_/_N_: Repeat search fwd/back
 
 "
 ;                                                Move                                               ;
+  ;---{Window move}---;
+  ("<up>" windmove-up)
+  ("<down>" windmove-down)
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
   ;-------{Char}------;
   ("h" evil-backward-char :color red)
   ("l" evil-forward-char :color red)
@@ -243,7 +258,7 @@ _o_: Open /n below              _n_/_N_: Repeat search fwd/back
   ("M" evil-window-middle :color red)
   ("L" evil-window-bottom :color red)
 ;                                                Jump                                               ;
-  
+
   ;-------{word}------;
   ("w" evil-forward-word-begin :color red)
   ("W" evil-forward-WORD-begin :color red)
@@ -308,7 +323,7 @@ _o_: Open /n below              _n_/_N_: Repeat search fwd/back
   ("." evil-repeat :color red)
   ("u" undo-tree-undo :color red)
   ("C-r" undo-tree-redo :color red)
-  
+
   ("<f1>" hydra-vim-move-mode/body "Hydra Mov" :color blue)
   ("<f2>" hydra-vim-find-mode/body "Hydra Mov" :color blue)
   ("<f3>" hydra-vim-insert-mode/body "Hydra Insert" :color blue)
@@ -323,15 +338,20 @@ _o_: Open /n below              _n_/_N_: Repeat search fwd/back
                                                                                            ╭──────┐
  Move              ^ ^        Jump      ^ ^                                           	   │ Ukhu │
 ╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
-^^                         	                                                                                             
+^^
 _r_: Replace one char          	 _u_: Undo
-_J_: Join line below	         _C-r_: Redo	    
+_J_: Join line below	         _C-r_: Redo
 _s_: Delete char & replace       ^ ^
-_S_/_cc_: Delete line & replace  ^ ^ 
+_S_/_cc_: Delete line & replace  ^ ^
 _._: Repeat last command         ^ ^
 
 "
 ;                                                Move                                               ;
+  ;---{Window move}---;
+  ("<up>" windmove-up)
+  ("<down>" windmove-down)
+  ("<left>" windmove-left)
+  ("<right>" windmove-right)
   ;-------{Char}------;
   ("h" evil-backward-char :color red)
   ("l" evil-forward-char :color red)
@@ -342,7 +362,7 @@ _._: Repeat last command         ^ ^
   ("M" evil-window-middle :color red)
   ("L" evil-window-bottom :color red)
 ;                                                Jump                                               ;
-  
+
   ;-------{word}------;
   ("w" evil-forward-word-begin :color red)
   ("W" evil-forward-WORD-begin :color red)
@@ -408,7 +428,7 @@ _._: Repeat last command         ^ ^
   ("." evil-repeat :color red)
   ("u" undo-tree-undo :color red)
   ("C-r" undo-tree-redo :color red)
-  
+
   ("<f1>" hydra-vim-move-mode/body "Hydra Mov" :color blue)
   ("<f2>" hydra-vim-find-mode/body "Hydra Mov" :color blue)
   ("<f3>" hydra-vim-insert-mode/body "Hydra Insert" :color blue)
@@ -416,7 +436,7 @@ _._: Repeat last command         ^ ^
   ("<escape>" nil "cancel" :color blue)
 )
 
-(global-set-key (kbd "<escape>") 'hydra-vim-move-mode/body) 
+(global-set-key (kbd "<escape>") 'hydra-vim-move-mode/body)
 
 
 
