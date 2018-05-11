@@ -130,6 +130,78 @@ This command switches to browser."
   (insert (s-trim comment-start))
   (newline))
 
+
+(defun insert-param-info (var-string)
+  (let (
+	(var-name (car(s-split ":" var-string)))
+	(var-type (car(cdr(s-split ":" var-string))))
+	(var-desc (cdr(cdr(s-split ":" var-string))))
+	)
+
+    (insert (s-prepend var-name " : "))
+    (insert (s-prepend var-type "\n"))
+    (insert (s-prepend (s-prepend "   " (format "%s" (car var-desc))) "\n") )
+    )
+)
+
+
+(defun tiqsi-numpydoc (description params return raises doctest result)
+  """ test"""
+  (interactive "sEnter Description:
+sEnter param list : 
+sEnter return type info :  
+sEnter exception info :
+sEnter Doctest : 
+sEnter Doctest result: ")
+  (insert "\"\"\"")
+  (if (not(equal description ""))
+          (progn(newline)
+          (insert (s-prepend description "\n")))
+      ())
+  (if (not(equal params ""))
+      (progn
+	(newline)
+	(insert "Parameters\n")
+	(insert "----------\n")
+	(newline)
+	(-map 'insert-param-info  (s-split ", " params))
+
+         )
+    ())
+
+  (if (not(equal return ""))
+      (progn
+	(insert "Returns\n")
+	(insert "-------\n")
+	
+	(newline)
+	(insert (s-prepend return "\n")))
+    ())
+
+  (if (not(equal raises ""))
+      (progn
+	(insert "Raises\n")
+	(insert "------\n")
+	(newline)
+          (insert (s-prepend raises "\n")))
+    ())
+
+  (if (not(equal doctest ""))
+      (progn 
+          (newline)
+      (insert "Doctest\n")
+      (insert "-------\n")
+          (insert  (s-join doctest '(">>> """)))
+          (newline)
+          (insert (s-join result '("""")))
+          (newline)
+          (insert "\"\"\""))
+      (insert "\n    \"\"\""))  
+  )
+
+
+
+
 (defun sdev/insert-comment (types function params return  extra doctest result )
 					;(interactive "sString for \\f:")
   (interactive "sEnter Type def:
