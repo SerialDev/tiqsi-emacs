@@ -1,7 +1,7 @@
 ;;; programming-clojure.el --- Tiqsi clojure support
 
 ;;; Commentary:
-;; 
+;;
 
 ;------{Cider}------;
 
@@ -21,7 +21,7 @@
   "Start Leiningen repl."
   (interactive)
   (async-shell-command "lein repl :start :port 46061" )
-   
+
   ;; ;; TODO fix with continuation passing
   ;; (async-start
   ;;  (lambda()
@@ -56,11 +56,11 @@
 (defun lein-project-file()
   "get project-file jar name."
   (interactive)
-  
-  (s-append "standalone.jar" 
-	    (s-replace "\"" "-" 
-		       (s-replace " \"" "-" 
-				  (s-replace "defproject " "" 
+
+  (s-append "standalone.jar"
+	    (s-replace "\"" "-"
+		       (s-replace " \"" "-"
+				  (s-replace "defproject " ""
 					     (regex-match "defproject .*"
 							  (my-file-contents (concat projectile-project-root "project.clj")) 0))))))
 
@@ -113,51 +113,85 @@
   (interactive "P")
   (if (looking-at ")") (forward-char 1))
   (while (not (looking-at ")")) (forward-char 1))
-  ) 
+  )
 
 (defun move-backward-paren (&optional arg)
   "Move backward parenthesis"
   (interactive "P")
   (if (looking-at "(") (forward-char -1))
   (while (not (looking-at "(")) (backward-char 1))
-) 
+)
 
-     
+
 (defun move-forward-sqrParen (&optional arg)
   "Move forward square brackets"
   (interactive "P")
   (if (looking-at "]") (forward-char 1))
   (while (not (looking-at "]")) (forward-char 1))
-  ) 
-      
+  )
+
 (defun move-backward-sqrParen (&optional arg)
   "Move backward square brackets"
   (interactive "P")
   (if (looking-at "[[]") (forward-char -1))
   (while (not (looking-at "[[]")) (backward-char 1))
-  ) 
-      
+  )
+
 (defun move-forward-curlyParen (&optional arg)
   "Move forward curly brackets"
   (interactive "P")
   (if (looking-at "}") (forward-char 1))
   (while (not (looking-at "}")) (forward-char 1))
-  ) 
-      
+  )
+
 (defun move-backward-curlyParen (&optional arg)
   "Move backward curly brackets"
   (interactive "P")
   (if (looking-at "{") (forward-char -1))
   (while (not (looking-at "{")) (backward-char 1))
-  ) 
+  )
 
-(define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)
-(define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
-(define-key clojure-mode-map (kbd "C-c <right>") 'paredit-forward-slurp-sexp)
-(define-key clojure-mode-map (kbd "C-c <left>") 'paredit-forward-barf-sexp)
-(define-key clojure-mode-map (kbd "C-c C-s") 'cider-eval-last-sexp)
-(define-key clojure-mode-map (kbd "C-c (") 'paredit-wrap-round)
-(define-key clojure-mode-map (kbd "C-c )") 'paredit-splice-sexp)
+
+
+(defhydra hydra-clojure-usage (:color pink
+				      :hint nil)
+"
+                                                                                           ╭──────┐
+ Move              ^ ^        Jump      ^ ^                                           	   │ Ukhu │
+╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
+^^
+_C-<up>_: move fwd paren    	_M-<up>_ wrap around
+_C-<down>_: move back paren     _M-<down>_ splice sexp
+_M-<right>_: fwd slurp paren	_C-<right>_: back barf paren
+_M-<left>_: fwd barf paren  	_C-<left>_: back slurp paren  
+_C-s_: eval last sexp           ^ ^
+"
+
+  ("C-<up>" move-forward-paren :color red)
+  ("C-<down>" move-backward-paren :color red)
+  ("M-<right>" paredit-forward-slurp-sexp :color red)
+  ("C-<right>" paredit-backward-barf-sexp :color red)
+  ("M-<left>" paredit-forward-barf-sexp :color red)
+  ("C-<left>" paredit-backward-slurp-sexp :color red)
+  ("C-s" cider-eval-last-sexp :color red)
+  ("M-<up>" paredit-wrap-round :color red)
+  ("M-<down>" paredit-splice-sexp :color red)
+  ("<escape>" nil "cancel" :color blue)
+  ("<f1>" lein-start-repl "start repl" :color red)
+  ("<f2>" lein-connect-repl "connect repl" :color red)
+  ("<f3>" lein-compile-uberjar "compile uberjar" :color blue)
+  ("<f3>" lein-run-uberjar "run uberjar" :color blue)
+)
+
+
+;; (define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)
+;; (define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
+;; (define-key clojure-mode-map (kbd "C-c <right>") 'paredit-forward-slurp-sexp)
+;; (define-key clojure-mode-map (kbd "C-c <left>") 'paredit-forward-barf-sexp)
+;; (define-key clojure-mode-map (kbd "C-c C-s") 'cider-eval-last-sexp)
+;; (define-key clojure-mode-map (kbd "C-c (") 'paredit-wrap-round)
+;; (define-key clojure-mode-map (kbd "C-c )") 'paredit-splice-sexp)
+(define-key clojure-mode-map (kbd "M-c") 'hydra-clojure-usage/body)
 
 
 (provide 'programming-clojure)
