@@ -1,7 +1,7 @@
 ;;; private-misc.el --- Tiqsi Miscellaneous defuns
 
 ;;; Commentary:
-;; 
+;;
 
 ;; http://ergoemacs.org/emacs/emacs_lookup_ref.html  TODO: Further edit this one so it behaves like dict
 
@@ -96,7 +96,7 @@ This command switches to browser."
   (newline)
   (insert comment-start)
   (insert
-    (s-truncate 83 
+    (s-truncate 83
       (sdev/center-pad 78 "="
         (s-join string '("{""}"))
     ))
@@ -109,7 +109,7 @@ This command switches to browser."
   (newline)
   (insert comment-start )
   (insert
-    (s-truncate 38 
+    (s-truncate 38
       (sdev/center-pad 38 "-"
         (s-join string '("{""}"))
 	))
@@ -122,7 +122,7 @@ This command switches to browser."
   (newline)
   (insert comment-start )
   (insert
-    (s-truncate 23 
+    (s-truncate 23
       (sdev/center-pad 19 "-"
         (s-join string '("{""}"))
 	))
@@ -130,14 +130,99 @@ This command switches to browser."
   (insert (s-trim comment-start))
   (newline))
 
+
+(defun insert-param-info (var-string)
+  (let (
+	(var-name (car(s-split ":" var-string)))
+	(var-type (car(cdr(s-split ":" var-string))))
+	(var-desc (cdr(cdr(s-split ":" var-string))))
+	)
+
+    (insert (s-prepend var-name " : "))
+    (insert (s-prepend var-type "\n"))
+    (insert (s-prepend (s-prepend "   " (format "%s" (car var-desc))) "\n") )
+    (newline)
+    )
+)
+
+(defun insert-val-desc (var-string)
+  (let (
+	(var-name (car(s-split ":" var-string)))
+	(var-desc (cdr(s-split ":" var-string)))
+	)
+    (insert (s-prepend var-name "\n"))
+    (insert (s-prepend (s-prepend "    " (format "%s" (car var-desc))) "\n") )
+    (newline)
+    )
+  )
+
+(defun tiqsi-numpydoc (description params return raises doctest result)
+  """ test"""
+  (interactive "sEnter Description:
+sEnter param list :
+sEnter return type info :
+sEnter exception info :
+sEnter Doctest :
+sEnter Doctest result: ")
+  (insert "\"\"\"")
+  (if (not(equal description ""))
+          (progn(newline)
+          (insert (s-prepend description "\n")))
+      ())
+  (if (not(equal params ""))
+      (progn
+	(newline)
+	(insert "Parameters\n")
+	(insert "----------\n")
+	(newline)
+	(-map 'insert-param-info  (s-split ", " params))
+
+         )
+    ())
+
+  (if (not(equal return ""))
+      (progn
+	(insert "Returns\n")
+	(insert "-------\n")
+
+	(newline)
+	(insert-val-desc return)
+	)
+    ())
+
+  (if (not(equal raises ""))
+      (progn
+	(insert "Raises\n")
+	(insert "------\n")
+	(newline)
+	(insert-val-desc raises)
+	)
+    ())
+
+  (if (not(equal doctest ""))
+      (progn
+          (newline)
+      (insert "Doctest\n")
+      (insert "-------\n")
+          (insert  (s-join doctest '(">>> """)))
+          (newline)
+          (insert (s-join result '("""")))
+          (newline)
+          (insert "\"\"\""))
+      (insert "\n    \"\"\""))
+  )
+
+
+
+
 (defun sdev/insert-comment (types function params return  extra doctest result )
 					;(interactive "sString for \\f:")
   (interactive "sEnter Type def:
-sEnter Function: 
+sEnter Function:
 sEnter Params :
 sEnter Return value :
-sEnter Extra information : 
-sEnter Doctest : 
+sEnter Extra information :
+sEnter Doctest :
 sEnter result of doctest: ")
   (insert "\"\"\"")
   (if (not(equal types ""))
@@ -145,7 +230,7 @@ sEnter result of doctest: ")
           (insert(sdev/truncate 83
             (s-prepend "    * type-def ::"
               (s-join " ::"
-                (s-split "," types)))))  
+                (s-split "," types)))))
       ()))
 
   (if (not(equal function ""))
@@ -166,7 +251,7 @@ sEnter result of doctest: ")
           (insert "    * ----------------{Returns}---------------\n")
           (insert (sdev/truncate 83 (s-join return '("    * "" . . . ")))))
       ())
-  
+
   (if (not(equal extra ""))
           (progn(newline)
           (insert "    * -----------------{Extra}----------------\n")
@@ -174,7 +259,7 @@ sEnter result of doctest: ")
       ())
 
   (if (not(equal doctest ""))
-      (progn 
+      (progn
           (newline)
           (insert "    * ----------------{Doctest}---------------\n")
           (insert (s-word-wrap 83 (s-join doctest '("    >>> """))))
@@ -204,25 +289,25 @@ sEnter function: ")
 ;;--{inspect python}-
 
 (defun sdev/inspect-module(module flag)
-    (interactive "sEnter module: 
+    (interactive "sEnter module:
 sEnter flag: ")
     (insert (s-concat "print(inspect_module(" module ", '" flag "'))")) )
 
 (add-hook 'python-mode-hook
           (lambda () (define-key python-mode-map (kbd "C-c = i") 'sdev/inspect-module)))
 
-;; Transpose a column of chars TODO: make it work with words too 
+;; Transpose a column of chars TODO: make it work with words too
 (defun sdev/insert-column (chars)
   (interactive "sChars to enter: ")
   (insert-rectangle (mapcar 'string (string-to-list chars))))
 
 
-  
+
 ;;; Lines to C-LIST
 (defun sdev/lines-to-cslist (start end &optional arg)
   (interactive "r\nP")
   (let ((insertion
-         (mapconcat 
+         (mapconcat
           (lambda (x) (format "\"%s\"" x))
           (split-string (buffer-substring start end)) ", ")))
     (delete-region start end)
@@ -238,8 +323,8 @@ sEnter flag: ")
    (mapconcat 'identity
               (split-string current-region-string separator)
               "\n")))
-			  
-			  
+
+
 (defun sdev/lines-to-csv (separator)
   "Converts the current region lines to a single line, CSV value, separated by the provided separator string."
   (interactive "sEnter separator character: ")
@@ -248,7 +333,7 @@ sEnter flag: ")
    (mapconcat 'identity
               (split-string current-region-string "\n")
               separator)))
-			  
+
 
 ;; TODO improve internal Shift right behaviour
 (defun sdev/py-try-catch(beginning end)
@@ -315,7 +400,7 @@ sed -n 's/^author //p' | \
 sort | uniq -c | sort -rn")))
 
 
-(when (require 'core-secrets nil 'noerror) 
+(when (require 'core-secrets nil 'noerror)
 
   (defun connect-to-eac()
     (interactive)
@@ -330,7 +415,7 @@ sort | uniq -c | sort -rn")))
     (interactive)
     (cd secrets-config_path)
     )
-  
+
   (global-set-key (kbd "C-c C-r p") 'cd-to-sdev)
   (global-set-key (kbd "C-c C-r c") 'cd-to-config)
 )
@@ -420,7 +505,7 @@ sort | uniq -c | sort -rn")))
     (insert (s-append " = "(s-prepend "self."(s-trim(s-replace "\"" ""(s-replace "\'" ""(car(s-split ":" (car list)))))))))
     (insert (s-trim (car(cdr(s-split ":" (car list))))))
     (newline-and-indent)
-    
+
     (setq list (cdr list))))
 
 
@@ -442,7 +527,7 @@ sort | uniq -c | sort -rn")))
 
 
 
-;; where run_shell = #!/bin/bash \n docker.exe exec -it <c089f602d9bb> python3 || docker.exe exec -it <c089f602d9bb> bash -c "python3; bash" 
+;; where run_shell = #!/bin/bash \n docker.exe exec -it <c089f602d9bb> python3 || docker.exe exec -it <c089f602d9bb> bash -c "python3; bash"
 (defun sdev-use-docker-cpython (&optional cpython)
   "Set defaults to use the standard interpreter instead of IPython.
 
@@ -503,7 +588,7 @@ else:
 (defun sdev/insert-flasgger (description tag params json-field response-desc extra  )
 					;(interactive "sString for \\f:")
   (interactive "sEnter description def:
-sEnter Tag: 
+sEnter Tag:
 sEnter Param names csv :
 sEnter json-field names csv :
 sEnter response description :
@@ -512,11 +597,11 @@ sEnter Extra information :")
   (newline-and-indent)
   (insert-and-newline description)
   (insert-and-newline "This is using docstrings for specifications")
-  
+
   (insert-and-newline "---")
   (insert-and-newline "tags:")
   (insert-and-newline (s-prepend "  - " tag))
-  
+
   (insert-and-newline "parameters:")
   (mapc (lambda (x)
 	  (insert-and-newline (s-prepend "  - " (s-prepend "name: " x)))
@@ -536,9 +621,9 @@ sEnter Extra information :")
           (insert-and-newline "          type: string")
 	  (insert-and-newline "          required: true")
 	  (insert-and-newline "          enum: ['','']")
-	  (insert-and-newline "          example: [1,2,3]") 
+	  (insert-and-newline "          example: [1,2,3]")
 	  ) (s-split "," json-field) )
-	  
+
   (insert-and-newline "definitions:")
   (insert-and-newline "  Response:")
   (insert-and-newline "    type: object")
@@ -581,6 +666,3 @@ sEnter Extra information :")
 (provide 'private-misc)
 
 ;;; private-misc.el ends here
-
-
-

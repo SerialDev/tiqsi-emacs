@@ -102,6 +102,22 @@ of an error, just add the package to a list of missing packages."
      nil)))
 
 
+;{Ensure Executables};
+;; Add any executables that must be found
+
+(defun ensure-executable (exec)
+  (unless (executable-find exec)
+    (message (concat exec " not found in exec-path"))))
+
+(defmacro when-available (func foo)
+  "*Do something if FUNCTION is available."
+  `(when (fboundp ,func) ,foo))
+
+(defmacro require-soft (feature &optional file)
+  "*Try to require FEATURE, but don't signal an error if 'require' fails."
+  `(require ,feature ,file 'noerror))
+
+
 
 (load-require  'core-setup)
 (load-require  'core-os)

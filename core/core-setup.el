@@ -11,139 +11,13 @@
   (straight-use-package module)
   (require module))
 
+
+(defun straight-require-lazy (module)
+  (straight-use-package-lazy module)
+  (try-require module))
+
+
 (straight-require 'use-package)
-(straight-require 'spaceline)
-(straight-require 'neotree)
-(straight-require 'switch-window)
-(straight-require 'posframe)
-(straight-require 'company-childframe)
-(straight-require 'flyspell)
-(straight-require 'origami)
-(straight-require 'bug-hunter)
-(straight-require 'rtags)
-(straight-require 'jdee)
-(straight-require 'py-isort)
-;; (straight-require 'traad) ;; Not convinced
-(straight-require 'py-autopep8)
-(straight-require 'typing)
-(straight-require 'flymake)
-(straight-require 'flymake-easy)
-(straight-require 'flymake-rust)
-(straight-require 'rust-mode)
-(straight-require 'textx-mode)
-(straight-require 'bnfc)
-(straight-require 'etags-select)
-(straight-require 'ctags-update)
-(straight-require 'helm-etags-plus) ;; Helm Etags support
-(straight-require 'spaceline-all-the-icons)
-(straight-require 'hydra)
-(straight-require 'ido)
-(straight-require 'ido-completing-read+)
-(straight-require 'delight)
-(straight-require 'find-dired)
-(straight-require 'magit)
-(straight-require 'git-gutter-fringe)
-(straight-require 'beacon)
-(straight-require 'scratch)
-(straight-require 'auto-complete)
-(straight-require 'direx)
-(straight-require 'beacon)
-(straight-require 'rainbow-mode)
-(straight-require 'highlight-indentation)
-(straight-require 'highlight-thing)
-(straight-require 'highlight-symbol)
-(straight-require 'highlight-parentheses)
-(straight-require 'paren)
-(straight-require 'color)
-(straight-require 'company-statistics)
-(straight-require 'company-quickhelp)
-(straight-require 'company-jedi)
-(straight-require 'mic-paren)
-(straight-require 'column-enforce-mode)
-(straight-require 'region-state)
-(straight-require 'diminish)
-(straight-require 'minimap)
-(straight-require 'projectile)
-(straight-require 'all-the-icons)
-(straight-require 'stripe-buffer)
-(straight-require 'flycheck)
-(straight-require 'flycheck-title)
-(straight-require 'dumb-jump)
-(straight-require 'ivy)
-(straight-require 'helm)
-(straight-require 'helm-flx)
-(straight-require 'helm-smex)
-(straight-require 'bind-key)
-(straight-require 'avy)
-(straight-require 'ace-jump-buffer)
-(straight-require 'ace-window)
-(straight-require 's)
-(straight-require 'erc)
-(straight-require 'org)
-(straight-require 'adaptive-wrap)
-(straight-require 'htmlize)
-(straight-require 'cider)
-(straight-require 'company-quickhelp)
-(straight-require 'ob-ipython)
-(straight-require 'docker)
-(straight-require 'docker-api)
-(straight-require 'jedi)
-(straight-require 'paredit)
-;; (straight-require 'parinfer)
-(straight-require 'docker-compose-mode)
-(straight-require 'dockerfile-mode)
-(straight-require 'camcorder)
-(straight-require 'windmove)
-(straight-require 'auto-complete)
-(straight-require 'focus)
-(straight-require 'drag-stuff)
-(straight-require 'undo-tree)
-(straight-require 'indent-tools)
-(straight-require 'vimish-fold)
-(straight-require 'corral)
-(straight-require 'xref)
-(straight-require 'cc-mode)
-(straight-require 'compile)
-(straight-require 'helpful)
-(straight-require 'flycheck-rust)
-(straight-require 'semantic)
-(straight-require 'stickyfunc-enhance)
-(straight-require 'which-key)
-(straight-require 'pos-tip)
-(straight-require 'disaster)
-(straight-require '0xc)
-(straight-require 'cl)
-(straight-require 'dabbrev)
-(straight-require 'elf-mode)
-(straight-require 'popup-pos-tip)
-(straight-require 'racer)
-(straight-require 'cargo)
-(straight-require 'clojure-mode)
-(straight-require 'cider)
-(straight-require 'ac-racer)
-(straight-require 'irony) ;; C & CPP completion support
-(straight-require 'hydra) ;; hydras
-(straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
-(straight-require 'ac-helm) ;; Interactive ac with Helm
-(straight-require 'helm-dash) ;; Dash Documentation Support
-(straight-require 'helm-pydoc) ;; Helm Python documentation
-(straight-require 'helm-swoop) ;; Swoop Editing
-(straight-require 'helm-descbinds) ;; Keybindings interactive search
-(straight-require 'helm-w32-launcher) ;; Start Menu Support
-(straight-require 'helm-chrome) ;; Chrome Bookmarks support
-(straight-require 'expand-region) ;; Select a code region
-(straight-require 'pcre2el) ;; Regexp syntax converter
-
-;-----{From git}----;
-
-
-(straight-use-package
- '(evil
-   :type git
-   :host github
-   :repo "emacs-evil/evil"
-))
-
 
 ;; Asynchronous execution
 
@@ -167,6 +41,222 @@
    :host github
    :repo "jwiegley/emacs-async"
 ))
+
+
+;-----------------{UX}-----------------;
+
+
+;-------{M-x}-------;
+
+(straight-require 'spaceline)
+(straight-require 'spaceline-all-the-icons)
+(straight-require 'delight)
+(straight-require 'diminish)
+
+
+;-----{Windows}-----;
+
+(straight-require-lazy 'neotree)
+(straight-require 'all-the-icons)
+(straight-require 'switch-window)
+(straight-require 'beacon)
+(straight-require 'windmove)
+
+
+;------{Buffer}-----;
+
+(straight-require 'stickyfunc-enhance)
+(straight-require 'stripe-buffer)
+(straight-require 'rainbow-mode)
+(straight-require 'highlight-indentation)
+(straight-require 'highlight-thing)
+(straight-require 'highlight-symbol)
+(straight-require 'highlight-parentheses)
+(straight-require 'mic-paren)
+
+;------{Search}-----;
+
+(straight-require 'ivy)
+(straight-require 'hydra)
+(straight-require 'ido)
+(straight-require 'ido-completing-read+)
+(straight-require 'find-dired)
+(straight-require 'direx)
+
+;-------{Git}-------;
+
+(straight-require 'magit)
+(straight-require 'git-gutter-fringe)
+
+;-------{Misc}------;
+
+(straight-require-lazy 'flyspell)
+(straight-require-lazy 'column-enforce-mode)
+(straight-require 'scratch)
+(straight-require 'region-state)
+(straight-require 'bind-key)
+(straight-require 'erc)
+(straight-require 'org)
+(straight-require-lazy 'adaptive-wrap)
+(straight-require 'focus)
+(straight-require 'camcorder)
+
+;---{helpful libs}--;
+
+(straight-require 'helpful)
+(straight-require 'which-key)
+(straight-require '0xc)
+
+(straight-require 'pos-tip)
+(straight-require 'popup-pos-tip)
+
+;-----{needed?}-----;
+
+(straight-require 'paren)
+(straight-require 'color)
+(straight-require 'cc-mode)
+(straight-require 'compile)
+
+;--{cutting board}--;
+
+;(straight-require 'posframe)
+;(straight-require 'company-childframe)
+;; (straight-require 'parinfer)
+
+;---------------{Modules}--------------;
+
+;-------{Helm}------;
+
+(straight-require 'helm)
+(straight-require 'helm-flx)
+(straight-require 'helm-smex)
+(straight-require 'helm-etags-plus) ;; Helm Etags support
+(straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
+(straight-require 'ac-helm) ;; Interactive ac with Helm
+(straight-require 'helm-dash) ;; Dash Documentation Support
+(straight-require 'helm-pydoc) ;; Helm Python documentation
+(straight-require 'helm-swoop) ;; Swoop Editing
+(straight-require 'helm-descbinds) ;; Keybindings interactive search
+(straight-require 'helm-w32-launcher) ;; Start Menu Support
+(straight-require 'helm-chrome) ;; Chrome Bookmarks support
+
+;-------------{Programming}------------;
+
+;-{elisp libraries}-;
+
+(straight-require 's)
+(straight-require 'htmlize)
+(straight-require 'docker-api)
+(straight-require 'pcre2el) ;; Regexp syntax converter
+
+
+;---{Major Modes}---;
+
+(straight-require 'clojure-mode)
+(straight-require 'cl)
+(straight-require 'elf-mode)
+(straight-require-lazy 'rust-mode)
+(straight-require-lazy 'textx-mode)
+(straight-require-lazy 'bnfc)
+
+(straight-require 'docker)
+(straight-require 'docker-compose-mode)
+(straight-require 'dockerfile-mode)
+
+;----{Platforms}----;
+
+(straight-require 'ob-ipython)
+(straight-require-lazy 'ein)
+(straight-require 'cider)
+
+
+;------{tools}------;
+
+(straight-require-lazy 'bug-hunter)
+
+(straight-require 'py-isort)
+;; (straight-require 'traad) ;; Not convinced
+(straight-require 'py-autopep8)
+
+
+;---{Intellisense}--;
+
+(straight-require-lazy 'rtags)
+(straight-require-lazy 'jdee)
+(straight-require 'jedi)
+(straight-require 'racer)
+
+
+
+(straight-require 'irony) ;; C & CPP completion support
+(straight-require 'auto-complete)
+(straight-require 'company-statistics)
+(straight-require 'company-quickhelp)
+(straight-require 'company-jedi)
+(straight-require 'dabbrev)
+
+(straight-require-lazy 'ac-racer)
+
+
+;----{utilities}----;
+
+(straight-require 'disaster)
+(straight-require 'cargo)
+
+
+;-----{Linters}-----;
+
+(straight-require-lazy 'flymake)
+(straight-require-lazy 'flymake-easy)
+(straight-require-lazy 'flymake-rust)
+(straight-require 'flycheck)
+(straight-require 'flycheck-title)
+(straight-require 'flycheck-rust)
+(straight-require 'semantic)
+
+
+;----{Navigation}---;
+
+(straight-require 'etags-select)
+(straight-require 'ctags-update)
+(straight-require 'minimap)
+(straight-require 'projectile)
+(straight-require 'dumb-jump)
+(straight-require 'avy)
+(straight-require 'ace-jump-buffer)
+(straight-require 'ace-window)
+(straight-require 'xref)
+
+
+;---------------{Editing}--------------;
+
+(straight-require-lazy 'origami)
+(straight-require 'paredit)
+(straight-require 'drag-stuff)
+(straight-require 'undo-tree)
+(straight-require 'indent-tools)
+(straight-require-lazy 'vimish-fold)
+(straight-require-lazy 'corral)
+(straight-require-lazy 'expand-region) ;; Select a code region by semantic units
+
+
+;----------------{Misc}----------------;
+
+(straight-require-lazy 'typing)
+
+
+;-----{From git}----;
+
+
+(straight-use-package
+ '(evil
+   :type git
+   :host github
+   :repo "emacs-evil/evil"
+))
+
+
+
 
 
 (straight-use-package
@@ -234,10 +324,10 @@
 
 ;---{Requirements}--;
 
-(require 'browse-url) ; part of gnu emacs
-(require 'uniquify)
-(require 'dired-x)
-(require 'helm-eshell) ;; Eshell History support
+(try-require 'browse-url) ; part of gnu emacs
+(try-require 'uniquify)
+(try-require 'dired-x)
+(try-require 'helm-eshell) ;; Eshell History support
 
 
 ;----{From ~Lisp}---;
@@ -252,21 +342,6 @@
 (load-relative "../modules/misc/hczim/gas-mode") ;; Assembly
 (try-require 'gas-mode)
 
-
-;{Ensure Executables};
-;; Add any executables that must be found
-
-(defun ensure-executable (exec)
-  (unless (executable-find exec)
-    (message (concat exec " not found in exec-path"))))
-
-(defmacro when-available (func foo)
-  "*Do something if FUNCTION is available."
-  `(when (fboundp ,func) ,foo))
-
-(defmacro require-soft (feature &optional file)
-  "*Try to require FEATURE, but don't signal an error if 'require' fails."
-  `(require ,feature ,file 'noerror))
 
 (ensure-executable "clang")
 (ensure-executable "gdb")
