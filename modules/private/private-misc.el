@@ -141,6 +141,7 @@ This command switches to browser."
     (insert (s-prepend var-name " : "))
     (insert (s-prepend var-type "\n"))
     (insert (s-prepend (s-prepend "   " (format "%s" (car var-desc))) "\n") )
+    (newline)
     )
 )
 
@@ -151,6 +152,7 @@ This command switches to browser."
 	)
     (insert (s-prepend var-name "\n"))
     (insert (s-prepend (s-prepend "    " (format "%s" (car var-desc))) "\n") )
+    (newline)
     )
   )
 

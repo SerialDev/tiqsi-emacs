@@ -91,7 +91,7 @@ point."
 
 ;; Performance bug: disable until resolved also affects helm-posframe
 ;; (company-childframe-mode 1)
-(company-childframe-mode 0)
+;(company-childframe-mode 0)
 
 ;; (face-attribute 'company-tooltip :background)
 
