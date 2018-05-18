@@ -24,11 +24,14 @@
   (setq gc-cons-threshold 20000000))
 
 (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+(add-hook 'helm-minibuffer-setup-hook #'my-minibuffer-setup-hook)
 (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)
+(add-hook 'helm-minibuffer-exit-hook #'my-minibuffer-exit-hook)
 
 (setq-default bidi-display-reordering nil)
 (setq redisplay-dont-pause t)
 (setq togle-truncate-lines t )
+
 
 (defun toggle-truncate-lines ()
 "Toggle whether to wrap lines at right window border."
