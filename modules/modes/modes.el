@@ -23,6 +23,7 @@
 (load-require 'modes-evil)
 (load-require 'modes-company)
 (load-require 'modes-flyspell)
+(load-require 'modes-shell)
 
 (provide 'modes)
 

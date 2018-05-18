@@ -82,18 +82,26 @@ point."
     (indent-according-to-mode)))
 
 
+(defun indent-and-complete ()
+  (indent-according-to-mode)
+  (company-complete-common))
+
 (defun tiqsi/indent-or-complete (arg)
   (interactive "*P")
   (if (company-manual-begin)
-      (company-complete-common)
+      (indent-and-complete)
     (indent-or-expand arg)))
-
 
 ;; Performance bug: disable until resolved also affects helm-posframe
 ;; (company-childframe-mode 1)
 ;(company-childframe-mode 0)
 
 ;; (face-attribute 'company-tooltip :background)
+
+;; TODO make a macro for these
+(defmacro test()
+  '( "enable-company")
+  )
 
 (enable-company)
 (global-auto-complete-mode 0)
