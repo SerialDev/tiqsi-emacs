@@ -9,6 +9,9 @@
 
 ;; straight.el based repo TODO remove this
 
+(setq user-emacs-directory (concat (file-name-directory buffer-file-name) "emacs-packages"))
+(setenv "HOME" (file-name-directory buffer-file-name))
+
 ;; (setq package-enable-at-startup nil)
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")))
