@@ -10,6 +10,7 @@
 (setq tiqsi-linux (featurep 'x))
 (setq tiqsi-win32 (not (or tiqsi-aquamacs tiqsi-linux)))
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
+(setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
 ;-{Determine Emacs}-;
 
@@ -47,8 +48,8 @@
   (setq tiqsi-font "PragmataPro")
   (prefer-coding-system 'utf-8)
   (when (display-graphic-p)
-    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
-)
+    (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
+
 
 (defun maximize-frame ()
     "Maximize the current frame"
@@ -72,8 +73,7 @@
 (when tiqsi-linux
   (setq default-buffer-file-coding-system 'utf-8-unix)
   (setq tiqsi-makescript "./build.sh")
-  (display-battery-mode 1)
- )
+  (display-battery-mode 1) )
 
 
 ;------{Mac OS}-----;
@@ -92,8 +92,7 @@
   (setq mac-command-key-is-meta t)
   (scroll-bar-mode nil)
   (setq mac-pass-command-to-system nil)
-  (setq tiqsi-makescript "./build.macosx")
-)
+  (setq tiqsi-makescript "./build.macosx"))
 
 ; Turn off the bell on Mac OS X
 (defun nil-bell ())

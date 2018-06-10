@@ -307,12 +307,12 @@
 ))
 
 
-(straight-use-package
- '(wakatime
-   :type git
-   :host github
-   :repo "wakatime/wakatime-mode"
-))
+;; (straight-use-package
+;;  '(wakatime
+;;    :type git
+;;    :host github
+;;    :repo "wakatime/wakatime-mode"
+;; ))
 
 
 (straight-use-package
@@ -332,14 +332,14 @@
 
 ;----{From ~Lisp}---;
 
-(load-relative "../modules/misc/andersl/demax") ;; restore congif when maximized
+(load-expand "modules/misc/andersl/demax") ;; restore congif when maximized
 (try-require 'demax)
 
-(load-relative "../modules/misc/tuhdo/org-recipes") ;; Org mode recipes
+(load-expand "modules/misc/tuhdo/org-recipes") ;; Org mode recipes
 (try-require 'org-recipes)
 
 ; Does not have a melpa source: http://www.hczim.de/software/gas-mode.html
-(load-relative "../modules/misc/hczim/gas-mode") ;; Assembly
+(load-expand "modules/misc/hczim/gas-mode") ;; Assembly
 (try-require 'gas-mode)
 
 

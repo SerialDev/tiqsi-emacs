@@ -3,7 +3,7 @@
 ;;; Commentary:
 ;; 
 
-(load-require 'private-misc)
+(load-expand  "modules/private/private-misc.el")
 
 (provide 'private)
 

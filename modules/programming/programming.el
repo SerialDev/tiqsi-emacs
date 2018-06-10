@@ -3,17 +3,18 @@
 ;;; Commentary:
 ;; 
 
-(load-require  'programming-bnfc)
-(load-require  'programming-assembly)
-(load-require  'programming-c)
-(load-require  'programming-rust)
-(load-require  'programming-python)
-(load-require  'programming-scala)
-(load-require  'programming-clojure)
-(load-require  'programming-text)
-(load-require  'programming-lisp)
-(load-require  'programming-java)
-(load-require  'programming-go)
+
+(load-expand  "modules/programming/programming-bnfc.el")
+(load-expand  "modules/programming/programming-assembly.el")
+(load-expand  "modules/programming/programming-c.el")
+(load-expand  "modules/programming/programming-rust.el")
+(load-expand  "modules/programming/programming-python.el")
+(load-expand  "modules/programming/programming-scala.el")
+(load-expand  "modules/programming/programming-clojure.el")
+(load-expand  "modules/programming/programming-text.el")
+(load-expand  "modules/programming/programming-lisp.el")
+(load-expand  "modules/programming/programming-java.el")
+(load-expand  "modules/programming/programming-go.el")
 
 (provide 'programming)
 

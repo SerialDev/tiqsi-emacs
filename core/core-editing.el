@@ -1,7 +1,7 @@
 ;;; core-editing.el --- Tiqsi Editing
 
 ;;; Commentary:
-;; 
+;;
 
 
 ;----{Commenting}---;
@@ -27,7 +27,7 @@
 (defun append-as-kill ()
   "Performs copy-region-as-kill as an append."
   (interactive)
-  (append-next-kill) 
+  (append-next-kill)
   (copy-region-as-kill (mark) (point))
   )
 
@@ -42,16 +42,14 @@
             (narrow-to-region (mark) (point))
             (goto-char (point-min))
             (replace-string old-word new-word)
-            ))
-  )
+            )))
 
 
 (defun tiqsi-replace-string (FromString ToString)
   "Replace a string without moving point."
   (interactive "sReplace: \nsReplace: %s  With: ")
   (save-excursion
-    (replace-string FromString ToString)
-  ))
+    (replace-string FromString ToString)))
 
 
 ;------{Saving}-----;
@@ -73,6 +71,7 @@
   "Copy the region-rectangle instead of `kill-rectangle'."
   (interactive "r")
   (setq killed-rectangle (extract-rectangle start end)))
+
 
 (defun add-full-stop ()
   "Terminate each line with a full stop."
@@ -109,7 +108,7 @@
     (indent-for-tab-command))
   (indent-for-tab-command))
 
-;;; Still to find a good keymap for this one  
+;;; Still to find a good keymap for this one
 (defun new-line-dwim ()
   (interactive)
   (let ((break-open-pair (or (and (looking-back "{" 1) (looking-at "}"))
@@ -146,7 +145,7 @@ region-end is used."
            (region (buffer-substring start end)))
       (goto-char end)
       (dotimes (i num)
-        (insert region)))))   
+        (insert region)))))
 
 
 (defun duplicate-current-line-or-region (arg)
@@ -220,7 +219,7 @@ If there's no region, the current line will be duplicated."
        (closest-ahead)))))
 
 ;; Once you go to the closest number, you might want to change it. These functions are useful for that.
-	  
+
 (defun sk/incs (s &optional num)
   (interactive "p")
   (let* ((inc (or num 1))
@@ -283,7 +282,7 @@ If there's no region, the current line will be duplicated."
 
 ;------{Toggle}-----;
 
-;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html  
+;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
 (try-require 'origami)
 
 (eval-after-load 'origami
@@ -305,7 +304,7 @@ If there's no region, the current line will be duplicated."
   :ensure t
   :commands (vimish-fold-toggle
              vimish-fold))
- 
+
 ;; Fold indentation https://stackoverflow.com/questions/1587972/how-to-display-indentation-guides-in-emacs/4459159#4459159
 ;; Quite nice for python mode TODO: fix for using with ipynb buffers in EIN
 (defun my-toggle-indent-fold ()
@@ -326,8 +325,8 @@ If there's no region, the current line will be duplicated."
 
 ; if a region is active, just indent
 ; if we’re looking at a space after a non-whitespace character, we try some company-expansion
-; otherwise call whatever would have been called otherwise.	  
-	  
+; otherwise call whatever would have been called otherwise.
+
 (defun malb/indent-or-complete (&optional arg)
   (interactive "P")
   (cond
@@ -438,7 +437,7 @@ region if active."
         (goto-char 0))
       (while (search-forward-regexp regex nil t)
         (move-beginning-of-line nil)
-        (kill-whole-line))))) 
+        (kill-whole-line)))))
 
 ;----{Kill Ring}----;
 
@@ -454,7 +453,7 @@ region if active."
 (defun pre-process-kill-ring-element (element)
   (replace-regexp-in-string "^[[:space:]]+" ""
                             (replace-regexp-in-string "[[:space:]]+$" "" (substring-no-properties element))))
- 
+
 (defun preprocess-kill-ring ()
   (let ((result nil)
         (element nil))
@@ -466,15 +465,11 @@ region if active."
                     (string-match-p "[\r\n]+" element)))
           (setq result (cons element result)))))
     (reverse result)))
- 
+
 (defun browse-kill-ring ()
   (interactive)
   (insert (completing-read "Pick an element: "
                        (preprocess-kill-ring))))
- 
-
-
-
 
 ;---{Keybindings}---;
 (define-key global-map [f8] 'tiqsi-replace-string)
