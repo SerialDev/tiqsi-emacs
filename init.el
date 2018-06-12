@@ -45,6 +45,11 @@ of an error, just add the package to a list of missing packages."
        (add-to-list 'missing-packages-list feature 'append))
      nil)))
 
+(defmacro require-soft (feature &optional file)
+  "*Try to require FEATURE, but don't signal an error if 'require' fails."
+  `(require ,feature ,file 'noerror))
+
+
 ;{Ensure Executables};
 ;; Add any executables that must be found
 
