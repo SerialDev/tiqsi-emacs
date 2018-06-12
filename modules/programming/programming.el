@@ -9,7 +9,7 @@
 (load-expand  "modules/programming/programming-c.el")
 (load-expand  "modules/programming/programming-rust.el")
 (load-expand  "modules/programming/programming-python.el")
-(load-expand  "modules/programming/programming-scala.el")
+;; (load-expand  "modules/programming/programming-scala.el")
 (load-expand  "modules/programming/programming-clojure.el")
 (load-expand  "modules/programming/programming-text.el")
 (load-expand  "modules/programming/programming-lisp.el")

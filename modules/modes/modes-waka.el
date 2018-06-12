@@ -2,10 +2,11 @@
 
 ;;; Commentary:
 ;; 
-(when (require 'core-secrets nil 'noerror) 
-  (global-wakatime-mode 0)
-  (setq wakatime-cli-path (eshell-command-result "which wakatime"))
-  ) 
+;; (when (require 'core-secrets nil 'noerror) 
+;;   (global-wakatime-mode 0)
+;;   (setq wakatime-cli-path (eshell-command-result "which wakatime"))
+;;   ) 
+
 
 (provide 'modes-waka)
 

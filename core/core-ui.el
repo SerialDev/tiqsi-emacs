@@ -98,7 +98,7 @@
 ;;   (defvar me/font-size-mode-line    420       "The font size to use for the mode line."))
 
 ;; (when tiqsi-linux
-;;    (set-face-attribute 'default nil :height 200))
+;;    (set-face-attribute 'default nil :height 120))
 
 (defun post-load-stuff ()
   (interactive)

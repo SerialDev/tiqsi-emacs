@@ -19,7 +19,18 @@
     (read-kbd-macro paredit-backward-delete-key) nil))
 (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
 
+
+;; Elisp go-to-definition with M-. and back again with M-,
+(autoload 'elisp-slime-nav-mode "elisp-slime-nav")
+(add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t)))
+(eval-after-load 'elisp-slime-nav '(diminish 'elisp-slime-nav-mode))
+
+
+;---{Keybindings}---;
+
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
+(define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
+(define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
 
 (provide 'programming-lisp)
 
