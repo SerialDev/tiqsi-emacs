@@ -107,6 +107,7 @@
 (straight-require 'which-key)
 (straight-require '0xc)
 
+(straight-require 'popup)
 (straight-require 'pos-tip)
 (straight-require 'popup-pos-tip)
 
