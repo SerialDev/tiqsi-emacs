@@ -8,8 +8,8 @@
 
 
 (defun comment-or-uncomment-region-or-line ()
-    "Comments or uncomments the region or the current line if there's no active region."
-   (interactive)
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
   (let ((start (line-beginning-position))
         (end (line-end-position)))
     (when (or (not transient-mark-mode) (region-active-p))
@@ -187,6 +187,7 @@ If there's no region, the current line will be duplicated."
             (goto-char start)
             (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
         (replace-match "\\1\n\\2")))))
+
 
 (defun uniquify-all-lines-buffer ()
   "Delete duplicate lines in buffer and keep first occurrence."

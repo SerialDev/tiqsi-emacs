@@ -157,7 +157,20 @@ This command switches to browser."
   )
 
 (defun tiqsi-numpydoc (description params return raises doctest result)
-  """ test"""
+  """     infer column types using pandas
+
+    Parameters
+    ----------
+
+    df : pandas.DataFrame
+        the dataframe from which column types will be extracted
+
+    Returns
+    -------
+
+    Dictionary
+        A python dictionary containing the type information of each column
+   """
   (interactive "sEnter Description:
 sEnter param list :
 sEnter return type info :

@@ -5,8 +5,9 @@
 
 (setq jedi:setup-keys nil)
 (setq jedi:tooltip-method nil)
-(autoload 'jedi:setup "jedi" nil t)
-(add-hook 'python-mode-hook 'jedi:setup)
+;; (autoload 'jedi:setup "jedi" nil t)
+;; (add-hook 'python-mode-hook 'jedi:setup)
+
 
 ;; (defun install-traad ()
 ;;   (if (equal (shell-command-to-string "which traad") "")
@@ -291,23 +292,29 @@ else:
 ;; (setq ac-quick-help-delay 0)
 
 
+;-------{Python Language Server}-------;
+
+
+;; (add-hook 'python-mode-hook #'lsp-python-enable)
+;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+
 
 ;---------------{Company}--------------;
 
-(use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
-  :straight t
-  :ensure t
-  :config
-  ;; (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
-  (add-hook 'python-mode-hook 'jedi:setup)
-  ;; (setq jedi:complete-on-dot t)
-  (setq jedi:use-shortcuts t)
-  (defun config/enable-company-jedi ()
-    (add-to-list 'company-backends 'company-jedi)
-    (company-mode 1)
-    (auto-complete-mode 0))
-  (add-hook 'python-mode-hook 'config/enable-company-jedi))
-(global-auto-complete-mode 0)
+;; (use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
+;;   :straight t
+;;   :ensure t
+;;   :config
+;;   ;; (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
+;;   (add-hook 'python-mode-hook 'jedi:setup)
+;;   ;; (setq jedi:complete-on-dot t)
+;;   (setq jedi:use-shortcuts t)
+;;   (defun config/enable-company-jedi ()
+;;     (add-to-list 'company-backends 'company-jedi)
+;;     (company-mode 1)
+;;     (auto-complete-mode 0))
+;;   (add-hook 'python-mode-hook 'config/enable-company-jedi))
+;; (global-auto-complete-mode 0)
 
 ;-----------{Code generation}----------;
 
@@ -355,6 +362,17 @@ else:
 
 (add-to-list 'flycheck-checkers 'python-mypy t)
 (flycheck-add-next-checker 'python-pylint 'python-mypy t)
+
+
+;--------{disable ac for python}-------;
+
+(defun disable-autocomplete() (interactive)
+  (auto-complete-mode 0))
+
+(defadvice auto-complete-mode (around disable-auto-complete-for-python)
+  (unless (eq major-mode 'python-mode) ad-do-it))
+
+(ad-activate 'auto-complete-mode)
 
 
 ;---{Keybindings}---;

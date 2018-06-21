@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;; Standard using SBCL
-;; 
+;; Elisp functions will go on this one too
 
 
 (when tiqsi-linux

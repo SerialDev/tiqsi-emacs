@@ -1,7 +1,7 @@
 ;;; core-navigation.el --- Tiqsi Navigation defuns
 
 ;;; Commentary:
-;; 
+;;
 
 ;----{Searching}----;
 
@@ -106,7 +106,7 @@ insert `%'."
         (forward-line -1))
       (move-to-column column t)))))
 
-	  
+
 (defun sk/move-text-down (arg)
   "Move region (transient-mark-mode active) or current line
   arg lines down."
@@ -140,7 +140,7 @@ insert `%'."
 ;-----{Line Nav}----;
 
 ;;Toggle between indentation level and beginning of line
-	  
+
 (defun sk/smarter-move-beginning-of-line (arg)
   "Move point back to indentation of beginning of line.
 Move point to the first non-whitespace character on this line.
@@ -182,7 +182,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 ;{Select Python Block};
 
-;; to work with expand-region 
+;; to work with expand-region
 (defun sk/mark-inside-python-block ()
   "Mark inside a python block"
   (interactive)
@@ -327,7 +327,7 @@ error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'down))
 	 (buf-this-buf (window-buffer (selected-window))))
-    (if (or (null other-win) 
+    (if (or (null other-win)
             (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
         (error "No window under this one")
       ;; swap top with this one
@@ -391,7 +391,7 @@ one, an error is signaled."
 ;; Navigation
 (global-set-key [C-S-right] 'shift-right)
 (global-set-key [C-S-left] 'shift-left)
-(global-set-key (kbd "C-S-a") 'move-end-of-line)				
+(global-set-key (kbd "C-S-a") 'move-end-of-line)
 (define-key global-map (kbd "S-<left>") 'open-rectangle)
 (define-key global-map (kbd "C-^") 'what-hexadecimal-value)
 (define-key global-map (kbd "C-M-#") 'insert-separator)
@@ -420,7 +420,7 @@ one, an error is signaled."
 
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-c w") 'rotate-windows)
-  
+
 (global-set-key (kbd "C-c 3") 'my-switch-to-buffer)
 (global-set-key (kbd "C-c 2") 'next-buffer)
 (global-set-key (kbd "C-c 1") 'previous-buffer)
