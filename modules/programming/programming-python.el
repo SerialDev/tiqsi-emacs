@@ -371,9 +371,26 @@ else:
 
 (defadvice auto-complete-mode (around disable-auto-complete-for-python)
   (unless (eq major-mode 'python-mode) ad-do-it))
-
 (ad-activate 'auto-complete-mode)
 
+
+(defun tiqsi-py-on-save(current-line)
+    (interactive)
+    (blacken-buffer)
+    (sdev/py-sort-imports)
+    (delete-trailing-whitespace)
+    (goto-line current-line)
+  )
+
+
+(defun tiqsi-py-before-save-hook ()
+  (when (eq major-mode 'python-mode)
+    (let ((current-line (string-to-number (format-mode-line "%l"))))
+      (tiqsi-py-on-save current-line)
+      )))
+
+
+(add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 
 ;---{Keybindings}---;
 

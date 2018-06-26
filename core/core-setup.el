@@ -270,6 +270,10 @@
 ;;   )
 ;; )
 
+(straight-require 'lsp-python)
+
+(straight-require 'blacken)
+
 (use-package lsp-mode
   :straight t
   :ensure t

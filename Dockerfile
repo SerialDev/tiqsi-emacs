@@ -1,3 +1,4 @@
+
 FROM       ubuntu:xenial
 
 MAINTAINER Andres Mariscal "https://github.com/serialdev"
@@ -41,7 +42,6 @@ RUN apt-get update && \
     apt-get install clang -y && \
     apt-get install cmake -y
 
-
 RUN apt-get install -y openssh-server && \
     mkdir /var/run/sshd && \
     echo 'root:root' |chpasswd && \
@@ -53,6 +53,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+
 ENV PATH /root/.cask/bin:$PATH
 
 RUN apt-get update && apt-get install opam -y && \
@@ -70,7 +71,6 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
     apt-get update && apt-get install yarn
 
-
 RUN apt-get install -y curl grep sed dpkg && \
     TINI_VERSION=`curl https://github.com/krallin/tini/releases/latest | grep -o "/v.*\"" | sed 's:^..\(.*\).$:\1:'` && \
     curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini_${TINI_VERSION}.deb" > tini.deb && \
@@ -85,7 +85,6 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
-
 RUN conda update -n base conda && \
     conda install pytorch -c pytorch && \
     conda install virtualenv && \
@@ -95,22 +94,21 @@ RUN conda update -n base conda && \
     pip install meson && \
     pip install python-language-server[all] && \
     pip install pyls-mypy && \
-    pip install pyls-isort
-
-
-
+    pip install pyls-isort && \
+    pip install black
 
 RUN git clone --recursive https://github.com/Andersbakken/rtags.git && \
     cd rtags && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 . && make && \
     export PATH=$PATH:/mnt/rtags/bin
-
 
 # install rustup toolchain
 RUN curl https://sh.rustup.rs -sSf | \
     sh -s -- --default-toolchain nightly -y
 
 ENV RUSTUP_HOME=/rust
+
 ENV CARGO_HOME=/cargo
+
 ENV PATH=/cargo/bin:/rust/bin:$PATH
 
 RUN echo "(curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path) && rustup default nightly" > /install-rust.sh && chmod 755 /install-rust.sh && \
@@ -132,7 +130,6 @@ RUN cd /tmp/  && \
     echo "(defvar *dist-url* \"http://beta.quicklisp.org/dist/quicklisp/2015-12-18/distinfo.txt\") \n (load \"quicklisp.lisp\") \n (quicklisp-quickstart:install :path \"/root/quicklisp/\" :dist-url *dist-url*) \n (with-open-file (out \"/root/.sbclrc\" :direction :output) \n (format out \"(load \\"/root/quicklisp\/setup.lisp\\")\"))    (ql:quickload \"quicklisp-slime-helper\")" > /tmp/install.lisp && \
     sbcl --non-interactive --load install.lisp
 
-
 #---------------------------------------------------------------------------------------------------#
 #                                          Important tools                                          #
 #---------------------------------------------------------------------------------------------------#
@@ -147,10 +144,17 @@ RUN apt-get install firefox -y && \
     cp /all-the-icons.el/fonts/octicons.ttf /usr/local/share/fonts && \
     cp /all-the-icons.el/fonts/weathericons.ttf /usr/local/share/fonts
 
-
 ADD ./ /tiqsi-emacs
+
 RUN cp /tiqsi-emacs/PragmataPro.ttf /usr/local/share/fonts
+
 ENV DISPLAY=192.168.249.66:0
+
+ENV LC_ALL=C.UTF-8
+
+ENV LANG=C.UTF-8
+
 RUN echo "XLIB_SKIP_ARGB_VISUALS=1 emacs -q -l /tiqsi-emacs/init.el &" >> /tiqsi-emacs/launch-tiqsi.sh && \
     chmod 777 /tiqsi-emacs/launch-tiqsi.sh
+
 WORKDIR /tiqsi-emacs/
