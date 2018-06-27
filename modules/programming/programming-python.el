@@ -18,14 +18,15 @@
 ;; (install-traad)
 
 
-
 (defvar jedi:goto-stack '())
+
 
 (defun jedi:jump-to-definition ()
   (interactive)
   (add-to-list 'jedi:goto-stack
                (list (buffer-name) (point)))
   (jedi:goto-definition))
+
 
 (defun jedi:jump-back ()
   (interactive)
@@ -48,7 +49,9 @@ FORM is checked at compile time."
           file-or-files)
     code))
 
+
 (defvar pyt--run-once-used-keys nil)
+
 
 (defmacro pyt--run-once (key &rest body)
   (declare (indent defun))
@@ -73,6 +76,7 @@ FORM is checked at compile time."
 
 
 (setq python-shell-prompt-detect-failure-warning nil)
+
 
 (setq
  python-shell-interpreter "ipython"
@@ -388,7 +392,6 @@ else:
     (let ((current-line (string-to-number (format-mode-line "%l"))))
       (tiqsi-py-on-save current-line)
       )))
-
 
 (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 

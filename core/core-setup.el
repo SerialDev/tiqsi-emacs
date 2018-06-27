@@ -270,10 +270,6 @@
 ;;   )
 ;; )
 
-(straight-require 'lsp-python)
-
-(straight-require 'blacken)
-
 (use-package lsp-mode
   :straight t
   :ensure t
@@ -295,22 +291,26 @@
             (lambda ()
               (lsp-python-enable)))
 
-
+  
 ;; (straight-require 'lsp-python)
-
 (use-package lsp-ui
   :straight t
   :ensure t
   :init (add-hook 'lsp-after-open-hook #'lsp-ui-mode)
   :config
-  (setq lsp-ui-doc-enable nil
+  (setq lsp-ui-doc-enable t
         lsp-ui-doc-header t
 	lsp-ui-sideline-ignore-duplicate t
+	lsp-enable-completion-at-point t
+	lsp-ui-doc-position 'top
         lsp-ui-doc-include-signature t
         ;; lsp-ui-doc-position 'at-point
+	lsp-ui-doc-background "#000000"
+	lsp-ui-doc-border "#505050"
         )
   (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   )
+
 
 (use-package company-lsp
   :straight t
@@ -322,6 +322,13 @@
         company-lsp-cache-candidates t
         company-lsp-async t)
   )
+
+
+(straight-require 'lsp-python)
+
+(straight-require 'blacken)
+(add-hook 'python-mode-hook (push 'company-lsp company-backends))
+
 
 ;; NB: only required if you prefer flake8 instead of the default
 ;; send pyls config via lsp-after-initialize-hook -- harmless for
