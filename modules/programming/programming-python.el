@@ -206,6 +206,17 @@ else:
     (error "I don't know how to set ipython settings for this Emacs"))))
 
 
+(defun sdev-use-remote (&optional ipython)
+  (interactive)
+  (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
+	python-shell-interpreter-args "-i"
+	python-shell-prompt-regexp ">>> "
+	python-shell-prompt-output-regexp ""
+
+	)
+  )
+
+
 (defun send-py-line ()
   (interactive)
   (setq-local py-temp (string-to-number(message "%d" (point))))
