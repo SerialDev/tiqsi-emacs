@@ -654,6 +654,32 @@ sEnter Extra information :")
   (insert "\"\"\""))
 
 
+(defun
+  sdev/timestamp-sprint()
+        (interactive)
+        ; If you want to insert date and time, you can use:
+        (insert
+	 "From: "
+	 (format-time-string "%A %d-%m-%Y %H:%M:%S " (time-subtract (current-time) (days-to-time 14)))
+	 "\nTo:   "
+
+	 (format-time-string "%A %d-%m-%Y %H:%M:%S " (current-time))))
+
+(defun tiqsi-md-to-html()
+  (interactive)
+  (async-shell-command (s-prepend (s-prepend "pandoc " (s-prepend (buffer-name) " -o ")) (s-replace ".md" ".html" (buffer-name)))))
+
+
+(defun tiqsi-md-insert-dropdown()
+  (interactive)
+  (insert
+   "<details>
+<summary>Array</summary>
+<br>
+
+</details>
+"))
+
 
 ;---{Keybindings}---;
 
