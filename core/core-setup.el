@@ -160,6 +160,7 @@
 (straight-require-lazy 'rust-mode)
 (straight-require-lazy 'textx-mode)
 (straight-require-lazy 'bnfc)
+(straight-require 'flymd) ;; Markdown mode support live editing
 
 (straight-require 'docker)
 (straight-require 'docker-compose-mode)

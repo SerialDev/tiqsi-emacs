@@ -54,6 +54,47 @@
   (setq jit-lock-stealth-time 1)) ; new with emacs21
 
 
+;-----------{Speed up linum}-----------;
+;; https://www.reddit.com/r/emacs/comments/3ky8lj/throttle_updating_line_numbers/
+
+(defun fast-count-lines()
+  (save-excursion
+    (goto-char (point-max))
+    (string-to-number (format-mode-line "%l"))))
+
+(with-eval-after-load "linum"
+  ;; set `linum-delay' so that linum uses `linum-schedule' to update linums.
+  (setq linum-delay t)
+
+  ;; create a new var to keep track of the current update timer.
+  (defvar-local my-linum-current-timer nil)
+
+  ;; rewrite linum-schedule so it waits for 1 second of idle time
+  ;; before updating, and so it only keeps one active idle timer going
+  (defun linum-schedule ()
+    (when (timerp my-linum-current-timer)
+      (cancel-timer my-linum-current-timer))
+    (setq my-linum-current-timer
+          (run-with-idle-timer 1 nil #'linum-update-current))))
+
+
+;; (defun my-line-count (line)
+;;   (let ((count (bound-and-true-p my-line-count)))
+;;     (when (or (not count) (> line count))
+;;       (setq count ((string-to-number fast-count-lines))
+;;       (setq-local my-line-count count)
+;;       (linum-schedule))
+;;     count))
+
+;; (setq linum-format
+;;       (lambda (line)
+;;         (let* ((w (length (number-to-string
+;;                            (my-line-count line))))
+;;                (fmt (concat "%" (number-to-string w) "d"
+;;                             (if window-system "" " "))))
+;;           (propertize (format fmt line) 'face 'linum))))
+
+
 (global-disable-mode 'async-bytecomp-package-mode)
 (global-disable-mode 'auto-composition-mode)
 (global-disable-mode 'auto-compression-mode)
