@@ -223,6 +223,7 @@ else:
   (let ((default-directory user-emacs-directory))
     (apply #'run-python args)))
 
+
 (eval-when-compile (require 'cl-lib))
 (defun nadvice/python-shell-send-string/fix-local-process
     (old-fun string &optional process)
@@ -243,6 +244,12 @@ else:
 
 (advice-add 'python-shell-send-string :around
             #'nadvice/python-shell-send-string/fix-local-process)
+
+
+(defun get-selection ()
+  "Get the text selected in current buffer as string"
+  (interactive)
+  (buffer-substring-no-properties (region-beginning) (region-end)))
 
 
 (defun send-py-line ()

@@ -34,7 +34,6 @@
 
 ;-{Static checking}-;
 
-(add-hook 'rust-mode-hook 'flymake-rust-load)
 
 (setq flymake-rust-use-cargo 1)
 
@@ -71,7 +70,21 @@ _d_: Doc          _t_: Test          _m_: Fmt
   ("q" cargo-process-clippy :color blue)
   ("ESC" nil "Exit"))
 
+
+
+(defun racer-ui-tooltip ()
+  "Show the docstring in a tooltip.
+The tooltip's face is `racer-tooltip'
+See `racer-describe'."
+  (interactive)
+  (-some-> (symbol-at-point)
+           (symbol-name)
+           (racer--describe)
+           (with-current-buffer (concat "\n" (buffer-string) "\n\n"))
+            (message 'racer-tooltip nil nil 1000)))
+
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
+(define-key rust-mode-map (kbd "C-t") 'racer-ui-tooltip )
 
 (provide 'programming-rust)
 
