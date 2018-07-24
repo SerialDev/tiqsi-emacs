@@ -105,7 +105,7 @@ point."
 
 (enable-company)
 (global-auto-complete-mode 0)
-(define-key company-mode-map "!" 'company-quickhelp-manual-begin)
+(define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
 (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
 
 (rectangle-mark-mode 0)
