@@ -38,6 +38,12 @@
 (setq flymake-rust-use-cargo 1)
 
 
+(defun tiqsi/cargo-doc-tree()
+  "Get the mccabe complexity for this buffer."
+  (interactive)
+  (message
+  (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
+
 ;-----{Hydras }-----;
 
 (defhydra hydra-rust (:color pink :hint nil)
@@ -49,7 +55,7 @@ _x_: Run-example  _n_: New           _c_: Repeat
 _b_: Build        _f_: Current-test  _e_: Bench
 _l_: Clean        _s_: Search        _o_: Current-file-tests
 _d_: Doc          _t_: Test          _m_: Fmt
-                _k_: Check         _q_: Clippy
+_|_: Doc Tree     _k_: Check         _q_: Clippy
 "
   ("e"   cargo-process-bench :color blue)
   ("b"   cargo-process-build :color blue)
@@ -66,6 +72,7 @@ _d_: Doc          _t_: Test          _m_: Fmt
   ("f"   cargo-process-current-test :color blue)
   ("o"   cargo-process-current-file-tests :color blue)
   ("m"   cargo-process-fmt :color blue)
+  ("|"   tiqsi/cargo-doc-tree :color blue)
   ("k"   cargo-process-check color: red)
   ("q" cargo-process-clippy :color blue)
   ("ESC" nil "Exit"))
