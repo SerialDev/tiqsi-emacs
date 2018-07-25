@@ -437,6 +437,8 @@
 (ensure-executable "make")
 (ensure-executable "rdm")
 (ensure-executable "ag")
+(ensure-executable "tree")
+
 
 (provide 'core-setup)
 ;;; core-setup.el ends here
