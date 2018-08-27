@@ -15,6 +15,7 @@
 (load-expand  "modules/programming/programming-lisp.el")
 (load-expand  "modules/programming/programming-java.el")
 (load-expand  "modules/programming/programming-go.el")
+(load-expand  "modules/programming/programming-elm.el")
 
 (provide 'programming)
 

@@ -44,14 +44,25 @@
   (message
   (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
 
+
+(defun cargo-process-run-optimized()
+  (interactive)
+  (compile "cargo run --release"))
+
+(defun cargo-process-build-optimized()
+  (interactive)
+  (compile "cargo build --release"))
+
+
+
 ;-----{Hydras }-----;
 
 (defhydra hydra-rust (:color pink :hint nil)
   "
 ^Rust Cargo commands^
-------------------------------------------------
-_r_: Run          _i_: Init          _u_: Update
-_x_: Run-example  _n_: New           _c_: Repeat
+----------------------------------------------------------------------------------
+_r_: Run          _i_: Init          _u_: Update               _+r_: Release O
+_x_: Run-example  _n_: New           _c_: Repeat               _+b_: Build O
 _b_: Build        _f_: Current-test  _e_: Bench
 _l_: Clean        _s_: Search        _o_: Current-file-tests
 _d_: Doc          _t_: Test          _m_: Fmt
@@ -72,6 +83,8 @@ _|_: Doc Tree     _k_: Check         _q_: Clippy
   ("f"   cargo-process-current-test :color blue)
   ("o"   cargo-process-current-file-tests :color blue)
   ("m"   cargo-process-fmt :color blue)
+  ("+r" cargo-process-run-optimized :color blue)
+  ("+b" cargo-process-build-optimized :color blue)
   ("|"   tiqsi/cargo-doc-tree :color blue)
   ("k"   cargo-process-check color: red)
   ("q" cargo-process-clippy :color blue)
