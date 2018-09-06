@@ -116,19 +116,31 @@ RUN apt-get install pkg-config libssl-dev && echo "(curl https://sh.rustup.rs -s
     rustup component add rust-src && \
     cargo install racer && rustup target add wasm32-unknown-unknown && cargo install cargo-web
 
-# Install SBCL from the tarball binaries.
-RUN wget http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.9-x86-64-linux-binary.tar.bz2 -O /tmp/sbcl.tar.bz2 && \
-    mkdir /tmp/sbcl && \
-    tar jxvf /tmp/sbcl.tar.bz2 --strip-components=1 -C /tmp/sbcl/ && \
-    cd /tmp/sbcl && \
-    sh install.sh && \
-    cd /tmp \
-    rm -rf /tmp/sbcl/
+# Install SBCL from the tarball binaries. ## Currently offloaded to SLIME-DOCKER
+# RUN wget http://prdownloads.sourceforge.net/sbcl/sbcl-1.2.9-x86-64-linux-binary.tar.bz2 -O /tmp/sbcl.tar.bz2 && \
+#     mkdir /tmp/sbcl && \
+#     tar jxvf /tmp/sbcl.tar.bz2 --strip-components=1 -C /tmp/sbcl/ && \
+#     cd /tmp/sbcl && \
+#     sh install.sh && \
+#     cd /tmp \
+#     rm -rf /tmp/sbcl/
 
-RUN cd /tmp/  && \
-    wget http://beta.quicklisp.org/quicklisp.lisp && \
-    echo "(defvar *dist-url* \"http://beta.quicklisp.org/dist/quicklisp/2015-12-18/distinfo.txt\") \n (load \"quicklisp.lisp\") \n (quicklisp-quickstart:install :path \"/root/quicklisp/\" :dist-url *dist-url*) \n (with-open-file (out \"/root/.sbclrc\" :direction :output) \n (format out \"(load \\"/root/quicklisp\/setup.lisp\\")\"))    (ql:quickload \"quicklisp-slime-helper\")" > /tmp/install.lisp && \
-    sbcl --non-interactive --load install.lisp
+# RUN cd /tmp/  && \
+#     wget http://beta.quicklisp.org/quicklisp.lisp && \
+#     echo "(defvar *dist-url* \"http://beta.quicklisp.org/dist/quicklisp/2015-12-18/distinfo.txt\") \n (load \"quicklisp.lisp\") \n (quicklisp-quickstart:install :path \"/root/quicklisp/\" :dist-url *dist-url*) \n (with-open-file (out \"/root/.sbclrc\" :direction :output) \n (format out \"(load \\"/root/quicklisp\/setup.lisp\\")\"))    (ql:quickload \"quicklisp-slime-helper\")" > /tmp/install.lisp && \
+#     sbcl --non-interactive --load install.lisp
+
+RUN wget "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-linux.tar.gz" && \
+    tar xzf binaries-for-linux.tar.gz && \
+    mv elm /usr/local/bin/
+
+# Install docker
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - &&
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" &&
+    apt-get update &&
+    apt-cache policy docker-ce &&
+    apt-get install -y docker-ce
+
 
 #---------------------------------------------------------------------------------------------------#
 #                                          Important tools                                          #

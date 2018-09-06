@@ -146,6 +146,8 @@
 ;-{elisp libraries}-;
 
 (straight-require 'elisp-slime-nav)
+(straight-require 'slime-docker)
+
 (straight-require 's)
 (straight-require 'htmlize)
 (straight-require 'docker-api)
