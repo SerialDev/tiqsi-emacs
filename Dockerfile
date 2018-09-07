@@ -28,7 +28,7 @@ RUN apt-get update && \
     build-essential \
     curl \
     libgif-dev \
-    libgnutls-dev \
+    libgnutls28-dev \
     libgtk-3-dev \
     libjpeg-dev \
     libncurses5-dev \
@@ -36,7 +36,7 @@ RUN apt-get update && \
     libxml2-dev \
     libxpm-dev \
     texinfo && \
-    apt-get install ninja -y && \
+    apt-get install ninja-build -y && \
     apt-get install libclang-dev -y && \
     apt-get install pkg-config -y && \
     apt-get install clang -y && \
@@ -63,8 +63,8 @@ RUN apt-get update && apt-get install opam -y && \
     opam install merlin -y && \
     opam user-setup install
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - && \
-    apt-get install nodejs -y && \
+RUN apt-get install nodejs -y && \
+    apt-get install npm -y && \
     npm install -g bs-platform && \
     npm install npm --global && \
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg |  apt-key add - && \
@@ -136,12 +136,12 @@ RUN wget "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-
 
 # Install docker
 RUN apt update && \
-    apt install apt-transport-https ca-certificates curl software-properties-common && \
+    apt install apt-transport-https ca-certificates curl software-properties-common -y && \
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
     add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" && \
     apt update && \
     apt-cache policy docker-ce && \
-    apt install docker-ce
+    apt install docker-ce -y
 
 
 
