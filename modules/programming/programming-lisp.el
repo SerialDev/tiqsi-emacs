@@ -38,14 +38,14 @@
 ----------------------------------------------------------------------------------
 _c_: Compile defun  _x_: Export Symbol       _u_: Undefine defun               _<_: List Callers
 _p_: Start Slime   _a_: GOTO beg defun       _:_: Interactive eval             _>_: List Callees
-_S_: Eval defun    _Sa_: GOTO end defun      _t_: Trace                        _s_: eval last sexpr
+_/_: Eval defun    _Sa_: GOTO end defun      _t_: Trace                        _s_: eval last sexpr
 _c_: Call defun    _TAB_: Complete at point  _v_: Edit Value                   _r_: Eval in repl
 _q_: Close parens  _RET_: Expand-1           _I_: Inspect                      _ESC_: Exit
 _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load File
 "
   ("c"   slime-compile-defun :color blue)
   ("p"   slime :color blue)
-  ("S"   slime-eval-defun :color blue)
+  ("/"   slime-eval-defun :color blue)
   ("c"   slime-call-defun :color blue)
   ("q"   slime-close-all-parens-in-sexp :color blue)
   
@@ -79,6 +79,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
+(define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)
 (define-key slime-mode-map (kbd "C-c C-p") 'slime)
 (define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
 (define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
