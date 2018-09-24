@@ -72,6 +72,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   ("kc"   slime-compile-file :color blue)
   ("ESC" nil "Exit"))
 
+;;TODO reindent defun or new line on enter to guarantee constant indentation
 
 ;---{Keybindings}---;
 
@@ -81,6 +82,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
 (define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)
 (define-key slime-mode-map (kbd "C-c C-p") 'slime)
+(define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
 (define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
 (define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
 
