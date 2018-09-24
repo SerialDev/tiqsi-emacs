@@ -1,7 +1,30 @@
-;;; programming-assembly.el --- Tiqsi Assembly mode support
+;;; programming-assembly.el --- Tiqsi Assembly mode support  -*- lexical-binding: t -*-
+
+;; Copyright (C) 2018-  Andres Mariscal
+
+;; Author: Andres Mariscal <carlos.mariscal.melgar@gmail.com>
+
+;; URL: https://github.com/serialdev/tiqsi-emacs
+;; Keywords: lisp
+;; Version: 0
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
-;; 
+;;
 
 (add-to-list 'auto-mode-alist '("\\.S\\'" . gas-mode))
 
@@ -37,8 +60,8 @@ Test cases
 
     (let ((case-fold-search nil) )
       (setq tempStr (replace-regexp-in-string "^0x" "" inputStr ))
-      (setq tempStr (replace-regexp-in-string "^#x" "" tempStr )) 
-      (setq tempStr (replace-regexp-in-string "^#" "" tempStr ))  
+      (setq tempStr (replace-regexp-in-string "^#x" "" tempStr ))
+      (setq tempStr (replace-regexp-in-string "^#" "" tempStr ))
       )
 
     (message "Hex %s is %d" tempStr (string-to-number tempStr 16 ) )
@@ -180,7 +203,7 @@ PAD says to padd (bit hex string with leading zeroes."
 ;; 0x base converter -- find a good keybinding for 0xc-convert-point
 
 
-;; Disaster CPP dissasemble on point 
+;; Disaster CPP dissasemble on point
 
 (define-key c-mode-base-map (kbd "C-c d") 'disaster)
 

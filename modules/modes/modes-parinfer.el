@@ -1,35 +1,30 @@
-;;; modes-parinfer.el --- Tiqsi parinfer support for lispy languages
+;;; modes-parinfer.el --- Tiqsi parinfer support for lispy languages  -*- lexical-binding: t -*-
 
+;; Copyright (C) 2018-  Andres Mariscal
 
-;; Copyright (C) 2017 Andres Mariscal <carlos.mariscal.melgar@gmail.com>
-;;
 ;; Author: Andres Mariscal <carlos.mariscal.melgar@gmail.com>
-;; URL: https://github.com/SerialDev/mypy-mode
-;; Created: Sunday 25-03-2018 10:23:05 
-;; Version: 1.0
-;; Package-Requires: ((emacs "24.4"))
 
-;;; Commentary:
-;; 
-;; Maintained by Andres Mariscal -- carlos.mariscal.melgar@gmail.com
-;;; License:
-;; This file is not part of GNU Emacs.
-;; However, it is distributed under the same license.
+;; URL: https://github.com/serialdev/tiqsi-emacs
+;; Keywords: lisp
+;; Version: 0
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
 
-;; GNU Emacs is free software; you can redistribute it and/or modify
+;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
-;; GNU Emacs is distributed in the hope that it will be useful,
+;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-;; Boston, MA 02110-1301, USA.
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+;; 
+;; Maintained by Andres Mariscal -- carlos.mariscal.melgar@gmail.com
 
 ;;; Code:
 

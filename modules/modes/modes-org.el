@@ -1,7 +1,30 @@
-;;; modes-org.el --- Tiqsi org mode support configuration
+;;; modes-org.el --- Tiqsi org mode support configuration  -*- lexical-binding: t -*-
+
+;; Copyright (C) 2018-  Andres Mariscal
+
+;; Author: Andres Mariscal <carlos.mariscal.melgar@gmail.com>
+
+;; URL: https://github.com/serialdev/tiqsi-emacs
+;; Keywords: lisp
+;; Version: 0
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
-;; 
+;;
 ;; Setting up Org Mode TODO: Fri, 25 Nov 2016, 10:01 alot more editing needed
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 
@@ -11,7 +34,7 @@
         (sequence "EMACS(e)" "BUG(b)" "DATA(a)" "|" "FIXED(f)")
         (sequence "|" "CANCELED(c)")))
 
-		
+
 (setq org-log-done 'my-insert-time-stamp)
 ;(setq org-log-done ')
 ;; I did this yesterday behaviour with org-mode
@@ -76,10 +99,10 @@
 
 (add-hook 'after-save-hook 'tangle-on-save-org-mode-file)
 
-;; Enable the auto-revert mode globally. This is quite useful when you have 
+;; Enable the auto-revert mode globally. This is quite useful when you have
 ;; multiple buffers opened that Org-mode can update after tangling.
 ;; All the buffers will be updated with what changed on the disk.
-(global-auto-revert-mode)  
+(global-auto-revert-mode)
 
 ;; Add Org files to the agenda when we save them
 (defun to-agenda-on-save-org-mode-file()
@@ -92,8 +115,8 @@
 ;; that way the CSS of the HTML theme will be used instead which is better
 (setq org-html-htmlize-output-type 'css)
 
-(when (require 'core-secrets nil 'noerror) 
-  
+(when (require 'core-secrets nil 'noerror)
+
   (custom-set-variables
    '(ispell-program-name 'secrets-ispell))
   )

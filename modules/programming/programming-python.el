@@ -108,7 +108,6 @@ FORM is checked at compile time."
 
 (defun sdev-use-ipython (&optional ipython)
   "Set defaults to use IPython instead of the standard interpreter.
-
 With prefix arg, prompt for the command to use."
   (interactive (list (when current-prefix-arg
                        (read-file-name "IPython command: "))))
@@ -151,6 +150,7 @@ With prefix arg, prompt for the command to use."
               python-shell-interpreter-args "-i " + ipython_py))))
    (t
     (error "I don't know how to set ipython settings for this Emacs"))))
+
 
 
 (defun sdev-use-cpython (&optional cpython)
@@ -211,10 +211,7 @@ else:
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
 	python-shell-interpreter-args "-i"
 	python-shell-prompt-regexp ">>> "
-	python-shell-prompt-output-regexp ""
-
-	)
-  )
+	python-shell-prompt-output-regexp ""))
 
 (defun run-python-locally (&rest args)
   (interactive (progn (require 'nadvice)
