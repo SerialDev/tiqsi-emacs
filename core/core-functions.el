@@ -24,10 +24,10 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
-;--{Disable modes}--;
+                                        ;--{Disable modes}--;
 
 (defun global-disable-mode (mode-fn)
   "Disable `MODE-FN' in ALL buffers."
@@ -36,7 +36,29 @@
     (with-current-buffer buffer
       (funcall mode-fn -1))))
 
-;-----{Strings}-----;
+                                        ;-----{Strings}-----;
+
+(defmacro f-string (fmt)
+  "From John Kitchin ->
+Like `s-format' but with format fields in it.
+FMT is a string to be expanded against the current lexical
+environment. It is like what is used in `s-lex-format', but has
+an expanded syntax to allow format-strings. For example:
+${user-full-name 20s} will be expanded to the current value of
+the variable `user-full-name' in a field 20 characters wide.
+  (let ((f (sqrt 5)))  (f-string \"${f 1.2f}\"))
+  will render as: 2.24
+This function is inspired by the f-strings in Python 3.6, which I
+enjoy using a lot.
+"
+  (let* ((matches (s-match-strings-all"${\\(?3:\\(?1:[^} ]+\\) *\\(?2:[^}]*\\)\\)}" fmt))
+         (agetter (cl-loop for (m0 m1 m2 m3) in matches
+                           collect `(cons ,m3  (format (format "%%%s" (if (string= ,m2 "")
+                                                                          (if s-lex-value-as-lisp "S" "s")
+                                                                        ,m2))
+                                                       (symbol-value (intern ,m1)))))))
+
+    `(s-format ,fmt 'aget (list ,@agetter))))
 
 ;; truncate if long
 (defun sdev/truncate (len s)
@@ -59,11 +81,11 @@
      (make-string (floor extra 2) (string-to-char padding) ))))
 
 
- ;; Change from snake_case to camelCase
- (defun sk/replace-next-underscore-with-camel (arg)
+;; Change from snake_case to camelCase
+(defun sk/replace-next-underscore-with-camel (arg)
   (interactive "p")
   (if (> arg 0)
- (setq arg (1+ arg))) ; 1-based index to get eternal loop with 0
+      (setq arg (1+ arg))) ; 1-based index to get eternal loop with 0
   (let ((case-fold-search nil))
     (while (not (= arg 1))
       (search-forward-regexp "\\b_[a-z]")
@@ -91,9 +113,9 @@ If the COUNT exeeds string length or is zero, whole string is returned."
   "Use STR and read COUNT chars from right.
 If the COUNT exeeds string length or is zero, whole string is returned."
   (let* ((pos (- (length str)  count))
-	 )
+         )
     (if (> pos 0)
-	(substring str (- 0 count))
+        (substring str (- 0 count))
       str
       )))
 
@@ -126,7 +148,7 @@ Input:
 Return:
   str"
   (mapconcat
-   (function identity)			;returns "as is"
+   (function identity)                  ;returns "as is"
    list
    (or separator " ")
    ))
@@ -143,16 +165,16 @@ Return:
                 (looking-at "\\b[[:upper:]]\\{2\\}[[:lower:]]"))
               (capitalize-word 1)))))
 
-;-----{bindings}----;
+                                        ;-----{bindings}----;
 
 (defun one-shot-keybinding (key command)
   (set-temporary-overlay-map
    (let ((map (make-sparse-keymap)))
      (define-key map (kbd key) command)
-     map) t))     
+     map) t))
 
 
-;-------{Eval}------;
+                                        ;-------{Eval}------;
 
 (defun sk/copy-current-file-path ()
   "Add current file path to kill ring. Limits the filename to project root if possible."
@@ -170,53 +192,53 @@ Return:
            (insert (current-kill 0)))))
 
 
-;--{Introspection}--;
+                                        ;--{Introspection}--;
 
 (defun my/show-functions-in-buffer ()
   "Show the functions defined in the current buffer"
   (interactive)
   (let ((current (current-buffer))
-	(buffer (get-buffer-create "*Function Definitions*")))
+        (buffer (get-buffer-create "*Function Definitions*")))
     (save-excursion
       (goto-char 0)
       (while (re-search-forward "(defun \\([^(|^ ]*\\)" nil t)
-	(progn
-	  (set-buffer buffer)
-	  (insert (format "Found : %s\n" (match-string 1)))
-	  (set-buffer current)
-	))
+        (progn
+          (set-buffer buffer)
+          (insert (format "Found : %s\n" (match-string 1)))
+          (set-buffer current)
+          ))
       )
     (pop-to-buffer buffer)))
 
-;          TODO Base an implementation on this for Peek at definition          ;
+                                        ;          TODO Base an implementation on this for Peek at definition          ;
 
 
-;--{Display defun}--;
+                                        ;--{Display defun}--;
 
 (defadvice popup-menu-show-quick-help
-  (around pos-tip-popup-menu-show-quick-help () activate)
+    (around pos-tip-popup-menu-show-quick-help () activate)
   "Show quick help using `pos-tip-show'."
   (if (eq window-system 'x)
       (let ((doc (popup-menu-document
-		  menu (or item
-			   (popup-selected-item menu)))))
-	(when (stringp doc)
-	  (pos-tip-show doc nil
-			(if (popup-hidden-p menu)
-			    (or (plist-get args :point)
-				(point))
-			  (overlay-end (popup-line-overlay
-					menu (+ (popup-offset menu)
-						(popup-selected-line menu)))))
-			nil 0)
-	  nil))
+                  menu (or item
+                           (popup-selected-item menu)))))
+        (when (stringp doc)
+          (pos-tip-show doc nil
+                        (if (popup-hidden-p menu)
+                            (or (plist-get args :point)
+                                (point))
+                          (overlay-end (popup-line-overlay
+                                        menu (+ (popup-offset menu)
+                                                (popup-selected-line menu)))))
+                        nil 0)
+          nil))
     ad-do-it))
 
 (defadvice popup-tip
-   (around popup-pos-tip-wrapper (string &rest args) activate)
-   (if (eq window-system 'x)
-       (apply 'popup-pos-tip string args)
-     ad-do-it))
+    (around popup-pos-tip-wrapper (string &rest args) activate)
+  (if (eq window-system 'x)
+      (apply 'popup-pos-tip string args)
+    ad-do-it))
 
 (defun chunyang-elisp-function-or-variable-quickhelp (symbol)
   "Display summary of function or variable at point.
@@ -250,21 +272,21 @@ Adapted from `describe-function-or-variable'."
              vdoc-short)
             :margin t)))))
 
-;                    TODO make a defun for this with python                    ;
+                                        ;                    TODO make a defun for this with python                    ;
 
 
-;--{Key completion}-;
+                                        ;--{Key completion}-;
 
 (which-key-mode 1)
 (setq which-key-idle-delay 0.5)
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (with-eval-after-load 'emacs
-    (define-key global-map (kbd "C-x C-c") nil)
-	(define-key global-map (kbd "C-x C-x") #'save-buffers-kill-terminal)
-	)
+  (define-key global-map (kbd "C-x C-c") nil)
+  (define-key global-map (kbd "C-x C-x") #'save-buffers-kill-terminal)
+  )
 
 (global-set-key (kbd "C-M-<return>") 'chunyang-elisp-function-or-variable-quickhelp)
 (global-set-key (kbd "M-<return>") 'xref-find-definitions-other-window)

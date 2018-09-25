@@ -24,13 +24,13 @@
 
 
 ;;; Commentary:
-;; 
+;;
 ;; pip install compdb
 ;; apt-get install libclang-dev
 ;;ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
 
 
-;----{Completion}---;
+                                        ;----{Completion}---;
 
 (add-hook 'c++-mode-hook 'irony-mode)
 (add-hook 'c-mode-hook 'irony-mode)
@@ -51,7 +51,7 @@
     'company-backends '(company-irony-c-headers company-irony)))
 
 
-;----{Formatting}---;
+                                        ;----{Formatting}---;
 
 ;;  (cond ((file-exists-p buffer-file-name) t)
 ;;         ((string-match "[.]hin" buffer-file-name) (tiqsi-source-format))
@@ -59,7 +59,7 @@
 ;;         ((string-match "[.]h" buffer-file-name) (tiqsi-header-format))
 ;;         ((string-match "[.]cpp" buffer-file-name) (tiqsi-source-format)))
 
-;----{Navigation}---;
+                                        ;----{Navigation}---;
 
 ;;
 ;; Grep for the symbol under the cursor.  Works only for C / C++ / H / RC
@@ -69,7 +69,7 @@
   "Grep current directory for symbol at cursor."
   (interactive)
   (grep (concat "grep -n -e " (current-word)  " *.c *.cpp *.h *.rc NUL"
-)))
+                )))
 
 
 (defun tiqsi-find-corresponding-file ()
@@ -81,7 +81,7 @@
       (setq CorrespondingFileName (concat BaseFileName ".h")))
   (if (string-match "\\.h" buffer-file-name)
       (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
-	(setq CorrespondingFileName (concat BaseFileName ".cpp"))))
+        (setq CorrespondingFileName (concat BaseFileName ".cpp"))))
   (if (string-match "\\.hin" buffer-file-name)
       (setq CorrespondingFileName (concat BaseFileName ".cin")))
   (if (string-match "\\.cin" buffer-file-name)
@@ -133,7 +133,7 @@
 ;; TODO  rtags-referece-tree fix
 ;; TODO  rtags-diagnostigs fix
 
-;--{rtags flycheck}-;
+                                        ;--{rtags flycheck}-;
 
 ;; ensure that we use only rtags checking
 ;; https://github.com/Andersbakken/rtags#optional-1
@@ -146,33 +146,33 @@
 
 (when
     (require 'rtags nil :noerror)
-   ;; company completion setup
+  ;; company completion setup
   (setq rtags-autostart-diagnostics t)
   (rtags-diagnostics)
   (setq rtags-completions-enabled t)
   (eval-after-load 'company
-  '(add-to-list
-    'company-backends 'company-rtags))
+    '(add-to-list
+      'company-backends 'company-rtags))
   ;; use rtags flycheck mode -- clang warnings shown inline
   (try-require 'flycheck-rtags)
   ;; c-mode-common-hook is also called by c++-mode
   (add-hook 'c-mode-hook #'setup-flycheck-rtags)
   (add-hook 'c++-mode-common-hook #'setup-flycheck-rtags)
-)
+  )
 
-;---{Indentation}---;
+                                        ;---{Indentation}---;
 
 (c-add-style "microsoft"
-              '("stroustrup"
-                (c-offsets-alist
-                 (innamespace . -)
-                 (inline-open . 0)
-                 (inher-cont . c-lineup-multi-inher)
-                 (arglist-cont-nonempty . +)
-                 (template-args-cont . +))))
+             '("stroustrup"
+               (c-offsets-alist
+                (innamespace . -)
+                (inline-open . 0)
+                (inher-cont . c-lineup-multi-inher)
+                (arglist-cont-nonempty . +)
+                (template-args-cont . +))))
 (setq c-default-style "microsoft")
 
-; C++ indentation style
+                                        ; C++ indentation style
 (defconst tiqsi-big-fun-c-style
   '(;(c-electric-pound-behavior   . t)
     (c-tab-always-indent         . t)
@@ -218,7 +218,7 @@
                                     (brace-list-open       .  0)
                                     (brace-list-intro      .  4)))
     (c-echo-syntactic-information-p . t))
-    "Casey's Big Fun C++ Style")
+  "Casey's Big Fun C++ Style")
 
 ;; (add-hook 'c-mode-common-hook 'tiqsi-big-fun-c-hook)
 
@@ -229,32 +229,32 @@
 (add-hook 'c++-mode-hook 'my-c++-mode-hook)
 
 (defun my-c-mode-common-hook ()
- ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
- (c-set-offset 'substatement-open 0)
- ;; other customizations can go here
+  ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
+  (c-set-offset 'substatement-open 0)
+  ;; other customizations can go here
 
- (setq
-  ;; use gdb-many-windows by default
-  gdb-many-windows t
-  ;; Non-nil means display source file containing the main routine at startup
-  gdb-show-main t
+  (setq
+   ;; use gdb-many-windows by default
+   gdb-many-windows t
+   ;; Non-nil means display source file containing the main routine at startup
+   gdb-show-main t
+   )
+
+  (cwarn-mode 1)
+  (setq c++-tab-always-indent t)
+  (setq c-basic-offset 4)                  ;; Default is 2
+  (setq c-indent-level 4)                  ;; Default is 2
+
+  (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
+  (setq tab-width 4)
+  (setq indent-tabs-mode t)  ; use spaces only if nil
   )
-
- (cwarn-mode 1)
- (setq c++-tab-always-indent t)
- (setq c-basic-offset 4)                  ;; Default is 2
- (setq c-indent-level 4)                  ;; Default is 2
-
- (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
- (setq tab-width 4)
- (setq indent-tabs-mode t)  ; use spaces only if nil
- )
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 (add-hook 'c++-mode-hook 'my-c-mode-common-hook)
 
 
-;----{Insertions}---;
+                                        ;----{Insertions}---;
 
 (defun tiqsi-header-format ()
   "Format the given file as a header file."
@@ -284,17 +284,17 @@
   )
 
 
-  (defun tiqsi-source-format ()
-     "Format the given file as a source file."
-     (interactive)
-     (setq BaseFileName (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
-     (insert "/* ========================================================================\n")
-     (insert "   $File: $\n")
-     (insert "   $Date: $\n")
-     (insert "   $Revision: $\n")
-     (insert "   $Creator: Andres Mariscal $\n")
-     (insert "   $Notice: (C) Copyright 2015 Andres Mariscal. All Rights Reserved. $\n")
-     (insert "   ======================================================================== */\n")
+(defun tiqsi-source-format ()
+  "Format the given file as a source file."
+  (interactive)
+  (setq BaseFileName (file-name-sans-extension (file-name-nondirectory buffer-file-name)))
+  (insert "/* ========================================================================\n")
+  (insert "   $File: $\n")
+  (insert "   $Date: $\n")
+  (insert "   $Revision: $\n")
+  (insert "   $Creator: Andres Mariscal $\n")
+  (insert "   $Notice: (C) Copyright 2015 Andres Mariscal. All Rights Reserved. $\n")
+  (insert "   ======================================================================== */\n")
   )
 
 
@@ -303,9 +303,9 @@
 (defun cpp-createclass ()
   (interactive)
   (setq classname (file-name-sans-extension (file-name-nondirectory   buffer-file-name)))
-  (insert 
-"/**
-  * " classname".h 
+  (insert
+   "/**
+  * " classname".h
   *
   * Author: SerialDev
   * Modified: " (format-time-string "%Y-%m-%d") "
@@ -334,16 +334,16 @@ class " classname "
 
 (defun ewd-classname ()
   "If the point is in a class definition, gets the name of the class.
-Return nil otherwise." 
+Return nil otherwise."
   (interactive)
- (save-excursion
+  (save-excursion
     (let ((brace (assoc 'inclass (c-guess-basic-syntax))))
       (if (null brace) '()        (goto-char (cdr brace))
-	(let ((class-open (assoc 'class-open (c-guess-basic-syntax))))
-	  (if class-open (goto-char (cdr class-open)))
-	  (if (looking-at "^class[ \t]+\\([A-Za-z_][^ \t:{]*\\)")
-	      (buffer-substring (match-beginning 1) (match-end 1))
-	    (error "Error parsing class definition!")))))))
+          (let ((class-open (assoc 'class-open (c-guess-basic-syntax))))
+            (if class-open (goto-char (cdr class-open)))
+            (if (looking-at "^class[ \t]+\\([A-Za-z_][^ \t:{]*\\)")
+                (buffer-substring (match-beginning 1) (match-end 1))
+              (error "Error parsing class definition!")))))))
 
 ;; Insert function prototype in current header file and matching
 ;; function body in implementation file.
@@ -355,24 +355,24 @@ operator.  This function expects the implementation file to be named
 foo.cpp and in the same directory as the current header file, foo.h."
   (interactive "sReturn type:\nsPrototype: ")
   (let ((classname (ewd-classname))
-	(c-tab-always-indent t))
+        (c-tab-always-indent t))
     (if (null classname) (message "Not in class definition!")
       (unless (string-equal rettype "") (setq rettype (concat rettype " ")))
       (insert rettype proto ";")
       (c-indent-command)
       (save-window-excursion
-	(find-file (concat (file-name-sans-extension (buffer-file-name))
-			   ".cpp"))
-	(end-of-buffer)
-	(insert "\n\n")
-	(insert-function-comment)
-	(end-of-buffer)
-	(insert rettype classname "::" proto "\n{\n}\n")))))
+        (find-file (concat (file-name-sans-extension (buffer-file-name))
+                           ".cpp"))
+        (end-of-buffer)
+        (insert "\n\n")
+        (insert-function-comment)
+        (end-of-buffer)
+        (insert rettype classname "::" proto "\n{\n}\n")))))
 
 
-;---{Compilation}---;
+                                        ;---{Compilation}---;
 
-; Setup my compilation mode
+                                        ; Setup my compilation mode
 (defun tiqsi-big-fun-compilation-hook ()
   (make-local-variable 'truncate-lines)
   (setq truncate-lines nil))
@@ -384,8 +384,8 @@ foo.cpp and in the same directory as the current header file, foo.h."
   "Recursively search for a makefile."
   (interactive)
   (if (file-exists-p tiqsi-makescript) t
-      (cd "../")
-      (find-project-directory-recursive)))
+    (cd "../")
+    (find-project-directory-recursive)))
 
 
 (defun find-project-directory ()
@@ -394,9 +394,9 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (setq find-project-from-directory (current-buffer-path))
   (switch-to-buffer-other-window "*compilation*")
   (if compilation-directory-locked (cd last-compilation-directory)
-  (cd find-project-from-directory)
-  (find-project-directory-recursive)
-  (setq last-compilation-directory default-directory)))
+    (cd find-project-from-directory)
+    (find-project-directory-recursive)
+    (setq last-compilation-directory default-directory)))
 
 
 (setq frame-title-format
@@ -444,47 +444,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (let ((shell-command-switch "-ic"))
     ad-do-it))
 
-;----{Completion}---;
-
-;                                Get all possible dabbrev expansions                                ;
-;; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/
-
-(defun ac-source-dabbrev (abbrev)
-  (interactive)
-  (dabbrev--reset-global-variables)
-  (let ((dabbrev-check-all-buffers t))
-    (sort (dabbrev--find-all-expansions abbrev t) #'string<)))
-
-(defvar ac-source-dabbrev-words
-  '((candidates
-     . (lambda () (all-completions ac-target
-                                   (ac-source-dabbrev ac-target)))))
-  "Get all the completions using dabbrev")
-
-(setq-default ac-sources '(ac-source-dabbrev-words))
-
-(defun ac-self-insert ()
-  (interactive)
-  (self-insert-command 1)
-  (ac-start))
-
-(defun ac-fix-keymap ()
-  (let ((i 32))
-    (while (<= i ?z)
-      (define-key ac-complete-mode-map
-        (make-string 1 i) 'ac-self-insert)
-      (incf i))))
-
-(ac-fix-keymap)
-
-(define-key ac-complete-mode-map (kbd "DEL")
-  (lambda ()
-    (interactive)
-    (backward-delete-char-untabify 1)
-    (ac-start)))
-
-;; (setq ac-auto-start nil)
-(setq tab-always-indent 'complete)
 
 (defun rtags-peek-definition ()
   "Peek at definition at point using rtags."
@@ -492,14 +451,10 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (let ((func (lambda ()
                 (rtags-find-symbol-at-point)
                 (rtags-location-stack-forward)
-		)))
+                )))
     (rtags-start-process-unless-running)
     (make-peek-frame func)))
 
-
-(lsp-ui-doc--display "test" " aga gag testasagagag")
-(lsp-ui-doc--display "test" " aga gag testasagagag")
-(lsp-ui-doc--delete-frame)
 
 (defun make-peek-frame (find-definition-function &rest args)
   "Make a new frame for peeking definition"
@@ -550,7 +505,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (global-set-key (kbd "C-c C-c c") 'delete-frame)
 
 
-;------{Hydras}-----;
+                                        ;------{Hydras}-----;
 
 (defhydra hydra-rtags (:color pink :hint nil)
   "
@@ -579,7 +534,7 @@ _v_: Find virtuals at point
   ("b" rtags-start-process-unless-running :color blue)
   ("ESC" nil "Exit"))
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 
 ;; (global-set-key (kbd "<f6>") 'ac-start)
@@ -599,7 +554,7 @@ _v_: Find virtuals at point
 (global-set-key "\C-ci" 'ewd-insert-new-method)
 (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
-; Alternate bindings for F-keyless setups (ie MacOS X terminal)
+                                        ; Alternate bindings for F-keyless setups (ie MacOS X terminal)
 (define-key c++-mode-map "\ec" 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map "\eC" 'tiqsi-find-corresponding-file-other-window)
 (define-key c++-mode-map "\es" 'tiqsi-save-buffer)
@@ -609,7 +564,7 @@ _v_: Find virtuals at point
 ;; (define-key c++-mode-map (kbd "<S-tab>") 'indent-for-tab-command)
 (define-key c++-mode-map "\C-y" 'indent-for-tab-command)
 (define-key c++-mode-map [C-tab] 'indent-region)
-(define-key c++-mode-map "	" 'indent-region)
+(define-key c++-mode-map "    " 'indent-region)
 (define-key c++-mode-map "\ej" 'imenu)
 (define-key c++-mode-map "\e." 'c-fill-paragraph)
 (define-key c++-mode-map "\e/" 'c-mark-function)

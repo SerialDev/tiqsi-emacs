@@ -36,30 +36,30 @@
 
 
 (setq org-log-done 'my-insert-time-stamp)
-;(setq org-log-done ')
+                                        ;(setq org-log-done ')
 ;; I did this yesterday behaviour with org-mode
 (defun org-todo-with-date (&optional arg)
   (interactive "P")
   (cl-letf* ((org-read-date-prefer-future nil)
              (my-current-time (org-read-date t t nil "when:" nil nil nil))
-            ((symbol-function #'org-current-effective-time)
-             #'(lambda () my-current-time)))
+             ((symbol-function #'org-current-effective-time)
+              #'(lambda () my-current-time)))
     (org-todo arg)
     ))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((ipython . t)
-    (lisp . t)
+   (lisp . t)
    ;; other languages..
    (clojure . t)
-   ;(sh . t)
+                                        ;(sh . t)
    (dot . t)
    (emacs-lisp . t)
    ))
 
 
-; Archive done tasks in tree / also change to file or agenda if using those in ORG mode : http://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-using-a-single-command
+                                        ; Archive done tasks in tree / also change to file or agenda if using those in ORG mode : http://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-using-a-single-command
 
 (defun org-archive-done-tasks ()
   (interactive)
@@ -126,9 +126,9 @@
 ;; Enable python mode in org-mode
 ;;(add-hook 'org-mode-hook 'python-mode)
 
-; Remove autosave and other unnecessary files to see in Dire
-; (setq-default dired-omit-files-p t) ; Buffer-local variable
-; (setq dired-omit-files "^\\.?#")
+                                        ; Remove autosave and other unnecessary files to see in Dire
+                                        ; (setq-default dired-omit-files-p t) ; Buffer-local variable
+                                        ; (setq dired-omit-files "^\\.?#")
 
 ;; Enable inline image when entering org-mode
 ;; Make sure you have all the necessary DLL for image display
@@ -138,9 +138,9 @@
 
 (add-hook 'org-mode-hook 'turn-on-org-show-all-inline-images)
 ;; Test correct dlls
-;(print image-library-alist)
+                                        ;(print image-library-alist)
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)

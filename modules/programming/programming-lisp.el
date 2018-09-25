@@ -48,7 +48,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   ("/"   slime-eval-defun :color blue)
   ("c"   slime-call-defun :color blue)
   ("q"   slime-close-all-parens-in-sexp :color blue)
-  
+
   ("x"   slime-export-symbol-at-point :color blue)
   ("a"   slime-beginning-of-defun :color blue)
   ("Sa"   slime-end-of-defun :color blue)
@@ -74,7 +74,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 ;;TODO reindent defun or new line on enter to guarantee constant indentation
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key slime-mode-map (kbd "M-c") 'hydra-slime/body )
 

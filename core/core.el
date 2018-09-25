@@ -63,7 +63,7 @@
 ;; https://github.com/codemac/config/blob/master/emacs.d/boot.org
 ;; https://github.com/codemac/config/blob/master/emacs.d/boot.org ;; TODO: further edit this to do it for one buffer
 ;; https://github.com/sabof/stripe-buffer stripe buffer to read tables better [this: https://github.com/sabof/stripe-buffer/pull/14 applied for performance]
-;; https://github.com/domtronn/all-the-icons.el all the icons 
+;; https://github.com/domtronn/all-the-icons.el all the icons
 ;; https://github.com/howardabrams/dot-files/blob/master/emacs.org
 ;; http://chrishecker.com/images/4/4b/Remove_me.emacs
 ;; http://mbork.pl/2016-09-26_Emacs_now_suggests_shorter_ways_of_invocating_a_command

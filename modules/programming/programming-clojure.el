@@ -26,7 +26,7 @@
 ;;; Commentary:
 ;;
 
-;------{Cider}------;
+                                        ;------{Cider}------;
 
 ;; Enter cider mode when entering the clojure major mode
 (add-hook 'clojure-mode-hook 'cider-mode)
@@ -81,11 +81,11 @@
   (interactive)
 
   (s-append "standalone.jar"
-	    (s-replace "\"" "-"
-		       (s-replace " \"" "-"
-				  (s-replace "defproject " ""
-					     (regex-match "defproject .*"
-							  (my-file-contents (concat projectile-project-root "project.clj")) 0))))))
+            (s-replace "\"" "-"
+                       (s-replace " \"" "-"
+                                  (s-replace "defproject " ""
+                                             (regex-match "defproject .*"
+                                                          (my-file-contents (concat projectile-project-root "project.clj")) 0))))))
 
 (defun my-file-contents (filename)
   "Return the contents of FILENAME."
@@ -127,7 +127,7 @@
 
 (defun move-to-close-paren()
   )
-  (looking-at ")")
+(looking-at ")")
 
 ;; TODO Dynamic dispatch all possible <> [] {} ()
 
@@ -143,7 +143,7 @@
   (interactive "P")
   (if (looking-at "(") (forward-char -1))
   (while (not (looking-at "(")) (backward-char 1))
-)
+  )
 
 
 (defun move-forward-sqrParen (&optional arg)
@@ -177,16 +177,16 @@
 
 
 (defhydra hydra-clojure-usage (:color pink
-				      :hint nil)
-"
+                                      :hint nil)
+  "
                                                                                            ╭──────┐
- Move              ^ ^        Jump      ^ ^                                           	   │ Ukhu │
+ Move              ^ ^        Jump      ^ ^                                                │ Ukhu │
 ╭──────────────────────────────────────────────────────────────────────────────────────────┴──────╯
 ^^
-_C-<up>_: move fwd paren    	_M-<up>_ wrap around
+_C-<up>_: move fwd paren        _M-<up>_ wrap around
 _C-<down>_: move back paren     _M-<down>_ splice sexp
-_M-<right>_: fwd slurp paren	_C-<right>_: back barf paren
-_M-<left>_: fwd barf paren  	_C-<left>_: back slurp paren  
+_M-<right>_: fwd slurp paren    _C-<right>_: back barf paren
+_M-<left>_: fwd barf paren      _C-<left>_: back slurp paren
 _C-s_: eval last sexp           ^ ^
 "
 
@@ -204,7 +204,7 @@ _C-s_: eval last sexp           ^ ^
   ("<f2>" lein-connect-repl "connect repl" :color red)
   ("<f3>" lein-compile-uberjar "compile uberjar" :color blue)
   ("<f3>" lein-run-uberjar "run uberjar" :color blue)
-)
+  )
 
 
 ;; (define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)

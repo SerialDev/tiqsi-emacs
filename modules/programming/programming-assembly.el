@@ -74,12 +74,12 @@ Test cases
 (defun bin-string-to-int (8bit-string)
   "Convert 8BIT-STRING  string to integer."
   (let* ((list  '(128 64 32 16 8 4 2 1))
-	 (i   0)
-	 (int 0)
+         (i   0)
+         (int 0)
          )
     (while (< i 8)
       (if (not (string= "0" (substring 8bit-string i (1+ i))))
-	  (setq int (+ int (nth i list) )))
+          (setq int (+ int (nth i list) )))
       (incf  i)
       )
     int
@@ -92,9 +92,9 @@ Test cases
 (defun int-to-bin-string (n &optional length)
   "Convert integer N to bit string (LENGTH, default 8)."
   (let* ((i    0)
-	 (len  (or length 8))
-	 (s    (make-string len ?0))
-	 )
+         (len  (or length 8))
+         (s    (make-string len ?0))
+         )
     (while (< i len)
       (if (not (zerop (logand n (ash 1 i))))
           (aset s (- len (1+ i)) ?1))
@@ -114,8 +114,8 @@ PAD says to padd (bit hex string with leading zeroes."
       (setq separator ""))
   (mapconcat
    (function (lambda (x)
-	       (setq x (format "%x" (logand x 255)))
-	       (if (= 1 (length x)) (concat "0" x) x)))
+               (setq x (format "%x" (logand x 255)))
+               (if (= 1 (length x)) (concat "0" x) x)))
    (list (ash n -24) (ash n -16) (ash n -8) n)
    separator))
 
@@ -129,9 +129,9 @@ PAD says to padd (bit hex string with leading zeroes."
       (setq separator ""))
   (mapconcat
    (function (lambda (x)
-	       (setq x (format "%o" (logand x 511)))
-	       (if (= 1 (length x)) (concat "00" x)
-		 (if (= 2 (length x)) (concat "0" x) x))))
+               (setq x (format "%o" (logand x 511)))
+               (if (= 1 (length x)) (concat "00" x)
+                 (if (= 2 (length x)) (concat "0" x) x))))
    (list (ash n -27) (ash n -18) (ash n -9) n)
    separator))
 
@@ -198,7 +198,7 @@ PAD says to padd (bit hex string with leading zeroes."
          ("\\.a\\'"   . elf-mode)))
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 ;; 0x base converter -- find a good keybinding for 0xc-convert-point
 

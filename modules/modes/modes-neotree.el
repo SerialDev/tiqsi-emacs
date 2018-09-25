@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -40,7 +40,7 @@
 
 (add-hook 'jdee-mode-hook 'tiqsi-java-hook )
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key global-map (kbd "M-<f8>") 'neotree-toggle)
 

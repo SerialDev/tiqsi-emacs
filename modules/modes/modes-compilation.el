@@ -24,34 +24,34 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
-; Setup my compilation mode
+                                        ; Setup my compilation mode
 (defun tiqsi-big-fun-compilation-hook ()
   (make-local-variable 'truncate-lines)
   (setq truncate-lines nil)
-)
+  )
 (add-hook 'compilation-mode-hook 'tiqsi-big-fun-compilation-hook)
 
-; devenv.com error parsing
+                                        ; devenv.com error parsing
 (add-to-list 'compilation-error-regexp-alist 'tiqsi-devenv)
 (add-to-list 'compilation-error-regexp-alist-alist '(tiqsi-devenv
- "*\\([0-9]+>\\)?\\(\\(?:[a-zA-Z]:\\)?[^:(\t\n]+\\)(\\([0-9]+\\)) : \\(?:see declaration\\|\\(?:warnin\\(g\\)\\|[a-z ]+\\) C[0-9]+:\\)"
-  2 3 nil (4)))
+                                                     "*\\([0-9]+>\\)?\\(\\(?:[a-zA-Z]:\\)?[^:(\t\n]+\\)(\\([0-9]+\\)) : \\(?:see declaration\\|\\(?:warnin\\(g\\)\\|[a-z ]+\\) C[0-9]+:\\)"
+                                                     2 3 nil (4)))
 
-; Compilation
+                                        ; Compilation
 (setq compilation-context-lines 0)
 (setq compilation-error-regexp-alist
-    (cons '("^\\([0-9]+>\\)?\\(\\(?:[a-zA-Z]:\\)?[^:(\t\n]+\\)(\\([0-9]+\\)) : \\(?:fatal error\\|warnin\\(g\\)\\) C[0-9]+:" 2 3 nil (4))
-     compilation-error-regexp-alist))
+      (cons '("^\\([0-9]+>\\)?\\(\\(?:[a-zA-Z]:\\)?[^:(\t\n]+\\)(\\([0-9]+\\)) : \\(?:fatal error\\|warnin\\(g\\)\\) C[0-9]+:" 2 3 nil (4))
+            compilation-error-regexp-alist))
 
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
   (interactive)
   (if (file-exists-p tiqsi-makescript) t
-      (cd "../")
-      (find-project-directory-recursive)))
+    (cd "../")
+    (find-project-directory-recursive)))
 
 (defun lock-compilation-directory ()
   "The compilation process should NOT hunt for a makefile"
@@ -71,9 +71,9 @@
   (setq find-project-from-directory default-directory)
   (switch-to-buffer-other-window "*compilation*")
   (if compilation-directory-locked (cd last-compilation-directory)
-  (cd find-project-from-directory)
-  (find-project-directory-recursive)
-  (setq last-compilation-directory default-directory)))
+    (cd find-project-from-directory)
+    (find-project-directory-recursive)
+    (setq last-compilation-directory default-directory)))
 
 (defun make-without-asking ()
   "Make the current build."

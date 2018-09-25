@@ -57,27 +57,27 @@
 
 
 (defun toggle-truncate-lines ()
-"Toggle whether to wrap lines at right window border."
-(interactive)
-   (if (eq truncate-lines nil)
-     (set-variable 'truncate-lines 't)
-     (set-variable 'truncate-lines nil)
-     ) )
+  "Toggle whether to wrap lines at right window border."
+  (interactive)
+  (if (eq truncate-lines nil)
+      (set-variable 'truncate-lines 't)
+    (set-variable 'truncate-lines nil)
+    ) )
 
 (defun toggle-line-spacing ()
-"Toggle line spacing between no extra space to extra half line height."
-(interactive)
-(if (eq line-spacing nil)
-    (setq-default line-spacing 0.5) ; add 0.5 height between lines
-  (setq-default line-spacing nil)   ; no extra heigh between lines
-  ))
+  "Toggle line spacing between no extra space to extra half line height."
+  (interactive)
+  (if (eq line-spacing nil)
+      (setq-default line-spacing 0.5) ; add 0.5 height between lines
+    (setq-default line-spacing nil)   ; no extra heigh between lines
+    ))
 
 
 (when (require-soft 'jit-lock)    ; enable JIT to make font-lock faster
   (setq jit-lock-stealth-time 1)) ; new with emacs21
 
 
-;-----------{Speed up linum}-----------;
+                                        ;-----------{Speed up linum}-----------;
 ;; https://www.reddit.com/r/emacs/comments/3ky8lj/throttle_updating_line_numbers/
 
 (defun fast-count-lines()

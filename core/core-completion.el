@@ -27,33 +27,73 @@
 
 ;; Completion core
 
+                                        ;----{Completion}---;
 
-(set-default 'ac-sources '(ac-source-abbrev ac-source-words-in-buffer))
+                                        ;                                Get all possible dabbrev expansions                                ;
+;; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/
+
+(defun ac-source-dabbrev (abbrev)
+  (interactive)
+  (dabbrev--reset-global-variables)
+  (let ((dabbrev-check-all-buffers t))
+    (sort (dabbrev--find-all-expansions abbrev t) #'string<)))
+
+(defvar ac-source-dabbrev-words
+  '((candidates
+     . (lambda () (all-completions ac-target
+                                   (ac-source-dabbrev ac-target)))))
+  "Get all the completions using dabbrev")
+
+
+(defun ac-self-insert ()
+  (interactive)
+  (self-insert-command 1)
+  (ac-start))
+
+(defun ac-fix-keymap ()
+  (let ((i 32))
+    (while (<= i ?z)
+      (define-key ac-complete-mode-map
+        (make-string 1 i) 'ac-self-insert)
+      (incf i))))
+
+(ac-fix-keymap)
+
+(define-key ac-complete-mode-map (kbd "DEL")
+  (lambda ()
+    (interactive)
+    (backward-delete-char-untabify 1)
+    (ac-start)))
+
+;; (setq ac-auto-start nil)
 (setq tab-always-indent 'complete)
+
+(setq-default ac-sources '(ac-source-dabbrev-words ac-source-abbrev ac-source-words-in-buffer))
+
 (add-to-list 'completion-styles 'initials t)
 
 ;; TODO mode specific enable since I use AC alot instead of company
-;(eval-after-load 'company
-;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
+                                        ;(eval-after-load 'company
+                                        ;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
 ;; (company-quickhelp-mode 1)
 ;; (setq company-quickhelp-delay 0.01)
 
 
- (defun core-completion-describe-function (function)
-   "Display the full documentation of FUNCTION (a symbol) in tooltip."
-   (interactive (list (function-called-at-point)))
-   (if (null function)
-       (pos-tip-show
-        "** You didn't specify a function! **" '("red"))
-     (pos-tip-show
-      (with-temp-buffer
-        (let ((standard-output (current-buffer))
-              (help-xref-following t))
-          (prin1 function)
-          (princ " is ")
-          (describe-function-1 function)
-          (buffer-string)))
-      nil nil nil 0)))
+(defun core-completion-describe-function (function)
+  "Display the full documentation of FUNCTION (a symbol) in tooltip."
+  (interactive (list (function-called-at-point)))
+  (if (null function)
+      (pos-tip-show
+       "** You didn't specify a function! **" '("red"))
+    (pos-tip-show
+     (with-temp-buffer
+       (let ((standard-output (current-buffer))
+             (help-xref-following t))
+         (prin1 function)
+         (princ " is ")
+         (describe-function-1 function)
+         (buffer-string)))
+     nil nil nil 0)))
 
 
 (provide 'core-completion)

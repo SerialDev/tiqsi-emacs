@@ -24,10 +24,10 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
-;---{Determine OS}--;
+                                        ;---{Determine OS}--;
 
 (setq tiqsi-aquamacs (featurep 'aquamacs))
 (setq tiqsi-linux (featurep 'x))
@@ -35,7 +35,7 @@
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
 (setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
-;-{Determine Emacs}-;
+                                        ;-{Determine Emacs}-;
 
 ;; Emacs type --- are we running GNU Emacs?
 (defmacro GNUEmacs (&rest body)
@@ -64,9 +64,9 @@
        (when (boundp 'aquamacs-version) aquamacs-version)))
 
 
-;------{Win 32}-----;
+                                        ;------{Win 32}-----;
 
-(when tiqsi-win32 
+(when tiqsi-win32
   (setq tiqsi-makescript "build.bat")
   (setq tiqsi-font "PragmataPro")
   (prefer-coding-system 'utf-8)
@@ -75,23 +75,23 @@
 
 
 (defun maximize-frame ()
-    "Maximize the current frame"
-     (interactive)
-     (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
-     (when tiqsi-win32 (w32-send-sys-command 61488)))
+  "Maximize the current frame"
+  (interactive)
+  (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
+  (when tiqsi-win32 (w32-send-sys-command 61488)))
 
 
 (defun w32-restore-frame ()
   "Restore a minimized frame"
-   (interactive)
-   (w32-send-sys-command 61728))
+  (interactive)
+  (w32-send-sys-command 61728))
 
 (defun w32-maximize-frame ()
   "Maximize the current frame"
-   (interactive)
-   (w32-send-sys-command 61488))
+  (interactive)
+  (w32-send-sys-command 61488))
 
-;------{Linux}------;
+                                        ;------{Linux}------;
 
 (when tiqsi-linux
   (setq default-buffer-file-coding-system 'utf-8-unix)
@@ -99,11 +99,11 @@
   (display-battery-mode 1) )
 
 
-;------{Mac OS}-----;
+                                        ;------{Mac OS}-----;
 
 
-(when tiqsi-aquamacs 
-  (cua-mode 0) 
+(when tiqsi-aquamacs
+  (cua-mode 0)
   (osx-key-mode 0)
   (tabbar-mode 0)
   (setq mac-command-modifier 'meta)
@@ -117,11 +117,11 @@
   (setq mac-pass-command-to-system nil)
   (setq tiqsi-makescript "./build.macosx"))
 
-; Turn off the bell on Mac OS X
+                                        ; Turn off the bell on Mac OS X
 (defun nil-bell ())
 (setq ring-bell-function 'nil-bell)
 
-;---{keybindings}---;
+                                        ;---{keybindings}---;
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
 

@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 (setq magit-completing-read-function 'ivy-completing-read)
 (global-magit-file-mode t)
@@ -37,7 +37,7 @@
   (setq git-gutter-fr:side 'right-fringe))
 
 
-;--{Push upstream}--;
+                                        ;--{Push upstream}--;
 
 (defun magit-push-arguments-maybe-upstream (magit-push-popup-fun &rest args)
   "Enable --set-upstream switch if there isn't a current upstream."
@@ -53,17 +53,17 @@
 (setq magit-completing-read-function #'magit-ido-completing-read)
 
 (defun sdev/magit-stage-and-commit()
- (interactive)
- (magit-stage)
- (switch-to-buffer-other-window)
- (magit-commit-popup 'c)) 
+  (interactive)
+  (magit-stage)
+  (switch-to-buffer-other-window)
+  (magit-commit-popup 'c))
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key magit-mode-map "\C-cc" 'magit-commit)
 (define-key magit-mode-map "C-x M-g" 'magit-dispatch-popup)
-;(define-key python-mode-map (kbd "C-c c") 'sdev/magit-stage-and-commit)
+                                        ;(define-key python-mode-map (kbd "C-c c") 'sdev/magit-stage-and-commit)
 
 (provide 'modes-magit)
 

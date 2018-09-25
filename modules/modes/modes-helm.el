@@ -24,14 +24,14 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
 (setq helm-display-function 'helm-display-buffer-in-own-frame
-        helm-display-buffer-reuse-frame t
-        helm-use-undecorated-frame-option t)
+      helm-display-buffer-reuse-frame t
+      helm-use-undecorated-frame-option t)
 
-;-{Posframe render}-;
+                                        ;-{Posframe render}-;
 
 
 (defun helm-posframe()
@@ -64,7 +64,7 @@
 
 ;; (helm-posframe)
 
-;---{Fuzzy Search}--;
+                                        ;---{Fuzzy Search}--;
 
 (helm-flx-mode 1)
 (setq helm-flx-for-helm-find-files t ;; t by default
@@ -72,12 +72,12 @@
 
 
 
-;-{Patch Helpful.el};
+                                        ;-{Patch Helpful.el};
 
 ;; (defun helm-describe-function (func)
 ;;   "FUNC is symbol or string."
 ;;   (cl-letf (((symbol-function 'message) #'ignore))
-;; 	(helpful-function (helm-symbolify func))
+;;      (helpful-function (helm-symbolify func))
 ;;      ))
 
 
@@ -85,16 +85,16 @@
 ;;   "FUNC is symbol or string."
 ;;   (cl-letf (((symbol-function 'message) #'ignore))
 ;;     (condition-case err
-;; 	(progn
-;; 	  (helpful-function (helm-symbolify func)))
+;;      (progn
+;;        (helpful-function (helm-symbolify func)))
 ;;       (argument-error
 ;;        (progn
-;; 	 (describe-function (helm-symbolify func)))))
+;;       (describe-function (helm-symbolify func)))))
 ;;     nil
 ;; ))
 
 
-;------{Resize}-----;
+                                        ;------{Resize}-----;
 
 (helm-autoresize-mode 1)
 (setq helm-autoresize-max-height 30)
@@ -102,17 +102,17 @@
 
 
 
-;---{Performance}---;
+                                        ;---{Performance}---;
 
 (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
       helm-input-idle-delay 0.01  ; this actually updates things
-					; reeeelatively quickly.
+                                        ; reeeelatively quickly.
       helm-quick-update t
       helm-M-x-requires-pattern nil
       helm-ff-skip-boring-files t)
 
 
-;-------{M-x}-------;
+                                        ;-------{M-x}-------;
 
 (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
 
@@ -121,21 +121,21 @@
       helm-recentf-fuzzy-match t)
 
 (setq helm-boring-buffer-regexp-list
-        '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
 
 (setq helm-boring-file-regexp-list
-        '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
-;------{Google}-----;
-;TODO helm-youtube support                                                                          ;
+                                        ;------{Google}-----;
+                                        ;TODO helm-youtube support                                                                          ;
 
 (when (executable-find "curl")
   (setq helm-net-prefer-curl t))
 
 
 
-;----{Horizontal}---;
+                                        ;----{Horizontal}---;
 
 (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
       helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
@@ -147,7 +147,7 @@
 (setq helm-split-window-default-side 'below)
 
 
-;--{Semantic Imenu}-;
+                                        ;--{Semantic Imenu}-;
 
 (setq helm-semantic-fuzzy-match t
       helm-imenu-fuzzy-match    t)
@@ -155,23 +155,23 @@
 
 (setq helm-lisp-fuzzy-completion t)
 
-;-{Locate Any File}-;
+                                        ;-{Locate Any File}-;
 
-;(shell-command "choco install; everything")
+                                        ;(shell-command "choco install; everything")
 (setq helm-locate-fuzzy-match t)
 
 
 (setq helm-apropos-fuzzy-match t)
 
 
-;--{Eshell History}-;
+                                        ;--{Eshell History}-;
 
 (add-hook 'eshell-mode-hook
           #'(lambda ()
               (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
 
 
-;------{Python}-----;
+                                        ;------{Python}-----;
 
 ;; (with-eval-after-load "python"
 ;;   (define-key python-mode-map (kbd "C-c hd") 'helm-pydoc))
@@ -189,7 +189,7 @@
 (add-hook 'py-mode-hook 'py-doc)
 
 
-;---{Buffer Funcs}--;
+                                        ;---{Buffer Funcs}--;
 
 (defun amitp/buffer-file-names ()
   "A list of filenames for the current buffers"
@@ -206,8 +206,8 @@
                  (append (amitp/buffer-file-names)
                          (helm-skip-boring-files (directory-files default-directory t))
                          recentf-list
-                         ;amitp/global-file-list
-			 ))))
+                                        ;amitp/global-file-list
+                         ))))
     (helm
      :sources '(helm-source-recentf)
      :buffer "*helm for files*")))
@@ -226,7 +226,7 @@
   (helm-quit-and-execute-action 'amitp/helm-locate))
 
 
-;--{Prog Headlines}-;
+                                        ;--{Prog Headlines}-;
 
 (defun helm-objc-headlines ()
   (interactive)
@@ -250,7 +250,7 @@
 (helm-descbinds-mode)
 
 
-;----{Swoop Edit}---;
+                                        ;----{Swoop Edit}---;
 
 ;; If this value is t, split window inside the current window
 (setq helm-swoop-split-with-multiple-windows nil)
@@ -276,7 +276,7 @@
               helm-swoop-pattern ;; this variable keeps the last used words
             $pre-input))))
 
-;----{Multi term}---;
+                                        ;----{Multi term}---;
 
 ;; (package-install 'helm-mt)
 ;; (try-require 'helm-mt)
@@ -285,14 +285,14 @@
 
 ;; (define-key global-map (kbd "C-c ho") 'helm-occur)
 
-;---{TODO re add}---;
+                                        ;---{TODO re add}---;
 
 ;; (global-set-key "\C-chr"
 ;;                 (lambda () (interactive)
 ;;                   (imenu--menubar-select imenu--rescan-item)))
 
 
-;-----{HYDRAS!}-----;
+                                        ;-----{HYDRAS!}-----;
 
 (defhydra hydra-gtags (:color blue :hint nil)
   "
@@ -348,7 +348,7 @@ _B_: Search buffers      _b_: Interactive search buffers
   (which-key-add-major-mode-key-based-replacements major-mode "SPC s" "Ag"))
 
 (defhydra hydra-window-stuff (:hint nil)
-    "
+  "
           Split: _v_ert  _s_:horz
          Delete: _c_lose  _o_nly
   Switch Window: _h_:left  _j_:down  _k_:up  _l_:right
@@ -358,36 +358,36 @@ _B_: Search buffers      _b_: Interactive search buffers
            Move: _a_:up  _z_:down  _i_menu"
 
 
-    ("z" scroll-up-line)
-    ("a" scroll-down-line)
-    ("i" idomenu)
+  ("z" scroll-up-line)
+  ("a" scroll-down-line)
+  ("i" idomenu)
 
-    ("u" winner-undo)
-    ("r" winner-redo)
+  ("u" winner-undo)
+  ("r" winner-redo)
 
-    ("h" windmove-left)
-    ("j" windmove-down)
-    ("k" windmove-up)
-    ("l" windmove-right)
+  ("h" windmove-left)
+  ("j" windmove-down)
+  ("k" windmove-up)
+  ("l" windmove-right)
 
-    ("p" previous-buffer)
-    ("n" next-buffer)
-    ("b" ido-switch-buffer) 
-    ("f" ido-find-file)
-    ("F" projectile-find-file)
+  ("p" previous-buffer)
+  ("n" next-buffer)
+  ("b" ido-switch-buffer)
+  ("f" ido-find-file)
+  ("F" projectile-find-file)
 
-    ("s" split-window-below)
-    ("v" split-window-right)
+  ("s" split-window-below)
+  ("v" split-window-right)
 
-    ("c" delete-window)
-    ("o" delete-other-windows)
+  ("c" delete-window)
+  ("o" delete-other-windows)
 
-    ("H" hydra-move-splitter-left)
-    ("J" hydra-move-splitter-down)
-    ("K" hydra-move-splitter-up)
-    ("L" hydra-move-splitter-right)
+  ("H" hydra-move-splitter-left)
+  ("J" hydra-move-splitter-down)
+  ("K" hydra-move-splitter-up)
+  ("L" hydra-move-splitter-right)
 
-    ("q" nil))
+  ("q" nil))
 
 ;; Hydra for in Helm
 (defhydra helm-like-unite ()
@@ -399,8 +399,8 @@ _B_: Search buffers      _b_: Interactive search buffers
   ("a" helm-toggle-all-marks "(un)mark all")
   ;; not sure if there's a better way to this
   ("/" (lambda ()
-	 (interactive)
-	 (execute-kbd-macro [?\C-s]))
+         (interactive)
+         (execute-kbd-macro [?\C-s]))
    "search")
   ("v" helm-execute-persistent-action)
   ("g" helm-beginning-of-buffer "top")
@@ -411,9 +411,9 @@ _B_: Search buffers      _b_: Interactive search buffers
   ("k" helm-previous-line "up")
   ("i" nil "cancel"))
 
-;; (define-key helm-map "jk" 'helm-like-unite/body)  
+;; (define-key helm-map "jk" 'helm-like-unite/body)
 
-					;-------------{Keybindings}------------;
+                                        ;-------------{Keybindings}------------;
 
 ;; (defhydra hydra-helm-bookmarks (:color pink
 ;;                              :hint nil)
@@ -434,7 +434,7 @@ _B_: Search buffers      _b_: Interactive search buffers
 
 ;; TODO Mode specific hydras send to something else
 (defhydra hydra-helm-menu (:color pink
-                             :hint nil)
+                                  :hint nil)
   "
 ^Code^                ^Movement^           ^Search^               ^Misc
 ^^^^^^^^---------------------------------------------------------------------------------
@@ -450,54 +450,54 @@ _pd_: Python Doc       ^ ^                 _sp_: Ag Project-root  ^ ^
 _j_: jedi:related-names
 "
   ;; ("w" hydra-window-stuff :color blue)
-  ;{references using jedi};
+                                        ;{references using jedi};
   ("j" helm-jedi-related-names :color blue)
-  ;----{Ocurrences}---;
+                                        ;----{Ocurrences}---;
   ("o" helm-occur :color blue)
-  ;----{helm etags}---;
+                                        ;----{helm etags}---;
   ("e" helm-etags-plus-select :color blue)
-  ;{semantic or imenu};
+                                        ;{semantic or imenu};
   ("i" helm-semantic-or-imenu :color blue)
-  ;-----{Apropos}-----;
+                                        ;-----{Apropos}-----;
   ("h" helm-apropos :color blue)
-  ;-{browse kill ring};
+                                        ;-{browse kill ring};
   ("k" helm-show-kill-ring :color blue)
-  ;-{browse mark ring};
+                                        ;-{browse mark ring};
   ("SPC" helm-mark-ring :color blue)
-  ;--{google suggest}-;
+                                        ;--{google suggest}-;
   ("g" helm-google-suggest :color blue)
-  ;----{bookmarks}----;
+                                        ;----{bookmarks}----;
   ("bb" helm-bookmarks :color blue)
-  ;-{chrome bookmarks};
+                                        ;-{chrome bookmarks};
   ("bc" helm-chrome-bookmarks :color blue)
-  ;--{anywhere Imenu}-;
+                                        ;--{anywhere Imenu}-;
   ("a" helm-imenu-anywhere :color blue)
-  ;-----{Regexp }-----;
+                                        ;-----{Regexp }-----;
   ("r" helm-regexp :color blue)
-  ;----{Registers}----;
+                                        ;----{Registers}----;
   ("x" helm-register :color blue)
-  ;---{Colour picker}--;
+                                        ;---{Colour picker}--;
   ("cp" helm-colors :color blue)
-  ;----{Calculator}---;
+                                        ;----{Calculator}---;
   ("ca" helm-calcul-expression :color blue)
-  ;----{man-pages}----;
+                                        ;----{man-pages}----;
   ("m" helm-man-woman :color blue)
-  ;----{Find files}---;
+                                        ;----{Find files}---;
   ("f" helm-find-files :color blue)
-  ;---{Locate Files}--;
+                                        ;---{Locate Files}--;
   ("lf" helm-locate :color blue)
-  ;----{Eval elisp}---;
+                                        ;----{Eval elisp}---;
   ("le" helm-eval-expression-with-eldoc :color blue)
-  ;------{Swoop}------;
+                                        ;------{Swoop}------;
   ("sws" helm-swoop :color blue)
   ("swm" helm-multi-swoop :color blue)
   ("swa" helm-multi-swoop-all :color blue)
   ("swi" helm-swoop-from-isearch :color blue)
-  ;{Python documentation};
+                                        ;{Python documentation};
   ("pd" helm-pydoc :color blue)
-  ;--{Search with Ag}-;
+                                        ;--{Search with Ag}-;
   ("ss" helm-ag :color blue)
-  ;-{Ag project root}-;
+                                        ;-{Ag project root}-;
   ("sp" helm-ag-project-root :color blue)
   ("c" nil "cancel")
   ("q" quit-window "quit" :color blue))
@@ -506,7 +506,7 @@ _j_: jedi:related-names
 
 
 
-;{TODO move this to a hydra specific...;
+                                        ;{TODO move this to a hydra specific...;
 
 (defhydra hydra-buffer (:color blue :columns 3)
   "
@@ -525,11 +525,11 @@ _j_: jedi:related-names
 
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (global-set-key (kbd "M-x") 'helm-smex)
 (global-set-key (kbd "M-X") 'helm-smex-major-mode-commands)
-;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
+                                        ;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 
 
@@ -548,7 +548,7 @@ _j_: jedi:related-names
 
 
 ;; (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
-;(define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
+                                        ;(define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
 ;; (define-key global-map (kbd "C-c hbb") 'helm-bookmarks) ;; Bookmarks support
 ;; (define-key global-map (kbd "C-c hbc") 'helm-chrome-bookmarks) ;; Chrome Bookmarks
 ;; (define-key global-map (kbd "C-c hg") 'helm-google-suggest) ;; Google Support
@@ -576,7 +576,7 @@ _j_: jedi:related-names
 
 
 
-;-{TODO re include}-;
+                                        ;-{TODO re include}-;
 
 ;; (when tiqsi-win32
 ;;   (global-set-key (kbd "C-c hwl") 'helm-w32-launcher)
@@ -585,18 +585,18 @@ _j_: jedi:related-names
 ;;   ;; (global-set-key (kbd "C-c hwp") 'helm-w32-launcher-open-shortcut-properties)
 ;;   (global-set-key (kbd "C-c hwr") 'helm-w32-launcher-flush-cache)
 ;;   )
-;; (when tiqsi-win32 
+;; (when tiqsi-win32
 
-;-{TODO re include}-;
+                                        ;-{TODO re include}-;
 
 ;; (when tiqsi-linux
 ;;   (define-key global-map (kbd "C-c ht") (helm-mt "multi-term")))
 
-;----{imenu tags}---;
+                                        ;----{imenu tags}---;
 
 ;; (define-key global-map (kbd "C-c ht") 'helm-imenu)
 
-;----{helm etags}---;
+                                        ;----{helm etags}---;
 
 ;; (define-key global-map (kbd "C-c he") 'helm-etags-plus-select)
 
@@ -604,15 +604,15 @@ _j_: jedi:related-names
 
 ;; (define-key global-map (kbd "C-c hi") 'helm-semantic-or-imenu)
 
-;-----{Apropos}-----;
+                                        ;-----{Apropos}-----;
 
 ;; (define-key global-map (kbd "C-c hh") 'helm-apropos)
 
-;-{browse kill ring};
+                                        ;-{browse kill ring};
 
 ;; (define-key global-map (kbd "C-c hk") 'helm-show-kill-ring)
 
-;-{browse mark ring};
+                                        ;-{browse mark ring};
 
 ;; (define-key global-map (kbd "C-c h SPC") 'helm-mark-ring)
 ;;   (define-key global-map (kbd "C-c ht") (helm-mt "shell")))

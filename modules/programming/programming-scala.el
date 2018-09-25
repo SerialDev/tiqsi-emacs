@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 (use-package ensime
   :straight t

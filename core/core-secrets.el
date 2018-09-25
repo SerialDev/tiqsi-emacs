@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 (setq wakatime-api-key "6c1c3893-f8ce-43bc-9b77-12f44cdcb39b")
 (defconst secrets-config_path "C:/Users/Carlos/Desktop/Workspace/emacs_dir/NewEmacs")

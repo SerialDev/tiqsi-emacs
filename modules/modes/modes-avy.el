@@ -33,14 +33,14 @@ selected frame."
 
 (defun sdev/jump-window (&optional frame)
   (interactive)
-    (if
-	(> (count-unique-visible-buffers) 4)
-	(call-interactively #'ace-window)
+  (if
+      (> (count-unique-visible-buffers) 4)
+      (call-interactively #'ace-window)
     (call-interactively #'other-window)))
 
 
 
-;---{keybindings}---;
+                                        ;---{keybindings}---;
 
 (global-set-key (kbd "M-w") 'sdev/jump-window)
 (global-set-key (kbd "C-c jj") 'avy-goto-word-or-subword-1)

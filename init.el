@@ -82,6 +82,7 @@ of an error, just add the package to a list of missing packages."
 ;{Ensure Executables};
 ;; Add any executables that must be found
 
+
 (defun ensure-executable (exec)
   (unless (executable-find exec)
     (message (concat exec " not found in exec-path"))))

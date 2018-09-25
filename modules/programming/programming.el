@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
 (load-expand  "modules/programming/programming-bnfc.el")

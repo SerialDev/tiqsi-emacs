@@ -39,7 +39,7 @@
 
 
 
-;--------{Check for paren bugs}--------;
+                                        ;--------{Check for paren bugs}--------;
 
 (defun core-debug-pbug ()
   "Check parenthesis bugs or similar horrors.
@@ -57,11 +57,11 @@
   No more \"End of file during parsing\" horrors!"
   (interactive)
   (let ((point (point))
-	(region-regex "^(def..")
-	defs beg end)
+        (region-regex "^(def..")
+        defs beg end)
     (goto-char (point-min))
     (setq defs (loop while (search-forward-regexp region-regex nil t)
-		     collect (point-at-bol)))
+                     collect (point-at-bol)))
     ;; so it evals last definition
     (nconc defs (list (point-max)))
     (setq beg (point-min))
@@ -72,18 +72,18 @@
       ;; (message "checking core-debug-pbug from %s to %s..." beg end)
       ;; (sit-for 1)
       (when (eq (condition-case nil
-		    (eval-region beg (1- end))
-		  (error 'core-debug-pbug-error))
-		'core-debug-pbug-error)
-	(push-mark end 'nomsg 'activate)
-	(goto-char beg)
-	(recenter)
-	(error "a core-debug-pbug found from %s to %s" beg end))
+                    (eval-region beg (1- end))
+                  (error 'core-debug-pbug-error))
+                'core-debug-pbug-error)
+        (push-mark end 'nomsg 'activate)
+        (goto-char beg)
+        (recenter)
+        (error "a core-debug-pbug found from %s to %s" beg end))
       (setq beg end))
     (goto-char point)
     (message "no core-debug-pbug found")))
 
-;-----------{test init file}-----------;
+                                        ;-----------{test init file}-----------;
 
 ;; http://oremacs.com/page17/ - test emacs init file
 (defun core-debug-test-emacs ()
@@ -91,7 +91,7 @@
   (require 'async)
   (async-start
    (lambda () (shell-command-to-string
-          "emacs --batch --eval \"
+               "emacs --batch --eval \"
 (condition-case e
     (progn
       (load \\\"~/.emacs\\\")
@@ -109,25 +109,25 @@
         (search-backward "ERROR!")))))
 
 
-;-------------{Bug hunter}-------------;
+                                        ;-------------{Bug hunter}-------------;
 
 ;; Debug startup failures. If your Emacs init file signals an error during startup, but you don’t know why,
 ;; simply issue M-x bug-hunter-init-file RET RET and The Bug Hunter will find it for you.
-;(use-package bug-hunter
-;  :ensure t)
+                                        ;(use-package bug-hunter
+                                        ;  :ensure t)
 
-;---------{Version bug reports}--------;
- 
+                                        ;---------{Version bug reports}--------;
+
 ;; for automatic version info addition to bug reports
 (defun core-debug-insert-debug-version-info ()
   "Insert version of Emacs and 7 characters of the commit hash."
   (interactive)
   (insert
    (format "GNU Emacs %s (commit %s)"
-	   emacs-version
-	   (substring (emacs-repository-get-version) 0 7))))
+           emacs-version
+           (substring (emacs-repository-get-version) 0 7))))
 
-;-----------------{gdb}----------------;
+                                        ;-----------------{gdb}----------------;
 
 ;; (setq gdb-many-windows nil)
 ;; (defun set-gdb-layout(&optional c-buffer)

@@ -24,9 +24,9 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
-;reduce how often we run it for large amount of error, mostly useful for .py;
+                                        ;reduce how often we run it for large amount of error, mostly useful for .py;
 (setq flycheck-highlighting-mode 'lines)
 
 
@@ -34,17 +34,17 @@
  '(flycheck-error ((((class color)) (:underline "Red"))))
  '(flycheck-warning ((((class color)) (:underline "Orange")))))
 
-;    Push mark when going to the next error to go back to previous position    ;
+                                        ;    Push mark when going to the next error to go back to previous position    ;
 (defadvice flycheck-next-error (before wh/flycheck-next-error-push-mark activate)
   (push-mark))
 
 
-;        Make some good use of screen realstate in the windows title bar       ;
+                                        ;        Make some good use of screen realstate in the windows title bar       ;
 (with-eval-after-load 'flycheck
   (flycheck-title-mode))
 
 
-;-{Custom Warnings}-;
+                                        ;-{Custom Warnings}-;
 
 (defcustom flycheck-navigation-minimum-level nil
   "The minimum level of errors to navigate.
@@ -61,7 +61,7 @@ is at least as severe as this one.  If nil, navigate all errors."
   :package-version '(flycheck . "0.21"))
 
 
-;------{Python}-----;
+                                        ;------{Python}-----;
 
 (setq flycheck-flake8-maximum-line-length '99)
 
@@ -80,15 +80,15 @@ is at least as severe as this one.  If nil, navigate all errors."
 
 
 
-;--------------{Flyspell}--------------;
+                                        ;--------------{Flyspell}--------------;
 
-;------{Hydras}-----;
+                                        ;------{Hydras}-----;
 
 (defhydra hydra-flycheck
   (:pre (progn (setq hydra-lv t) (flycheck-list-errors))
-   :post (progn (setq hydra-lv nil) (quit-windows-on "*Flycheck errors*"))
-   :color red
-   :hint nil)
+        :post (progn (setq hydra-lv nil) (quit-windows-on "*Flycheck errors*"))
+        :color red
+        :hint nil)
   "Flycheck"
   ("f"  flycheck-error-list-set-filter                            "Filter")
   ("j"  flycheck-next-error                                       "Next")
@@ -97,7 +97,7 @@ is at least as severe as this one.  If nil, navigate all errors."
   ("G"  (progn (goto-char (point-max)) (flycheck-previous-error)) "Last")
   ("ESC"  nil "Exit"))
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 ;;(add-hook 'python-mode-hook ' sdev-python-mode-hook)
 (define-key python-mode-map (kbd "C-c n") 'flycheck-next-error)

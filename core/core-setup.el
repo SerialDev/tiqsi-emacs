@@ -79,7 +79,7 @@
 
 ;-----{Windows}-----;
 
-(straight-require-lazy 'neotree)
+(straight-require 'neotree)
 (straight-require 'all-the-icons)
 (straight-require 'switch-window)
 (straight-require 'beacon)
@@ -114,7 +114,7 @@
 ;-------{Misc}------;
 
 (straight-require-lazy 'flyspell)
-(straight-require-lazy 'column-enforce-mode)
+(straight-require 'column-enforce-mode)
 (straight-require 'scratch)
 (straight-require 'region-state)
 (straight-require 'bind-key)
@@ -183,8 +183,8 @@
 (straight-require 'cl)
 (straight-require 'elf-mode)
 (straight-require-lazy 'rust-mode)
-(straight-require-lazy 'textx-mode)
-(straight-require-lazy 'bnfc)
+(straight-require 'textx-mode)
+(straight-require 'bnfc)
 (straight-require 'flymd) ;; Markdown mode support live editing
 
 (straight-require 'docker)
@@ -194,7 +194,7 @@
 ;----{Platforms}----;
 
 (straight-require 'ob-ipython)
-(straight-require-lazy 'ein)
+(straight-require 'ein)
 (straight-require 'cider)
 
 
@@ -209,8 +209,8 @@
 
 ;---{Intellisense}--;
 
-(straight-require-lazy 'rtags)
-(straight-require-lazy 'jdee)
+(straight-require 'rtags)
+(straight-require 'jdee)
 (straight-require 'jedi)
 (straight-require 'racer)
 
@@ -223,7 +223,7 @@
 (straight-require 'company-jedi)
 (straight-require 'dabbrev)
 
-(straight-require-lazy 'ac-racer)
+(straight-require 'ac-racer)
 
 
 ;----{utilities}----;
@@ -234,9 +234,9 @@
 
 ;-----{Linters}-----;
 
-(straight-require-lazy 'flymake)
-(straight-require-lazy 'flymake-easy)
-(straight-require-lazy 'flymake-rust)
+(straight-require 'flymake)
+(straight-require 'flymake-easy)
+(straight-require 'flymake-rust)
 (straight-require 'flycheck)
 (straight-require 'flycheck-title)
 (straight-require 'flycheck-rust)
@@ -258,19 +258,19 @@
 
 ;---------------{Editing}--------------;
 
-(straight-require-lazy 'origami)
+(straight-require 'origami)
 (straight-require 'paredit)
 (straight-require 'drag-stuff)
 (straight-require 'undo-tree)
 (straight-require 'indent-tools)
 (straight-require-lazy 'vimish-fold)
-(straight-require-lazy 'corral)
-(straight-require-lazy 'expand-region) ;; Select a code region by semantic units
+(straight-require 'corral)
+(straight-require 'expand-region) ;; Select a code region by semantic units
 
 
 ;----------------{Misc}----------------;
 
-(straight-require-lazy 'typing)
+(straight-require 'typing)
 
 
 ;-----{From git}----;

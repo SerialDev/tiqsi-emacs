@@ -24,12 +24,12 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
-;{set compilation dir};
+                                        ;{set compilation dir};
 (setq compilation-directory-locked nil)
 
-;---{TODO related}--;
+                                        ;---{TODO related}--;
 
 (setq tiqsi-todo-file "/todo.txt")
 
@@ -37,7 +37,7 @@
   (interactive)
   (find-file tiqsi-todo-file))
 
-;---{LOG related}---;
+                                        ;---{LOG related}---;
 
 (setq tiqsi-log-file "/log.txt")
 
@@ -58,9 +58,9 @@
   (goto-char (point-max)))
 
 
-;---{MAP to MODE}---;
+                                        ;---{MAP to MODE}---;
 
-; Accepted file extensions and their appropriate modes
+                                        ; Accepted file extensions and their appropriate modes
 (setq auto-mode-alist
       (append
        '(("\\.cpp$"    . c++-mode)
@@ -82,7 +82,7 @@
 
 
 
-;---{Buffer File}---;
+                                        ;---{Buffer File}---;
 
 (defun delete-current-buffer-file ()
   "Removes file connected to current buffer and kills buffer."
@@ -100,31 +100,31 @@
 ;; Never understood why Emacs doesn't have this function.
 ;;
 (defun rename-current-buffer-file (new-name)
- "Renames both current buffer and file it's visiting to NEW-NAME." (interactive "sNew name: ")
- (let ((name (buffer-name))
-    (filename (buffer-file-name)))
- (if (not filename)
-    (message "Buffer '%s' is not visiting a file!" name)
- (if (get-buffer new-name)
-     (message "A buffer named '%s' already exists!" new-name)
-    (progn   (rename-file filename new-name 1)   (rename-buffer new-name)    (set-visited-file-name new-name)    (set-buffer-modified-p nil)))))) ;;
+  "Renames both current buffer and file it's visiting to NEW-NAME." (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (if (not filename)
+        (message "Buffer '%s' is not visiting a file!" name)
+      (if (get-buffer new-name)
+          (message "A buffer named '%s' already exists!" new-name)
+        (progn   (rename-file filename new-name 1)   (rename-buffer new-name)    (set-visited-file-name new-name)    (set-buffer-modified-p nil)))))) ;;
 
 ;; Never understood why Emacs doesn't have this function, either.
 ;;
 (defun move-buffer-file (dir)
- "Moves both current buffer and file it's visiting to DIR." (interactive "DNew directory: ")
- (let* ((name (buffer-name))
-     (filename (buffer-file-name))
-     (dir
-     (if (string-match dir "\\(?:/\\|\\\\)$")
-     (substring dir 0 -1) dir))
-     (newname (concat dir "/" name)))
+  "Moves both current buffer and file it's visiting to DIR." (interactive "DNew directory: ")
+  (let* ((name (buffer-name))
+         (filename (buffer-file-name))
+         (dir
+          (if (string-match dir "\\(?:/\\|\\\\)$")
+              (substring dir 0 -1) dir))
+         (newname (concat dir "/" name)))
 
- (if (not filename)
-    (message "Buffer '%s' is not visiting a file!" name)
- (progn     (copy-file filename newname 1)  (delete-file filename)  (set-visited-file-name newname)     (set-buffer-modified-p nil)     t)))) 
+    (if (not filename)
+        (message "Buffer '%s' is not visiting a file!" name)
+      (progn     (copy-file filename newname 1)  (delete-file filename)  (set-visited-file-name newname)     (set-buffer-modified-p nil)     t))))
 
-;--{Scratch Files}--;
+                                        ;--{Scratch Files}--;
 
 (defun start--file (path)
   "Create a file at PATH, creating any containing directories as necessary.
@@ -196,7 +196,7 @@ Visit the file after creation."
   ;; Since we killed it, don't let caller do that.
   nil)
 
-;---{keybindings}---;
+                                        ;---{keybindings}---;
 
 (define-key global-map [M-t] 'load-todo)
 (define-key global-map [M-T] 'load-log)

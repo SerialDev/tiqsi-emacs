@@ -24,10 +24,10 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key global-map (kbd "C-#") 'minimap-mode)
 

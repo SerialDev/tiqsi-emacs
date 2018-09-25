@@ -26,12 +26,12 @@
 ;;; Commentary:
 ;;
 
-;----{Searching}----;
+                                        ;----{Searching}----;
 
-; Commands
+                                        ; Commands
 (set-variable 'grep-command "grep -irHn ")
 (when tiqsi-win32
-    (set-variable 'grep-command "findstr -s -n -i -l "))
+  (set-variable 'grep-command "findstr -s -n -i -l "))
 
 
 ;; find matching parenthesis (% command in vim)
@@ -44,13 +44,13 @@ insert `%'."
         (t (self-insert-command (or arg 1)))))
 
 
-;--{Nav primitives}-;
+                                        ;--{Nav primitives}-;
 
 (defun previous-blank-line ()
   "Moves to the previous line containing nothing but whitespace."
   (interactive)
   (search-backward-regexp "^[ \t]*\n")
-)
+  )
 
 (defun next-blank-line ()
   "Moves to the next line containing nothing but whitespace."
@@ -58,10 +58,10 @@ insert `%'."
   (forward-line)
   (search-forward-regexp "^[ \t]*\n")
   (forward-line -1)
-)
+  )
 
 
-;----{Nav Shift}----;
+                                        ;----{Nav Shift}----;
 
 
 (defun un-indent-by-removing-4-spaces ()
@@ -99,7 +99,7 @@ insert `%'."
   (shift-region -1))
 
 
-;--{Move txt ^ & v}-;
+                                        ;--{Move txt ^ & v}-;
 
 (defun sk/move-text-internal (arg)
   (cond
@@ -141,26 +141,26 @@ insert `%'."
   (interactive "*p")
   (sk/move-text-internal (- arg)))
 
-;--{Find elements}--;
+                                        ;--{Find elements}--;
 
 (defun find-assignment ()
   (if (re-search-forward
-         "[^<>=!]=\\|\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>="
-         (save-excursion (end-of-line) (point)) t)
+       "[^<>=!]=\\|\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>="
+       (save-excursion (end-of-line) (point)) t)
       (progn
-    (goto-char (match-beginning 0))
-    (if (looking-at ".==")
-        nil
-      (if (looking-at "\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>=")
-          (set-mark (match-end 0))
-        (forward-char 1)
-        (set-mark (1+ (point))))
-      (delete-horizontal-space)
-      t))
+        (goto-char (match-beginning 0))
+        (if (looking-at ".==")
+            nil
+          (if (looking-at "\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>=")
+              (set-mark (match-end 0))
+            (forward-char 1)
+            (set-mark (1+ (point))))
+          (delete-horizontal-space)
+          t))
     nil))
 
 
-;-----{Line Nav}----;
+                                        ;-----{Line Nav}----;
 
 ;;Toggle between indentation level and beginning of line
 
@@ -183,7 +183,7 @@ point reaches the beginning or end of the buffer, stop there."
     (when (= orig-point (point))
       (move-beginning-of-line 1))))
 
-;{Select Current Line};
+                                        ;{Select Current Line};
 
 ;; alternative to expand region, depends on smarter-move-beginning-of-line
 (defun sk/select-inside-line ()
@@ -193,7 +193,7 @@ point reaches the beginning or end of the buffer, stop there."
   (set-mark (line-end-position))
   (exchange-point-and-mark))
 
-;{Select Around Line};
+                                        ;{Select Around Line};
 
 (defun sk/select-around-line ()
   "Select line including the newline character"
@@ -203,7 +203,7 @@ point reaches the beginning or end of the buffer, stop there."
   (sk/smarter-move-beginning-of-line 1))
 
 
-;{Select Python Block};
+                                        ;{Select Python Block};
 
 ;; to work with expand-region
 (defun sk/mark-inside-python-block ()
@@ -213,7 +213,7 @@ point reaches the beginning or end of the buffer, stop there."
   (next-line 1))
 
 
-;--{Efficient nav}--;
+                                        ;--{Efficient nav}--;
 
 (use-package avy
   :straight t
@@ -221,10 +221,10 @@ point reaches the beginning or end of the buffer, stop there."
   ;; :bind ("C-c <SPC>" . avy-goto-word-1) ;; Need to get used to it
   :config (progn
             (setq avy-background t)))
-            ;(key-chord-define-global "jj"  #'avy-goto-word-1)
+                                        ;(key-chord-define-global "jj"  #'avy-goto-word-1)
 
 
-;-----{Buffers}-----;
+                                        ;-----{Buffers}-----;
 
 (defun malb/switch-to-previous-buffer ()
   "Switch to previously open buffer.
@@ -232,7 +232,7 @@ Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
-;------{Window}-----;
+                                        ;------{Window}-----;
 
 ;; swap 2 windows
 (defun my-swap-windows ()
@@ -309,12 +309,12 @@ frames with exactly two windows."
 
 ;;;###autoload
 (defun buf-move-left ()
-"Swap the current buffer and the buffer on the left of the split.
+  "Swap the current buffer and the buffer on the left of the split.
 If there is no split, ie now window on the left of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'left))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
         (error "No left split")
       ;; swap top with this one
@@ -329,11 +329,11 @@ one, an error is signaled."
   "Swap the current buffer and the buffer above the split.
 If there is no split, ie now window above the current one, an
 error is signaled."
-;;  "Switches between the current buffer, and the buffer above the
-;;  split, if possible."
+  ;;  "Switches between the current buffer, and the buffer above the
+  ;;  split, if possible."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'up))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
         (error "No window above this one")
       ;; swap top with this one
@@ -344,12 +344,12 @@ error is signaled."
 
 ;;;###autoload
 (defun buf-move-down ()
-"Swap the current buffer and the buffer under the split.
+  "Swap the current buffer and the buffer under the split.
 If there is no split, ie now window under the current one, an
 error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'down))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (or (null other-win)
             (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
         (error "No window under this one")
@@ -361,12 +361,12 @@ error is signaled."
 
 ;;;###autoload
 (defun buf-move-right ()
-"Swap the current buffer and the buffer on the right of the split.
+  "Swap the current buffer and the buffer on the right of the split.
 If there is no split, ie now window on the right of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'right))
-	 (buf-this-buf (window-buffer (selected-window))))
+         (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
         (error "No right split")
       ;; swap top with this one
@@ -386,7 +386,7 @@ one, an error is signaled."
     (pop-to-buffer buffer nil t)))
 
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key global-map "\ef" 'find-file)
 (define-key global-map "\eF" 'find-file-other-window)
@@ -418,9 +418,7 @@ one, an error is signaled."
 (define-key global-map (kbd "S-<left>") 'open-rectangle)
 (define-key global-map (kbd "C-^") 'what-hexadecimal-value)
 (define-key global-map (kbd "C-M-#") 'insert-separator)
-(define-key global-map "\e#"'comment-or-uncomment-region-or-line)
 (define-key global-map "\e " 'set-mark-command)
-(define-key global-map [M-q] 'append-as-kill)
 (define-key global-map [M-a] 'yank)
 (define-key global-map [M-z] 'kill-region)
 (define-key global-map [M-up] 'previous-blank-line)
@@ -447,7 +445,7 @@ one, an error is signaled."
 (global-set-key (kbd "C-c 3") 'my-switch-to-buffer)
 (global-set-key (kbd "C-c 2") 'next-buffer)
 (global-set-key (kbd "C-c 1") 'previous-buffer)
-;(global-set-key (kbd "%") 'match-paren)
+                                        ;(global-set-key (kbd "%") 'match-paren)
 
 
 (provide 'core-navigation)

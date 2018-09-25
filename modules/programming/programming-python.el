@@ -61,7 +61,7 @@ FORM is checked at compile time."
      ,@body))
 
 
-;-----{Fixes upstream bug <25.2RC}-----;
+                                        ;-----{Fixes upstream bug <25.2RC}-----;
 
 ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25753#44
 (when (version< emacs-version "25.2")
@@ -84,23 +84,23 @@ FORM is checked at compile time."
  python-shell-prompt-regexp "In \\[[0-9]+\\]: "
  python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
  python-shell-completion-setup-code
-   "from IPython.core.completerlib import module_completion"
+ "from IPython.core.completerlib import module_completion"
  python-shell-completion-string-code
  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
  python-shell-completion-module-string-code
-   "';'.join(module_completion('''%s'''))\n"
+ "';'.join(module_completion('''%s'''))\n"
  )
 
 
 ;;; smartrep
 (pyt--eval-after-load (smartrep python)
-  (smartrep-define-key
-      python-mode-map
-      "C-c"
-    '(("C-p" . beginning-of-defun)
-      ("C-n" . end-of-defun)
-      (">"   . python-indent-shift-right)
-      ("<"   . python-indent-shift-left))))
+                      (smartrep-define-key
+                       python-mode-map
+                       "C-c"
+                       '(("C-p" . beginning-of-defun)
+                         ("C-n" . end-of-defun)
+                         (">"   . python-indent-shift-right)
+                         ("<"   . python-indent-shift-left))))
 
 (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
 (setq py-autopep8-options '("--max-line-length=110"))
@@ -209,9 +209,9 @@ else:
 (defun sdev-use-remote (&optional ipython)
   (interactive)
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
-	python-shell-interpreter-args "-i"
-	python-shell-prompt-regexp ">>> "
-	python-shell-prompt-output-regexp ""))
+        python-shell-interpreter-args "-i"
+        python-shell-prompt-regexp ">>> "
+        python-shell-prompt-output-regexp ""))
 
 (defun run-python-locally (&rest args)
   (interactive (progn (require 'nadvice)
@@ -255,7 +255,7 @@ else:
   (next-line 1 1)
   (python-shell-send-region py-temp (point) nil t))
 
-;-----------{I-menu merging}-----------;
+                                        ;-----------{I-menu merging}-----------;
 
 ;; Python mode
 (defun my-merge-imenu ()
@@ -265,29 +265,29 @@ else:
     (append mode-imenu custom-imenu)))
 
 (defun my-python-menu-hook()
-    (interactive)
-    (add-to-list
-        'imenu-generic-expression
-        '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
-    (setq imenu-create-index-function 'my-merge-imenu)
-    ;; (eval-after-load "company"
-    ;;     '(progn
-    ;;         (unless (member 'company-jedi (car company-backends))
-    ;;             (setq comp-back (car company-backends))
-    ;;             (push 'company-jedi comp-back)
-    ;;             (setq company-backends (list comp-back)))))
-    )
+  (interactive)
+  (add-to-list
+   'imenu-generic-expression
+   '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
+  (setq imenu-create-index-function 'my-merge-imenu)
+  ;; (eval-after-load "company"
+  ;;     '(progn
+  ;;         (unless (member 'company-jedi (car company-backends))
+  ;;             (setq comp-back (car company-backends))
+  ;;             (push 'company-jedi comp-back)
+  ;;             (setq company-backends (list comp-back)))))
+  )
 
 (add-hook 'python-mode-hook 'my-python-menu-hook)
 
-;-----------{Mccabe python }-----------;
+                                        ;-----------{Mccabe python }-----------;
 ;; requires pip install mccabe
 
 (defun sdev/py-mccabe()
   "Get the mccabe complexity for this buffer."
   (interactive)
   (message
-  (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
+   (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
 
 
 ;;; Indentation for python
@@ -312,7 +312,7 @@ else:
   (py-isort-region))
 
 
-; DISABLED to work with Ipython3 and prevent Inline matplotlib issues
+                                        ; DISABLED to work with Ipython3 and prevent Inline matplotlib issues
 ;; (setq ein:use-auto-complete-superpack t
 ;;       ein:use-smartrep t)
 
@@ -320,7 +320,7 @@ else:
 
 
 
-;-----------------{Ac}-----------------;
+                                        ;-----------------{Ac}-----------------;
 
 ;; (defun my-ac-jedi-setup ()
 ;;   (jedi:setup)
@@ -339,14 +339,14 @@ else:
 ;; (setq ac-quick-help-delay 0)
 
 
-;-------{Python Language Server}-------;
+                                        ;-------{Python Language Server}-------;
 
 
 ;; (add-hook 'python-mode-hook #'lsp-python-enable)
 ;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
 
 
-;---------------{Company}--------------;
+                                        ;---------------{Company}--------------;
 
 ;; (use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
 ;;   :straight t
@@ -363,18 +363,18 @@ else:
 ;;   (add-hook 'python-mode-hook 'config/enable-company-jedi))
 ;; (global-auto-complete-mode 0)
 
-;-----------{Code generation}----------;
+                                        ;-----------{Code generation}----------;
 
 ;; (package-install 'pygen)
 ;; (try-require 'pygen)
 ;; (add-hook 'python-mode-hook 'pygen-mode)
-;(shell-command "pip install rope")
+                                        ;(shell-command "pip install rope")
 
 
-;----{debugging}----;
+                                        ;----{debugging}----;
 
-; Highlight the call to ipdb
-; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/
+                                        ; Highlight the call to ipdb
+                                        ; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/
 (defun annotate-pdb ()
   (interactive)
   (highlight-lines-matching-regexp "import ipdb")
@@ -389,13 +389,13 @@ else:
   (highlight-lines-matching-regexp "^[ ]*import ipdb; ipdb.set_trace()"))
 
 (defun ipdb-cleanup ()
-    (interactive)
-    (save-excursion
-      (replace-regexp ".*ipdb.set_trace().*\n" "" nil (point-min) (point-max))
-      ;; (save-buffer)
-      ))
+  (interactive)
+  (save-excursion
+    (replace-regexp ".*ipdb.set_trace().*\n" "" nil (point-min) (point-max))
+    ;; (save-buffer)
+    ))
 
-;-------{mypy}------;
+                                        ;-------{mypy}------;
 
 (flycheck-define-checker
     python-mypy ""
@@ -411,10 +411,10 @@ else:
 (flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
 
-;--------{disable ac for python}-------;
+                                        ;--------{disable ac for python}-------;
 
 (defun disable-autocomplete() (interactive)
-  (auto-complete-mode 0))
+       (auto-complete-mode 0))
 
 (defadvice auto-complete-mode (around disable-auto-complete-for-python)
   (unless (eq major-mode 'python-mode) ad-do-it))
@@ -422,11 +422,11 @@ else:
 
 
 (defun tiqsi-py-on-save(current-line)
-    (interactive)
-    (blacken-buffer)
-    (sdev/py-sort-imports)
-    (delete-trailing-whitespace)
-    (goto-line current-line)
+  (interactive)
+  (blacken-buffer)
+  (sdev/py-sort-imports)
+  (delete-trailing-whitespace)
+  (goto-line current-line)
   )
 
 
@@ -438,7 +438,7 @@ else:
 
 (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 ;; redefine jedi's C-. (jedi:goto-definition)
 ;; to remember position, and set C-, to jump back

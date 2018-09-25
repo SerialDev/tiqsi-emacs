@@ -41,21 +41,21 @@
 (add-hook 'rust-mode-hook
           '(lambda ()
              (setq tab-width 2)
-						 (setq racer-cmd (expand-file-name "/cargo/bin/racer"))
-						 (setq racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
+             (setq racer-cmd (expand-file-name "/cargo/bin/racer"))
+             (setq racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
              ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
              ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
              (setq company-tooltip-align-annotations t)
-         (add-hook 'rust-mode-hook #'racer-mode)
+             (add-hook 'rust-mode-hook #'racer-mode)
              (add-hook 'racer-mode-hook #'eldoc-mode)
              (add-hook 'racer-mode-hook #'company-mode)
              (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-         (add-hook 'rust-mode-hook 'cargo-minor-mode)
+             (add-hook 'rust-mode-hook 'cargo-minor-mode)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
              (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
 
 
-;-{Static checking}-;
+                                        ;-{Static checking}-;
 
 
 (setq flymake-rust-use-cargo 1)
@@ -65,7 +65,7 @@
   "Get the mccabe complexity for this buffer."
   (interactive)
   (message
-  (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
+   (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
 
 
 (defun cargo-process-run-optimized()
@@ -78,7 +78,7 @@
 
 
 
-;-----{Hydras }-----;
+                                        ;-----{Hydras }-----;
 
 (defhydra hydra-rust (:color pink :hint nil)
   "
@@ -124,7 +124,7 @@ See `racer-describe'."
            (symbol-name)
            (racer--describe)
            (with-current-buffer (concat "\n" (buffer-string) "\n\n"))
-            (message 'racer-tooltip nil nil 1000)))
+           (message 'racer-tooltip nil nil 1000)))
 
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
 (define-key rust-mode-map (kbd "C-t") 'racer-ui-tooltip )

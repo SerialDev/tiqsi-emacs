@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
 (add-to-list  'auto-mode-alist '("\\.tx\\'" . textx-mode))

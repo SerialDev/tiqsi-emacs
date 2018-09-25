@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 
 (defun my-erc-hook ()
@@ -718,7 +718,7 @@
 
 (setq erc-max-buffer-size 10000)
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 (define-key erc-mode-map (kbd "C-c e") 'erc-insert-emoticon)
 (define-key erc-mode-map (kbd "M-.") 'erc-goto-def)

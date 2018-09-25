@@ -27,7 +27,7 @@
 ;;
 
 
-;----{Commenting}---;
+                                        ;----{Commenting}---;
 
 
 (defun comment-or-uncomment-region-or-line ()
@@ -47,25 +47,25 @@
     (comment-or-uncomment-region start end)))
 
 
+
 (defun append-as-kill ()
   "Performs copy-region-as-kill as an append."
   (interactive)
   (append-next-kill)
-  (copy-region-as-kill (mark) (point))
-  )
+  (copy-region-as-kill (mark) (point)))
 
 
-;----{Replacing}----;
+                                        ;----{Replacing}----;
 
 
 (defun tiqsi-replace-in-region (old-word new-word)
   "Perform a replace-string in the current region."
   (interactive "sReplace: \nsReplace: %s  With: ")
   (save-excursion (save-restriction
-            (narrow-to-region (mark) (point))
-            (goto-char (point-min))
-            (replace-string old-word new-word)
-            )))
+                    (narrow-to-region (mark) (point))
+                    (goto-char (point-min))
+                    (replace-string old-word new-word)
+                    )))
 
 
 (defun tiqsi-replace-string (FromString ToString)
@@ -75,7 +75,7 @@
     (replace-string FromString ToString)))
 
 
-;------{Saving}-----;
+                                        ;------{Saving}-----;
 
 
 (defun tiqsi-save-buffer ()
@@ -88,9 +88,9 @@
   (save-buffer))
 
 
-;----{Inserting}----;
+                                        ;----{Inserting}----;
 
-(defun my-copy-rectangle (start end)
+(defun tiqsi-copy-rectangle (start end)
   "Copy the region-rectangle instead of `kill-rectangle'."
   (interactive "r")
   (setq killed-rectangle (extract-rectangle start end)))
@@ -103,11 +103,10 @@
     (insert ".")
     (forward-char )))
 
-(defun
-  sdev/timestamp()
-        (interactive)
-        ; If you want to insert date and time, you can use:
-        (insert(format-time-string "%A %d-%m-%Y %H:%M:%S ")))
+(defun sdev/timestamp()
+  (interactive)
+                                        ; If you want to insert date and time, you can use:
+  (insert(format-time-string "%A %d-%m-%Y %H:%M:%S ")))
 
 ;;; editing-defuns.el --- Basic text editing defuns -*- lexical-binding: t; -*-
 (defun open-line-below ()
@@ -184,7 +183,7 @@ If there's no region, the current line will be duplicated."
     (one-shot-keybinding "d" 'duplicate-current-line)))
 
 
-;---{Indentation}---;
+                                        ;---{Indentation}---;
 
 (defun indent-buffer ()
   "Indents an entire buffer using the default intenting scheme."
@@ -196,7 +195,7 @@ If there's no region, the current line will be duplicated."
   (jump-to-register 'o))
 
 
-;---{Modification}--;
+                                        ;---{Modification}--;
 
 
 ;; unrelated, but a nice spot for it
@@ -228,7 +227,7 @@ If there's no region, the current line will be duplicated."
       (narrow-to-region start end))
     (switch-to-buffer buf)))
 
-(defun sk/goto-closest-number ()
+(defun tiqsi-goto-closest-number ()
   (interactive)
   (let ((closest-behind (save-excursion (search-backward-regexp "[0-9]" nil t)))
         (closest-ahead (save-excursion (search-forward-regexp "[0-9]" nil t))))
@@ -240,11 +239,11 @@ If there's no region, the current line will be duplicated."
       ((and closest-behind (not closest-ahead)) closest-behind)
       ((> (- closest-ahead (point)) (- (point) closest-behind)) closest-behind)
       ((> (- (point) closest-behind) (- closest-ahead (point))) closest-ahead)
-       (closest-ahead)))))
+      (closest-ahead)))))
 
 ;; Once you go to the closest number, you might want to change it. These functions are useful for that.
 
-(defun sk/incs (s &optional num)
+(defun tiqsi-incs (s &optional num)
   (interactive "p")
   (let* ((inc (or num 1))
          (new-number (number-to-string (+ inc (string-to-number s))))
@@ -253,20 +252,20 @@ If there's no region, the current line will be duplicated."
         (s-pad-left (length s) "0" new-number)
       new-number)))
 
-(defun sk/change-number-at-point (arg)
+(defun tiqsi-change-number-at-point (arg)
   (interactive "p")
   (unless (or (looking-at "[0-9]")
               (looking-back "[0-9]"))
-    (sk/goto-closest-number))
+    (tiqsi-goto-closest-number))
   (save-excursion
     (while (looking-back "[0-9]")
       (forward-char -1))
     (re-search-forward "[0-9]+" nil)
-    (replace-match (sk/incs (match-string 0) arg) nil nil)))
+    (replace-match (tiqsi-incs (match-string 0) arg) nil nil)))
 
-(defun sk/subtract-number-at-point (arg)
+(defun tiqsi-subtract-number-at-point (arg)
   (interactive "p")
-  (sk/change-number-at-point (- arg)))
+  (tiqsi-change-number-at-point (- arg)))
 
 (defun transpose-params ()
   "Presumes that params are in the form (p, p, p) or {p, p, p} or [p, p, p]"
@@ -287,7 +286,6 @@ If there's no region, the current line will be duplicated."
                         (point))))
     (transpose-regions start-of-first end-of-first start-of-last end-of-last)))
 
-
 (defun move-forward-out-of-param ()
   (while (not (looking-at ")\\|, \\| ?}\\| ?\\]"))
     (cond
@@ -304,24 +302,24 @@ If there's no region, the current line will be duplicated."
      (t (backward-char)))))
 
 
-;------{Toggle}-----;
+                                        ;------{Toggle}-----;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
 (try-require 'origami)
 
 (eval-after-load 'origami
-    '(progn
-       (defun rb-show-only (buffer point)
-         (interactive (list (current-buffer) (point)))
-         (progn (origami-show-only-node buffer point)
-                (minimap-new-minimap)))
+  '(progn
+     (defun rb-show-only (buffer point)
+       (interactive (list (current-buffer) (point)))
+       (progn (origami-show-only-node buffer point)
+              (minimap-new-minimap)))
 
-       (defun rb-toggle-rec (buffer point)
-         (interactive (list (current-buffer) (point)))
-         (progn (origami-recursively-toggle-node buffer point)
-                (minimap-new-minimap)))
-       (global-origami-mode 1)
-   ))
+     (defun rb-toggle-rec (buffer point)
+       (interactive (list (current-buffer) (point)))
+       (progn (origami-recursively-toggle-node buffer point)
+              (minimap-new-minimap)))
+     (global-origami-mode 1)
+     ))
 
 (use-package vimish-fold
   :straight t
@@ -331,7 +329,7 @@ If there's no region, the current line will be duplicated."
 
 ;; Fold indentation https://stackoverflow.com/questions/1587972/how-to-display-indentation-guides-in-emacs/4459159#4459159
 ;; Quite nice for python mode TODO: fix for using with ipynb buffers in EIN
-(defun my-toggle-indent-fold ()
+(defun tiqsi-toggle-indent-fold ()
   "Toggle fold all lines larger than indentation on current line"
   (interactive)
   (let ((col 1))
@@ -341,15 +339,15 @@ If there's no region, the current line will be duplicated."
       (set-selective-display
        (if selective-display nil (or col 1))))))
 (add-hook 'python-mode-hook
-  (lambda () (define-key python-mode-map (kbd "C-c f") 'my-toggle-indent-fold)))
+          (lambda () (define-key python-mode-map (kbd "C-c f") 'tiqsi-toggle-indent-fold)))
 
-; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
+                                        ; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
 
-; This function then hopefully does what I want:
+                                        ; This function then hopefully does what I want:
 
-; if a region is active, just indent
-; if we’re looking at a space after a non-whitespace character, we try some company-expansion
-; otherwise call whatever would have been called otherwise.
+                                        ; if a region is active, just indent
+                                        ; if we’re looking at a space after a non-whitespace character, we try some company-expansion
+                                        ; otherwise call whatever would have been called otherwise.
 
 (defun malb/indent-or-complete (&optional arg)
   (interactive "P")
@@ -419,30 +417,30 @@ If there's no region, the current line will be duplicated."
 
 
 
-;-----{Deleting}----;
+                                        ;-----{Deleting}----;
 
 
 (defun sdev/del-beg-line()
- (interactive)
-(let ((beg(point ))) (sk/smarter-move-beginning-of-line())
- (delete-region beg(point))))
+  (interactive)
+  (let ((beg(point ))) (sk/smarter-move-beginning-of-line())
+       (delete-region beg(point))))
 
 (defun sdev/del-end-line()
- (interactive)
-(let ((beg(point ))) (move-end-of-line())
- (delete-region beg(point))))
+  (interactive)
+  (let ((beg(point ))) (move-end-of-line())
+       (delete-region beg(point))))
 
 ;; Kill whitespace
 (defun kill-whitespace ()
-          "Kill the whitespace between two non-whitespace characters"
-          (interactive "*")
-          (save-excursion
-            (save-restriction
-              (save-match-data
-                (progn
-                  (re-search-backward "[^ \t\r\n]" nil t)
-                  (re-search-forward "[ \t\r\n]+" nil t)
-                  (replace-match "" nil nil))))))
+  "Kill the whitespace between two non-whitespace characters"
+  (interactive "*")
+  (save-excursion
+    (save-restriction
+      (save-match-data
+        (progn
+          (re-search-backward "[^ \t\r\n]" nil t)
+          (re-search-forward "[ \t\r\n]+" nil t)
+          (replace-match "" nil nil))))))
 
 (defun remove-blank-lines ()
   "Delete blank lines from the current buffer."
@@ -463,7 +461,7 @@ region if active."
         (move-beginning-of-line nil)
         (kill-whole-line)))))
 
-;----{Kill Ring}----;
+                                        ;----{Kill Ring}----;
 
 (use-package undo-tree
   :straight t
@@ -493,12 +491,12 @@ region if active."
 (defun browse-kill-ring ()
   (interactive)
   (insert (completing-read "Pick an element: "
-                       (preprocess-kill-ring))))
+                           (preprocess-kill-ring))))
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 (define-key global-map [f8] 'tiqsi-replace-string)
 
-; Editting
+                                        ; Editting
 (define-key global-map (kbd "C-q" )'copy-region-as-kill)
 (define-key global-map (kbd "C-f" )'yank)
 (define-key global-map "" 'nil)
@@ -510,13 +508,13 @@ region if active."
 (define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
 (define-key global-map "\eO" 'tiqsi-replace-string)
-; \377 is alt-backspace
+                                        ; \377 is alt-backspace
 (define-key global-map "\377" 'backward-kill-word)
 (define-key global-map [M-delete] 'kill-word)
 (define-key global-map "\e[" 'start-kbd-macro)
 (define-key global-map "\e]" 'end-kbd-macro)
 (define-key global-map "\e'" 'call-last-kbd-macro)
-; Buffers
+                                        ; Buffers
 (define-key global-map "\er" 'revert-buffer)
 (define-key global-map "\ek" 'kill-this-buffer)
 (define-key global-map "\es" 'save-buffer)
@@ -527,19 +525,22 @@ region if active."
 (define-key global-map (kbd "C-+") 'duplicate-current-line-or-region)
 (global-set-key (kbd "C-M-y") 'browse-kill-ring)
 (global-set-key (kbd "C-d") 'sdev/del-beg-line)
+(define-key global-map "\e#"'comment-or-uncomment-region-or-line)
 
 (define-key global-map (kbd "C-c m") 'origami-toggle-node)
-(define-key global-map (kbd "C-c M") 'my-toggle-indent-fold)
+(define-key global-map (kbd "C-c TAB") 'tiqsi-toggle-indent-fold)
+(define-key global-map [M-q] 'append-as-kill)
 
 (global-set-key (kbd "C-S-d") 'sdev/del-end-line)
 (global-set-key (kbd "C-c q") 'toggle-quotes)
+(global-set-key (kbd "M-n") 'tiqsi-goto-closest-number)
 (global-set-key (kbd "C-c t t") 'sdev/timestamp)
 (global-set-key (kbd "C-c <deletechar>") 'kill-whitespace)
 (global-set-key (kbd "C-c <up>") 'drag-stuff-up)
 (global-set-key (kbd "C-c <down>") 'drag-stuff-down)
-;(bind-key "<tab>" #'malb/indent-or-complete)
-; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
-; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
+                                        ;(bind-key "<tab>" #'malb/indent-or-complete)
+                                        ; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
+                                        ; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
 
 (provide 'core-editing)
 

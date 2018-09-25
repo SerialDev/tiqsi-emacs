@@ -51,11 +51,11 @@
   (etags-select-find-tag-at-point))
 
 
-;---{Auto update}---;
+                                        ;---{Auto update}---;
 
 (ctags-global-auto-update-mode)
 (setq ctags-update-prompt-create-tags nil);you need manually create TAGS in your project
- ;; or only turn it on for some special mode
+;; or only turn it on for some special mode
 
 (autoload 'turn-on-ctags-auto-update-mode "ctags-update" "turn on 'ctags-auto-update-mode'." t)
 (add-hook 'python-mode-common-hook  'turn-on-ctags-auto-update-mode)
@@ -64,7 +64,7 @@
 ;; Support Multiple TAG files
 ;; ;; (setq tags-table-list '("/path/of/TAGS1"    "/path/of/TAG2"))
 
-;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 (global-set-key (kbd "M-.") 'my-find-tag)
 
 ;;list all visited tags
