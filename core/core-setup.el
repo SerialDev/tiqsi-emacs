@@ -283,6 +283,16 @@
    :repo "emacs-evil/evil"
 ))
 
+
+;; (straight-use-package
+;;  '(evxcr
+;;    :type git
+;;    :host github
+;;    :repo "serialdev/evxcr-mode"
+;;    :config
+;;    (add-hook 'rust-mode-hook #'evcxr-minor-mode)
+;; ))
+
 ;; language server protocol support
 ;; (straight-use-package
 ;;  '(lsp-mode

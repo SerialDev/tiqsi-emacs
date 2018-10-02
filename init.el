@@ -124,6 +124,26 @@ of an error, just add the package to a list of missing packages."
   (load bootstrap-file nil 'nomessage))
 
 
+
+(defun calling-function ()
+  (let ((n 6) ;; nestings in this function + 1 to get out of it
+        func
+        bt)
+    (while (and (setq bt (backtrace-frame n))
+              (not func))
+        (setq n (1+ n)
+              func (and bt
+                      (nth 0 bt)
+                      (nth 1 bt))))
+    func))
+
+
+(defun try!(func)
+  (if (ignore-errors
+	(funcall func))
+      (message (format "success: %s %s %s" (calling-function) (format-mode-line "%l") buffer-file-name  ))
+      (message (format "failure: %s %s %s" (calling-function) (format-mode-line "%l") buffer-file-name))))
+
 (load-expand "core/core.el" )
 (load-expand "modules/modes/modes.el" )
 (load-expand "modules/programming/programming.el" )
