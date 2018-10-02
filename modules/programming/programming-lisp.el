@@ -4,9 +4,9 @@
 ;; Standard using SBCL
 ;; Elisp functions will go on this one too
 
-
-(when tiqsi-linux
-  (load (expand-file-name "~/quicklisp/slime-helper.el")))
+(try!
+ '(when tiqsi-linux
+    (load (expand-file-name "~/quicklisp/slime-helper.el"))))
 
 ;; Replace "sbcl" with the path to your implementation
 ;; Do some standard SLIME configuration.

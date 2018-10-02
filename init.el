@@ -38,6 +38,10 @@
                          ("melpa" . "http://melpa.org/packages/")))
 (package-initialize)
 
+;; Debug?
+;; (setq debug-on-error t)
+
+
 ;----{About User}---;
 
 (setq user-full-name "C Andres Mariscal"
@@ -54,6 +58,7 @@
 ;; attempt to load a feature/library, failing silently
 (defvar missing-packages-list nil
   "List of packages that `try-require' can't find.")
+
 
 (defun try-require (feature)
   "Attempt to load a library or module. Return true if the
@@ -141,8 +146,9 @@ of an error, just add the package to a list of missing packages."
 (defun try!(func)
   (if (ignore-errors
 	(funcall func))
-      (message (format "success: %s %s %s" (calling-function) (format-mode-line "%l") buffer-file-name  ))
-      (message (format "failure: %s %s %s" (calling-function) (format-mode-line "%l") buffer-file-name))))
+      (message (format "%s SUCCESS: %s %s %s" (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name  ))
+      (message (format "%s FAILURE: %s %s %s" (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name))))
+
 
 (load-expand "core/core.el" )
 (load-expand "modules/modes/modes.el" )
