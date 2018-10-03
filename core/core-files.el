@@ -137,7 +137,7 @@ Visit the file after creation."
   (interactive "sName of scratch file: ")
   (start--file (expand-file-name (format "~/scratch/%s" file-name))))
 
-(defun wh/start-tmp-file (file-name)
+(defun tiqsi-start-tmp-file (file-name)
   "Create a file in /tmp for the given file name."
   (interactive "sName of temporary file: ")
   (start--file (expand-file-name (format "/tmp/%s" file-name))))

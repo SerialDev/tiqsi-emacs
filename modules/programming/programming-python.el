@@ -436,7 +436,7 @@ else:
       (tiqsi-py-on-save current-line)
       )))
 
-(add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
+;; (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 
                                         ;---{Keybindings}---;
 

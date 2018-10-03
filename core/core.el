@@ -73,8 +73,8 @@
 ;; Chris Hecker
 ;; Casey Muratory
 
-(load-expand  "core/core-setup.el")
 (load-expand  "core/core-os.el")
+(load-expand  "core/core-setup.el")
 (load-expand  "core/core-ui.el")
 (load-expand  "core/core-editing.el")
 

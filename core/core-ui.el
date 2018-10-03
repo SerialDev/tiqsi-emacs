@@ -171,7 +171,7 @@
   :ensure t
   :diminish highlight-indent-guides-mode
   :config (progn (setq highlight-indent-guides-method 'column)
-                 (add-hook 'python-mode-hook #'highlight-indent-guides-mode)))
+                 (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
 
 
                                         ;{Highlight actions};
