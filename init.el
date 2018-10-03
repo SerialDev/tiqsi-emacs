@@ -142,12 +142,16 @@ of an error, just add the package to a list of missing packages."
                       (nth 1 bt))))
     func))
 
+(defmacro cond-require (item do-this)
+  `(if (require ',item nil 'noerror)
+       (try! ',do-this)
+     (message (format "FAILURE-COND-CHECK %s: %s %s %s %s" ',item (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name))))
 
 (defun try!(func)
   (if (ignore-errors
 	(funcall func))
-      (message (format "%s SUCCESS: %s %s %s" (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name  ))
-      (message (format "%s FAILURE: %s %s %s" (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name))))
+      (message (format "%s SUCCESS: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name  ))
+      (message (format "%s FAILURE: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name))))
 
 
 (load-expand "core/core.el" )
