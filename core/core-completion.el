@@ -95,18 +95,6 @@
          (buffer-string)))
      nil nil nil 0)))
 
-;; (use-package company-lsp
-;;   :straight t
-;;   :ensure t
-;;   :config
-;;   (push 'company-lsp company-backends)
-;;   (setq company-lsp-enable-recompletion t
-;;         company-lsp-enable-snippet t
-;;         company-lsp-cache-candidates t
-;;         company-lsp-async t))
-
-;; (add-hook 'python-mode-hook (push 'company-lsp company-backends))
-
 
 (provide 'core-completion)
 

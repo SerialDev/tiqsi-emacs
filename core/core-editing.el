@@ -338,16 +338,17 @@ If there's no region, the current line will be duplicated."
       (setq col (+ 1 (current-column)))
       (set-selective-display
        (if selective-display nil (or col 1))))))
+
 (add-hook 'python-mode-hook
-          (lambda () (define-key python-mode-map (kbd "C-c f") 'tiqsi-toggle-indent-fold)))
+  (lambda () (define-key python-mode-map (kbd "C-c f") 'tiqsi-toggle-indent-fold)))
 
-                                        ; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
+; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
 
-                                        ; This function then hopefully does what I want:
+; This function then hopefully does what I want:
 
-                                        ; if a region is active, just indent
-                                        ; if we’re looking at a space after a non-whitespace character, we try some company-expansion
-                                        ; otherwise call whatever would have been called otherwise.
+; if a region is active, just indent
+; if we’re looking at a space after a non-whitespace character, we try some company-expansion
+; otherwise call whatever would have been called otherwise.
 
 (defun malb/indent-or-complete (&optional arg)
   (interactive "P")
