@@ -129,6 +129,7 @@
 (straight-require 'helpful)
 (straight-require 'which-key)
 (straight-require '0xc)
+(straight-require 'parsec)
 
 (straight-require 'popup)
 (straight-require 'pos-tip)
@@ -189,6 +190,7 @@
 (straight-require-lazy 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
+(straight-require 'geiser) ;; Scheme mode support 
 (straight-require 'flymd) ;; Markdown mode support live editing
 
 (straight-require 'docker)
@@ -285,6 +287,13 @@
    :repo "emacs-evil/evil"
 ))
 
+(straight-use-package
+ '(matrix-client
+   :type git
+   :host github
+   :repo "jgkamat/matrix-client-el"
+))
+
 
 ;; (straight-use-package
 ;;  '(evxcr
@@ -340,6 +349,7 @@
    :host github
    :repo "SerialDev/mypy-mode"
 ))
+
 
 
 (straight-use-package

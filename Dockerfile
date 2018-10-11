@@ -121,6 +121,7 @@ RUN apt-get install sbcl && \
     sbcl --load /usr/share/cl-quicklisp/quicklisp.lisp \
        --eval '(quicklisp-quickstart:install)'       \
        --eval '(ql:add-to-init-file)'                \
+       --eval '(ql:quickload "quicklisp-slime-helper")'                \
        --eval '(quit)'
 
 RUN wget "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-linux.tar.gz" && \
@@ -152,6 +153,11 @@ RUN apt-get install firefox -y && \
     cp /all-the-icons.el/fonts/material-design-icons.ttf /usr/local/share/fonts && \
     cp /all-the-icons.el/fonts/octicons.ttf /usr/local/share/fonts && \
     cp /all-the-icons.el/fonts/weathericons.ttf /usr/local/share/fonts
+
+RUN apt-get install chicken-bin -y && \
+    cd `csi -p '(chicken-home)'` && \
+    curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | tar zx
+
 
 ADD ./ /tiqsi-emacs
 
