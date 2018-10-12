@@ -27,6 +27,7 @@
 ;;
 
 
+(setq exec-path (append exec-path '("/home/usr/.cargo/bin")))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 (add-hook 'rust-mode-hook  #'company-mode)
 (add-hook 'rust-mode-hook  #'racer-mode)
