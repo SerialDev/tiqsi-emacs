@@ -32,6 +32,8 @@
  '(helm-ag-insert-at-point 'symbol)
  '(helm-ag-ignore-buffer-patterns '("\\.txt\\'" "\\.mkd\\'")))
 
+(setq ag-highlight-search t)
+
                                         ;--{search with Ag}-;
 
 ;; (define-key global-map (kbd "C-c hs") 'helm-ag)
