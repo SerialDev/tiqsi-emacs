@@ -119,6 +119,10 @@
 ;; eldoc for clojure
 (add-hook 'cider-mode-hook #'eldoc-mode)
 
+;; Use clojure-mode for Clojurescript.
+
+(add-auto-mode 'clojure-mode "\\.cljs\\'")
+
 
 ;; error buffer not popping up
 (setq cider-show-error-buffer nil)
