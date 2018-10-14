@@ -57,6 +57,14 @@
   (newline-and-indent)
   (goto-char (point-max)))
 
+;; Automatically creating missing parent directories when visiting a new file.
+
+(defun tiqsi--create-non-existent-directory ()
+      (let ((parent-directory (file-name-directory buffer-file-name)))
+        (when (and (not (file-exists-p parent-directory))
+                   (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
+          (make-directory parent-directory t))))
+(add-to-list 'find-file-not-found-functions #'tiqsi--create-non-existent-directory)
 
                                         ;---{MAP to MODE}---;
 
