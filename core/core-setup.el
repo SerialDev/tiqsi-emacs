@@ -186,6 +186,7 @@
 
 (straight-require 'clojure-mode)
 (straight-require 'cl)
+(straight-require 'elm-mode)
 (straight-require 'elf-mode)
 (straight-require-lazy 'rust-mode)
 (straight-require 'textx-mode)

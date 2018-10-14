@@ -28,6 +28,8 @@
 
 ;; Based on Claudia Doppioslash's elm config https://www.lambdacat.com/post-modern-emacs-setup-for-elm/
 
+;;; Code:
+
 (add-hook 'flycheck-mode-hook 'flycheck-elm-setup)
 (with-eval-after-load 'flycheck
   '(add-hook 'flycheck-mode-hook #'flycheck-elm-setup))
@@ -41,3 +43,7 @@
 (add-hook 'elm-mode-hook
           (lambda ()
             (setq company-backends '(company-elm))))
+
+(provide 'programming-elm)
+
+;;; programming-elm.el ends here
