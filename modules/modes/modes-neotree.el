@@ -42,7 +42,7 @@
 
                                         ;---{Keybindings}---;
 
-(define-key global-map (kbd "M-<f8>") 'neotree-toggle)
+(define-key global-map (kbd "M-<f9>") 'neotree-toggle)
 
 
 (provide 'modes-neotree)
