@@ -109,6 +109,7 @@ point."
   (indent-according-to-mode)
   (company-complete-common))
 
+;; TODO Bugged fix it
 (defun tiqsi/indent-or-complete (arg)
   (interactive "*P")
   (if (company-manual-begin)
@@ -129,7 +130,8 @@ point."
 (enable-company)
 (global-auto-complete-mode 0)
 (define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
-(define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
+;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
+(define-key global-map (kbd "<tab>") 'indent-or-expand)
 
 (rectangle-mark-mode 0)
 
