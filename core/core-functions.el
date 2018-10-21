@@ -278,8 +278,12 @@ Adapted from `describe-function-or-variable'."
 
                                         ;--{Key completion}-;
 
-(which-key-mode 1)
-(setq which-key-idle-delay 0.5)
+(use-package which-key
+  :straight t
+  :ensure t
+  :config (progn
+	    (which-key-mode 1)
+	    (setq which-key-idle-delay 0.5)))
 
 
                                         ;---{Keybindings}---;

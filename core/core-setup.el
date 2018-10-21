@@ -123,7 +123,6 @@
 ;---{helpful libs}--;
 
 (straight-require 'helpful)
-(straight-require 'which-key)
 (straight-require '0xc)
 (straight-require 'parsec)
 
@@ -377,7 +376,7 @@
 ;---{Requirements}--;
 
 (try-require 'browse-url) ; part of gnu emacs
-(try-require 'uniquify)
+(try-require 'uniquify) ;; part of gnu emacs
 (try-require 'dired-x)
 (try-require 'helm-eshell) ;; Eshell History support
 

@@ -70,7 +70,6 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
       (select-window win)
       )))
 
-
                                         ;----{M-x short}----;
 
 (defun display-extended-command-shorter (command)
@@ -102,6 +101,7 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
 
 (setq uniquify-buffer-name-style 'post-forward)
 (setq uniquify-after-kill-buffer-p t)
+
 
 (define-minor-mode sk/dubcaps-mode
   "Toggle `sk/dubcaps-mode'.  Converts words in DOuble CApitals to
