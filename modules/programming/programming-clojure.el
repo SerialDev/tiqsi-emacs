@@ -28,6 +28,15 @@
 
                                         ;------{Cider}------;
 
+;; Setup cider for clojurescript / figwheel dev.
+
+(setq nrepl-hide-special-buffers t)
+
+(setq cider-cljs-lein-repl
+      "(do (require 'figwheel-sidecar.repl-api)
+       (figwheel-sidecar.repl-api/start-figwheel!)
+       (figwheel-sidecar.repl-api/cljs-repl))")
+
 ;; Enter cider mode when entering the clojure major mode
 (add-hook 'clojure-mode-hook 'cider-mode)
 
@@ -38,7 +47,6 @@
 
 ;; Replace return key with newline-and-indent when in cider mode.
 (add-hook 'cider-mode-hook '(lambda () (local-set-key (kbd "RET") 'newline-and-indent)))
-
 
 (defun lein-start-repl()
   "Start Leiningen repl."
@@ -60,7 +68,11 @@
   (cider-connect "127.0.0.1" "46061" )
   )
 
+(defun figwheel-repl ()
+  (interactive)
+  (inf-clojure "lein figwheel"))
 
+;; (add-hook 'clojure-mode-hook #'inf-clojure-minor-mode)
 
 (defun lein-compile-uberjar()
   "Compile lein to jar."
@@ -121,7 +133,7 @@
 
 ;; Use clojure-mode for Clojurescript.
 
-(add-auto-mode 'clojure-mode "\\.cljs\\'")
+;; (add-auto-mode 'clojure-mode "\\.cljs\\'")
 
 
 ;; error buffer not popping up

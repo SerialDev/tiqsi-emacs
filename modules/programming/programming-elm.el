@@ -40,6 +40,11 @@
   (add-to-list 'company-backends 'company-elm))
 (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
 
+;; For Elm 0.19 and greater, set this to '(\"elm\" \"repl\")."
+(setq elm-interactive-command '("\"elm\" \"repl\""))
+
+
+
 (add-hook 'elm-mode-hook
           (lambda ()
             (setq company-backends '(company-elm))))
