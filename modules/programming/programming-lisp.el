@@ -16,6 +16,8 @@
 
 ;; (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
+(slime-setup '(slime-fancy slime-company))
+
 
 (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
 ;; Stop SLIME's REPL from grabbing DEL,

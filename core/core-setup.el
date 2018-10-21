@@ -185,6 +185,7 @@
 ;---{Major Modes}---;
 
 (straight-require 'clojure-mode)
+;; (straight-require 'inf-clojure)
 (straight-require 'cl)
 (straight-require 'elm-mode)
 (straight-require 'elf-mode)
@@ -229,7 +230,7 @@
 (straight-require 'dabbrev)
 
 (straight-require 'ac-racer)
-
+(straight-require 'slime-company)
 
 ;----{utilities}----;
 
