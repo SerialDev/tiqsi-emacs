@@ -74,7 +74,6 @@
 (straight-require 'spaceline)
 (straight-require 'spaceline-all-the-icons)
 (straight-require 'delight)
-(straight-require 'diminish)
 
 
 ;-----{Windows}-----;
@@ -82,7 +81,6 @@
 (straight-require 'neotree)
 (straight-require 'all-the-icons)
 (straight-require 'switch-window)
-(straight-require 'beacon)
 (straight-require 'windmove)
 
 
@@ -92,7 +90,6 @@
 (straight-require 'stripe-buffer)
 (straight-require 'rainbow-mode)
 (straight-require 'highlight-indentation)
-(straight-require 'highlight-thing)
 (straight-require 'highlight-symbol)
 (straight-require 'highlight-parentheses)
 (straight-require 'mic-paren)
@@ -114,15 +111,14 @@
 ;-------{Misc}------;
 
 (straight-require-lazy 'flyspell)
-(straight-require 'column-enforce-mode)
 (straight-require 'scratch)
 (straight-require 'region-state)
 (straight-require 'bind-key)
 (straight-require 'erc)
 (straight-require 'org)
-(straight-require-lazy 'adaptive-wrap)
 (straight-require 'focus)
-(straight-require 'camcorder)
+(straight-require-lazy 'adaptive-wrap)
+(straight-require-lazy 'camcorder)
 
 ;---{helpful libs}--;
 
@@ -137,16 +133,16 @@
 
 ;-----{needed?}-----;
 
-(straight-require 'paren)
-(straight-require 'color)
-(straight-require 'cc-mode)
-(straight-require 'compile)
-
 ;--{cutting board}--;
 
-;(straight-require 'posframe)
+
+(require 'cc-mode)
+(require 'compile)
+(require 'color)
+(require 'paren)
+
+;; (straight-require 'posframe)
 ;(straight-require 'company-childframe)
-;; (straight-require 'parinfer)
 
 ;; (straight-require 'company-jedi)
 ;; (straight-require 'jedi)
@@ -174,7 +170,7 @@
 ;-{elisp libraries}-;
 
 (straight-require 'elisp-slime-nav)
-(straight-require 'slime-docker)
+;; (straight-require 'slime-docker)
 
 (straight-require 's)
 (straight-require 'htmlize)
@@ -187,8 +183,8 @@
 (straight-require 'clojure-mode)
 ;; (straight-require 'inf-clojure)
 (straight-require 'cl)
-(straight-require 'elm-mode)
-(straight-require 'elf-mode)
+(straight-require-lazy 'elm-mode)
+(straight-require-lazy 'elf-mode)
 (straight-require-lazy 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
@@ -335,13 +331,6 @@
    :type git
    :host github
    :repo "hotpxl/company-irony-c-headers"
-))
-
-(straight-use-package
- '(volatile-highlights
-   :type git
-   :host github
-   :repo "k-talo/volatile-highlights.el"
 ))
 
 

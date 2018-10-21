@@ -135,19 +135,20 @@
 
                                         ;------{Beacon}-----;
 
-(beacon-mode 1)
-(setq beacon-push-mark 35)
-(setq beacon-color "#666600")
-(setq beacon-blink-when-point-moves-vertically 20)
-(setq beacon-blink-when-point-moves-horizontally 20)
-(setq beacon-blink-when-focused t)
-(setq beacon-blink-duration 0.2)
-(setq beacon-blink-delay 0.2)
-(setq beacon-size 20)
+(use-package beacon
+  :straight t
+  :ensure t
+  :config (progn
+	    (beacon-mode 1)
+	    (setq beacon-push-mark 35)
+	    (setq beacon-color "#666600")
+	    (setq beacon-blink-when-point-moves-vertically 20)
+	    (setq beacon-blink-when-point-moves-horizontally 20)
+	    (setq beacon-blink-when-focused t)
+	    (setq beacon-blink-duration 0.2)
+	    (setq beacon-blink-delay 0.2)
+	    (setq beacon-size 20)))
 
-
-(use-package diminish
-  :ensure t) ;; to use as :diminish in use packages
 
                                         ;----{spaceline}----;
 
@@ -163,29 +164,45 @@
   :straight t
   :ensure t
   :config (progn
-            (add-hook 'emacs-lisp-mode-hook #'rainbow-mode))
-  :diminish rainbow-mode)
+            (add-hook 'emacs-lisp-mode-hook #'rainbow-mode)))
 
 (use-package highlight-indent-guides
   :straight t
   :ensure t
-  :diminish highlight-indent-guides-mode
   :config (progn (setq highlight-indent-guides-method 'column)
                  (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
 
 
                                         ;{Highlight actions};
 
-(volatile-highlights-mode t)
+(straight-use-package
+ '(volatile-highlights
+   :type git
+   :host github
+   :repo "k-talo/volatile-highlights.el"
+   :config (progn (volatile-highlights-mode t))
+))
 
                                         ;-{Highlight thing}-;
 
-(setq highlight-thing-delay-seconds 0.15) ;; default at 0.5
+(straight-require 'highlight-thing)
+
+(use-package highlight-thing
+  :straight t
+  :ensure t
+  :config (progn
+	    (setq highlight-thing-delay-seconds 0.15) ;; default at 0.5
+	    ))
 
 
                                         ;{Enforce Line Limit};
-(setq column-enforce-column 100)
-(setq column-enforce-comments nil)
+
+(use-package column-enforce-mode
+  :straight
+  :ensure
+  :config (progn
+	    (setq column-enforce-column 100)
+	    (setq column-enforce-comments nil)))
 
 
                                         ;{Marked region info};
@@ -193,11 +210,6 @@
 ;; (add-hook 'rectangle-mark-mode 'region-state-mode)
 (add-hook 'text-mode 'region-state-mode)
 
-
-                                        ;{Avoid Line Clutter};
-(diminish 'highlight-thing-mode)
-(diminish 'volatile-highlights-mode)
-(diminish 'highlight-parentheses-mode)
 
                                         ;------{Clock}------;
 
@@ -244,6 +256,20 @@
 (setq ediff-split-window-function 'split-window-horizontally)
 
 
+                                        ;{Avoid Line Clutter};
+
+(use-package diminish
+  :straight t
+  :ensure t
+  :config (progn
+	    (diminish 'highlight-thing-mode)
+	    (diminish 'highlight-indent-guides-mode)
+	    (diminish 'volatile-highlights-mode)
+	    (diminish 'highlight-parentheses-mode)
+	    (diminish 'rainbow-mode)
+  )) ;; to use as :diminish in use packages
+
+
                                         ;------{Paren}------;
 
 (global-highlight-parentheses-mode 1)
@@ -255,7 +281,6 @@
   (XEmacs
    (paren-set-mode 'paren)))
 
-
 ;; if the matching paren is offscreen, show the matching line in the echo area
 ;; + many other useful things
 (when window-system
@@ -264,7 +289,6 @@
 
     ;; activating
     (paren-activate)))
-
 
                                         ; TODO
 ;; highlight sexp look into implementing http://superuser.com/questions/304848/highlight-the-matching-content-of-a-pair-of-braces-in-emacs
