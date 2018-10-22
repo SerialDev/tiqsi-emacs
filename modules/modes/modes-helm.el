@@ -27,6 +27,76 @@
 ;;
 
 
+(use-package helm
+  :straight t
+  :ensure t
+  :config (progn
+	    ;; Resize
+	    (helm-autoresize-mode 1)
+	    (setq helm-autoresize-max-height 30)
+	    (setq helm-autoresize-min-height 10)
+
+	    ;; Performance
+	    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+	    	  helm-input-idle-delay 0.01  ; this actually updates things
+                                        ; reeeelatively quickly.
+	    	  helm-quick-update t
+	    	  helm-M-x-requires-pattern nil
+	    	  helm-ff-skip-boring-files t)
+
+	    ;; M-x features
+	    (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
+	    (setq helm-buffers-fuzzy-matching t
+		  helm-recentf-fuzzy-match t)
+
+	    (setq helm-boring-buffer-regexp-list
+		  '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+
+
+	    (setq helm-boring-file-regexp-list
+		  '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+
+	    ;; Horizontal
+
+	    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+		  helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+		  helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+		  helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+		  helm-ff-file-name-history-use-recentf t
+		  helm-echo-input-in-header-line t)
+
+	    (setq helm-split-window-default-side 'below)
+
+	    ;; Semantic Imenu
+
+	    (setq helm-semantic-fuzzy-match t
+		  helm-imenu-fuzzy-match    t)
+
+	    (setq helm-lisp-fuzzy-completion t)
+
+	    ;; Locate any file
+
+					;(shell-command "choco install; everything")
+	    (setq helm-locate-fuzzy-match t)
+	    (setq helm-apropos-fuzzy-match t)
+
+	    (when (executable-find "curl")
+	      (setq helm-net-prefer-curl t))))
+
+;; Straight install requirements
+
+(straight-require 'helm-smex)
+(straight-require 'helm-etags-plus) ;; Helm Etags support
+(straight-require 'ac-helm) ;; Interactive ac with Helm
+(straight-require 'helm-pydoc) ;; Helm Python documentation
+(straight-require 'helm-descbinds) ;; Keybindings interactive search
+(when tiqsi-win32
+  (straight-require 'helm-w32-launcher)) ;; Start Menu Support
+(straight-require 'helm-chrome) ;; Chrome Bookmarks support
+
+
+;; USE BUFFER
+
 ;; (setq helm-display-function 'helm-display-buffer-in-own-frame
 ;;       helm-display-buffer-reuse-frame t
 ;;       helm-use-undecorated-frame-option t)
@@ -64,13 +134,44 @@
 
 ;; (helm-posframe)
 
-                                        ;---{Fuzzy Search}--;
 
-(helm-flx-mode 1)
-(setq helm-flx-for-helm-find-files t ;; t by default
-      helm-flx-for-helm-locate t) ;; nil by default
+;; Fuzzy search with helm
+(use-package helm-flx
+  :straight t
+  :ensure t
+  :config (progn
+	    (helm-flx-mode 1)
+	    (setq helm-flx-for-helm-find-files t ;; t by default
+		  helm-flx-for-helm-locate t) ;; nil by default
+	    ))
 
+;; Interactive Silver Searcher with Helm
 
+(use-package helm-ag
+  :straight t
+  :ensure t
+  :config (progn
+	    (custom-set-variables
+	     '(helm-ag-base-command "ag --nocolor --nogroup --ignore-case")
+	     '(helm-ag-command-option "--all-text")
+	     '(helm-ag-insert-at-point 'symbol)
+	     '(helm-ag-ignore-buffer-patterns '("\\.txt\\'" "\\.mkd\\'")))
+	    (setq ag-highlight-search t)))
+
+;; Dash Documentation Support
+
+(use-package helm-dash
+  :straight t
+  :ensure t
+  :config (progn
+	    (eval-after-load "helm-dash"
+	      '(defun helm-dash-actions (actions doc-item) `(("Go to doc" . eww))))
+	    ;; (setq-local helm-dash-docsets-path "../../tools/dash/")
+	    (setq helm-dash-docsets-path (format "%s/.emacs.d/docsets" (getenv "HOME")))
+	    ;; (setq helm-dash-common-docsets '(("NumPy") ("Redis") ("Pandas")))
+	    ;; (setq helm-dash-browser-func 'browse-url-generic)
+	    ;; (setq helm-dash-browser-func 'browse-url)
+	    (setq helm-dash-browser-func 'eww)))
 
                                         ;-{Patch Helpful.el};
 
@@ -94,74 +195,14 @@
 ;; ))
 
 
-                                        ;------{Resize}-----;
-
-(helm-autoresize-mode 1)
-(setq helm-autoresize-max-height 30)
-(setq helm-autoresize-min-height 10)
 
 
 
-                                        ;---{Performance}---;
-
-(setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-      helm-input-idle-delay 0.01  ; this actually updates things
-                                        ; reeeelatively quickly.
-      helm-quick-update t
-      helm-M-x-requires-pattern nil
-      helm-ff-skip-boring-files t)
 
 
-                                        ;-------{M-x}-------;
-
-(setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
-
-
-(setq helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match t)
-
-(setq helm-boring-buffer-regexp-list
-      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
-
-
-(setq helm-boring-file-regexp-list
-      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
                                         ;------{Google}-----;
                                         ;TODO helm-youtube support                                                                          ;
-
-(when (executable-find "curl")
-  (setq helm-net-prefer-curl t))
-
-
-
-                                        ;----{Horizontal}---;
-
-(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t
-      helm-echo-input-in-header-line t)
-
-(setq helm-split-window-default-side 'below)
-
-
-                                        ;--{Semantic Imenu}-;
-
-(setq helm-semantic-fuzzy-match t
-      helm-imenu-fuzzy-match    t)
-
-
-(setq helm-lisp-fuzzy-completion t)
-
-                                        ;-{Locate Any File}-;
-
-                                        ;(shell-command "choco install; everything")
-(setq helm-locate-fuzzy-match t)
-
-
-(setq helm-apropos-fuzzy-match t)
 
 
                                         ;--{Eshell History}-;
@@ -169,24 +210,6 @@
 (add-hook 'eshell-mode-hook
           #'(lambda ()
               (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
-
-
-                                        ;------{Python}-----;
-
-;; (with-eval-after-load "python"
-;;   (define-key python-mode-map (kbd "C-c hd") 'helm-pydoc))
-
-
-(setq helm-dash-docsets-path (format "%s/.emacs.d/docsets" (getenv "HOME")))
-;; (setq helm-dash-common-docsets '(("NumPy") ("Redis") ("Pandas")))
-(setq helm-dash-browser-func 'browse-url-generic)
-
-
-(defun py-doc ()
-  (interactive)
-  (setq-local helm-dash-docsets '(("NumPy") ("Pandas"))))
-
-(add-hook 'py-mode-hook 'py-doc)
 
 
                                         ;---{Buffer Funcs}--;
@@ -250,31 +273,36 @@
 (helm-descbinds-mode)
 
 
-                                        ;----{Swoop Edit}---;
 
-;; If this value is t, split window inside the current window
-(setq helm-swoop-split-with-multiple-windows nil)
+;; Swoop Editing
 
-;; Split direcion. 'split-window-vertically or 'split-window-horizontally
-(setq helm-swoop-split-direction 'split-window-vertically)
+(use-package helm-swoop
+  :straight t
+  :ensure t
+  :config (progn
+	    ;; If this value is t, split window inside the current window
+	    (setq helm-swoop-split-with-multiple-windows nil)
 
-;; If nil, you can slightly boost invoke speed in exchange for text color
-(setq helm-swoop-speed-or-color t)
+	    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+	    (setq helm-swoop-split-direction 'split-window-vertically)
 
-;; Optional face for line numbers
-;; Face name is `helm-swoop-line-number-face`
-(setq helm-swoop-use-line-number-face t)
+	    ;; If nil, you can slightly boost invoke speed in exchange for text color
+	    (setq helm-swoop-speed-or-color t)
 
-;; If you prefer fuzzy matching
-(setq helm-swoop-use-fuzzy-match t)
+	    ;; Optional face for line numbers
+	    ;; Face name is `helm-swoop-line-number-face`
+	    (setq helm-swoop-use-line-number-face t)
 
-;; If there is no symbol at the cursor, use the last used words instead.
-(setq helm-swoop-pre-input-function
-      (lambda ()
-        (let (($pre-input (thing-at-point 'symbol)))
-          (if (eq (length $pre-input) 0)
-              helm-swoop-pattern ;; this variable keeps the last used words
-            $pre-input))))
+	    ;; If you prefer fuzzy matching
+	    (setq helm-swoop-use-fuzzy-match t)
+
+	    ;; If there is no symbol at the cursor, use the last used words instead.
+	    (setq helm-swoop-pre-input-function
+		  (lambda ()
+		    (let (($pre-input (thing-at-point 'symbol)))
+		      (if (eq (length $pre-input) 0)
+			  helm-swoop-pattern ;; this variable keeps the last used words
+			$pre-input))))))
 
                                         ;----{Multi term}---;
 
@@ -542,80 +570,6 @@ _j_: jedi:related-names
 (global-set-key (kbd "C-<return>") 'ac-complete-with-helm)
 
 (define-key global-map (kbd "M-i") 'helm-swoop-back-to-last-point)
-;; (define-key global-map (kbd "C-c ss") 'helm-swoop)
-;; (define-key global-map (kbd "C-c sm") 'helm-multi-swoop)
-;; (define-key global-map (kbd "C-c sa") 'helm-multi-swoop-all)
-
-
-;; (define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
-                                        ;(define-key helm-swoop-map (kbd "M-i") 'helm-multi-swoop-all-from-helm-swoop)
-;; (define-key global-map (kbd "C-c hbb") 'helm-bookmarks) ;; Bookmarks support
-;; (define-key global-map (kbd "C-c hbc") 'helm-chrome-bookmarks) ;; Chrome Bookmarks
-;; (define-key global-map (kbd "C-c hg") 'helm-google-suggest) ;; Google Support
-;; (define-key global-map (kbd "C-c ha") 'helm-imenu-anywhere) ;; Search Anywhere
-;; (define-key global-map (kbd "C-c hr") 'helm-regexp) ;; Helm Regex Search
-;; (define-key global-map (kbd "C-c hx") 'helm-register) ;; Register inspection
-;; (define-key global-map (kbd "C-c hcp") 'helm-colors) ;; Colour Picker
-;; (define-key global-map (kbd "C-c hcc") 'helm-calcul-expression) ;; Calculator helm interface
-;; (define-key global-map (kbd "C-c hm") 'helm-man-woman) ;; Manpages inspect
-;; (define-key global-map (kbd "C-c hf") 'helm-find-files) ;; Helm find files
-;; (define-key global-map (kbd "C-c f") 'helm-locate) ;; Helm Locate Files
-;; (global-set-key (kbd "C-c h M-:") 'helm-eval-expression-with-eldoc) ;; Eval Elisp
-;;(global-set-key (kbd "C-M-]") (lambda () (interactive) (org-cycle t))) ;; Cycle through
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                                        ;-{TODO re include}-;
-
-;; (when tiqsi-win32
-;;   (global-set-key (kbd "C-c hwl") 'helm-w32-launcher)
-;;   (global-set-key (kbd "C-c hwe") 'helm-w32-launcher-elevated)
-;;   (global-set-key (kbd "C-c hwd") 'helm-w32-launcher-open-shortcut-directory)
-;;   ;; (global-set-key (kbd "C-c hwp") 'helm-w32-launcher-open-shortcut-properties)
-;;   (global-set-key (kbd "C-c hwr") 'helm-w32-launcher-flush-cache)
-;;   )
-;; (when tiqsi-win32
-
-                                        ;-{TODO re include}-;
-
-;; (when tiqsi-linux
-;;   (define-key global-map (kbd "C-c ht") (helm-mt "multi-term")))
-
-                                        ;----{imenu tags}---;
-
-;; (define-key global-map (kbd "C-c ht") 'helm-imenu)
-
-                                        ;----{helm etags}---;
-
-;; (define-key global-map (kbd "C-c he") 'helm-etags-plus-select)
-
-;; ;{semantic or imenu};
-
-;; (define-key global-map (kbd "C-c hi") 'helm-semantic-or-imenu)
-
-                                        ;-----{Apropos}-----;
-
-;; (define-key global-map (kbd "C-c hh") 'helm-apropos)
-
-                                        ;-{browse kill ring};
-
-;; (define-key global-map (kbd "C-c hk") 'helm-show-kill-ring)
-
-                                        ;-{browse mark ring};
-
-;; (define-key global-map (kbd "C-c h SPC") 'helm-mark-ring)
-;;   (define-key global-map (kbd "C-c ht") (helm-mt "shell")))
 
 
 

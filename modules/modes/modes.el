@@ -36,7 +36,6 @@
 (load-expand  "modules/modes/modes-magit.el")
 (load-expand  "modules/modes/modes-minimap.el")
 (load-expand  "modules/modes/modes-dash.el")
-(load-expand  "modules/modes/modes-ag.el")
 (load-expand  "modules/modes/modes-tramp.el")
 (load-expand  "modules/modes/modes-waka.el")
 (load-expand  "modules/modes/modes-avy.el")

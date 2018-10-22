@@ -163,7 +163,7 @@ ADD ./ /tiqsi-emacs
 
 RUN cp /tiqsi-emacs/PragmataPro.ttf /usr/local/share/fonts
 
-ENV DISPLAY=192.168.249.66:0
+ENV DISPLAY=169.254.60.134:0
 
 ENV LC_ALL=C.UTF-8
 

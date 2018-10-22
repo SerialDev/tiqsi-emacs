@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 ;;
-
+def
 (use-package company
   :straight t
   :ensure t
@@ -47,7 +47,7 @@
   	      ("\C-w" . nil)
   	      :map company-mode-map
   	      ("<M-SPC>" . company-complete-common))
-  :defer t
+  :defer nil
   :diminish company-mode)
 
 ;; (insert(color-lighten-name "#161616" 10))#2f992f992f99
@@ -71,8 +71,6 @@
    )))
 
 (face-attribute 'default :background)
-
-
 
 (use-package company-statistics
   :straight t)
@@ -116,20 +114,10 @@ point."
       (indent-and-complete)
     (indent-or-expand arg)))
 
-;; Performance bug: disable until resolved also affects helm-posframe
-;; (company-childframe-mode 1)
-;(company-childframe-mode 0)
-
-;; (face-attribute 'company-tooltip :background)
-
-;; TODO make a macro for these
-(defmacro test()
-  '( "enable-company")
-  )
-
 (enable-company)
 (global-auto-complete-mode 0)
 (define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
+
 ;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
 (define-key global-map (kbd "<tab>") 'indent-or-expand)
 

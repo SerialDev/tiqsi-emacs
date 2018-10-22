@@ -59,7 +59,7 @@
 
 (autoload 'turn-on-ctags-auto-update-mode "ctags-update" "turn on 'ctags-auto-update-mode'." t)
 (add-hook 'python-mode-common-hook  'turn-on-ctags-auto-update-mode)
-(add-hook 'emacs-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
+(add-hook 'emacs-evil/evil-lisp-mode-hook  'turn-on-ctags-auto-update-mode)
 
 ;; Support Multiple TAG files
 ;; ;; (setq tags-table-list '("/path/of/TAGS1"    "/path/of/TAG2"))

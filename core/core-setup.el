@@ -26,21 +26,6 @@
 ;;; Commentary:
 ;;
 
-(setq straight-use-package-by-default t)
-(setq use-package-verbose t
-      use-package-always-ensure t)
-
-(defun straight-require (module)
-  (straight-use-package module)
-  (require module))
-
-
-(defun straight-require-lazy (module)
-  (straight-use-package-lazy module)
-  (try-require module))
-
-
-(straight-require 'use-package)
 
 ;; Asynchronous execution
 
@@ -147,22 +132,6 @@
 ;; (straight-require 'jedi)
 
 ;---------------{Modules}--------------;
-
-;-------{Helm}------;
-
-(straight-require 'helm)
-(straight-require 'helm-flx)
-(straight-require 'helm-smex)
-(straight-require 'helm-etags-plus) ;; Helm Etags support
-(straight-require 'helm-ag) ;; Interactive Silver Searcher with Helm
-(straight-require 'ac-helm) ;; Interactive ac with Helm
-(straight-require 'helm-dash) ;; Dash Documentation Support
-(straight-require 'helm-pydoc) ;; Helm Python documentation
-(straight-require 'helm-swoop) ;; Swoop Editing
-(straight-require 'helm-descbinds) ;; Keybindings interactive search
-(when tiqsi-win32
-  (straight-require 'helm-w32-launcher)) ;; Start Menu Support
-(straight-require 'helm-chrome) ;; Chrome Bookmarks support
 
 ;-------------{Programming}------------;
 

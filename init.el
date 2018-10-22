@@ -129,6 +129,24 @@ of an error, just add the package to a list of missing packages."
   (load bootstrap-file nil 'nomessage))
 
 
+;; Bootstrap use-package
+
+(setq straight-use-package-by-default t)
+(setq use-package-verbose t
+      use-package-always-ensure t)
+
+(defun straight-require (module)
+  (straight-use-package module)
+  (require module))
+
+
+(defun straight-require-lazy (module)
+  (straight-use-package-lazy module)
+  (try-require module))
+
+
+(straight-require 'use-package)
+
 
 (defun calling-function ()
   (let ((n 6) ;; nestings in this function + 1 to get out of it
