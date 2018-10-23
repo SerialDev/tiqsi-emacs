@@ -74,6 +74,7 @@
 ;; Casey Muratory
 
 (load-expand  "core/core-os.el")
+(load-expand  "core/core-setup.el")
 (load-expand  "core/core-ui.el")
 (load-expand  "core/core-editing.el")
 
@@ -86,7 +87,6 @@
 (load-expand  "core/core-secrets.el")
 (load-expand  "core/core-performance.el")
 
-(load-expand  "core/core-setup.el")
 
 (provide 'core)
 
