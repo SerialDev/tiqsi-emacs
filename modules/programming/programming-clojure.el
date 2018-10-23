@@ -24,13 +24,50 @@
 
 
 ;;; Commentary:
+;; - They both require the installation of version -> ([cider/piggieback "0.3.9"])
+;; - They both require to enable cider-nrepl -> (:plugins [[cider/cider-nrepl "0.18.0"]])
+;; Current Issues and solutions
+;;   lein new figwheel project-name
+;;   lein figwheel
 ;;
+;; Alternatively
+;;   lein repl
+;;   (use 'figwheel-sidecar.repl-api)
+;;   (start-figwheel!)
+
 
                                         ;------{Cider}------;
 
 ;; Setup cider for clojurescript / figwheel dev.
 
+(defmacro with-minibuffer-input (form &rest inputs)
+  (declare (indent 1))
+  `(minibuffer-with-setup-hook
+       (lambda ()
+         (minibuffer-input-provider ',inputs))
+     ,form))
+
+;; -*- lexical-binding: t -*-
+(defun minibuffer-input-provider (inputs)
+  (let ((hook (make-symbol "hook")))
+    (fset hook (lambda ()
+                 (remove-hook 'post-command-hook hook)
+                 (when inputs
+                   (when (= 0 (minibuffer-depth))
+                     (error "Too many inputs"))
+                   (when (cdr inputs)
+                     (add-hook 'post-command-hook hook))
+                   (insert (pop inputs))
+                   (exit-minibuffer))))
+    (add-hook 'post-command-hook hook)))
+
+(use-package with-simulated-input
+  :straight t
+  :ensure t
+)
+
 (setq nrepl-hide-special-buffers t)
+(setq cider-cljs-repl-type "figwheel")
 
 (setq cider-cljs-lein-repl
       "(do (require 'figwheel-sidecar.repl-api)
@@ -51,7 +88,7 @@
 (defun lein-start-repl()
   "Start Leiningen repl."
   (interactive)
-  (async-shell-command "lein repl :start :port 46061" )
+  (async-shell-command "lein repl :start :port 6666" )
 
   ;; ;; TODO fix with continuation passing
   ;; (async-start
@@ -65,8 +102,9 @@
 (defun lein-connect-repl()
   "Start Leiningen repl."
   (interactive)
-  (cider-connect "127.0.0.1" "46061" )
+  (with-simulated-input "127.0.0.1 RET 6666 RET" (call-interactively 'cider-connect))
   )
+
 
 (defun figwheel-repl ()
   (interactive)
@@ -227,7 +265,7 @@ _C-s_: eval last sexp           ^ ^
 ;; (define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
 ;; (define-key clojure-mode-map (kbd "C-c <right>") 'paredit-forward-slurp-sexp)
 ;; (define-key clojure-mode-map (kbd "C-c <left>") 'paredit-forward-barf-sexp)
-;; (define-key clojure-mode-map (kbd "C-c C-s") 'cider-eval-last-sexp)
+(define-key clojure-mode-map (kbd "C-c s") 'cider-eval-last-sexp)
 ;; (define-key clojure-mode-map (kbd "C-c (") 'paredit-wrap-round)
 ;; (define-key clojure-mode-map (kbd "C-c )") 'paredit-splice-sexp)
 (define-key clojure-mode-map (kbd "M-c") 'hydra-clojure-usage/body)
