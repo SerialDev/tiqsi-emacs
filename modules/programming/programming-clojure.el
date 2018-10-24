@@ -117,7 +117,7 @@
   ;;    46061)
   ;;  (lambda(result)
   ;;    (cider-connect "127.0.0.1" (message "%s" result))))
-  )
+  
 
 (defun lein-connect-repl()
   "Start Leiningen repl."
