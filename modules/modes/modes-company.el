@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 ;;
-def
+
 (use-package company
   :straight t
   :ensure t
