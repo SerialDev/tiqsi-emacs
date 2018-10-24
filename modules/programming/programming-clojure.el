@@ -70,9 +70,26 @@
 (setq cider-cljs-repl-type "figwheel")
 
 (setq cider-cljs-lein-repl
-      "(do (require 'figwheel-sidecar.repl-api)
-       (figwheel-sidecar.repl-api/start-figwheel!)
-       (figwheel-sidecar.repl-api/cljs-repl))")
+      "(cond
+  (and (resolve 'user/run) (resolve 'user/browser-repl)) ;; Chestnut projects
+  (eval '(do (user/run)
+             (user/browser-repl)))
+
+  (try
+    (require 'figwheel-sidecar.repl-api)
+    (resolve 'figwheel-sidecar.repl-api/start-figwheel!)
+    (catch Throwable _))
+  (eval '(do (figwheel-sidecar.repl-api/start-figwheel!)
+             (figwheel-sidecar.repl-api/cljs-repl)))
+
+  (try
+    (require 'cemerick.piggieback)
+    (resolve 'cemerick.piggieback/cljs-repl)
+    (catch Throwable _))
+  (eval '(cemerick.piggieback/cljs-repl (cljs.repl.rhino/repl-env)))
+
+  :else
+  (throw (ex-info \"Failed to initialize CLJS repl. Add com.cemerick/piggieback and optionally figwheel-sidecar to your project.\" {})))")
 
 ;; Enter cider mode when entering the clojure major mode
 (add-hook 'clojure-mode-hook 'cider-mode)
@@ -88,12 +105,15 @@
 (defun lein-start-repl()
   "Start Leiningen repl."
   (interactive)
-  (async-shell-command "lein repl :start :port 6666" )
+  (let* ((output-buffer (generate-new-buffer "temp-clj"))
+	 (proc (progn
+		 (async-shell-command "lein repl :start :port 6666" output-buffer)
+		 (get-buffer-process output-buffer))))))
 
   ;; ;; TODO fix with continuation passing
   ;; (async-start
   ;;  (lambda()
-  ;;    (async-shell-command "lein repl :start :port 46061" )
+  ;;    (async-shell-command "lein repl :start :port 6666" )
   ;;    46061)
   ;;  (lambda(result)
   ;;    (cider-connect "127.0.0.1" (message "%s" result))))
@@ -105,6 +125,18 @@
   (with-simulated-input "127.0.0.1 RET 6666 RET" (call-interactively 'cider-connect))
   )
 
+(defun lein-figwheel()
+  (interactive)
+  (progn
+    (set-buffer "temp-clj")
+    (insert "(use 'figwheel-sidecar.repl-api)")
+    (comint-send-input)
+    (insert "(start-figwheel!)")
+    (comint-send-input)))
+
+(defun lein-connect-cljs-repl()
+  (interactive) 
+    (with-simulated-input "127.0.0.1 RET 6666 RET figwheel RET" (call-interactively 'cider-connect-cljs)))
 
 (defun figwheel-repl ()
   (interactive)

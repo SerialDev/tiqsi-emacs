@@ -501,8 +501,8 @@ foo.cpp and in the same directory as the current header file, foo.h."
       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       (make-frame-visible doc-frame))))
 
-(global-set-key (kbd "C-c C-c p") 'rtags-peek-definition)
-(global-set-key (kbd "C-c C-c c") 'delete-frame)
+(define-key c-mode-base-map (kbd "C-c p") 'rtags-peek-definition)
+(define-key c-mode-base-map (kbd "C-c d") 'delete-frame)
 
 
                                         ;------{Hydras}-----;
