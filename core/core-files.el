@@ -204,6 +204,17 @@ Visit the file after creation."
   ;; Since we killed it, don't let caller do that.
   nil)
 
+;; (setq find-file-tree-fun "findfile(){ tree -f | grep $1; } # $1 = filename, -f is full path")
+
+(defun find-file-tree-current(str)
+  (interactive "sInsert str to search:")
+  (compile (format "tree -f | grep %s" str)))
+
+(defun find-file-tree-dir(dir str)
+  (interactive "sInsert directory to start:
+sInsert str to search: ")
+  (compile (format "tree -f %s | grep %s" dir str)))
+
                                         ;---{keybindings}---;
 
 (define-key global-map [M-t] 'load-todo)
