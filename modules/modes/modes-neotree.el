@@ -51,6 +51,7 @@
 
 
 
+
                                         ;---{Keybindings}---;
 
 (define-key global-map (kbd "M-<f9>") 'neotree-toggle)

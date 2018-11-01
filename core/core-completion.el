@@ -96,6 +96,19 @@
      nil nil nil 0)))
 
 
+(defun describe-thing-in-popup ()
+  (interactive)
+  (let* ((thing (symbol-at-point))
+         (help-xref-following t)
+         (description (with-temp-buffer
+                        (help-mode)
+                        (help-xref-interned thing)
+                        (buffer-string))))
+    (pos-tip-show description)))
+
+(global-set-key (kbd "M-5") 'describe-thing-in-popup)
+
+
 (provide 'core-completion)
 
 ;;; core-completion.el ends here
