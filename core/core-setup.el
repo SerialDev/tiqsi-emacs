@@ -54,6 +54,22 @@
 ;-----------------{UX}-----------------;
 
 
+(use-package dashboard
+  :straight t
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
+
+
+
+(use-package ediff
+  :straight t
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  (setq-default ediff-highlight-all-diffs 'nil)
+  (setq ediff-diff-options "-w"))
+
+
 ;-------{M-x}-------;
 
 (straight-require 'spaceline)
