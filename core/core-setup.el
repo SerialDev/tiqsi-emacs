@@ -79,7 +79,6 @@
 
 ;-----{Windows}-----;
 
-(straight-require 'neotree)
 (straight-require 'all-the-icons)
 (straight-require 'switch-window)
 (straight-require 'windmove)

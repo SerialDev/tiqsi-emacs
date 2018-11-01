@@ -28,17 +28,28 @@
 
 ;;; Code:
 
-(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 (defun tiqsi-java-hook()
 
   (jdee-flycheck-enable-p)
   (neotree-show)
   )
-
 (setq jdee-server-dir "/jdee-server/target/")
 
-(add-hook 'jdee-mode-hook 'tiqsi-java-hook )
+(use-package neotree
+  :straight t
+  :config
+  (progn
+    (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+    (setq neotree-smart-optn t
+          neo-window-fixed-size nil)
+  ;; Disable linum for neotree
+    (add-hook 'jdee-mode-hook 'tiqsi-java-hook )
+    ))
+
+
+
+
 
                                         ;---{Keybindings}---;
 
