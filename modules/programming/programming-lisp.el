@@ -76,10 +76,21 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 ;;TODO reindent defun or new line on enter to guarantee constant indentation
 
+(defun insert-let()
+  (interactive)
+  (insert "(let ((x ))
+  )")
+  (search-backward "x")
+  (delete-forward-char 1)
+  )
+
+
+
                                         ;---{Keybindings}---;
 
 (define-key slime-mode-map (kbd "M-c") 'hydra-slime/body )
 
+(define-key slime-mode-map (kbd "C-l") 'insert-let)
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
 (define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)

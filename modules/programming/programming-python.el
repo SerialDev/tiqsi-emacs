@@ -248,12 +248,20 @@ else:
   (interactive)
   (buffer-substring-no-properties (region-beginning) (region-end)))
 
+(setq tiqsi-python-buffer "*Python*")
 
 (defun send-py-line ()
   (interactive)
-  (setq-local py-temp (string-to-number(message "%d" (point))))
-  (next-line 1 1)
-  (python-shell-send-region py-temp (point) nil t))
+  (let ((py-temp (thing-at-point 'line t)) )
+    (comint-send-string tiqsi-python-buffer py-temp)))
+
+(defun send-py-region(begin end)
+  (interactive "r")
+  (comint-send-string tiqsi-python-buffer
+		      (buffer-substring-no-properties begin end))
+  (comint-send-string tiqsi-python-buffer "\n")
+  )
+
 
                                         ;-----------{I-menu merging}-----------;
 
@@ -455,6 +463,7 @@ else:
 
 (define-key python-mode-map (kbd "C-c C-x r") 'python-shell-send-region)
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
+(define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 
 
 (provide 'programming-python)
