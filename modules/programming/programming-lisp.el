@@ -27,8 +27,6 @@
     (read-kbd-macro paredit-backward-delete-key) nil))
 (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
 
-(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
-
 ;; Elisp go-to-definition with M-. and back again with M-,
 (autoload 'elisp-slime-nav-mode "elisp-slime-nav")
 (add-hook 'emacs-lisp-mode-hook (lambda () (elisp-slime-nav-mode t)))
@@ -84,18 +82,37 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   (delete-forward-char 1)
   )
 
+;; (straight-use-package
+;;  '(sly
+;;    :type git
+;;    :host github
+;;    :repo "joaotavora/sly"
+;;    ))
 
+;; TODO resolve issues with installation through straight
+(package-install 'sly)
+(package-install 'sly-repl-ansi-color)
+(package-install 'sly-macrostep)
+(require-soft 'sly)
+(require-soft 'sly-repl-ansi-color)
+(require-soft 'sly-macrostep)
+
+
+(push 'sly-repl-ansi-color sly-contribs)
+(add-hook 'lisp-mode-hook (lambda () (company-quickhelp-local-mode t)))
+
+(add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 
                                         ;---{Keybindings}---;
 
 (define-key slime-mode-map (kbd "M-c") 'hydra-slime/body )
-
 (define-key slime-mode-map (kbd "C-l") 'insert-let)
-(define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
 (define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)
 (define-key slime-mode-map (kbd "C-c C-p") 'slime)
 (define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
+
+(define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
 (define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
 
