@@ -68,6 +68,9 @@
 
 (setq nrepl-hide-special-buffers t)
 (setq cider-cljs-repl-type "figwheel")
+(setq cider-default-cljs-repl "figwheel")
+(setq cider-default-repl-command "lein")
+
 
 (setq cider-cljs-lein-repl
       "(cond
