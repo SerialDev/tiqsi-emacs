@@ -100,17 +100,26 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 (push 'sly-repl-ansi-color sly-contribs)
 (add-hook 'lisp-mode-hook (lambda () (company-quickhelp-local-mode t)))
+(add-hook 'lisp-mode-hook (lambda () (sly-mode t)))
+(add-hook 'lisp-mode-hook (lambda () (slime-mode nil)))
 
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 
                                         ;---{Keybindings}---;
 
+;; Slime
 (define-key slime-mode-map (kbd "M-c") 'hydra-slime/body )
 (define-key slime-mode-map (kbd "C-l") 'insert-let)
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
 (define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)
 (define-key slime-mode-map (kbd "C-c C-p") 'slime)
 (define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
+
+;; Sly
+(define-key sly-mode-map (kbd "C-l") 'insert-let)
+(define-key sly-mode-map (kbd "C-c C-s") 'sly-eval-last-expression)
+
+
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
