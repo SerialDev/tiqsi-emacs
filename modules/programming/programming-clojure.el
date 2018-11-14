@@ -295,6 +295,10 @@ _C-s_: eval last sexp           ^ ^
   ("<f3>" lein-run-uberjar "run uberjar" :color blue)
   )
 
+(add-hook 'cider-repl-mode-hook #'company-mode)
+(add-hook 'cider-mode-hook #'company-mode)
+
+(define-key clojure-mode-map (kbd "TAB") 'company-indent-or-complete-common)
 
 ;; (define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)
 ;; (define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
