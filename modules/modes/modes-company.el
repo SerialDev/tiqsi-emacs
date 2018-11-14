@@ -119,7 +119,8 @@ point."
 (define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
 
 ;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
-(define-key global-map (kbd "<tab>") 'indent-or-expand)
+;; (define-key global-map (kbd "<tab>") 'indent-or-expand)
+(define-key global-map (kbd "<tab>") ''company-indent-or-complete-common)
 
 (rectangle-mark-mode 0)
 
