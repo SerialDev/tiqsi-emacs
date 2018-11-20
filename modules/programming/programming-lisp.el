@@ -89,6 +89,8 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 ;;    :repo "joaotavora/sly"
 ;;    ))
 
+(add-hook 'lisp-mode-hook (lambda () (slime-mode nil)))
+
 ;; TODO resolve issues with installation through straight
 (package-install 'sly)
 (package-install 'sly-repl-ansi-color)
@@ -98,10 +100,31 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (require-soft 'sly-macrostep)
 
 
+(straight-use-package
+ '(sly-quicklisp
+   :type git
+   :host github
+   :repo "joaotavora/sly-quicklisp"
+))
+
+
+(try!
+ (when tiqsi-linux
+    (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el"))))
+
+(require 'sly-quicklisp-autoloads)
+
+(sly-setup)
+(sly-enable-contrib 'sly-quicklisp)
+(sly-enable-contrib 'sly-indentation)
+(sly-enable-contrib 'sly-fancy)
+(sly-enable-contrib 'sly-fancy-trace)
+(sly-enable-contrib 'sly-trace-dialog)
+(sly-enable-contrib 'sly-repl-ansi-color)
+
 (push 'sly-repl-ansi-color sly-contribs)
 (add-hook 'lisp-mode-hook (lambda () (company-quickhelp-local-mode t)))
 (add-hook 'lisp-mode-hook (lambda () (sly-mode t)))
-(add-hook 'lisp-mode-hook (lambda () (slime-mode nil)))
 
 (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
 
@@ -116,8 +139,10 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
 
 ;; Sly
+(define-key sly-editing-mode-map (kbd "C-l") 'insert-let)
 (define-key sly-mode-map (kbd "C-l") 'insert-let)
-(define-key sly-mode-map (kbd "C-c C-s") 'sly-eval-last-expression)
+(define-key sly-editing-mode-map (kbd "C-c C-s") 'sly-eval-last-expression)
+(define-key sly-mode-map (kbd "C-c s") 'sly-eval-last-expression)
 
 
 
