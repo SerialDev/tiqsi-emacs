@@ -39,6 +39,7 @@
 (load-expand  "modules/programming/programming-java.el")
 (load-expand  "modules/programming/programming-go.el")
 (load-expand  "modules/programming/programming-elm.el")
+(load-expand  "modules/programming/programming-nim.el")
 
 (provide 'programming)
 

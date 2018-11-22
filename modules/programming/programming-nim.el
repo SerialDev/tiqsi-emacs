@@ -32,6 +32,7 @@
   :config (progn
 	    (add-hook 'nim-mode-hook 'nimsuggest-mode)
 	    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
+	    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
 	    (add-hook 'nimsuggest-mode-hook 'flycheck-nimsuggest-setup)
 	    ))
 
