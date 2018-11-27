@@ -235,6 +235,10 @@ Return:
           nil))
     ad-do-it))
 
+(defun match-indentation(data)
+  (regex-match "^[[:space:]]*" data 0))
+
+
 (defadvice popup-tip
     (around popup-pos-tip-wrapper (string &rest args) activate)
   (if (eq window-system 'x)
