@@ -723,6 +723,15 @@ sEnter Extra information :")
    :repo "joaotavora/yasnippet"
 ))
 
+
+(straight-use-package
+ '(yasnippet-snippets
+   :type git
+   :host github
+   :repo "andreacrotti/yasnippet-snippets"
+))
+
+
 ;---{Keybindings}---;
 
 (global-set-key (kbd "C-;") 'sdev/line-to-msg)
