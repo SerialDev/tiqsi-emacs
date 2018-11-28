@@ -705,12 +705,23 @@ sEnter Extra information :")
 
 (use-package markdown-mode
   :ensure t
+  :straight t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
+(straight-use-package
+ '(yasnippets 
+   :type git
+   :host github
+  :config (progn
+	      (yas-reload-all)
+	      (add-hook 'c++-mode-hook #'yas-minor-mode)
+	      )
+   :repo "joaotavora/yasnippet"
+))
 
 ;---{Keybindings}---;
 
