@@ -724,12 +724,12 @@ sEnter Extra information :")
 ))
 
 
-(straight-use-package
- '(yasnippet-snippets
-   :type git
-   :host github
-   :repo "andreacrotti/yasnippet-snippets"
-))
+;; (straight-use-package
+;;  '(yasnippet-snippets
+;;    :type git
+;;    :host github
+;;    :repo "andreacrotti/yasnippet-snippets"
+;; ))
 
 
 ;---{Keybindings}---;
