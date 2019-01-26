@@ -142,8 +142,8 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
 
 ;; Sly
-(define-key sly-editing-mode-map (kbd "C-l") 'insert-let)
-(define-key sly-mode-map (kbd "C-l") 'insert-let)
+;; (define-key sly-editing-mode-map (kbd "C-l") 'insert-let)
+;; (define-key sly-mode-map (kbd "C-l") 'insert-let)
 ;; (define-key sly-editing-mode-map (kbd "C-c C-s") 'sly-eval-last-expression)
 ;; (define-key sly-mode-map (kbd "C-c s") 'sly-eval-last-expression)
 

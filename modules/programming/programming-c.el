@@ -100,7 +100,7 @@
 
 
 (when tiqsi-linux
-  (setq rtags-path "/rtags/bin")
+  (setq rtags-path "~/rtags/bin/")
   )
 
 (setq rtags-completions-enabled t)
