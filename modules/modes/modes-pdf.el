@@ -1,4 +1,4 @@
-;;; programming-clojure.el --- Tiqsi clojure support  -*- lexical-binding: t -*-
+;;; modes-pdf.el --- Tiqsi pdf support  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-  Andres Mariscal
 
@@ -26,25 +26,12 @@
 ;;; Commentary:
 ;;
 
-;; Based on Claudia Doppioslash's elm config https://www.lambdacat.com/post-modern-emacs-setup-for-elm/
-
-;;; Code:
-
-;; npm install -g elm-oracle
-
-;; (with-eval-after-load 'company
-;;   (add-to-list 'company-backends 'company-elm))
-;; (add-hook 'elm-mode-hook #'elm-oracle-setup-completion)
-
-;; For Elm 0.19 and greater, set this to '(\"elm\" \"repl\")."
-(setq elm-interactive-command '("\"elm\" \"repl\""))
+(use-package pdfgrep
+  :straight t
+  :ensure t
+  )
 
 
+(provide 'modes-pdf)
 
-;; (add-hook 'elm-mode-hook
-;;           (lambda ()
-;;             (setq company-backends '(company-elm))))
-
-(provide 'programming-elm)
-
-;;; programming-elm.el ends here
+;;; modes-pdf.el ends here
