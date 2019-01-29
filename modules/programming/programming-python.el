@@ -446,7 +446,101 @@ else:
 
 ;; (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 
-                                        ;---{Keybindings}---;
+;---------------------------------------------------------------------------------
+
+(setq test-test "birthday = df.birthday[0]
+age = time_since(df.birthday[0]).days // 365
+age_range = (age-5, age+5)
+profile_deleted = deleted_status(df)
+profile_disabled = disabled_status(df)")
+
+(defun parse-l ()
+  (parsec-collect*
+   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
+					 (parsec-or (parsec-letter)
+						    (parsec-str "\"")
+						    (parsec-digit)
+						    (parsec-str "-")
+						    (parsec-str "[")
+						    (parsec-str "]")
+						    (parsec-str ".")
+						    (parsec-str "_"))))
+   (parsec-optional* (parsec-lookahead "="))))
+
+(defun parse-r ()
+  (parsec-collect*
+   (parsec-optional* (parsec-str "="))
+   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
+					 (parsec-or (parsec-letter)
+						    (parsec-str "\"")
+						    (parsec-digit)
+						    (parsec-str "-")
+						    (parsec-str "[")
+						    (parsec-str "]")
+						    (parsec-str ".")
+						    (parsec-str "_"))))
+   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))
+
+(parsec-with-input test-test
+      (parsec-many
+       (parsec-collect
+	(car(parse-l))
+	(car(parse-r))))
+      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof))))
+
+(defun evcxr-parse-toml (input)
+  (parsec-with-input input
+    (parsec-many
+     (parsec-collect*
+      (car (evcxr-parse-title))
+      (parsec-many
+       (parsec-collect
+	(car(evcxr-parse-l))
+	(car(evcxr-parse-r))))
+      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))))
+
+
+(parsec-with-input test-test
+  (parsec-many
+   (parsec-collect*
+   (parsec-many-as-string (parsec-letter))
+   (parsec-many-as-string (parsec-optional* (parsec-str "=")))
+   (parsec-many-as-string (parsec-optional*(parsec-any-ch)))
+   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))
+   ))
+  )
+
+(defun split-lines (input)
+  (interactive)
+  (parsec-with-input input
+    (parsec-many
+    (car(parsec-collect
+     (parsec-many-as-string (parsec-re "."))
+     (parsec-optional (parsec-eol-or-eof))
+     )))))
+
+(parsec-with-input (car
+		    (split-lines test-test))
+  (parsec-collect
+   (parsec-endby (parsec-str "=") (parsec-many-as-string(parsec-letter))))
+)
+
+(defun parse-l (input)
+  (interactive)
+  ((let ((left (car input)))
+     (setq left ()
+  ))
+  (car (split-lines input))))
+
+
+(defun evcxr-eval-region (begin end)
+  "Evaluate region between BEGIN and END."
+  (interactive "r")
+  (buffer-substring-no-properties begin end)
+)
+;---------------------------------------------------------------------------------
+
+					;---{Keybindings}---;
 
 ;; redefine jedi's C-. (jedi:goto-definition)
 ;; to remember position, and set C-, to jump back
