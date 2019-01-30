@@ -379,6 +379,16 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (add-hook 'compilation-mode-hook 'tiqsi-big-fun-compilation-hook)
 
+(setq tiqsi-makescript "./build.sh")
+
+(defun compile-cmake()
+  (interactive)
+  (if (file-directory-p "build")
+      (progn (message "compiling"
+	      (compile "cd build && cmake .. && make")))
+    (progn (message "Creating Build directory before building"
+		    (compile "mkdir build && cd build && cmake .. && make")))))
+
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
@@ -546,11 +556,16 @@ _v_: Find virtuals at point
 (define-key ac-complete-mode-map (kbd "C-g") 'ac-stop)
 (define-key ac-complete-mode-map "\t" 'ac-complete)
 (define-key ac-complete-mode-map "\r" 'ac-complete)
-(define-key global-map "\em" 'make-without-asking)
+(define-key global-map (kbd "M-m") 'make-without-asking)
 (define-key global-map (kbd "M-n") 'run-without-asking)
+
 (global-set-key [C-f1] 'show-file-name) ; Or any other key you want
-(define-key c++-mode-map (kbd "C-?") 'irony-get-type)
+
 (global-set-key (kbd "C-?" ) nil)
+(define-key c++-mode-map (kbd "C-?") 'irony-get-type)
+(define-key c-mode-map (kbd "C-?") 'irony-get-type)
+(define-key c-mode-base-map (kbd "C-?") 'irony-get-type)
+
 (global-set-key "\C-ci" 'ewd-insert-new-method)
 (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
