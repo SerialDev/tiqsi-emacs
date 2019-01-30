@@ -390,6 +390,141 @@ foo.cpp and in the same directory as the current header file, foo.h."
 		    (compile "mkdir build && cd build && cmake .. && make")))))
 
 
+;; Tiqsi find file
+(defun tiqsi-parent-directory (dir)
+  (unless (equal "/" dir)
+    (file-name-directory (directory-file-name dir))))
+
+(defun tiqsi-find-file-in-hierarchy (current-dir fname)
+  "Search for a file named FNAME upwards through the directory hierarchy, starting from CURRENT-DIR"
+  (let ((file (concat current-dir fname))
+        (parent (tiqsi-parent-directory (expand-file-name current-dir))))
+    (if (file-exists-p file)
+        file
+      (when parent
+        (tiqsi-find-file-in-hierarchy parent fname)))))
+
+
+(defun tiqsi-get-string-from-file (filePath)
+  "Return filePath's file content.
+;; thanks to “Pascal J Bourguignon” and “TheFlyingDutchman 〔zzbba…@aol.com〕”. 2010-09-02
+"
+  (with-temp-buffer
+    (insert-file-contents filePath)
+    (buffer-string)))
+
+
+(defun tiqsi-search-file-get-string(filename)
+  (lexical-let ((file-content (tiqsi-get-string-from-file
+		       (tiqsi-find-file-in-hierarchy
+			(file-name-directory buffer-file-name) filename ))))
+	file-content
+  ))
+
+(defun tiqsi-search-file-get-string(filename)
+  (tiqsi-get-string-from-file
+		       (tiqsi-find-file-in-hierarchy
+			(file-name-directory buffer-file-name) filename ))
+  )
+
+(defun tiqsi--join (sep string-list)
+  (mapconcat 'identity (split-string string-list) sep)
+  )
+
+(defun tiqsi--remove-newlines(source)
+  (tiqsi--join " " source))
+
+(defun tiqsi--parsec-alphanumeric ()
+  (parsec-or
+   (parsec-or
+    (parsec-eol-or-eof)
+    (parsec-letter))
+   (parsec-digit)))
+
+(defun tiqsi--parsec-between-round-brackets()
+  (parsec-between
+   (parsec-ch ?\()
+   (parsec-ch ?\))
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric))))
+
+(defun tiqsi--parsec-between-square-brackets()
+  (parsec-between
+   (parsec-ch ?\[)
+   (parsec-ch ?\])
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric)
+    )))
+
+(defun tiqsi--parsec-between-curly-brackets()
+  (parsec-between
+   (parsec-ch ?\{)
+   (parsec-ch ?\})
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric)
+    )))
+
+(defun tiqsi--parsec-between-angle-brackets()
+  (parsec-between
+   (parsec-ch ?\<)
+   (parsec-ch ?\>)
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric)
+    )))
+
+(defun tiqsi--parsec-between-single-quotes()
+  (parsec-between
+   (parsec-ch ?\')
+   (parsec-ch ?\')
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric)
+    )))
+
+(defun tiqsi--parsec-between-double-quotes()
+  (parsec-between
+   (parsec-ch ?\")
+   (parsec-ch ?\")
+   (parsec-many-as-string
+    (tiqsi--parsec-alphanumeric)
+    )))
+
+
+
+
+
+;; TODO fix this parser
+;; (defun tiqsi--parsec-anything-except (provided)
+;;   (parsec-or
+;;    (parsec-eol-or-eof)
+;;    (parsec-none-of ?\})
+;;    ))
+
+;; (defun tiqsi--parsec-anything-non-enclosing ()
+;;   (parsec-or
+;;    (parsec-re "[\\-\-]")
+;;    (parsec-or
+;;     (parsec-or
+;;      (parsec-eol-or-eof)
+;;      (parsec-letter))
+;;     (parsec-digit))))
+
+
+
+
+;; END tiqsi-find-file
+
+;; TODO with cmakelist.txt file parse the project name and the output executable name
+;; TODO make a exec-cmake that will execute the compilation target if exists
+;; TODO make a tiqsi--compilation.json that will use the existing rc path from rtags and add it
+;; once per project
+
+
+(defun tiqsi--get-cmakelist-content()
+  (interactive)
+  (tiqsi-search-file-get-string "CMakeLists.txt"))
+
+
+
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
   (interactive)
