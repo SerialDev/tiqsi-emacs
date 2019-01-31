@@ -441,19 +441,35 @@ foo.cpp and in the same directory as the current header file, foo.h."
     (parsec-letter))
    (parsec-digit)))
 
+(defun tiqsi--parsec-all-ascii-no-brackets ()
+  (parsec-or
+   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:;\|^_`~=\?]")
+   (tiqsi--parsec-alphanumeric)))
+
+(defun tiqsi--parsec-brackets()
+  (parsec-re "[]{[}()]")
+  )
+
+(defun tiqsi--parsec-all-ascii()
+  (parsec-or
+   (tiqsi--parsec-brackets)
+   (tiqsi--parsec-all-ascii-no-brackets)
+   )
+)
+
 (defun tiqsi--parsec-between-round-brackets()
   (parsec-between
    (parsec-ch ?\()
    (parsec-ch ?\))
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric))))
+    (tiqsi--parsec-all-ascii-no-brackets))))
 
 (defun tiqsi--parsec-between-square-brackets()
   (parsec-between
    (parsec-ch ?\[)
    (parsec-ch ?\])
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric)
+    (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
 (defun tiqsi--parsec-between-curly-brackets()
@@ -461,7 +477,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (parsec-ch ?\{)
    (parsec-ch ?\})
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric)
+    (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
 (defun tiqsi--parsec-between-angle-brackets()
@@ -469,7 +485,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (parsec-ch ?\<)
    (parsec-ch ?\>)
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric)
+    (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
 (defun tiqsi--parsec-between-single-quotes()
@@ -477,7 +493,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (parsec-ch ?\')
    (parsec-ch ?\')
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric)
+    (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
 (defun tiqsi--parsec-between-double-quotes()
@@ -485,28 +501,9 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (parsec-ch ?\")
    (parsec-ch ?\")
    (parsec-many-as-string
-    (tiqsi--parsec-alphanumeric)
+    (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
-
-
-
-
-;; TODO fix this parser
-;; (defun tiqsi--parsec-anything-except (provided)
-;;   (parsec-or
-;;    (parsec-eol-or-eof)
-;;    (parsec-none-of ?\})
-;;    ))
-
-;; (defun tiqsi--parsec-anything-non-enclosing ()
-;;   (parsec-or
-;;    (parsec-re "[\\-\-]")
-;;    (parsec-or
-;;     (parsec-or
-;;      (parsec-eol-or-eof)
-;;      (parsec-letter))
-;;     (parsec-digit))))
 
 
 
