@@ -561,6 +561,34 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (tiqsi-search-file-get-string "CMakeLists.txt"))
 
 
+(defmacro tiqsi-parse-cmake (data)
+
+  `(let ((tiqsi-parse-cmake-result '() ))
+      (tiqsi-parse-cmake-recurse ,data)
+      tiqsi-parse-cmake-result
+  )
+
+)
+
+(defun tiqsi-parse-cmake-recurse  ( data)
+  (if (equal data "")
+      (message "Done parsing cmake")
+    (let (
+	  (result (tiqsi--parsec-with-remainder data
+						(parsec-collect
+						 (parsec-many-s
+						  (parsec-or
+						   (tiqsi--parsec-all-ascii-no-brackets))
+						  )
+  (tiqsi--parsec-between-round-brackets)
+  )
+)
+	      ))
+  (add-to-list 'tiqsi-parse-cmake-result (car result))
+
+      (tiqsi-parse-cmake-recurse (cdr result) )
+  )))
+
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
