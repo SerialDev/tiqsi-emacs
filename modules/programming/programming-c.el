@@ -434,6 +434,16 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun tiqsi--remove-newlines(source)
   (tiqsi--join " " source))
 
+(defmacro tiqsi--parsec-with-index (data &rest parsers )
+  `(let ((parsec-result  (parsec-with-input ,data
+			,@parsers))
+	 (idx (parsec-with-input ,data
+		(parsec-query
+		 ,@parsers
+		 :end ))) )
+         (cons parsec-result idx)))
+
+
 (defun tiqsi--parsec-alphanumeric ()
   (parsec-or
    (parsec-or
@@ -441,10 +451,19 @@ foo.cpp and in the same directory as the current header file, foo.h."
     (parsec-letter))
    (parsec-digit)))
 
+(defun tiqsi--parsec-ascii-special-chars-no-brackets ()
+  (parsec-re "['\\!%#\"$ &\*\+\-/,\.:;\|^_`~=\?]")
+  )
+
 (defun tiqsi--parsec-all-ascii-no-brackets ()
   (parsec-or
-   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:;\|^_`~=\?]")
+   (tiqsi--parsec-ascii-special-chars-no-brackets)
    (tiqsi--parsec-alphanumeric)))
+
+
+(defun tiqsi--parsec-whitespace ()
+     (parsec-re"[ \t\r\n\v\f]"))
+
 
 (defun tiqsi--parsec-brackets()
   (parsec-re "[]{[}()]")
