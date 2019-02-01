@@ -523,7 +523,28 @@ foo.cpp and in the same directory as the current header file, foo.h."
     (tiqsi--parsec-all-ascii-no-brackets)
     )))
 
+(defun tiqsi--parsec-retrieve-remaining-by-idx (data idx)
+  (substring data idx nil))
 
+
+(defmacro tiqsi--parsec-with-remainder (data &rest parsers )
+  `(let ((parsec-result  (parsec-with-input ,data
+			,@parsers))
+	 (idx (parsec-with-input ,data
+		(parsec-query
+		 ,@parsers
+		 :end ))) )
+         (cons parsec-result  (tiqsi--parsec-retrieve-remaining-by-idx ,data idx ))))
+
+
+(defmacro tiqsi--parsec-with-index-remainder (data &rest parsers )
+  `(let ((parsec-result  (parsec-with-input ,data
+			,@parsers))
+	 (idx (parsec-with-input ,data
+		(parsec-query
+		 ,@parsers
+		 :end ))) )
+         (cons parsec-result (cons idx (tiqsi--parsec-retrieve-remaining-by-idx ,data idx )))))
 
 
 
