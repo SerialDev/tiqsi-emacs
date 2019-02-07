@@ -455,10 +455,16 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:;\|^_`~=\?]")
   )
 
+(defun tiqsi--parsec-ascii-special-chars-no-brackets-pound ()
+  (parsec-re "['\\!%\"$ &\*\+\-/,\.:;\|^_`~=\?]")
+  )
+
 (defun tiqsi--parsec-all-ascii-no-brackets ()
   (parsec-or
-   (tiqsi--parsec-ascii-special-chars-no-brackets)
+   (tiqsi--parsec-ascii-special-chars-no-brackets-pound)
    (tiqsi--parsec-alphanumeric)))
+
+
 
 
 (defun tiqsi--parsec-whitespace ()
@@ -476,12 +482,20 @@ foo.cpp and in the same directory as the current header file, foo.h."
    )
 )
 
-(defun tiqsi--parsec-between-round-brackets()
+
+(defun tiqsi--parsec-all-ascii-no-brackets-except (&optional bracket)
+  (parsec-or
+  (parsec-re (format "['\\!%s#\"$ &\*\+\-/,\.:;\|^_` ~=\?]" bracket))
+    (tiqsi--parsec-alphanumeric)))
+
+
+(defun tiqsi--parsec-between-round-brackets(&optional bracket)
   (parsec-between
    (parsec-ch ?\()
    (parsec-ch ?\))
    (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets))))
+    (tiqsi--parsec-all-ascii-no-brackets-except bracket)
+    )))
 
 (defun tiqsi--parsec-between-square-brackets()
   (parsec-between
@@ -524,7 +538,10 @@ foo.cpp and in the same directory as the current header file, foo.h."
     )))
 
 (defun tiqsi--parsec-retrieve-remaining-by-idx (data idx)
-  (substring data idx nil))
+  (condition-case nil
+      (substring data idx nil)
+    (error ""))
+  )
 
 
 (defmacro tiqsi--parsec-with-remainder (data &rest parsers )
@@ -573,22 +590,42 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun tiqsi-parse-cmake-recurse  ( data)
   (if (equal data "")
       (message "Done parsing cmake")
-    (let (
-	  (result (tiqsi--parsec-with-remainder data
-						(parsec-collect
-						 (parsec-many-s
-						  (parsec-or
-						   (tiqsi--parsec-all-ascii-no-brackets))
-						  )
-  (tiqsi--parsec-between-round-brackets)
+	(let (
+	      (result (tiqsi--parsec-with-remainder data
+							(parsec-or
+							(parsec-collect
+							 (parsec-many-s
+							   (tiqsi--parsec-all-ascii-no-brackets )
+							  )
+							 (tiqsi--parsec-between-round-brackets "}{")
+							 )
+							(tiqsi--cmake--parsec-pound-comment)))))
+	  (add-to-list 'tiqsi-parse-cmake-result (car result))
+	  (tiqsi-parse-cmake-recurse (cdr result) ))))
+
+(defun tiqsi--cmake--parsec-pound-comment ()
+  (parsec-or
+   (tiqsi--cmake--parsec-pound-comment-block)
+   (tiqsi--cmake--parsec-pound-comment-inline)
+   ))
+
+(defun tiqsi--cmake--parsec-pound-comment-inline ()
+  (parsec-collect
+  (parsec-ch ?\#)
+  (parsec-until-as-string
+     (parsec-ch ?\#)
+     )
   )
 )
-	      ))
-  (add-to-list 'tiqsi-parse-cmake-result (car result))
 
-      (tiqsi-parse-cmake-recurse (cdr result) )
-  )))
-
+(defun tiqsi--cmake--parsec-pound-comment-block ()
+  (parsec-collect
+  (parsec-str "#[[")
+  (parsec-until-as-string
+     (parsec-str "]]")
+     )
+  )
+)
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
