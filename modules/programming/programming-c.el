@@ -415,13 +415,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 (defun tiqsi-search-file-get-string(filename)
-  (lexical-let ((file-content (tiqsi-get-string-from-file
-		       (tiqsi-find-file-in-hierarchy
-			(file-name-directory buffer-file-name) filename ))))
-	file-content
-  ))
-
-(defun tiqsi-search-file-get-string(filename)
   (tiqsi-get-string-from-file
 		       (tiqsi-find-file-in-hierarchy
 			(file-name-directory buffer-file-name) filename ))
@@ -567,8 +560,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 ;; END tiqsi-find-file
 
-;; TODO with cmakelist.txt file parse the project name and the output executable name
-;; TODO make a exec-cmake that will execute the compilation target if exists
 ;; TODO make a tiqsi--compilation.json that will use the existing rc path from rtags and add it
 ;; once per project
 
@@ -577,37 +568,12 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (interactive)
   (tiqsi-search-file-get-string "CMakeLists.txt"))
 
-
-(defmacro tiqsi-parse-cmake (data)
-
-  `(let ((tiqsi-parse-cmake-result '() ))
-      (tiqsi-parse-cmake-recurse ,data)
-      tiqsi-parse-cmake-result
-  )
-
-)
-
-(defun tiqsi-parse-cmake-recurse  ( data)
-  (if (equal data "")
-      (message "Done parsing cmake")
-	(let (
-	      (result (tiqsi--parsec-with-remainder data
-							(parsec-or
-							(parsec-collect
-							 (parsec-many-s
-							   (tiqsi--parsec-all-ascii-no-brackets )
-							  )
-							 (tiqsi--parsec-between-round-brackets "}{")
-							 )
-							(tiqsi--cmake--parsec-pound-comment)))))
-	  (add-to-list 'tiqsi-parse-cmake-result (car result))
-	  (tiqsi-parse-cmake-recurse (cdr result) ))))
-
 (defun tiqsi--cmake--parsec-pound-comment ()
   (parsec-or
    (tiqsi--cmake--parsec-pound-comment-block)
    (tiqsi--cmake--parsec-pound-comment-inline)
-   ))
+   )
+  )
 
 (defun tiqsi--cmake--parsec-pound-comment-inline ()
   (parsec-collect
@@ -626,6 +592,58 @@ foo.cpp and in the same directory as the current header file, foo.h."
      )
   )
 )
+
+
+(defun tiqsi-parse-cmake-recurse  ( data)
+  (if (equal data "")
+      (message "Done parsing cmake")
+	(let (
+	      (result (tiqsi--parsec-with-remainder data
+							(parsec-or
+							(parsec-collect
+							 (parsec-many-s
+							   (tiqsi--parsec-all-ascii-no-brackets )
+							  )
+							 (tiqsi--parsec-between-round-brackets "}{")
+							 )
+							(tiqsi--cmake--parsec-pound-comment)))))
+	  (add-to-list 'tiqsi-parse-cmake-result (car result))
+	  (tiqsi-parse-cmake-recurse (cdr result) ))))
+
+(defmacro tiqsi-parse-cmake (data)
+
+  `(let ((tiqsi-parse-cmake-result '() ))
+      (tiqsi-parse-cmake-recurse ,data)
+      tiqsi-parse-cmake-result
+      )
+)
+
+(defun tiqsi--cmake-find-and-parse ()
+      (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content))))
+
+
+(defun tiqsi-cmake-get-executable-name ()
+  (interactive)
+  (car
+   (split-string
+    (car
+     (cdr
+      (tiqsi--cmake-find-add-executable
+       (tiqsi--cmake-find-and-parse)))) " ")))
+       ;; (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content)))    ))) " ")))
+
+
+(defun tiqsi--cmake-find-add-executable (parsed-list)
+  (if (equal (car (car parsed-list)) "add_executable" )
+      (car parsed-list)
+    (tiqsi--cmake-is-executable-name (cdr parsed-list))
+    )
+  )
+
+(defun tiqsi-cmake-run-executable()
+  (interactive)
+  (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name))))
+
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
@@ -793,8 +811,6 @@ _v_: Find virtuals at point
 (define-key ac-complete-mode-map (kbd "C-g") 'ac-stop)
 (define-key ac-complete-mode-map "\t" 'ac-complete)
 (define-key ac-complete-mode-map "\r" 'ac-complete)
-(define-key global-map (kbd "M-m") 'make-without-asking)
-(define-key global-map (kbd "M-n") 'run-without-asking)
 
 (global-set-key [C-f1] 'show-file-name) ; Or any other key you want
 
@@ -806,17 +822,19 @@ _v_: Find virtuals at point
 (global-set-key "\C-ci" 'ewd-insert-new-method)
 (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
-                                        ; Alternate bindings for F-keyless setups (ie MacOS X terminal)
+; Alternate bindings for F-keyless setups (ie MacOS X terminal)
+
 (define-key c++-mode-map "\ec" 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map "\eC" 'tiqsi-find-corresponding-file-other-window)
 (define-key c++-mode-map "\es" 'tiqsi-save-buffer)
 ;; (define-key c++-mode-map [S-tab] 'indent-for-tab-command)
 (define-key c++-mode-map "\t" 'indent-for-tab-command)
 (define-key c++-mode-map (kbd "<backtab>")'un-indent-by-removing-4-spaces)
+
 ;; (define-key c++-mode-map (kbd "<S-tab>") 'indent-for-tab-command)
 (define-key c++-mode-map "\C-y" 'indent-for-tab-command)
 (define-key c++-mode-map [C-tab] 'indent-region)
-(define-key c++-mode-map "    " 'indent-region)
+;; (define-key c++-mode-map "    " 'indent-region)
 (define-key c++-mode-map "\ej" 'imenu)
 (define-key c++-mode-map "\e." 'c-fill-paragraph)
 (define-key c++-mode-map "\e/" 'c-mark-function)
@@ -830,6 +848,12 @@ _v_: Find virtuals at point
 (define-key c++-mode-map (kbd "C-,") 'rtags:jump-back)
 (define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
 (define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
+
+;; TODO Make dependant on what build-system is being used 
+;; (define-key global-map (kbd "M-m") 'make-without-asking)
+;; (define-key global-map (kbd "M-n") 'run-without-asking)
+(define-key global-map (kbd "M-m") 'compile-cmake)
+(define-key global-map (kbd "M-n") 'tiqsi-cmake-run-executable)
 
 
 (provide 'programming-c)
