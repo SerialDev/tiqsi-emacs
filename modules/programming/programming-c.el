@@ -634,15 +634,28 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 (defun tiqsi--cmake-find-add-executable (parsed-list)
-  (if (equal (car (car parsed-list)) "add_executable" )
+
+    ;; (if (equal (car (car parsed-list)) "add_executable" )
+    ;; 	(if (equal (length parsed-list) 1)
+    ;; 	    (car parsed-list)
+    ;; 	(car parsed-list))
+    ;;   (tiqsi--cmake-find-add-executable (cdr parsed-list))
+  ;;   )
+  (condition-case nil 
+      (message (caar parsed-list))
+    (error nil))
+  (if (or (equal (length (car parsed-list)) 1)
+	  (equal (caar parsed-list) "add_executable"))
       (car parsed-list)
-    (tiqsi--cmake-is-executable-name (cdr parsed-list))
-    )
+    (tiqsi--cmake-find-add-executable (cdr parsed-list)))
   )
+
 
 (defun tiqsi-cmake-run-executable()
   (interactive)
-  (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name))))
+  (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
+  ;; (print (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
+  )
 
 
 (defun find-project-directory-recursive ()
