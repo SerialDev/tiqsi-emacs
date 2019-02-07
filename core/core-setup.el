@@ -171,6 +171,7 @@
 (straight-require-lazy 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
+(straight-require 'tide) ;; Typescript mode support 
 (straight-require 'geiser) ;; Scheme mode support 
 (straight-require 'flymd) ;; Markdown mode support live editing
 
