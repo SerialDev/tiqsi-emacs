@@ -100,7 +100,7 @@
 
 
 (when tiqsi-linux
-  (setq rtags-path "~/rtags/bin/")
+  (setq rtags-path "/rtags/bin/")
   )
 
 (setq rtags-completions-enabled t)
@@ -384,8 +384,10 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun compile-cmake()
   (interactive)
   (if (file-directory-p "build")
-      (progn (message "compiling"
-	      (compile "cd build && cmake .. && make")))
+      (progn
+	(message "compiling"
+		 (compile "cd build && cmake .. && make"))
+	(add-to-rtags))
     (progn (message "Creating Build directory before building"
 		    (compile "mkdir build && cd build && cmake .. && make")))))
 
@@ -560,10 +562,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 ;; END tiqsi-find-file
 
-;; TODO make a tiqsi--compilation.json that will use the existing rc path from rtags and add it
-;; once per project
-
-
 (defun tiqsi--get-cmakelist-content()
   (interactive)
   (tiqsi-search-file-get-string "CMakeLists.txt"))
@@ -634,13 +632,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 (defun tiqsi--cmake-find-add-executable (parsed-list)
-
-    ;; (if (equal (car (car parsed-list)) "add_executable" )
-    ;; 	(if (equal (length parsed-list) 1)
-    ;; 	    (car parsed-list)
-    ;; 	(car parsed-list))
-    ;;   (tiqsi--cmake-find-add-executable (cdr parsed-list))
-  ;;   )
   (condition-case nil 
       (message (caar parsed-list))
     (error nil))
@@ -654,9 +645,25 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun tiqsi-cmake-run-executable()
   (interactive)
   (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
+  ;; (sdev/jump-window)
   ;; (print (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
   )
 
+(defun start-rtags()
+  (interactive)
+  (call-process-shell-command "./rtags/bin/rdm &" nil 0) 
+  )
+
+(eval-after-load 'cc-mode (start-rtags))
+
+
+(defun add-to-rtags()
+  (interactive)
+  (call-process-shell-command
+   (format "/rtags/bin/rc -J %sbuild/%s" (file-name-directory buffer-file-name) "compile_commands.json")
+			      nil 0)
+  (message
+   (format "/rtags/bin/rc -J  %sbuild/%s" (file-name-directory buffer-file-name) "compile_commands.json")))
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
