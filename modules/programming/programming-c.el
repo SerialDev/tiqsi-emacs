@@ -100,7 +100,7 @@
 
 
 (when tiqsi-linux
-  (setq rtags-path "/rtags/bin/")
+  (setq rtags-path "/home/serialdev/rtags/bin/")
   )
 
 (setq rtags-completions-enabled t)
@@ -651,7 +651,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun start-rtags()
   (interactive)
-  (call-process-shell-command "./rtags/bin/rdm &" nil 0) 
+  (call-process-shell-command (format "%srdm" rtags-path) nil 0) 
   )
 
 (eval-after-load 'cc-mode (start-rtags))
@@ -660,10 +660,10 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun add-to-rtags()
   (interactive)
   (call-process-shell-command
-   (format "/rtags/bin/rc -J %sbuild/%s" (file-name-directory buffer-file-name) "compile_commands.json")
+   (format "%src -J %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")
 			      nil 0)
   (message
-   (format "/rtags/bin/rc -J  %sbuild/%s" (file-name-directory buffer-file-name) "compile_commands.json")))
+   (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
