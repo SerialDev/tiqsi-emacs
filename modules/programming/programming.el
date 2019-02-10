@@ -40,6 +40,8 @@
 (load-expand  "modules/programming/programming-go.el")
 (load-expand  "modules/programming/programming-elm.el")
 (load-expand  "modules/programming/programming-nim.el")
+(load-expand  "modules/programming/programming-typescript.el")
+(load-expand  "modules/programming/programming-cfsharp.el")
 
 (provide 'programming)
 
