@@ -50,13 +50,19 @@
   (electric-pair-local-mode 1) ;; Emacs 25
 )
 
+(use-package omnisharp
+  :straight t
+  :config (progn
+	    (message "setting up omnisharp")
+))
+
 
 
 (use-package csharp-mode
   :straight t
   :config (progn
 	    (add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook)
-	    (add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-setup t)
+	    (add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook t)
 	    ))
 
 

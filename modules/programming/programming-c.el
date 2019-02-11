@@ -27,7 +27,7 @@
 ;;
 ;; pip install compdb
 ;; apt-get install libclang-dev
-;;ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
+;; ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
 
 
                                         ;----{Completion}---;
@@ -632,7 +632,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 (defun tiqsi--cmake-find-add-executable (parsed-list)
-  (condition-case nil 
+  (condition-case nil
       (message (caar parsed-list))
     (error nil))
   (if (or (equal (length (car parsed-list)) 1)
@@ -651,7 +651,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun start-rtags()
   (interactive)
-  (call-process-shell-command (format "%srdm" rtags-path) nil 0) 
+  (call-process-shell-command (format "%srdm" rtags-path) nil 0)
   )
 
 (eval-after-load 'cc-mode (start-rtags))
@@ -664,6 +664,79 @@ foo.cpp and in the same directory as the current header file, foo.h."
 			      nil 0)
   (message
    (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
+
+
+;  -------------------------------------------------------------------------------- ;
+
+;  -------------------------------------------------------------------------------- ;
+					; Create cmake
+; project-name -> src -> main.cpp/c
+;                     -> main.cpp/c
+;                     -> CMakeLists.txt
+;                     -> .gitignore
+;                     -> README.md
+
+(defun tiqsi-create-cmake (project-name)
+  (interactive "sEnter Project Name:")
+  (f-mkdir project-name)
+  (f-mkdir (format "%s/src" project-name))
+
+  (write-region "int main(int argc, char *argv[])
+{
+
+    return 0;
+}"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
+  (write-region (format "cmake_minimum_required(VERSION 2.8.12)
+
+project(%s)
+
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra\")
+
+add_definitions(-std=c99)
+
+
+add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CMakeLists.txt" (f-dirname (f-this-file )) project-name))
+  (write-region " "  ""  (format "%s/%s/src/README.md" (f-dirname (f-this-file ))      project-name))
+  (write-region "# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+/build"  ""  (format "%s/%s/src/.gitignore" (f-dirname (f-this-file ))     project-name))
+  )
+
+
+;  -------------------------------------------------------------------------------- ;
+
+
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
@@ -869,7 +942,7 @@ _v_: Find virtuals at point
 (define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
 (define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
 
-;; TODO Make dependant on what build-system is being used 
+;; TODO Make dependant on what build-system is being used
 ;; (define-key global-map (kbd "M-m") 'make-without-asking)
 ;; (define-key global-map (kbd "M-n") 'run-without-asking)
 (define-key global-map (kbd "M-m") 'compile-cmake)
