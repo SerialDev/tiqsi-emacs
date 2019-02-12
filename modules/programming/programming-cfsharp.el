@@ -50,26 +50,30 @@
   (electric-pair-local-mode 1) ;; Emacs 25
 )
 
-(use-package omnisharp
-  :straight t
-  :config (progn
-	    (message "setting up omnisharp")
+
+(straight-use-package
+ '(omnisharp
+   :type git
+   :host github
+   :repo "OmniSharp/omnisharp-emacs"
 ))
 
 
 
-(use-package csharp-mode
-  :straight t
-  :config (progn
-	    (add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook)
-	    (add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook t)
-	    ))
+(straight-use-package
+ '(csharp-mode
+   :type git
+   :host github
+   :repo "josteink/csharp-mode"
+))
 
 
 (eval-after-load
   'company
   '(add-to-list 'company-backends #'company-omnisharp))
 
+(add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook)
+(add-hook 'csharp-mode-hook 'tiqsi-csharp-mode-hook t)
 
 (use-package fsharp-mode
   :straight t
@@ -84,6 +88,43 @@
 				  (shell-command-to-string "which fsharpc")))))
 	    ))
 
+
+(use-package polymode
+  :straight t
+  :config (progn
+
+	    ))
+
+
+(defcustom pm-host/blazor
+  (pm-host-chunkmode :name "csharp-mode"
+                     :mode 'csharp-mode)
+  "Csharp host chunkmode"
+  :group 'poly-hostmodes
+  :type 'object)
+
+(defcustom  pm-inner/blazor-html
+  (pm-inner-auto-chunkmode :name "html-code"
+                           :head-matcher "^[<.*>]"
+                           :tail-matcher "</.*>"
+                           :mode-matcher 'html-mode)
+  "Html blazor code block."
+  :group 'poly-innermodes
+  :type 'object)
+
+(defcustom  pm-inner/blazor-csharp
+  (pm-inner-auto-chunkmode :name "csharp-code"
+                           :head-matcher "^@functions"
+                           :tail-matcher "^}"
+                           :mode-matcher 'csharp-mode)
+  "csharp blazor code block."
+  :group 'poly-innermodes
+  :type 'object)
+
+(define-polymode poly-blazor-mode
+  :hostmode 'pm-host/blazor
+  :innermodes '(pm-inner/blazor-html
+		pm-inner/blazor-csharp))
 
 
 

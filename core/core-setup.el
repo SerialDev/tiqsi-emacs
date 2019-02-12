@@ -54,11 +54,11 @@
 ;-----------------{UX}-----------------;
 
 
-(use-package dashboard
-  :straight t
-  :ensure t
-  :config
-  (dashboard-setup-startup-hook))
+;(use-package dashboard
+;  :straight t
+;  :ensure t
+;  :config
+;  (dashboard-setup-startup-hook))
 
 
 
@@ -269,12 +269,12 @@
    :repo "emacs-evil/evil"
 ))
 
-(straight-use-package
- '(matrix-client
-   :type git
-   :host github
-   :repo "jgkamat/matrix-client-el"
-))
+;(straight-use-package
+; '(matrix-client
+;   :type git
+;   :host github
+;   :repo "jgkamat/matrix-client-el"
+;))
 
 
 ;; (straight-use-package
@@ -299,7 +299,7 @@
 ;;   )
 ;; )
 
-(straight-require 'blacken)
+;(straight-require 'blacken)
 
 (straight-use-package
  '(flycheck-rtags
