@@ -546,7 +546,13 @@ foo.cpp and in the same directory as the current header file, foo.h."
 		(parsec-query
 		 ,@parsers
 		 :end ))) )
-         (cons parsec-result  (tiqsi--parsec-retrieve-remaining-by-idx ,data idx ))))
+     (cons parsec-result
+	   (tiqsi--parsec-retrieve-remaining-by-idx ,data
+						    (if  (equal (car? idx) 'parsec-error)
+							0
+						      (- idx 1))
+
+						    ))))
 
 
 (defmacro tiqsi--parsec-with-index-remainder (data &rest parsers )
@@ -556,7 +562,13 @@ foo.cpp and in the same directory as the current header file, foo.h."
 		(parsec-query
 		 ,@parsers
 		 :end ))) )
-         (cons parsec-result (cons idx (tiqsi--parsec-retrieve-remaining-by-idx ,data idx )))))
+     (cons parsec-result
+	   (cons idx
+		 (tiqsi--parsec-retrieve-remaining-by-idx ,data
+ 							  (if  (equal (car? idx) 'parsec-error)
+							      0
+							    (- idx 1))
+							  )))))
 
 
 
@@ -735,8 +747,45 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 
 ;  -------------------------------------------------------------------------------- ;
+; Spiral rule : http://c-faq.com/decl/spiral.anderson.html
+;; [X] or []
+;; => Array X size of... or Array undefined size of...
+;; (type1, type2)
+;; => function passing type1 and type2 returning...
+;; *
+;; => pointer(s) to...
+;  -------------------------------------------------------------------------------- ;
+; Simple declaration
+(setq test-simple "char *str[10];")
+; Pointer to Function declaration
+(setq test-fn "char *(*fp)( int, float *);")
+; The Ultimate test
+(setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
+;  -------------------------------------------------------------------------------- ;
+(popup-tip "test")
+
+(defun spiral--pointer-to(token)
+  (let ((data   (tiqsi--parsec-with-remainder token
+				(parsec-str "*")
+				)
+		))
+    (cons (if (equal (car data) 'parsec-error)
+	"*"
+      "pointer to ") (cdr data))
+    )
+  )
+
+(parsec-with-input "[]"
+  (tiqsi--parsec-between-square-brackets)
+  )
 
 
+;; (spiral--pointer-to "*s")
+
+
+
+
+;  -------------------------------------------------------------------------------- ;
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
