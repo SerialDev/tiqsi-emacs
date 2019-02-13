@@ -746,42 +746,68 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
   )
 
 
-;  -------------------------------------------------------------------------------- ;
-; Spiral rule : http://c-faq.com/decl/spiral.anderson.html
-;; [X] or []
-;; => Array X size of... or Array undefined size of...
-;; (type1, type2)
-;; => function passing type1 and type2 returning...
-;; *
-;; => pointer(s) to...
-;  -------------------------------------------------------------------------------- ;
-; Simple declaration
-(setq test-simple "char *str[10];")
-; Pointer to Function declaration
-(setq test-fn "char *(*fp)( int, float *);")
-; The Ultimate test
-(setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
-;  -------------------------------------------------------------------------------- ;
-(popup-tip "test")
+;; ;  -------------------------------------------------------------------------------- ;
+;; ; Spiral rule : http://c-faq.com/decl/spiral.anderson.html
+;; ;; [X] or []
+;; ;; => Array X size of... or Array undefined size of...
+;; ;; (type1, type2)
+;; ;; => function passing type1 and type2 returning...
+;; ;; *
+;; ;; => pointer(s) to...
+;; ;  -------------------------------------------------------------------------------- ;
+;; ; Simple declaration
+;; (setq test-simple "char *str[10];")
+;; ; Pointer to Function declaration
+;; (setq test-fn "char *(*fp)( int, float *);")
+;; ; The Ultimate test
+;; (setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
+;; ;  -------------------------------------------------------------------------------- ;
+;; (popup-tip "test")
 
+; TODO spiral function parser and spiral recursively
 (defun spiral--pointer-to(token)
   (let ((data   (tiqsi--parsec-with-remainder token
 				(parsec-str "*")
 				)
 		))
-    (cons (if (equal (car data) 'parsec-error)
-	"*"
-      "pointer to ") (cdr data))
+    (cons
+     (if (equal
+	  (car?(car data)) 'parsec-error)
+	 ""
+       "pointer to ")
+     (cdr data))
     )
   )
 
-(parsec-with-input "[]"
-  (tiqsi--parsec-between-square-brackets)
-  )
 
 
-;; (spiral--pointer-to "*s")
+(defun spiral--array(token)
+  (let ((data
+	 (tiqsi--parsec-with-remainder token
+				       (tiqsi--parsec-between-square-brackets)
+				       )))
+    (cons
+     (if (equal
+	  (car?(car data)) 'parsec-error)
+	 ""
+       (if (= (length (car data)) 0)
+	   "Array of size  ~Undefined of"
+	 (format "Array of size %s of" (car data))))
+     (cdr data))))
 
+
+
+  ;; (let ((data   (tiqsi--parsec-with-remainder "( astat) "
+  ;; 				(tiqsi--parsec-between-round-brackets)
+  ;; 				)
+  ;; 		))
+  ;;   data
+  ;;   )
+
+
+;; (spiral--pointer-to "*saga")
+
+;; (spiral--array "[123]")
 
 
 
