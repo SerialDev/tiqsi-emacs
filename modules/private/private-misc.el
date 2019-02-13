@@ -248,7 +248,10 @@ sEnter Doctest result: ")
       (insert "\n    \"\"\""))
   )
 
-
+(defun get-docker-ip (docker-id)
+  (interactive "sEnter Docker id: ")
+  (async-shell-command
+   (format "docker inspect -f \"{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}\" %s" docker-id)))
 
 
 (defun sdev/insert-comment (types function params return  extra doctest result )
