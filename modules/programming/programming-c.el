@@ -754,6 +754,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; ;; => function passing type1 and type2 returning...
 ;; ;; *
 ;; ;; => pointer(s) to...
+;; ;; Operator precedence () * L
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; ; Simple declaration
 ;; (setq test-simple "char *str[10];")
@@ -796,14 +797,20 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
      (cdr data))))
 
 
+(defun spiral--func(token)
+  (let ((data   (tiqsi--parsec-with-remainder token
+  				(tiqsi--parsec-between-round-brackets)
+  				)
+  		))
+    (cons
+     (if (equal
+	  (car?(car data)) 'parsec-error)
+	 ""
+       (format "function passing - %s - returning  " (car data) ))
+     (cdr data))
+    ))
 
-  ;; (let ((data   (tiqsi--parsec-with-remainder "( astat) "
-  ;; 				(tiqsi--parsec-between-round-brackets)
-  ;; 				)
-  ;; 		))
-  ;;   data
-  ;;   )
-
+;; (spiral--func "s( astat *  tast ) sss")
 
 ;; (spiral--pointer-to "*saga")
 
