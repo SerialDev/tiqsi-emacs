@@ -746,6 +746,14 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
   )
 
 
+
+(defun check-for-semicolon (string)
+  (if (equal (car(cdr(split-string string ";"  ))) "")
+      (car(split-string string ";" ))
+    nil)
+  )
+
+
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; ; Spiral rule : http://c-faq.com/decl/spiral.anderson.html
 ;; ;; [X] or []
@@ -765,7 +773,9 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; (popup-tip "test")
 
-; TODO spiral function parser and spiral recursively
+; TODO Parser for C declr to generate the tokens t be fed through
+; TODO Parse (<content>)(<content>) into (<content> . "(<content>)") to handle C-style cast
+; TODO spiral recursively
 (defun spiral--pointer-to(token)
   (let ((data   (tiqsi--parsec-with-remainder token
 				(parsec-str "*")
@@ -809,6 +819,23 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
        (format "function passing - %s - returning  " (car data) ))
      (cdr data))
     ))
+
+(setq testing
+      (tiqsi--parsec-with-remainder (check-for-semicolon test-ultimate)
+				    (parsec-collect
+				      (parsec-many-as-string
+				       (parsec-or
+					(parsec-letter)
+					(tiqsi--parsec-whitespace))
+				       )
+				      (tiqsi--parsec-between-round-brackets)
+				      )
+				    )
+)
+
+(testing)
+
+;; (check-for-semicolon test-ultimate)
 
 ;; (spiral--func "s( astat *  tast ) sss")
 
