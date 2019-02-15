@@ -833,7 +833,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 				    )
 )
 
-(testing)
+;; (testing)
 
 ;; (check-for-semicolon test-ultimate)
 
@@ -842,6 +842,55 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; (spiral--pointer-to "*saga")
 
 ;; (spiral--array "[123]")
+
+;; (popup-tip "test")
+
+
+(defun make-tip-frame (&rest args)
+    (setq tip-frame (make-frame '(
+				  (minibuffer . nil)
+				  (name . "*Tip Frame*")
+				  (width . 80)
+				  (height . 15)
+				  (visibility . nil)
+
+				  )))
+
+    (set-frame-position tip-frame
+			(- (car (window-absolute-pixel-position)) (frame-char-width))
+			(+ (cdr (window-absolute-pixel-position)) (frame-char-size)))
+
+    (let ((current-frame (selected-frame) ))
+      ;; (make-frame-visible tip-frame)
+      (raise-frame tip-frame)
+      (frame--set-input-focus current-frame)
+      )
+    )
+
+(defun frame--set-input-focus (frame)
+;; Ensure, if possible, that FRAME gets input focus.
+(when (memq (window-system frame) '(x w32 ns))
+  (x-focus-frame frame))
+  ;; Move mouse cursor if necessary.
+  ;; (cond
+  ;;  (mouse-autoselect-window
+  ;;   (let ((edges (window-inside-edges (frame-selected-window frame))))
+  ;;     ;; Move mouse cursor into FRAME's selected window to avoid that
+  ;;     ;; Emacs mouse-autoselects another window.
+  ;;     (set-mouse-position frame (nth 2 edges) (nth 1 edges))))
+  ;;  (focus-follows-mouse
+  ;;   ;; Move mouse cursor into FRAME to avoid that another frame gets
+  ;;   ;; selected by the window manager.
+  ;;   (set-mouse-position frame (1- (frame-width frame)) 0)))
+  )
+
+
+
+
+
+;; (delete-frame tip-frame)
+;; (make-tip-frame)
+;; (popup-tip "test")
 
 
 
