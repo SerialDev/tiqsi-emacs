@@ -141,6 +141,7 @@
   :config (progn
 	    (beacon-mode 1)
 	    (setq beacon-push-mark 35)
+	    ;; (add-hook 'beacon-dont-blink-predicates #'fundamental-mode-p)
 	    (setq beacon-color "#666600")
 	    (setq beacon-blink-when-point-moves-vertically 20)
 	    (setq beacon-blink-when-point-moves-horizontally 20)
@@ -149,9 +150,7 @@
 	    (setq beacon-blink-delay 0.2)
 	    (setq beacon-size 20)))
 
-(add-hook 'beacon-dont-blink-predicates
-          (lambda () (bound-and-true-p fundamental-mode)
-	    ))
+
 
                                         ;----{spaceline}----;
 
