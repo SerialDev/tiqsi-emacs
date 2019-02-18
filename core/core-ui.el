@@ -86,7 +86,20 @@
 
                                         ;--{Line Highlight}-;
 
-(global-hl-line-mode 1)
+(global-hl-line-mode 0)
+
+(defvar-local was-hl-line-mode-on nil)
+(defun hl-line-on-maybe ()  (if was-hl-line-mode-on (hl-line-mode +1)))
+(defun hl-line-off-maybe () (if was-hl-line-mode-on (hl-line-mode -1)))
+(add-hook 'hl-line-mode-hook
+  (lambda () (if hl-line-mode (setq was-hl-line-mode-on t)))))
+
+(add-hook 'prog-mode-hook #'hl-line-mode)
+(add-hook 'emacs-lisp-mode-hook #'hl-line-mode)
+(add-hook 'fundamental-mode-entry-hook 'hl-line-off-maybe)
+(add-hook 'fundamental-mode-exit-hook 'hl-line-off-maybe)
+
+
 (set-face-background 'hl-line "midnight blue")
 
                                         ;-----{Set Font}----;

@@ -571,7 +571,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 							  )))))
 
 
-
 ;; END tiqsi-find-file
 
 (defun tiqsi--get-cmakelist-content()
@@ -769,7 +768,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; ; Pointer to Function declaration
 ;; (setq test-fn "char *(*fp)( int, float *);")
 ;; ; The Ultimate test
-;; (setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
+(setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; (popup-tip "test")
 
@@ -820,6 +819,18 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
      (cdr data))
     ))
 
+
+(defun car? (input)
+  (condition-case nil
+      (car input)
+    (error input)))
+
+(defun cdr? (input)
+  (condition-case nil
+      (cdr input)
+    (error input)))
+
+
 (setq testing
       (tiqsi--parsec-with-remainder (check-for-semicolon test-ultimate)
 				    (parsec-collect
@@ -845,14 +856,14 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 ;; (popup-tip "test")
 
-
-(setq tip-frame-params 
+;; --------------------------------Create a frame with tooltip---------------------
+(setq tip-frame-params
       '(
 	(minibuffer . nil)
 	(name . "*Tip Frame*")
 	(lambda () (setq mode-line-format nil))
 	(width . 80)
-	(height . 10)
+	(height . 5)
 	(visibility . nil)
 	(minibuffer-frame-alist nil)
 	(vertical-scroll-bars . nil)
@@ -883,7 +894,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
   (when (memq (window-system frame) '(x w32 ns))
     (x-focus-frame frame)))
 
-(defun make-tip-frame (&rest args)
+(defun make-tip-frame (tip &rest args)
     (setq tip-frame (make-frame tip-frame-params)
 	  )
     (generate-new-buffer "*Tip Frame Buffer*")
@@ -897,15 +908,27 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
       (make-frame-visible tip-frame)
       (select-frame tip-frame)
       (pop-to-buffer "*Tip Frame Buffer*")
-      ;; (setq-local beacon-mode nil)
-      ;; (setq mode-line-format nil)
+      (with-current-buffer "*Tip Frame Buffer*"
+	(fundamental-mode)
+	(setq-local beacon-mode nil)
+	(setq mode-line-format nil)
+	;; (set-background-color "#5F55FF")
+	(linum-mode -1)
+	(insert  tip)
+	)
+
       (frame--set-input-focus current-frame)
       (frame-restack current-frame tip-frame)
       )
     )
 
-;; (make-tip-frame)
-;; (delete-frame tip-frame)
+(defun close-tip-frame()
+  (with-current-buffer "*Tip Frame Buffer*"
+    (delete-region (point-min) (point-max)))
+  (delete-frame tip-frame))
+
+;; (make-tip-frame "why")
+;; (close-tip-frame)
 
 
 ;  -------------------------------------------------------------------------------- ;
