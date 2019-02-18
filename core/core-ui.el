@@ -149,6 +149,9 @@
 	    (setq beacon-blink-delay 0.2)
 	    (setq beacon-size 20)))
 
+(add-hook 'beacon-dont-blink-predicates
+          (lambda () (bound-and-true-p fundamental-mode)
+	    ))
 
                                         ;----{spaceline}----;
 
