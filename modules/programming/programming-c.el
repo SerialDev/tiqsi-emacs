@@ -752,6 +752,28 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
     nil)
   )
 
+;; ;  -------------------------------------------------------------------------------- ;
+;; ;  TODO parse (select (this ( now) ) ) -> ("select" "(this ( now) )")
+;; ;                                      -> ("select" ("this "(now)"))
+;; ;                                      -> ("select" ("this ("now") ))
+;; ;  -------------------------------------------------------------------------------- ;
+(setq test-parens "(select (this (now) ) ) ")
+
+(defun perlish-fix-regexps (regexp)
+  "Simple translation of a perlish REGEXP to an emacs one."
+  (let ( (new-pattern regexp) )
+    (setq new-pattern (replace-regexp-in-string "(" "\\\\(" new-pattern))
+    (setq new-pattern (replace-regexp-in-string ")" "\\\\)" new-pattern))
+    (setq new-pattern (replace-regexp-in-string "|" "\\\\|" new-pattern))
+    (setq new-pattern (replace-regexp-in-string "\\\\\"" "\"" new-pattern))
+    new-pattern))
+
+
+(tiqsi--parsec-with-remainder test-parens
+			      (parsec-many-as-string (parsec-re "(") )
+
+)
+
 
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; ; Spiral rule : http://c-faq.com/decl/spiral.anderson.html
