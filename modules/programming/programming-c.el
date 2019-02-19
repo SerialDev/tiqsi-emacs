@@ -839,7 +839,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 					(parsec-letter)
 					(tiqsi--parsec-whitespace))
 				       )
-				      (tiqsi--parsec-between-round-brackets)
+				      (tiqsi--parsec-between-round-brackets "(")
 				      )
 				    )
 )
@@ -857,13 +857,12 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; (popup-tip "test")
 
 ;; --------------------------------Create a frame with tooltip---------------------
+;; TODO Make tip based on tip char len + height
 (setq tip-frame-params
       '(
 	(minibuffer . nil)
 	(name . "*Tip Frame*")
 	(lambda () (setq mode-line-format nil))
-	(width . 80)
-	(height . 5)
 	(visibility . nil)
 	(minibuffer-frame-alist nil)
 	(vertical-scroll-bars . nil)
@@ -889,13 +888,16 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 	(left . -1)))
 
 
+
 (defun frame--set-input-focus (frame)
   ;; Ensure, if possible, that FRAME gets input focus.
   (when (memq (window-system frame) '(x w32 ns))
     (x-focus-frame frame)))
 
 (defun make-tip-frame (tip &rest args)
-    (setq tip-frame (make-frame tip-frame-params)
+  (setq tip-frame (make-frame
+		   (append (append tip-frame-params '((width . 80))) '((height . 5)))
+		   )
 	  )
     (generate-new-buffer "*Tip Frame Buffer*")
 
