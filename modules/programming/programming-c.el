@@ -889,6 +889,10 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 
 
+   (list (type-of (+ (* (frame-char-width) (length "testete")) (frame-char-width))))
+
+(/ (frame-char-height) 2)
+
 (defun frame--set-input-focus (frame)
   ;; Ensure, if possible, that FRAME gets input focus.
   (when (memq (window-system frame) '(x w32 ns))
@@ -896,7 +900,16 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 (defun make-tip-frame (tip &rest args)
   (setq tip-frame (make-frame
-		   (append (append tip-frame-params '((width . 80))) '((height . 5)))
+		   (append (append tip-frame-params
+				   `(
+				     ;; (width . ,(+ (* (frame-char-width) (length tip)) (frame-char-width)))
+				     (width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))
+				     ))
+			   `(
+			     (height . 5)
+			     ;; (height . ,(frame-char-height))
+			     ;; (height . ,(/ (frame-char-height) 2))
+			     ))
 		   )
 	  )
     (generate-new-buffer "*Tip Frame Buffer*")
@@ -929,7 +942,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
     (delete-region (point-min) (point-max)))
   (delete-frame tip-frame))
 
-;; (make-tip-frame "why")
+;; (make-tip-frame "whyssssssss")
 ;; (close-tip-frame)
 
 
