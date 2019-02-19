@@ -888,11 +888,6 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 	(left . -1)))
 
 
-
-   (list (type-of (+ (* (frame-char-width) (length "testete")) (frame-char-width))))
-
-(/ (frame-char-height) 2)
-
 (defun frame--set-input-focus (frame)
   ;; Ensure, if possible, that FRAME gets input focus.
   (when (memq (window-system frame) '(x w32 ns))
