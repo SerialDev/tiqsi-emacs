@@ -842,16 +842,6 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
     ))
 
 
-(defun car? (input)
-  (condition-case nil
-      (car input)
-    (error input)))
-
-(defun cdr? (input)
-  (condition-case nil
-      (cdr input)
-    (error input)))
-
 
 (setq testing
       (tiqsi--parsec-with-remainder (check-for-semicolon test-ultimate)

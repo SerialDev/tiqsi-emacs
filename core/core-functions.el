@@ -96,6 +96,18 @@ enjoy using a lot.
       (setq arg (1- arg)))))
 
 
+
+(defun car? (input)
+  (condition-case nil
+      (car input)
+    (error input)))
+
+(defun cdr? (input)
+  (condition-case nil
+      (cdr input)
+    (error input)))
+
+
 ;;; ----------------------------------------------------------------------
 ;;;
 (defsubst str-left (str count)
