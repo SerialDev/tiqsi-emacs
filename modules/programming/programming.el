@@ -27,6 +27,8 @@
 ;;
 
 
+(load-expand  "modules/programming/utils-parsec.el")
+
 (load-expand  "modules/programming/programming-bnfc.el")
 (load-expand  "modules/programming/programming-assembly.el")
 (load-expand  "modules/programming/programming-c.el")
