@@ -100,7 +100,7 @@
 
 
 (when tiqsi-linux
-  (setq rtags-path "/home/serialdev/rtags/bin/")
+  (setq rtags-path "/rtags/bin/")
   )
 
 (setq rtags-completions-enabled t)
@@ -551,7 +551,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
 						    (if  (equal (car? idx) 'parsec-error)
 							0
 						      (- idx 1))
-
 						    ))))
 
 
@@ -666,7 +665,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
   )
 
 (eval-after-load 'cc-mode (start-rtags))
-
+(insert (format "%srdm" rtags-path) )/home/serialdev/rtags/bin/rdm/home/serialdev/rtags/bin/rdm
 
 (defun add-to-rtags()
   (interactive)
@@ -680,7 +679,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 ;  -------------------------------------------------------------------------------- ;
 
 ;  -------------------------------------------------------------------------------- ;
-					; Create cmake
+; Create cmake
 ; project-name -> src -> main.cpp/c
 ;                     -> main.cpp/c
 ;                     -> CMakeLists.txt
@@ -784,6 +783,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; ;; *
 ;; ;; => pointer(s) to...
 ;; ;; Operator precedence () * L
+
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; ; Simple declaration
 ;; (setq test-simple "char *str[10];")
@@ -791,6 +791,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; (setq test-fn "char *(*fp)( int, float *);")
 ;; ; The Ultimate test
 (setq test-ultimate "void (*signal(int, void (*fp)(int)))(int);")
+;; ; ``signal is a function passing an int and a pointer to a function passing an int returning nothing (void) returning a pointer to a function passing an int returning nothing (void)''
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; (popup-tip "test")
 

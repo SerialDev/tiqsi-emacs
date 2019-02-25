@@ -92,7 +92,7 @@
 (defun hl-line-on-maybe ()  (if was-hl-line-mode-on (hl-line-mode +1)))
 (defun hl-line-off-maybe () (if was-hl-line-mode-on (hl-line-mode -1)))
 (add-hook 'hl-line-mode-hook
-  (lambda () (if hl-line-mode (setq was-hl-line-mode-on t)))))
+  (lambda () (if hl-line-mode (setq was-hl-line-mode-on t))))
 
 (add-hook 'prog-mode-hook #'hl-line-mode)
 (add-hook 'emacs-lisp-mode-hook #'hl-line-mode)
