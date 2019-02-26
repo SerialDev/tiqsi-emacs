@@ -213,6 +213,18 @@
     (parsec-ch ?\))
     ,@parsers))
 
+(defmacro utils-parsec--between-double-quotes(&rest parsers)
+  `(parsec-between
+    (parsec-ch ?\")
+    (parsec-ch ?\")
+    ,@parsers))
+
+(defmacro utils-parsec--between-single-quotes(&rest parsers)
+  `(parsec-between
+    (parsec-ch ?\')
+    (parsec-ch ?\')
+    ,@parsers))
+
 (defmacro utils-parsec--between-macro(name init end)
   `(defmacro ,(intern (format "utils-parsec--between-%s" name))
        (&rest parsers)
@@ -222,7 +234,7 @@
       ,(intern ",@parsers"))))
 
 
-;; ;; TODO generate defmacros with macro 
+;; ;; TODO generate defmacros with macro
 ;; (utils-parsec--between-macro "round-brackets" ?\( ?\))
 ;; (utils-parsec--between-macro "square-brackets" ?\[ ?\])
 
@@ -247,15 +259,39 @@
 
   )
 
-;; TODO
-;; (defun utils-parsec--lex-str()
-  
-;;   )
 
-;; TODO REMOVE TEST CASES 
-(parsec-with-input "\"this is a string\""
-  (utils-parsec--lex-snake)
+
+;; TODO
+(defun utils-parsec--lex-str()
+
+  (utils-parsec--str
+   (parsec-or 
+   (utils-parsec--between-single-quotes
+    (parsec-many1-as-string
+     (parsec-or
+      (parsec-many1-as-string (parsec-letter))
+      (parsec-many1-as-string (parsec-re " "))))
+    )
+   (utils-parsec--between-double-quotes
+    (parsec-many1-as-string
+     (parsec-or
+      (parsec-many1-as-string (parsec-letter))
+      (parsec-many1-as-string (parsec-re " "))))
+    )
+   )
+   )
   )
+
+;; TODO REMOVE TEST CASES
+(parsec-with-input "\"this is a string\""
+  (utils-parsec--lex-str)
+  )
+
+(parsec-with-input "\'this one is too\'"
+  (utils-parsec--lex-str)
+  )
+
+
 
 (parsec-with-input "this_is_a_name(132), funcall, params, for, Python)"
 
@@ -294,7 +330,7 @@
 
   )
 
-;; TODO Eval last sexpr macro with car and cdr added - speed up dev 
+;; TODO Eval last sexpr macro with car and cdr added - speed up dev
 
 (scheme-read "(test (this '(niw as))")
 (scheme-read "(niw as)")
