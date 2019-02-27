@@ -104,8 +104,6 @@
     (buffer-string)))
 
 
-
-
 (defun utils-parsec--search-file-get-string(file-name)
   (utils-parsec--get-string-from-file
    (utils-parsec--find-file-in-hierarchy
@@ -203,13 +201,25 @@
 
 
 (defsubst utils-parsec--snake(token)
-  (cons 'Snake token))
+  (cons 'SnakeCase token))
 
 (defsubst utils-parsec--str(token)
   (cons 'String token))
 
 (defsubst utils-parsec--double(token)
   (cons 'Double token))
+
+(defsubst utils-parsec--defun(token)
+  (cons 'Defun token))
+
+(defsubst utils-parsec--defsubst(token)
+  (cons 'Defsubst token))
+
+(defsubst utils-parsec--defmacro(token)
+  (cons 'Defmacro token))
+
+(defsubst utils-parsec--lisp-case(token)
+  (cons 'LispCase token))
 
 ;; utils-parsec for lexing
 
@@ -307,16 +317,70 @@
 ;; (utils-parsec--between-macro "round-brackets" ?\( ?\))
 ;; (utils-parsec--between-macro "square-brackets" ?\[ ?\])
 
-(defun utils-parsec--lex-snake()
-  (utils-parsec--snake
+(defun utils-parsec--parse-snake()
   (parsec-collect
    (parsec-many1-as-string
    (parsec-or
     (parsec-many1-s
      (parsec-letter))
-     (parsec-ch ?\_))
-   )
-  )))
+     (parsec-ch ?\_)))))
+
+(defun utils-parsec--lex-snake()
+  (utils-parsec--snake
+   (utils-parsec--parse-snake)))
+
+
+;                                                Lisp                                               ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+(defun utils-parsec--parse-lisp-case()
+  (parsec-collect
+   (parsec-many1-as-string
+    (parsec-or
+     (parsec-many1-s
+      (parsec-letter))
+     (parsec-many1-s (parsec-ch ?\-))))))
+
+
+(defun utils-parsec--lex-lisp-case()
+  (utils-parsec--lisp-case
+   (utils-parsec--parse-lisp-case)
+  ))
+
+
+(defun utils-parsec--parse-defun ()
+ (parsec-between
+   (parsec-re "(defun ")
+   (parsec-re " ?(")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defun ()
+  (utils-parsec--defun
+  (utils-parsec--parse-defun)))
+
+
+(defun utils-parsec--parse-defsubst ()
+ (parsec-between
+   (parsec-re "(defsubst ")
+   (parsec-re " ?(")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defsubst ()
+  (utils-parsec--defsubst
+  (utils-parsec--parse-defsubst)))
+
+
+(defun utils-parsec--parse-defmacro ()
+ (parsec-between
+   (parsec-re "(defmacro ")
+   (parsec-re " ?(")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defmacro ()
+  (utils-parsec--defmacro
+  (utils-parsec--parse-defmacro)))
+
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
 
 (defun utils-parsec--lex-pyfunc()
 
@@ -385,10 +449,14 @@
      ))))
 
 
+
+
 ; ------------------------------------------------------------------------------------------------  ;
 ;                                             Test Cases                                            ;
 ; ------------------------------------------------------------------------------------------------  ;
 
+;                                           String support                                          ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
 (parsec-with-input "\"this is a string\""
   (utils-parsec--lex-py-str)
   )
@@ -412,6 +480,67 @@
 
 (parsec-with-input "123.24"
   (utils-parsec--lex-double))
+
+;                                            Lisp Support                                           ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+(parsec-with-input "this-is--lisp"
+  (utils-parsec--lex-lisp-case))
+
+
+(parsec-with-input "(defun this-is--lisp ()"
+  (utils-parsec--lex-defun))
+
+
+
+;; TODO handle these cases
+;; (utils-parsec--return-remainder "
+(cddddr (car
+(parsec-with-input "
+(defsubst utils-parsec--bool (value)
+  (cons 'Bool value))
+
+
+;; utils-parsec generic re-usable parser combinators
+
+(defmacro utils-parsec--lex-list-by-sep (what sep)
+  `(apply #'utils-parsec--list
+	 (parsec-sepby
+	  ,what
+	  ,sep)))
+
+(defun utils-parsec--lex-eof()
+  (utils-parsec--eof
+   (utils-parsec--parse-eof)))
+
+
+
+
+(defmacro utils-parsec--lex-list-by-sep (what sep)
+  `(apply #'utils-parsec--list
+	 (parsec-sepby
+	  ,what
+	  ,sep)))
+"
+  (parsec-collect
+   (parsec-many
+   (parsec-or
+    (utils-parsec--lex-spaces)
+    (utils-parsec--lex-eol)
+    (parsec-between
+     (parsec-ch ?\;)
+     (utils-parsec--lex-eol)
+     (parsec-re ".*"))
+    (parsec-or
+     (utils-parsec--lex-defun)
+     (utils-parsec--lex-defsubst)
+     (utils-parsec--lex-defmacro)
+     )
+    (parsec-re ".*")
+    )
+   )
+))
+))
+
 
 ;; (parsec-with-input "\\ \t \""
 ;;   (parsec-re (perlish-fix-regexps "(\\(?:b|t|n|f|r|\"|\\)|\\(?:(?:[0-2][0-9]{1,2}|3[0-6][0-9]|37[0-7]|[0-9]{1,2}))|\\(?:u(?:[0-9a-fA-F]{4})))"))
