@@ -25,11 +25,53 @@
 
 ;;; Commentary:
 
-;; TODO CMake Parser / Ninja Parser / Meson parser
+
+
+; ------------------------------------------------------------------------------------------------  ;
+;                                    Parsec Utilities available                                     ;
+; ------------------------------------------------------------------------------------------------  ;
+
+
+; ------------------------------------------------------------------------------------------------  ;
+;                                       Parsec Utilities TODO                                       ;
+; ------------------------------------------------------------------------------------------------  ;
+;                                                                                                   ;
+; Recursively start walking the paths                                                               ;
+; Check for -> is-dir?                                                                              ;
+;           -> check files-in-dir                                                                   ;
+;	    -> walk those directories until there is a match                                        ;
+;                                                                                                   ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+;                                                                                                   ;
+;  parse (select (this ( now) ) ) -> ("select" "(this ( now) )")                                    ;
+;                                     -> ("select" ("this "(now)"))                                 ;
+;                                     -> ("select" ("this ("now") ))                                ;
+;                                                                                                   ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+;                                                                                                   ;
+; Eval last sexpr macro with car and cdr added - speed up dev                                       ;
+;                                                                                                   ;
+; ------------------------------------------------------------------------------------------------  ;
+
+; ------------------------------------------------------------------------------------------------  ;
+;                                 Parsec Utilities example Use-cases TODO                           ;
+; ------------------------------------------------------------------------------------------------  ;
+;                                                                                                   ;
+; Create a build-system loader for c-mode:                                                          ;
+;   -> CMake Parser                                                                                 ;
+;   -> Ninja Parser                                                                                 ;
+;   -> Meson Parser                                                                                 ;
+;                                                                                                   ;
+; ------------------------------------------------------------------------------------------------  ;
 
 (require 'parsec)
 
-;; utils-parsec file utilities
+
+(defun car? (input)
+  (condition-case nil
+      (car input)
+    (error input)))
+
 
 (defun utils-parsec--current-dir ()
   (file-name-directory buffer-file-name))
@@ -49,7 +91,7 @@
     (if (file-exists-p file)
 	file
       (when parent
-	(tiqsi-find-file-in-hierarchy parent file-name)))))
+	(utils-parsec--find-file-in-hierarchy parent file-name)))))
 
 (defun utils-parsec--get-string-from-file (filePath)
   "Return filePath's file content
@@ -62,10 +104,6 @@
     (buffer-string)))
 
 
-;; TODO Recursively start walking the paths
-;; Check for -> is-dir?
-;;           -> check files-in-dir
-;;           -> walk those directories until there is a match
 
 
 (defun utils-parsec--search-file-get-string(file-name)
@@ -200,15 +238,21 @@
    (string-to-number
     (utils-parsec--parse-number))))
 
+(defun utils-parsec--parse-eol()
+  (parsec-eol))
 
 (defun utils-parsec--lex-eol()
   (utils-parsec--eol
-   (parsec-eol)))
+   (utils-parsec--parse-eol)))
+
+(defun utils-parsec--parse-eof()
+  (parsec-eof))
 
 
 (defun utils-parsec--lex-eof()
   (utils-parsec--eof
-   (parsec-eof)))
+   (utils-parsec--parse-eof)))
+
 
 
 ;; utils-parsec generic re-usable parser combinators
@@ -242,6 +286,12 @@
   `(parsec-between
     (parsec-ch ?\')
     (parsec-ch ?\')
+    ,@parsers))
+
+(defmacro utils-parsec--between-triple-quotes(&rest parsers)
+  `(parsec-between
+    (parsec-re "\"\"\"")
+    (parsec-re "\"\"\"")
     ,@parsers))
 
 (defmacro utils-parsec--between-macro(name init end)
@@ -278,13 +328,20 @@
 
   )
 
+(defun utils-parsec--parse-alphanumeric()
+  (parsec-many1-as-string
+   (parsec-or
+    (parsec-many1-as-string (parsec-letter))
+    (parsec-many1-as-string (parsec-digit))
+    (parsec-many1-as-string (parsec-re " ")))))
+
+
+
 
 (defun utils-parsec--parse-double-quote-str()
-    (utils-parsec--between-double-quotes
-     (parsec-many1-as-string
-      (parsec-or
-       (parsec-many1-as-string (parsec-letter))
-       (parsec-many1-as-string (parsec-re " "))))))
+  (utils-parsec--between-double-quotes
+   (utils-parsec--parse-alphanumeric)))
+
 
 
 (defun utils-parsec--lex-double-quote-str()
@@ -293,23 +350,18 @@
 
 
 (defun utils-parsec--parse-single-quote-str()
-    (utils-parsec--between-single-quotes
-     (parsec-many1-as-string
-      (parsec-or
-       (parsec-many1-as-string (parsec-letter))
-       (parsec-many1-as-string (parsec-re " "))))))
+  (utils-parsec--between-single-quotes
+   (utils-parsec--parse-alphanumeric)))
+
 
 (defun utils-parsec--lex-single-quote-str()
   (utils-parsec--str
    (utils-parsec--parse-single-quote-str)))
 
 
-(defun utils-parsec--lex-triple-quote-str()
-    (utils-parsec--between-single-quotes
-     (parsec-many1-as-string
-      (parsec-or
-       (parsec-many1-as-string (parsec-letter))
-       (parsec-many1-as-string (parsec-re " "))))))
+(defun utils-parsec--parse-triple-quote-str()
+  (utils-parsec--between-triple-quotes
+   (utils-parsec--parse-alphanumeric)))
 
 (defun utils-parsec--lex-triple-quote-str()
   (utils-parsec--str
@@ -319,22 +371,9 @@
 (defun utils-parsec--lex-py-str()
   (utils-parsec--str
    (parsec-or
+    (utils-parsec--parse-triple-quote-str)
     (utils-parsec--parse-double-quote-str)
     (utils-parsec--parse-single-quote-str))))
-
-(defun utils-parsec--lex-str()
-  (utils-parsec--str
-   (parsec-or
-    (utils-parsec--between-single-quotes
-     (parsec-many1-as-string
-      (parsec-or
-       (parsec-many1-as-string (parsec-letter))
-       (parsec-many1-as-string (parsec-re " ")))))
-    (utils-parsec--between-double-quotes
-     (parsec-many1-as-string
-      (parsec-or
-       (parsec-many1-as-string (parsec-letter))
-       (parsec-many1-as-string (parsec-re " "))))))))
 
 (defun utils-parsec--lex-double()
   (utils-parsec--double
@@ -346,7 +385,10 @@
      ))))
 
 
-;; TODO REMOVE TEST CASES
+; ------------------------------------------------------------------------------------------------  ;
+;                                             Test Cases                                            ;
+; ------------------------------------------------------------------------------------------------  ;
+
 (parsec-with-input "\"this is a string\""
   (utils-parsec--lex-py-str)
   )
@@ -355,8 +397,27 @@
   (utils-parsec--lex-py-str)
   )
 
+(parsec-with-input "\"\"\"this 1 is too\"\"\""
+  (utils-parsec--lex-py-str)
+  )
+
+(parsec-with-input "\"\"\"this 1 is too\"\"\""
+  (utils-parsec--lex-py-str)
+  )
+
+;; TODO support Ascii range of special chars
+(parsec-with-input "\"\"\"this@ 1 is too\"\"\""
+  (utils-parsec--lex-py-str)
+  )
+
 (parsec-with-input "123.24"
   (utils-parsec--lex-double))
+
+;; (parsec-with-input "\\ \t \""
+;;   (parsec-re (perlish-fix-regexps "(\\(?:b|t|n|f|r|\"|\\)|\\(?:(?:[0-2][0-9]{1,2}|3[0-6][0-9]|37[0-7]|[0-9]{1,2}))|\\(?:u(?:[0-9a-fA-F]{4})))"))
+;;   )
+
+;; "(\\(?:b|t|n|f|r|\"|\\)|\\(?:(?:[0-2][0-9]{1,2}|3[0-6][0-9]|37[0-7]|[0-9]{1,2}))|\\(?:u(?:[0-9a-fA-F]{4})))"
 
 (parsec-with-input "(132)"
 
@@ -401,9 +462,6 @@
   )
 
 ;; TODO Eval last sexpr macro with car and cdr added - speed up dev
-
-(scheme-read "(test (this '(niw as))")
-(scheme-read "(niw as)")
 
 
 
