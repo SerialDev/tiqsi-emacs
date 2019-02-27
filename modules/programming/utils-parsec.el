@@ -170,22 +170,35 @@
 (defsubst utils-parsec--str(token)
   (cons 'String token))
 
+(defsubst utils-parsec--double(token)
+  (cons 'Double token))
+
 ;; utils-parsec for lexing
 
+(defun utils-parsec--parse-space()
+  (parsec-re " "))
 
 (defun utils-parsec--lex-space()
   (utils-parsec--space
-    (parsec-re " " )))
+    (utils-parsec--parse-space)))
 
+(defun utils-parsec--parse-spaces()
+  (parsec-many1-as-string (parsec-re " " )))
 
 (defun utils-parsec--lex-spaces()
   (utils-parsec--spaces
-   (parsec-many1-as-string (parsec-re " " ))))
+   (utils-parsec--parse-spaces)))
+
+
+
+(defun utils-parsec--parse-number()
+  (parsec-many1-as-string (parsec-digit)))
 
 
 (defun utils-parsec--lex-number()
   (utils-parsec--number
-   (string-to-number (parsec-many1-as-string (parsec-digit)))))
+   (string-to-number
+    (utils-parsec--parse-number))))
 
 
 (defun utils-parsec--lex-eol()
@@ -208,6 +221,12 @@
 	  ,sep)))
 
 (defmacro utils-parsec--between-brackets(&rest parsers)
+  `(parsec-between
+    (parsec-ch ?\()
+    (parsec-ch ?\))
+    ,@parsers))
+
+(defmacro utils-parsec--between-round-brackets(&rest parsers)
   `(parsec-between
     (parsec-ch ?\()
     (parsec-ch ?\))
@@ -260,45 +279,96 @@
   )
 
 
+(defun utils-parsec--parse-double-quote-str()
+    (utils-parsec--between-double-quotes
+     (parsec-many1-as-string
+      (parsec-or
+       (parsec-many1-as-string (parsec-letter))
+       (parsec-many1-as-string (parsec-re " "))))))
 
-;; TODO
-(defun utils-parsec--lex-str()
 
+(defun utils-parsec--lex-double-quote-str()
   (utils-parsec--str
-   (parsec-or 
-   (utils-parsec--between-single-quotes
+   (utils-parsec--parse-double-quote-str)))
+
+
+(defun utils-parsec--parse-single-quote-str()
+    (utils-parsec--between-single-quotes
+     (parsec-many1-as-string
+      (parsec-or
+       (parsec-many1-as-string (parsec-letter))
+       (parsec-many1-as-string (parsec-re " "))))))
+
+(defun utils-parsec--lex-single-quote-str()
+  (utils-parsec--str
+   (utils-parsec--parse-single-quote-str)))
+
+
+(defun utils-parsec--lex-triple-quote-str()
+    (utils-parsec--between-single-quotes
+     (parsec-many1-as-string
+      (parsec-or
+       (parsec-many1-as-string (parsec-letter))
+       (parsec-many1-as-string (parsec-re " "))))))
+
+(defun utils-parsec--lex-triple-quote-str()
+  (utils-parsec--str
+   (utils-parsec--parse-triple-quote-str)))
+
+
+(defun utils-parsec--lex-py-str()
+  (utils-parsec--str
+   (parsec-or
+    (utils-parsec--parse-double-quote-str)
+    (utils-parsec--parse-single-quote-str))))
+
+(defun utils-parsec--lex-str()
+  (utils-parsec--str
+   (parsec-or
+    (utils-parsec--between-single-quotes
+     (parsec-many1-as-string
+      (parsec-or
+       (parsec-many1-as-string (parsec-letter))
+       (parsec-many1-as-string (parsec-re " ")))))
+    (utils-parsec--between-double-quotes
+     (parsec-many1-as-string
+      (parsec-or
+       (parsec-many1-as-string (parsec-letter))
+       (parsec-many1-as-string (parsec-re " "))))))))
+
+(defun utils-parsec--lex-double()
+  (utils-parsec--double
+   (string-to-number
     (parsec-many1-as-string
      (parsec-or
-      (parsec-many1-as-string (parsec-letter))
-      (parsec-many1-as-string (parsec-re " "))))
-    )
-   (utils-parsec--between-double-quotes
-    (parsec-many1-as-string
-     (parsec-or
-      (parsec-many1-as-string (parsec-letter))
-      (parsec-many1-as-string (parsec-re " "))))
-    )
-   )
-   )
-  )
+      (parsec-many1-as-string (parsec-digit))
+      (parsec-ch ?\.))
+     ))))
+
 
 ;; TODO REMOVE TEST CASES
 (parsec-with-input "\"this is a string\""
-  (utils-parsec--lex-str)
+  (utils-parsec--lex-py-str)
   )
 
 (parsec-with-input "\'this one is too\'"
-  (utils-parsec--lex-str)
+  (utils-parsec--lex-py-str)
   )
 
+(parsec-with-input "123.24"
+  (utils-parsec--lex-double))
 
+(parsec-with-input "(132)"
 
-(parsec-with-input "this_is_a_name(132), funcall, params, for, Python)"
+  (utils-parsec--between-round-brackets (utils-parsec--lex-number))
+)
+
+(parsec-with-input "this_is_a_func_name(132)"
 
   (parsec-collect
-  (utils-parsec--lex-pyfunc)
-  (utils-parsec--between-brackets (utils-parsec--lex-number))
-)
+    (utils-parsec--lex-pyfunc)
+    (utils-parsec--between-round-brackets (utils-parsec--lex-number))
+    )
   )
 
 
