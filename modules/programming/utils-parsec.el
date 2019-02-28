@@ -494,7 +494,7 @@
 
 ;; TODO handle these cases
 ;; (utils-parsec--return-remainder "
-(cddddr (car
+(car
 (parsec-with-input "
 (defsubst utils-parsec--bool (value)
   (cons 'Bool value))
@@ -539,7 +539,48 @@
     )
    )
 ))
-))
+)
+
+(defmacro with-buffer-content (&rest fun)
+  `(let ((content ,(buffer-substring-no-properties (point-min) (point-max) )))
+    ,@fun
+  ))
+
+
+(with-buffer-content
+ (print content))
+
+(defun utils-parsec--ascii-special-chars-no-brackets-semicolon ()
+  (parsec-re "['\\!%#\"$ &\*\+\-/,\.:\|^_`~=\?]")
+  )
+
+(with-buffer-content 
+
+;; (parsec-with-input content
+(utils-parsec--return-remainder content
+
+  (parsec-collect
+   (parsec-many
+    (parsec-or
+     (utils-parsec--lex-spaces)
+     (utils-parsec--lex-eol)
+     (parsec-between
+     (parsec-ch ?\;)
+     (utils-parsec--lex-eol)
+     (parsec-re ".*"))
+    (parsec-or
+     (utils-parsec--lex-defun)
+     (utils-parsec--lex-defsubst)
+     (utils-parsec--lex-defmacro)
+     )
+    (parsec-re ".*")
+     ;; (parsec-ch ?\?)
+     ;; (parsec-re " ?(\"")
+     (utils-parsec--ascii-special-chars-no-brackets-semicolon)
+    )
+   )
+   )
+  ))
 
 
 ;; (parsec-with-input "\\ \t \""
@@ -569,6 +610,9 @@
   )
 
 
+(utils-parsec--return-remainder "test This"
+   (parsec-string "test"))
+
 (parsec-with-input
  "2  134 2
  2"
@@ -584,11 +628,6 @@
   )
 
 
-
-(utils-parsec--return-remainder "test This"
-   (parsec-string "test")
-
-  )
 
 ;; TODO Eval last sexpr macro with car and cdr added - speed up dev
 
