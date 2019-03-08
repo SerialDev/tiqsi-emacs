@@ -7,7 +7,7 @@
 ;; URL: https://github.com/serialdev/tiqsi-emacs
 ;; Keywords: lisp
 ;; Version: 0
-;; Package-Requires: ((cl-lib "0.5") (emacs "24") (parsec "24"))
+;; Package-Requires: ((cl-lib "0.5") (emacs "24") (parsec "24") (s "1.6.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,8 +22,134 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ;;; Commentary:
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                              Defmacro                                             ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; with-buffer-content                                                                            ...;
+; utils-parsec--return-index-remainder                                                           ...;
+; utils-parsec--return-remainder                                                                 ...;
+; utils-parsec--lex-list-by-sep                                                                  ...;
+; utils-parsec--between-brackets                                                                 ...;
+; utils-parsec--between-round-brackets                                                           ...;
+; utils-parsec--between-double-quotes                                                            ...;
+; utils-parsec--between-single-quotes                                                            ...;
+; utils-parsec--between-triple-quotes                                                            ...;
+; utils-parsec--between-macro                                                                    ...;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                              DefSubst                                             ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; utils-parsec--bool                                                                             ...;
+; utils-parsec--true                                                                             ...;
+; utils-parsec--false                                                                            ...;
+; utils-parsec--atom                                                                             ...;
+; utils-parsec--number                                                                           ...;
+; utils-parsec--list                                                                             ...;
+; utils-parsec--space                                                                            ...;
+; utils-parsec--spaces                                                                           ...;
+; utils-parsec--eol                                                                              ...;
+; utils-parsec--eof                                                                              ...;
+; utils-parsec--pyfunc                                                                           ...;
+; utils-parsec--snake                                                                            ...;
+; utils-parsec--str                                                                              ...;
+; utils-parsec--double                                                                           ...;
+; utils-parsec--defun                                                                            ...;
+; utils-parsec--defsubst                                                                         ...;
+; utils-parsec--defmacro                                                                         ...;
+; utils-parsec--defvar                                                                           ...;
+; utils-parsec--defcustom                                                                        ...;
+; utils-parsec--defminmode                                                                       ...;
+; utils-parsec--declarefun                                                                       ...;
+; utils-parsec--lisp-case                                                                        ...;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                               Defun                                               ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; car?                                                                                           ...;
+; utils-parsec--insert-center                                                                    ...;
+; utils-parsec--insert-sep                                                                       ...;
+; utils-parsec--insert-sep-sparse                                                                ...;
+; utils-parsec--insert-left                                                                      ...;
+; utils-parsec--current-dir                                                                      ...;
+; utils-parsec--parent-directory                                                                 ...;
+; utils-parsec--find-file-in-hierarchy                                                           ...;
+; utils-parsec--get-string-from-file                                                             ...;
+; utils-parsec--search-file-get-string                                                           ...;
+; utils-parsec--retrieve-remaining-by-idx                                                        ...;
+; utils-parsec--join                                                                             ...;
+; utils-parsec--remove-newlines                                                                  ...;
+; utils-parsec--parse-space                                                                      ...;
+; utils-parsec--lex-space                                                                        ...;
+; utils-parsec--parse-spaces                                                                     ...;
+; utils-parsec--lex-spaces                                                                       ...;
+; utils-parsec--parse-number                                                                     ...;
+; utils-parsec--lex-number                                                                       ...;
+; utils-parsec--parse-eol                                                                        ...;
+; utils-parsec--lex-eol                                                                          ...;
+; utils-parsec--parse-eof                                                                        ...;
+; utils-parsec--lex-eof                                                                          ...;
+; utils-parsec--parse-snake                                                                      ...;
+; utils-parsec--lex-snake                                                                        ...;
+; utils-parsec--parse-lisp-case                                                                  ...;
+; utils-parsec--lex-lisp-case                                                                    ...;
+; utils-parsec--parse-defun                                                                      ...;
+; utils-parsec--lex-defun                                                                        ...;
+; utils-parsec--parse-defsubst                                                                   ...;
+; utils-parsec--lex-defsubst                                                                     ...;
+; utils-parsec--parse-defmacro                                                                   ...;
+; utils-parsec--lex-defmacro                                                                     ...;
+; utils-parsec--parse-defvar                                                                     ...;
+; utils-parsec--lex-defvar                                                                       ...;
+; utils-parsec--parse-defcustom                                                                  ...;
+; utils-parsec--lex-defcustom                                                                    ...;
+; utils-parsec--parse-defminmode                                                                 ...;
+; utils-parsec--lex-defminmode                                                                   ...;
+; utils-parsec--parse-declarefun                                                                 ...;
+; utils-parsec--lex-declarefun                                                                   ...;
+; utils-parsec--lex-pyfunc                                                                       ...;
+; utils-parsec--parse-alphanumeric                                                               ...;
+; utils-parsec--parse-double-quote-str                                                           ...;
+; utils-parsec--lex-double-quote-str                                                             ...;
+; utils-parsec--parse-single-quote-str                                                           ...;
+; utils-parsec--lex-single-quote-str                                                             ...;
+; utils-parsec--parse-triple-quote-str                                                           ...;
+; utils-parsec--lex-triple-quote-str                                                             ...;
+; utils-parsec--lex-py-str                                                                       ...;
+; utils-parsec--lex-double                                                                       ...;
+; utils-parsec--ascii-special-chars-no-brackets-semicolon                                        ...;
+; utils-parsec--get-current-buffer-definitions-elisp                                             ...;
+; utils-parsec--current-buffer-documentation-elisp                                               ...;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                               Defvar                                              ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                             Defcustom                                             ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                         Define-minor-mode                                         ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;                                          Declare-Function                                         ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+;                                     End Parsec generated info                                     ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
 
 
 
@@ -66,11 +192,60 @@
 
 (require 'parsec)
 
+;                                            misc-defuns                                            ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
+
+(defun with-buffer-content (&rest fun)
+  ;; `(let ((content ,(buffer-substring-no-properties (point-min) (point-max) )))
+  `(let ((content ,(with-current-buffer (get-buffer (current-buffer))
+	    (buffer-substring-no-properties (point-min) (point-max))
+	    )))
+    ,@fun
+    ))
+
+
+
+
 
 (defun car? (input)
   (condition-case nil
       (car input)
     (error input)))
+
+
+
+(defun utils-parsec--insert-center (string)
+  (interactive "sString for inside centered message: ")
+  (insert comment-start)
+  (insert
+    (s-truncate 99 (s-center 99 string ) ))
+  (insert (s-trim comment-start))
+  (newline))
+
+
+(defun utils-parsec--insert-sep ()
+  (interactive)
+  (insert
+   (format "%s - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-sep-sparse ()
+  (interactive)
+  (insert
+   (format "%s -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-left (string)
+  (interactive "sString for inside left message: ")
+  (insert (s-pad-right 2 " " comment-start))
+  (insert
+    (s-truncate 98 (s-pad-right 99 " " string ) ))
+  (insert (s-trim comment-start))
+  (newline))
+
 
 
 (defun utils-parsec--current-dir ()
@@ -218,6 +393,18 @@
 (defsubst utils-parsec--defmacro(token)
   (cons 'Defmacro token))
 
+(defsubst utils-parsec--defvar(token)
+  (cons 'Defvar token))
+
+(defsubst utils-parsec--defcustom(token)
+  (cons 'Defcustom token))
+
+(defsubst utils-parsec--defminmode(token)
+  (cons 'Defminmode token))
+
+(defsubst utils-parsec--declarefun(token)
+  (cons 'Declarefun token))
+
 (defsubst utils-parsec--lisp-case(token)
   (cons 'LispCase token))
 
@@ -339,6 +526,10 @@
     (parsec-or
      (parsec-many1-s
       (parsec-letter))
+     (parsec-many1-s
+      (parsec-digit))
+     (parsec-many1-s (parsec-ch ?\?))
+     (parsec-many1-s (parsec-ch ?\|))
      (parsec-many1-s (parsec-ch ?\-))))))
 
 
@@ -351,7 +542,8 @@
 (defun utils-parsec--parse-defun ()
  (parsec-between
    (parsec-re "(defun ")
-   (parsec-re " ?(")
+   ;; (parsec-re " ?(")
+   (parsec-or (parsec-re " ?(") (parsec-eol))
    (utils-parsec--lex-lisp-case)))
 
 (defun utils-parsec--lex-defun ()
@@ -362,7 +554,8 @@
 (defun utils-parsec--parse-defsubst ()
  (parsec-between
    (parsec-re "(defsubst ")
-   (parsec-re " ?(")
+   (parsec-or (parsec-re " ?(") (parsec-eol))
+   ;; (parsec-re " ?(")
    (utils-parsec--lex-lisp-case)))
 
 (defun utils-parsec--lex-defsubst ()
@@ -373,12 +566,61 @@
 (defun utils-parsec--parse-defmacro ()
  (parsec-between
    (parsec-re "(defmacro ")
-   (parsec-re " ?(")
+   (parsec-or (parsec-re " ?(") (parsec-eol))
+   ;; (parsec-re " ?(")
    (utils-parsec--lex-lisp-case)))
 
 (defun utils-parsec--lex-defmacro ()
   (utils-parsec--defmacro
   (utils-parsec--parse-defmacro)))
+
+;; TODO Handle non () cases
+(defun utils-parsec--parse-defvar ()
+ (parsec-between
+   (parsec-re "(defvar ")
+   (parsec-or (parsec-re " ") (parsec-ch ?\)))
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defvar ()
+  (utils-parsec--defvar
+  (utils-parsec--parse-defvar)))
+
+
+;; TODO Handle non () cases
+(defun utils-parsec--parse-defcustom ()
+ (parsec-between
+   (parsec-re "(defcustom ")
+   (parsec-or (parsec-re " ") (parsec-ch ?\)))
+   ;; (parsec-re " ")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defcustom ()
+  (utils-parsec--defcustom
+  (utils-parsec--parse-defcustom)))
+
+;; TODO Handle non () cases
+(defun utils-parsec--parse-defminmode ()
+ (parsec-between
+   (parsec-re "(define-minor-mode ")
+   (parsec-or (parsec-re " ") (parsec-ch ?\)))
+   ;; (parsec-re " ")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-defminmode ()
+  (utils-parsec--defminmode
+  (utils-parsec--parse-defminmode)))
+
+;; TODO Handle non () cases
+(defun utils-parsec--parse-declarefun ()
+ (parsec-between
+   (parsec-re "(declare-function ")
+   (parsec-or (parsec-re " ") (parsec-ch ?\)))
+   ;; (parsec-re " ")
+   (utils-parsec--lex-lisp-case)))
+
+(defun utils-parsec--lex-declarefun ()
+  (utils-parsec--declarefun
+  (utils-parsec--parse-declarefun)))
 
 ; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
 
@@ -457,6 +699,7 @@
 
 ;                                           String support                                          ;
 ; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
+
 (parsec-with-input "\"this is a string\""
   (utils-parsec--lex-py-str)
   )
@@ -494,57 +737,8 @@
 
 ;; TODO handle these cases
 ;; (utils-parsec--return-remainder "
-(car
-(parsec-with-input "
-(defsubst utils-parsec--bool (value)
-  (cons 'Bool value))
 
 
-;; utils-parsec generic re-usable parser combinators
-
-(defmacro utils-parsec--lex-list-by-sep (what sep)
-  `(apply #'utils-parsec--list
-	 (parsec-sepby
-	  ,what
-	  ,sep)))
-
-(defun utils-parsec--lex-eof()
-  (utils-parsec--eof
-   (utils-parsec--parse-eof)))
-
-
-
-
-(defmacro utils-parsec--lex-list-by-sep (what sep)
-  `(apply #'utils-parsec--list
-	 (parsec-sepby
-	  ,what
-	  ,sep)))
-"
-  (parsec-collect
-   (parsec-many
-   (parsec-or
-    (utils-parsec--lex-spaces)
-    (utils-parsec--lex-eol)
-    (parsec-between
-     (parsec-ch ?\;)
-     (utils-parsec--lex-eol)
-     (parsec-re ".*"))
-    (parsec-or
-     (utils-parsec--lex-defun)
-     (utils-parsec--lex-defsubst)
-     (utils-parsec--lex-defmacro)
-     )
-    (parsec-re ".*")
-    )
-   )
-))
-)
-
-(defmacro with-buffer-content (&rest fun)
-  `(let ((content ,(buffer-substring-no-properties (point-min) (point-max) )))
-    ,@fun
-  ))
 
 
 (with-buffer-content
@@ -554,33 +748,167 @@
   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:\|^_`~=\?]")
   )
 
-(with-buffer-content 
 
-;; (parsec-with-input content
-(utils-parsec--return-remainder content
-
-  (parsec-collect
-   (parsec-many
-    (parsec-or
-     (utils-parsec--lex-spaces)
-     (utils-parsec--lex-eol)
-     (parsec-between
-     (parsec-ch ?\;)
-     (utils-parsec--lex-eol)
-     (parsec-re ".*"))
-    (parsec-or
-     (utils-parsec--lex-defun)
-     (utils-parsec--lex-defsubst)
-     (utils-parsec--lex-defmacro)
-     )
-    (parsec-re ".*")
-     ;; (parsec-ch ?\?)
-     ;; (parsec-re " ?(\"")
-     (utils-parsec--ascii-special-chars-no-brackets-semicolon)
-    )
-   )
-   )
+(defun utils-parsec--get-current-buffer-parsed(content)
+  (let ((
+	 current-defuns
+	 (parsec-with-input content
+	     (parsec-collect
+	      (parsec-many
+	       (parsec-or
+		(utils-parsec--lex-spaces)
+		(utils-parsec--lex-eol)
+		(parsec-between
+		 (parsec-ch ?\;)
+		 (utils-parsec--lex-eol)
+		 (parsec-re ".*"))
+		(parsec-or
+		 (utils-parsec--lex-defun)
+		 (utils-parsec--lex-defsubst)
+		 (utils-parsec--lex-defmacro)
+		 (utils-parsec--lex-defvar)
+		 (utils-parsec--lex-defcustom)
+		 (utils-parsec--lex-defminmode)
+		 (utils-parsec--lex-declarefun))
+		(parsec-re ".*")))))))
+    current-defuns
   ))
+
+(defun utils-parsec--collect-defuns(current-defuns)
+  (cl-loop for item in current-defuns
+	   with x
+	   if (or(equal (car? item) 'Defmacro)
+		 (equal (car? item) 'Defun)
+		 (equal (car? item) 'Defsubst)
+		 (equal (car? item) 'Defvar)
+		 (equal (car? item) 'Defcustom)
+		 (equal (car? item) 'Defminmode)
+		 (equal (car? item) 'Declarefun)
+		 )
+	   collect item
+	   ))
+
+(defun utils-parsec--get-current-buffer-definitions-elisp()
+  (with-current-buffer (current-buffer)
+      (utils-parsec--collect-defuns  (car(utils-parsec--get-current-buffer-parsed
+					  (buffer-substring-no-properties (point-min) (point-max)))))))
+
+
+(defun utils-parsec--current-buffer-documentation-elisp ()
+  (interactive)
+  (let ((current-defuns
+	 (utils-parsec--get-current-buffer-definitions-elisp)
+	 ))
+
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Defmacro")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+	     with x
+	     if (equal(car? item) 'Defmacro)
+	     do (progn
+		  (utils-parsec--insert-left (caddr item))
+		  )
+	     )
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "DefSubst")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+	     with x
+	     if (equal(car? item) 'Defsubst)
+	     do (progn
+		  (utils-parsec--insert-left (caddr item))
+		  )
+
+	     )
+
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Defun")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+	     with x
+	     if (equal(car? item) 'Defun)
+	     do (progn
+		  (utils-parsec--insert-left (caddr item))
+		  )
+	     )
+    (utils-parsec--insert-sep-sparse)
+
+
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Defvar")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+    	     with x
+    	     if (equal(car? item) 'Defvar)
+    	     do (progn
+    		  (utils-parsec--insert-left (caddr item))
+    		  )
+    	     )
+    (utils-parsec--insert-sep-sparse)
+
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Defcustom")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+    	     with x
+    	     if (equal(car? item) 'Defcustom)
+    	     do (progn
+    		  (utils-parsec--insert-left (caddr item))
+    		  )
+    	     )
+    (utils-parsec--insert-sep-sparse)
+
+
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Define-minor-mode")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+    	     with x
+    	     if (equal(car? item) 'Defminmode)
+    	     do (progn
+    		  (utils-parsec--insert-left (caddr item))
+    		  )
+    	     )
+    (utils-parsec--insert-sep-sparse)
+
+
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    (utils-parsec--insert-sep)
+    (utils-parsec--insert-center "Declare-Function")
+    (utils-parsec--insert-sep)
+    (cl-loop for item in current-defuns
+    	     with x
+    	     if (equal(car? item) 'Declarefun)
+    	     do (progn
+    		  (utils-parsec--insert-left (caddr item))
+    		  )
+    	     )
+    (utils-parsec--insert-sep-sparse)
+
+
+    (utils-parsec--insert-center "End Parsec generated info")
+    (utils-parsec--insert-sep-sparse)
+    (newline)
+    ))
+
+
+
+;; (insert (utils-parsec--sep))
+
+;; (caddr(car (get-current-buffer-definitions-elisp)))
 
 
 ;; (parsec-with-input "\\ \t \""
