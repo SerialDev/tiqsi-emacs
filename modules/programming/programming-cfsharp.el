@@ -105,8 +105,8 @@
 
 (defcustom  pm-inner/blazor-html
   (pm-inner-auto-chunkmode :name "html-code"
-                           :head-matcher "^[<.*>]"
-                           :tail-matcher "</.*>"
+                           :head-matcher "^@page.*"
+                           :tail-matcher "^@functions"
                            :mode-matcher 'html-mode)
   "Html blazor code block."
   :group 'poly-innermodes
