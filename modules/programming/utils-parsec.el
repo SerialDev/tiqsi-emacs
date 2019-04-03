@@ -197,7 +197,6 @@
 
 
 (defun with-buffer-content (&rest fun)
-  ;; `(let ((content ,(buffer-substring-no-properties (point-min) (point-max) )))
   `(let ((content ,(with-current-buffer (get-buffer (current-buffer))
 	    (buffer-substring-no-properties (point-min) (point-max))
 	    )))
@@ -205,15 +204,10 @@
     ))
 
 
-
-
-
 (defun car? (input)
   (condition-case nil
       (car input)
     (error input)))
-
-
 
 (defun utils-parsec--insert-center (string)
   (interactive "sString for inside centered message: ")
@@ -375,6 +369,10 @@
   (cons 'Pyfunc token))
 
 
+(defsubst utils-parsec--func-notation(token)
+  (cons 'FuncN token))
+
+
 (defsubst utils-parsec--snake(token)
   (cons 'SnakeCase token))
 
@@ -529,6 +527,7 @@
      (parsec-many1-s
       (parsec-digit))
      (parsec-many1-s (parsec-ch ?\?))
+     (parsec-many1-s (parsec-ch ?\.))
      (parsec-many1-s (parsec-ch ?\|))
      (parsec-many1-s (parsec-ch ?\-))))))
 
@@ -634,6 +633,17 @@
 
   )
 
+
+(defun utils-parsec--lex-func-notation()
+
+  (utils-parsec--func-notation
+  (car (parsec-collect
+   (utils-parsec--lex-snake)
+   (parsec-lookahead
+    (parsec-ch ?\()))))
+
+  )
+
 (defun utils-parsec--parse-alphanumeric()
   (parsec-many1-as-string
    (parsec-or
@@ -690,7 +700,27 @@
       (parsec-ch ?\.))
      ))))
 
+;                                 TODO add type identifiers to these                                ;
+; -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - ;
 
+(defun utils-parsec--parse-sep (sep)
+  (parsec-collect
+   (parsec-re (format "%s" sep) )
+   (utils-parsec--lex-spaces))
+  )
+
+
+(defun utils-parsec--parse-func-application (sep)
+  (parsec-collect
+   (utils-parsec--lex-func-notation)
+   (utils-parsec--between-round-brackets
+    (utils-parsec--lex-list-by-sep
+     (parsec-between (parsec-ch ?\')
+		     (parsec-ch ?\')
+		     (parsec-or
+		      (utils-parsec--lex-lisp-case)
+		      (utils-parsec--lex-snake-case)))
+     (utils-parsec--parse-sep sep)))))
 
 
 ; ------------------------------------------------------------------------------------------------  ;
@@ -741,8 +771,8 @@
 
 
 
-(with-buffer-content
- (print content))
+;; (with-buffer-content
+;;  (print content))
 
 (defun utils-parsec--ascii-special-chars-no-brackets-semicolon ()
   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:\|^_`~=\?]")
@@ -936,6 +966,21 @@
    (utils-parsec--lex-number)
    (utils-parsec--lex-spaces))
   )
+
+(parsec-with-input "2, 3, 4, 5"
+  )
+
+(parsec-with-input ", ,  , "
+  (parsec-collect
+   (parsec-re "," )
+   (utils-parsec--lex-spaces))
+  )
+(parsec-with-input ", ,  , "
+  (utils-parsec--parse-sep ",")
+  )
+
+
+(format "%s" ",")
 
 
 (utils-parsec--return-remainder "test This"
