@@ -179,6 +179,7 @@
 ;                                                                                                   ;
 ; ------------------------------------------------------------------------------------------------  ;
 
+
 ; ------------------------------------------------------------------------------------------------  ;
 ;                                 Parsec Utilities example Use-cases TODO                           ;
 ; ------------------------------------------------------------------------------------------------  ;
@@ -245,9 +246,23 @@
 (defun utils-parsec--current-dir ()
   (file-name-directory buffer-file-name))
 
+(defun utils-parsec--current-dir-up (amount)
+  ()
+  )
+
+;; (utils-parsec--current-dir)
+
+
+
+
 (defun utils-parsec--parent-directory (dir)
   (unless (equal "/" dir)
     (file-name-directory (directory-file-name dir))))
+
+
+(utils-parsec--find-file-in-hierarchy (utils-parsec--current-dir) "utils-parsec.el")
+
+(current-dir)
 
 
 (defun utils-parsec--find-file-in-hierarchy (current-dir file-name)
@@ -1004,10 +1019,8 @@
 
 ;; TODO Eval last sexpr macro with car and cdr added - speed up dev
 
-
-
-(utils-parsec--remove-newlines
- (utils-parsec--search-file-get-string "init.el"))
+;; (utils-parsec--remove-newlines
+;;  (utils-parsec--search-file-get-string "init.el"))
 
 
 (provide 'utils-parsec)
