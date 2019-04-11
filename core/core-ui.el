@@ -26,48 +26,57 @@
 ;;; Commentary:
 ;;
 
-                                        ;{Startup Windowing};
+;                                         Startup Windowing                                         ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq next-line-add-newlines nil)
 (setq-default truncate-lines t)
 (setq truncate-partial-width-windows nil)
 (split-window-horizontally)
 
-                                        ;---{No Scrollbar}--;
+;                                            No Scrollbar                                           ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (scroll-bar-mode -1))
 
-                                        ;----{NO Toolbar}---;
+;                                             NO Toolbar                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (tool-bar-mode 0))
 
-                                        ;{NO shift to select};
+;                                         NO shift to select                                        ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq shift-select-mode nil)
 
-                                        ;-{Dont ask Yes/No}-;
+;                                          Dont ask Yes/No                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
 
-                                        ;-{NO middle mouse}-;
+;                                          NO middle mouse                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;no screwing with my middle mouse button                                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-                                        ; no screwing with my middle mouse button
 (global-unset-key [mouse-2])
 
 
-                                        ;--{Smooth Scroll}--;
-
+;                                           Smooth Scroll                                           ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 (setq scroll-step 3)
 
 
-                                        ;-{Show Keystrokes}-;
+;                                          Show Keystrokes                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq echo-keystrokes 0.0001)
 
-                                        ;-{Brigth red TODO}-;
+;                                          Brigth red TODO                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode python-mode))
 
@@ -84,7 +93,8 @@
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
 
 
-                                        ;--{Line Highlight}-;
+;                                           Line Highlight                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-hl-line-mode 0)
 
@@ -102,12 +112,21 @@
 
 (set-face-background 'hl-line "midnight blue")
 
-                                        ;-----{Set Font}----;
+;                                              Set Font                                             ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(setq tiqsi-font "PragmataPro")
+(defun font-exists-p (font)
+  "check if font exists"
+  (if (null (x-list-fonts font)) nil t))
+
+(if (font-exists-p "PragmataPro")
+    (setq tiqsi-font "PragmataPro")
+  (setq tiqsi-font "Courier New"))
+
+
 ;; Font cosmetic edits
-(add-to-list 'default-frame-alist '(font . "PragmataPro"))
-(set-face-attribute 'default t :font "PragmataPro")
+(add-to-list 'default-frame-alist `(font . ,tiqsi-font))
+(set-face-attribute 'default t :font tiqsi-font)
 (set-face-attribute 'font-lock-builtin-face nil :foreground "#DAB98F")
 (set-face-attribute 'font-lock-comment-face nil :foreground "gray50")
 (set-face-attribute 'font-lock-constant-face nil :foreground "olive drab")
@@ -120,7 +139,7 @@
 
 
 ;; Consistent things
-(defvar me/font-family            "PragmataPro"  "The font to use.")
+(defvar me/font-family            tiqsi-font  "The font to use.")
 
 (when tiqsi-win32
   (defvar me/font-size-default      120       "The font size to use for default text.")
@@ -146,7 +165,8 @@
   )
 (add-hook 'window-setup-hook 'post-load-stuff t)
 
-                                        ;------{Beacon}-----;
+;                                               Beacon                                              ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (use-package beacon
   :straight t
@@ -165,7 +185,8 @@
 
 
 
-                                        ;----{spaceline}----;
+;                                             spaceline                                             ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (use-package spaceline-all-the-icons
@@ -173,7 +194,8 @@
     :after spaceline
     :config (spaceline-all-the-icons-theme)))
 
-                                        ;-{Colour str repr}-;
+;                                          Colour str repr                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (use-package rainbow-mode
   :straight t
@@ -188,7 +210,8 @@
                  (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
 
 
-                                        ;{Highlight actions};
+;                                         Highlight actions                                         ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (straight-use-package
  '(volatile-highlights
@@ -198,7 +221,8 @@
    :config (progn (volatile-highlights-mode t))
 ))
 
-                                        ;-{Highlight thing}-;
+;                                          Highlight thing                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (straight-require 'highlight-thing)
 
@@ -210,7 +234,9 @@
 	    ))
 
 
-                                        ;{Enforce Line Limit};
+;                                         Enforce Line Limit                                        ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
 
 (use-package column-enforce-mode
   :straight
@@ -220,25 +246,30 @@
 	    (setq column-enforce-comments nil)))
 
 
-                                        ;{Marked region info};
+;                                         Marked region info                                        ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 ;; (add-hook 'rectangle-mark-mode 'region-state-mode)
 (add-hook 'text-mode 'region-state-mode)
 
 
-                                        ;------{Clock}------;
+;                                               Clock                                               ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (display-time)
 
-                                        ;---{Line numbers}--;
+;                                            Line numbers                                           ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-linum-mode)
 
-                                        ;---{col numbers}---;
+;                                            col numbers                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (column-number-mode t)
 
-                                        ;--{show file-size}-;
+;                                           show file-size                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (size-indication-mode t)
 
@@ -261,7 +292,8 @@
     ad-do-it))
 
 
-                                        ;------{Ediff}------;
+;                                               Ediff                                               ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defun tiqsi-ediff-setup-windows (buffer-A buffer-B buffer-C control-buffer)
   (ediff-setup-windows-plain buffer-A buffer-B buffer-C control-buffer)
@@ -271,7 +303,8 @@
 (setq ediff-split-window-function 'split-window-horizontally)
 
 
-                                        ;{Avoid Line Clutter};
+;                                         Avoid Line Clutter                                        ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (use-package diminish
   :straight t
@@ -285,7 +318,8 @@
   )) ;; to use as :diminish in use packages
 
 
-                                        ;------{Paren}------;
+;                                               Paren                                               ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-highlight-parentheses-mode 1)
 
@@ -305,8 +339,9 @@
     ;; activating
     (paren-activate)))
 
-                                        ; TODO
-;; highlight sexp look into implementing http://superuser.com/questions/304848/highlight-the-matching-content-of-a-pair-of-braces-in-emacs
+;; TODO
+;; highlight sexp look into implementing
+;; http://superuser.com/questions/304848/highlight-the-matching-content-of-a-pair-of-braces-in-emacs
 
 ;; TODO enable for clojure / lisp mode only
 ;; (show-paren-mode t)
@@ -323,7 +358,8 @@
 (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
 (semantic-mode 1)
 
-                                        ;---{Keybindings}---;
+;                                            Keybindings                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)
