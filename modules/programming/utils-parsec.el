@@ -273,10 +273,10 @@
     (buffer-string)))
 
 
-(defun utils-parsec--search-file-get-string(file-name)
-  (utils-parsec--get-string-from-file
+(defmacro utils-parsec--search-file-get-string(file-name)
+  `(utils-parsec--get-string-from-file
    (utils-parsec--find-file-in-hierarchy
-    (utils-parsec--current-dir) file-name)))
+    ,(utils-parsec--current-dir) ,file-name)))
 
 ;; utils-parsec input utilities
 
