@@ -27,7 +27,8 @@
 ;;
 
 
-                                        ;---{Determine OS}--;
+;                                            Determine OS                                           ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq tiqsi-aquamacs (featurep 'aquamacs))
 (setq tiqsi-linux (featurep 'x))
@@ -35,9 +36,11 @@
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
 (setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
-                                        ;-{Determine Emacs}-;
+;                                          Determine Emacs                                          ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; Emacs type: are we running GNU Emacs?                                                           ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-;; Emacs type --- are we running GNU Emacs?
 (defmacro GNUEmacs (&rest body)
   "Execute any number of forms if running under GNU Emacs."
   (list 'if (string-match "GNU Emacs" (version))
@@ -64,7 +67,8 @@
        (when (boundp 'aquamacs-version) aquamacs-version)))
 
 
-                                        ;------{Win 32}-----;
+;                                               Win 32                                              ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-win32
   (setq tiqsi-makescript "build.bat")
@@ -91,16 +95,20 @@
   (interactive)
   (w32-send-sys-command 61488))
 
-                                        ;------{Linux}------;
+;                                               Linux                                               ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+(if tiqsi-win32
+    (setq os-sep "\\")
+  (setq os-sep "/"))
 
 (when tiqsi-linux
   (setq default-buffer-file-coding-system 'utf-8-unix)
   (setq tiqsi-makescript "./build.sh")
   (display-battery-mode 1) )
 
-
-                                        ;------{Mac OS}-----;
-
+;                                               Mac OS                                              ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-aquamacs
   (cua-mode 0)
@@ -121,10 +129,12 @@
 (defun nil-bell ())
 (setq ring-bell-function 'nil-bell)
 
-                                        ;---{keybindings}---;
+;                                            Keybindings                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
-
+keybindings
 (provide 'core-os)
 
 ;;; core-os.el ends here

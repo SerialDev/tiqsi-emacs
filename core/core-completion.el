@@ -27,10 +27,11 @@
 
 ;; Completion core
 
-                                        ;----{Completion}---;
-
-                                        ;                                Get all possible dabbrev expansions                                ;
-;; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/
+;                                             Completion                                            ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+; Get all possible dabbrev expansions                                                               ;
+; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/                 ;
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defun ac-source-dabbrev (abbrev)
   (interactive)
@@ -72,9 +73,11 @@
 
 (add-to-list 'completion-styles 'initials t)
 
-;; TODO mode specific enable since I use AC alot instead of company
-                                        ;(eval-after-load 'company
-                                        ;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
+; ------------------------------------------------------------------------------------------------  ;
+;                  TODO mode specific enable since I use AC alot instead of company                 ;
+; ------------------------------------------------------------------------------------------------  ;
+;; (eval-after-load 'company
+;;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
 ;; (company-quickhelp-mode 1)
 ;; (setq company-quickhelp-delay 0.01)
 
