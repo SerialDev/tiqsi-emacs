@@ -381,6 +381,31 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (setq tiqsi-makescript "./build.sh")
 
+
+(if tiqsi-win32
+    (defun compile (data)
+      (send-to-shell data)
+      (send-to-shell "exit")
+      (sdev/jump-window))
+  (message "compile defined"))
+
+(defun compile-c-lang()
+  (interactive)
+  (if (file-exists-p "meson.build")
+      (compile-meson)
+    (if (file-exists-p "CMakeLists.txt")
+	(compile-cmake)
+      (make-without-asking))))
+
+(defun compile-meson()
+  (if (file-directory-p "build")
+      (progn ( message "compiling")
+		       (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
+    (progn
+      (message "Generating meson & compiling")
+      (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+      (add-to-rtags))))
+
 (defun compile-cmake()
   (interactive)
   (if (file-directory-p "build")
@@ -652,6 +677,26 @@ foo.cpp and in the same directory as the current header file, foo.h."
   )
 
 
+(defun run-c-lang()
+  (interactive)
+  (if (file-exists-p "meson.build")
+      (run-meson)
+    (if (file-exists-p "CMakeLists.txt")
+	(tiqsi-cmake-run-executable)
+      (run-without-asking))))
+
+
+
+;; TODO fix this:
+(setq meson-executable-name "demo")
+(defun run-meson ()
+
+  (if tiqsi-win32
+      (async-shell-command (format "cd build && %s.exe" meson-executable-name))
+  (async-shell-command (format "cd build && ./%s" meson-executable-name)))
+
+  )
+
 (defun tiqsi-cmake-run-executable()
   (interactive)
   (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
@@ -665,7 +710,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
   )
 
 (eval-after-load 'cc-mode (start-rtags))
-(insert (format "%srdm" rtags-path) )/home/serialdev/rtags/bin/rdm/home/serialdev/rtags/bin/rdm
+;; (insert (format "%srdm" rtags-path) )/home/serialdev/rtags/bin/rdm/home/serialdev/rtags/bin/rdm
 
 (defun add-to-rtags()
   (interactive)
@@ -1163,8 +1208,8 @@ _v_: Find virtuals at point
 ;; TODO Make dependant on what build-system is being used
 ;; (define-key global-map (kbd "M-m") 'make-without-asking)
 ;; (define-key global-map (kbd "M-n") 'run-without-asking)
-(define-key global-map (kbd "M-m") 'compile-cmake)
-(define-key global-map (kbd "M-n") 'tiqsi-cmake-run-executable)
+(define-key global-map (kbd "M-m") 'compile-c-lang)
+(define-key global-map (kbd "M-n") 'run-c-lang)
 
 
 (provide 'programming-c)
