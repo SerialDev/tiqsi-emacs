@@ -382,12 +382,24 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (setq tiqsi-makescript "./build.sh")
 
 
+
 (if tiqsi-win32
     (defun compile (data)
-      (send-to-shell data)
-      (send-to-shell "exit")
-      (sdev/jump-window))
+
+      (if (get-buffer "*shell*")
+	  (progn
+	    (kill-buffer "*shell*")
+	    (send-to-shell data)
+	    (send-to-shell "exit")
+	    (sdev/jump-window))      
+	(progn
+	  (send-to-shell data)
+	  (send-to-shell "exit")
+	  (sdev/jump-window))
+	)
+      )
   (message "compile defined"))
+
 
 (defun compile-c-lang()
   (interactive)
@@ -696,6 +708,13 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (async-shell-command (format "cd build && ./%s" meson-executable-name)))
 
   )
+
+(defun close-side-come-back ()
+  (interactive)
+  (sdev/jump-window)
+  (kill-current-buffer)
+  (sdev/jump-window))
+
 
 (defun tiqsi-cmake-run-executable()
   (interactive)
@@ -1205,11 +1224,13 @@ _v_: Find virtuals at point
 (define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
 (define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
 
+
 ;; TODO Make dependant on what build-system is being used
 ;; (define-key global-map (kbd "M-m") 'make-without-asking)
 ;; (define-key global-map (kbd "M-n") 'run-without-asking)
 (define-key global-map (kbd "M-m") 'compile-c-lang)
 (define-key global-map (kbd "M-n") 'run-c-lang)
+(define-key global-map (kbd "M-/") 'close-side-come-back)
 
 
 (provide 'programming-c)

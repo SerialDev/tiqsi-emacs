@@ -260,9 +260,9 @@
     (file-name-directory (directory-file-name dir))))
 
 
-(utils-parsec--find-file-in-hierarchy (utils-parsec--current-dir) "utils-parsec.el")
+;; (utils-parsec--find-file-in-hierarchy (utils-parsec--current-dir) "utils-parsec.el")
 
-(current-dir)
+;; (current-dir)
 
 
 (defun utils-parsec--find-file-in-hierarchy (current-dir file-name)
