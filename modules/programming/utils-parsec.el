@@ -219,7 +219,14 @@
   (newline))
 
 
-(defun utils-parsec--insert-sep ()
+(defun utils-parsec--insert-sep-full ()
+  (interactive)
+  (insert
+   (format "%s ------------------------------------------------------------------------------------------------- %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-sep-med ()
   (interactive)
   (insert
    (format "%s - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - %s" comment-start comment-start))
@@ -232,6 +239,23 @@
    (format "%s -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - %s" comment-start comment-start))
   (newline)
   )
+
+(defun utils-parsec--insert-sep-end ()
+  (interactive)
+  (insert
+   (format "%s _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-box ()
+  (interactive)
+  (beginning-of-line 1)
+  (utils-parsec--insert-sep-full)
+  (sdev/line-to-msg-centered)
+  (utils-parsec--insert-sep-full)
+  (newline-and-indent)
+  (utils-parsec--insert-sep-end))
+
 
 (defun utils-parsec--insert-left (string)
   (interactive "sString for inside left message: ")

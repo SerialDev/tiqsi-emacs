@@ -391,7 +391,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 	    (kill-buffer "*shell*")
 	    (send-to-shell data)
 	    (send-to-shell "exit")
-	    (sdev/jump-window))      
+	    (sdev/jump-window))
 	(progn
 	  (send-to-shell data)
 	  (send-to-shell "exit")
@@ -403,19 +403,24 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun compile-c-lang()
   (interactive)
-  (if (file-exists-p "meson.build")
+  (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
       (compile-meson)
-    (if (file-exists-p "CMakeLists.txt")
+    (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
 	(compile-cmake)
       (make-without-asking))))
 
 (defun compile-meson()
   (if (file-directory-p "build")
       (progn ( message "compiling")
-		       (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
+	     (if (file-exists-p "meson.build") 
+		 (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+	       (compile "cd .. && build && ninja -t compdb cxx cc > compile_commands.json && ninja")))
     (progn
       (message "Generating meson & compiling")
-      (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+      (if (file-exists-p "meson.build") 
+	  (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+	(compile "cd .. && meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
+
       (add-to-rtags))))
 
 (defun compile-cmake()
@@ -689,25 +694,25 @@ foo.cpp and in the same directory as the current header file, foo.h."
   )
 
 
-(defun run-c-lang()
-  (interactive)
-  (if (file-exists-p "meson.build")
-      (run-meson)
-    (if (file-exists-p "CMakeLists.txt")
-	(tiqsi-cmake-run-executable)
-      (run-without-asking))))
 
 
+; ------------------------------------------------------------------------------------------------- ;
+;                                           TODO                                                    ;
+; ------------------------------------------------------------------------------------------------- ;
+; fix this: meson-executable-name should be inferred from meson.build file                           ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
-;; TODO fix this:
 (setq meson-executable-name "demo")
+
 (defun run-meson ()
+(interactive)
+  (let ((command (if (file-exists-p "meson.build")
+		     "cd build "
+		   "cd .. && cd build ") ))
 
-  (if tiqsi-win32
-      (async-shell-command (format "cd build && %s.exe" meson-executable-name))
-  (async-shell-command (format "cd build && ./%s" meson-executable-name)))
-
-  )
+    (if tiqsi-win32
+    	(async-shell-command (format "%s && %s.exe" command meson-executable-name))
+      (async-shell-command (format "%s && ./%s" command meson-executable-name)))))
 
 (defun close-side-come-back ()
   (interactive)
@@ -722,6 +727,17 @@ foo.cpp and in the same directory as the current header file, foo.h."
   ;; (sdev/jump-window)
   ;; (print (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
   )
+
+
+
+(defun run-c-lang()
+  (interactive)
+  (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
+      (run-meson)
+  (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
+	(tiqsi-cmake-run-executable)
+      (run-without-asking))))
+
 
 (defun start-rtags()
   (interactive)
@@ -740,15 +756,76 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
 
 
-;  -------------------------------------------------------------------------------- ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                            Create Meson                                           ;
+; ------------------------------------------------------------------------------------------------- ;
+; Create Meson                                                                                      ;
+; project-name -> src -> main.cpp/c                                                                 ;
+;                     -> main.cpp/c                                                                 ;
+;              -> meson.build                                                                       ;
+;              -> .gitignore                                                                        ;
+;              -> README.md                                                                         ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
-;  -------------------------------------------------------------------------------- ;
-; Create cmake
-; project-name -> src -> main.cpp/c
-;                     -> main.cpp/c
-;                     -> CMakeLists.txt
-;                     -> .gitignore
-;                     -> README.md
+(defun tiqsi-create-meson (project-name)
+  (interactive "sEnter Project Name:")
+  (f-mkdir project-name)
+  (f-mkdir (format "%s/src" project-name))
+  (write-region "int main(int argc, char *argv[])
+{
+
+    return 0;
+}"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
+
+  (write-region (format "
+project('%s', 'c')
+executable('%s' 'src/main.c')" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
+
+  (write-region " "  ""  (format "%s/%s/README.md" (f-dirname (f-this-file ))      project-name))
+  (write-region "# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+/build"  ""  (format "%s/%s/.gitignore" (f-dirname (f-this-file ))     project-name)))
+
+; ------------------------------------------------------------------------------------------------- ;
+;                                            Create CMake                                           ;
+; ------------------------------------------------------------------------------------------------- ;
+; Create cmake                                                                                      ;
+; project-name -> src -> main.cpp/c                                                                 ;
+;                     -> main.cpp/c                                                                 ;
+;                     -> CMakeLists.txt                                                             ;
+;                     -> .gitignore                                                                 ;
+;                     -> README.md                                                                  ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (defun tiqsi-create-cmake (project-name)
   (interactive "sEnter Project Name:")
@@ -760,6 +837,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
     return 0;
 }"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
+
   (write-region (format "cmake_minimum_required(VERSION 2.8.12)
 
 project(%s)
