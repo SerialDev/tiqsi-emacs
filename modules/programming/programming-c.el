@@ -885,7 +885,12 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 /build"  ""  (format "%s/%s/src/.gitignore" (f-dirname (f-this-file ))     project-name))
   )
 
-
+(defun insert-semicolon ()
+  (interactive)
+  (move-end-of-line 1)
+  (insert ";")
+  (newline-and-indent)
+  )
 
 (defun check-for-semicolon (string)
   (if (equal (car(cdr(split-string string ";"  ))) "")
@@ -893,11 +898,16 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
     nil)
   )
 
-;; ;  -------------------------------------------------------------------------------- ;
-;; ;  TODO parse (select (this ( now) ) ) -> ("select" "(this ( now) )")
-;; ;                                      -> ("select" ("this "(now)"))
-;; ;                                      -> ("select" ("this ("now") ))
-;; ;  -------------------------------------------------------------------------------- ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                                TODO                                               ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                                                                                   ;
+; parse (select (this ( now) ) ) -> ("select" "(this ( now) )")                                     ;
+;                                      -> ("select" ("this "(now)"))                                ;
+;                                      -> ("select" ("this ("now") ))                               ;
+;                                                                                                   ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+
 (setq test-parens "(select (this (now) ) ) ")
 
 (defun perlish-fix-regexps (regexp)
@@ -1309,6 +1319,7 @@ _v_: Find virtuals at point
 (define-key global-map (kbd "M-m") 'compile-c-lang)
 (define-key global-map (kbd "M-n") 'run-c-lang)
 (define-key global-map (kbd "M-/") 'close-side-come-back)
+(define-key c-mode-base-map (kbd "C-<down>") 'insert-semicolon)
 
 
 (provide 'programming-c)
