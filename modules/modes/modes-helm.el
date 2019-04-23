@@ -563,9 +563,9 @@ _j_: jedi:related-names
 
 (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history) ;; For Minibuffer
 (define-key shell-mode-map (kbd "C-c C-l") 'helm-comint-input-ring) ;; For Shell
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+;(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+;(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 (define-key global-map (kbd "C-c b") 'helm-mini) ;; Browse Open Buffers
 (global-set-key (kbd "C-<return>") 'ac-complete-with-helm)
 

@@ -82,6 +82,8 @@ This command switches to browser."
 
 (defun sdev/line-to-msg()
   (interactive)
+  (insert " ")
+  (move-beginning-of-line 1)
   (sdev/insert-msg-right (s-trim-right (thing-at-point 'line t)))
   (kill-whole-line 1)
   )
@@ -89,7 +91,8 @@ This command switches to browser."
 
 (defun sdev/line-to-msg-centered()
   (interactive)
- (sdev/insert-msg (s-trim-right (thing-at-point 'line t)))
+  (move-beginning-of-line 1)
+  (sdev/insert-msg (s-trim-right (thing-at-point 'line t)))
   (kill-whole-line 1)
  )
 

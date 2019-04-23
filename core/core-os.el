@@ -134,7 +134,6 @@
 
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
-keybindings
 (provide 'core-os)
 
 ;;; core-os.el ends here

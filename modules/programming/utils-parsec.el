@@ -219,7 +219,14 @@
   (newline))
 
 
-(defun utils-parsec--insert-sep ()
+(defun utils-parsec--insert-sep-full ()
+  (interactive)
+  (insert
+   (format "%s ------------------------------------------------------------------------------------------------- %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-sep-med ()
   (interactive)
   (insert
    (format "%s - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - %s" comment-start comment-start))
@@ -232,6 +239,23 @@
    (format "%s -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  - %s" comment-start comment-start))
   (newline)
   )
+
+(defun utils-parsec--insert-sep-end ()
+  (interactive)
+  (insert
+   (format "%s _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ %s" comment-start comment-start))
+  (newline)
+  )
+
+(defun utils-parsec--insert-box ()
+  (interactive)
+  (beginning-of-line 1)
+  (utils-parsec--insert-sep-full)
+  (sdev/line-to-msg-centered)
+  (utils-parsec--insert-sep-full)
+  (newline-and-indent)
+  (utils-parsec--insert-sep-end))
+
 
 (defun utils-parsec--insert-left (string)
   (interactive "sString for inside left message: ")
@@ -260,9 +284,9 @@
     (file-name-directory (directory-file-name dir))))
 
 
-(utils-parsec--find-file-in-hierarchy (utils-parsec--current-dir) "utils-parsec.el")
+;; (utils-parsec--find-file-in-hierarchy (utils-parsec--current-dir) "utils-parsec.el")
 
-(current-dir)
+;; (current-dir)
 
 
 (defun utils-parsec--find-file-in-hierarchy (current-dir file-name)

@@ -381,6 +381,48 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (setq tiqsi-makescript "./build.sh")
 
+
+
+(if tiqsi-win32
+    (defun compile (data)
+
+      (if (get-buffer "*shell*")
+	  (progn
+	    (kill-buffer "*shell*")
+	    (send-to-shell data)
+	    (send-to-shell "exit")
+	    (sdev/jump-window))
+	(progn
+	  (send-to-shell data)
+	  (send-to-shell "exit")
+	  (sdev/jump-window))
+	)
+      )
+  (message "compile defined"))
+
+
+(defun compile-c-lang()
+  (interactive)
+  (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
+      (compile-meson)
+    (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
+	(compile-cmake)
+      (make-without-asking))))
+
+(defun compile-meson()
+  (if (file-directory-p "build")
+      (progn ( message "compiling")
+	     (if (file-exists-p "meson.build") 
+		 (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+	       (compile "cd .. && build && ninja -t compdb cxx cc > compile_commands.json && ninja")))
+    (progn
+      (message "Generating meson & compiling")
+      (if (file-exists-p "meson.build") 
+	  (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+	(compile "cd .. && meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
+
+      (add-to-rtags))))
+
 (defun compile-cmake()
   (interactive)
   (if (file-directory-p "build")
@@ -652,6 +694,33 @@ foo.cpp and in the same directory as the current header file, foo.h."
   )
 
 
+
+
+; ------------------------------------------------------------------------------------------------- ;
+;                                           TODO                                                    ;
+; ------------------------------------------------------------------------------------------------- ;
+; fix this: meson-executable-name should be inferred from meson.build file                           ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+
+(setq meson-executable-name "demo")
+
+(defun run-meson ()
+(interactive)
+  (let ((command (if (file-exists-p "meson.build")
+		     "cd build "
+		   "cd .. && cd build ") ))
+
+    (if tiqsi-win32
+    	(async-shell-command (format "%s && %s.exe" command meson-executable-name))
+      (async-shell-command (format "%s && ./%s" command meson-executable-name)))))
+
+(defun close-side-come-back ()
+  (interactive)
+  (sdev/jump-window)
+  (kill-current-buffer)
+  (sdev/jump-window))
+
+
 (defun tiqsi-cmake-run-executable()
   (interactive)
   (async-shell-command (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
@@ -659,13 +728,24 @@ foo.cpp and in the same directory as the current header file, foo.h."
   ;; (print (format "cd build && ./%s" (tiqsi-cmake-get-executable-name)))
   )
 
+
+
+(defun run-c-lang()
+  (interactive)
+  (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
+      (run-meson)
+  (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
+	(tiqsi-cmake-run-executable)
+      (run-without-asking))))
+
+
 (defun start-rtags()
   (interactive)
   (call-process-shell-command (format "%srdm" rtags-path) nil 0)
   )
 
 (eval-after-load 'cc-mode (start-rtags))
-(insert (format "%srdm" rtags-path) )/home/serialdev/rtags/bin/rdm/home/serialdev/rtags/bin/rdm
+;; (insert (format "%srdm" rtags-path) )/home/serialdev/rtags/bin/rdm/home/serialdev/rtags/bin/rdm
 
 (defun add-to-rtags()
   (interactive)
@@ -676,15 +756,76 @@ foo.cpp and in the same directory as the current header file, foo.h."
    (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
 
 
-;  -------------------------------------------------------------------------------- ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                            Create Meson                                           ;
+; ------------------------------------------------------------------------------------------------- ;
+; Create Meson                                                                                      ;
+; project-name -> src -> main.cpp/c                                                                 ;
+;                     -> main.cpp/c                                                                 ;
+;              -> meson.build                                                                       ;
+;              -> .gitignore                                                                        ;
+;              -> README.md                                                                         ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
-;  -------------------------------------------------------------------------------- ;
-; Create cmake
-; project-name -> src -> main.cpp/c
-;                     -> main.cpp/c
-;                     -> CMakeLists.txt
-;                     -> .gitignore
-;                     -> README.md
+(defun tiqsi-create-meson (project-name)
+  (interactive "sEnter Project Name:")
+  (f-mkdir project-name)
+  (f-mkdir (format "%s/src" project-name))
+  (write-region "int main(int argc, char *argv[])
+{
+
+    return 0;
+}"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
+
+  (write-region (format "
+project('%s', 'c')
+executable('%s' 'src/main.c')" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
+
+  (write-region " "  ""  (format "%s/%s/README.md" (f-dirname (f-this-file ))      project-name))
+  (write-region "# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+/build"  ""  (format "%s/%s/.gitignore" (f-dirname (f-this-file ))     project-name)))
+
+; ------------------------------------------------------------------------------------------------- ;
+;                                            Create CMake                                           ;
+; ------------------------------------------------------------------------------------------------- ;
+; Create cmake                                                                                      ;
+; project-name -> src -> main.cpp/c                                                                 ;
+;                     -> main.cpp/c                                                                 ;
+;                     -> CMakeLists.txt                                                             ;
+;                     -> .gitignore                                                                 ;
+;                     -> README.md                                                                  ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (defun tiqsi-create-cmake (project-name)
   (interactive "sEnter Project Name:")
@@ -696,6 +837,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
     return 0;
 }"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
+
   (write-region (format "cmake_minimum_required(VERSION 2.8.12)
 
 project(%s)
@@ -743,7 +885,12 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 /build"  ""  (format "%s/%s/src/.gitignore" (f-dirname (f-this-file ))     project-name))
   )
 
-
+(defun insert-semicolon ()
+  (interactive)
+  (move-end-of-line 1)
+  (insert ";")
+  (newline-and-indent)
+  )
 
 (defun check-for-semicolon (string)
   (if (equal (car(cdr(split-string string ";"  ))) "")
@@ -751,11 +898,16 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
     nil)
   )
 
-;; ;  -------------------------------------------------------------------------------- ;
-;; ;  TODO parse (select (this ( now) ) ) -> ("select" "(this ( now) )")
-;; ;                                      -> ("select" ("this "(now)"))
-;; ;                                      -> ("select" ("this ("now") ))
-;; ;  -------------------------------------------------------------------------------- ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                                TODO                                               ;
+; ------------------------------------------------------------------------------------------------- ;
+;                                                                                                   ;
+; parse (select (this ( now) ) ) -> ("select" "(this ( now) )")                                     ;
+;                                      -> ("select" ("this "(now)"))                                ;
+;                                      -> ("select" ("this ("now") ))                               ;
+;                                                                                                   ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+
 (setq test-parens "(select (this (now) ) ) ")
 
 (defun perlish-fix-regexps (regexp)
@@ -1160,11 +1312,14 @@ _v_: Find virtuals at point
 (define-key c++-mode-map (kbd "C-r f") 'rtags-fixit)
 (define-key c++-mode-map (kbd "C-n") 'rtags-next-diag)
 
+
 ;; TODO Make dependant on what build-system is being used
 ;; (define-key global-map (kbd "M-m") 'make-without-asking)
 ;; (define-key global-map (kbd "M-n") 'run-without-asking)
-(define-key global-map (kbd "M-m") 'compile-cmake)
-(define-key global-map (kbd "M-n") 'tiqsi-cmake-run-executable)
+(define-key global-map (kbd "M-m") 'compile-c-lang)
+(define-key global-map (kbd "M-n") 'run-c-lang)
+(define-key global-map (kbd "M-/") 'close-side-come-back)
+(define-key c-mode-base-map (kbd "C-<down>") 'insert-semicolon)
 
 
 (provide 'programming-c)

@@ -8,11 +8,16 @@
  '(when tiqsi-linux
     (load (expand-file-name "~/quicklisp/slime-helper.el"))))
 
+
+(load (expand-file-name "C:/Users/andre/.roswell/helper.el"))
+
+
 ;; Replace "sbcl" with the path to your implementation
 ;; Do some standard SLIME configuration.
 (slime-setup '(slime-fancy slime-tramp))
 ;; Set the default lisp you want to use (here it's SBCL).
-(setq inferior-lisp-program "sbcl")
+;; (setq inferior-lisp-program "sbcl")
+(setq inferior-lisp-program "ros -Q run")
 
 ;; (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
