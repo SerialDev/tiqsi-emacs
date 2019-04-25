@@ -779,7 +779,8 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
   (write-region (format "
 project('%s', 'c')
-executable('%s' 'src/main.c')" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
+src = ['src/main.c']
+executable('%s', src)" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
 
   (write-region " "  ""  (format "%s/%s/README.md" (f-dirname (f-this-file ))      project-name))
   (write-region "# Prerequisites
