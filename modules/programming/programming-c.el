@@ -778,8 +778,14 @@ foo.cpp and in the same directory as the current header file, foo.h."
 }"  ""  (format "%s/%s/src/main.c" (f-dirname (f-this-file ))         project-name))
 
   (write-region (format "
-project('%s', 'c')
-executable('%s' 'src/main.c')" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
+project('%s', 'c',
+        default_options : ['c_std=c11'],
+	version : '1.0.0',
+        license : 'GPL')
+
+src = ['src/main.c']
+incdir = include_directories('include')
+executable('%s', src, include_directories : incdir)" project-name project-name)  ""  (format "%s/%s/meson.build" (f-dirname (f-this-file )) project-name))
 
   (write-region " "  ""  (format "%s/%s/README.md" (f-dirname (f-this-file ))      project-name))
   (write-region "# Prerequisites
