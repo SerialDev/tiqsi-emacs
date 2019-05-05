@@ -111,7 +111,7 @@ ENV CARGO_HOME=/cargo
 
 ENV PATH=/cargo/bin:/rust/bin:$PATH
 
-RUN apt-get install pkg-config libssl-dev && echo "(curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path) && rustup default nightly" > /install-rust.sh && chmod 755 /install-rust.sh && \
+RUN apt-get install pkg-config libssl-dev -y && echo "(curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path) && rustup default nightly" > /install-rust.sh && chmod 755 /install-rust.sh && \
     bash install-rust.sh && \
     rustup component add rust-src && \
     cargo install racer && rustup target add wasm32-unknown-unknown && cargo install cargo-web
