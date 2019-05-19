@@ -136,6 +136,7 @@
 (set-face-attribute 'font-lock-string-face nil :foreground "olive drab")
 (set-face-attribute 'font-lock-type-face nil :foreground "burlywood3")
 (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
+(set-face-attribute 'region nil :background "#666" :foreground "#ffffff")
 
 
 ;; Consistent things
