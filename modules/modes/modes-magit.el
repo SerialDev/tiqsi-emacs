@@ -61,8 +61,8 @@
 
                                         ;---{Keybindings}---;
 
-(define-key magit-mode-map "\C-cc" 'magit-commit)
-(define-key magit-mode-map "C-x M-g" 'magit-dispatch-popup)
+;; (define-key magit-mode-map "\C-cc" 'magit-commit)
+;; (define-key magit-mode-map "C-x M-g" 'magit-dispatch-popup)
                                         ;(define-key python-mode-map (kbd "C-c c") 'sdev/magit-stage-and-commit)
 
 (provide 'modes-magit)

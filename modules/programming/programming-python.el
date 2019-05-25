@@ -246,7 +246,8 @@ else:
 (defun get-selection ()
   "Get the text selected in current buffer as string"
   (interactive)
-  (buffer-substring-no-properties (region-beginning) (region-end)))
+  (print (buffer-substring-no-properties (region-beginning) (region-end)))
+  )
 
 (setq tiqsi-python-buffer "*Python*")
 
@@ -557,7 +558,7 @@ profile_disabled = disabled_status(df)")
 
 (define-key python-mode-map (kbd "C-c C-x r") 'python-shell-send-region)
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
-(define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
+;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 
 
 (provide 'programming-python)
