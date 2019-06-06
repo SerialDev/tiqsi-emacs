@@ -1,67 +1,13 @@
 ;;; programming-python.el --- Tiqsi python programming support
-
+q
 ;;; Commentary:
 ;;
 
-(setq jedi:setup-keys nil)
-(setq jedi:tooltip-method nil)
-;; (autoload 'jedi:setup "jedi" nil t)
-;; (add-hook 'python-mode-hook 'jedi:setup)
 
+;---------------------------------------------------------------------------------------------------;
+;Fixes upstream bug <25.2RC                                                                         ;
+;---------------------------------------------------------------------------------------------------;
 
-;; (defun install-traad ()
-;;   (if (equal (shell-command-to-string "which traad") "")
-;;       (shell-command "pip install traad")
-;;     (print "traad already installed"))
-;;   (setq traad-server-program (shell-command-to-string "which traad")))
-
-;; (install-traad)
-
-
-(defvar jedi:goto-stack '())
-
-
-(defun jedi:jump-to-definition ()
-  (interactive)
-  (add-to-list 'jedi:goto-stack
-               (list (buffer-name) (point)))
-  (jedi:goto-definition))
-
-
-(defun jedi:jump-back ()
-  (interactive)
-  (let ((p (pop jedi:goto-stack)))
-    (if p (progn
-            (switch-to-buffer (nth 0 p))
-            (goto-char (nth 1 p))))))
-
-
-(defmacro pyt--eval-after-load (file-or-files &rest form)
-  "Execute FORM when all the files in FILE-OR-FILES are loaded.
-FORM is checked at compile time."
-  (declare (debug (form form &rest form))
-           (indent 1))
-  (when (stringp file-or-files)
-    (setq file-or-files (list file-or-files)))
-  (let ((code `(progn ,@form)))
-    (mapc (lambda (file)
-            (setq code `(eval-after-load ',file ',code)))
-          file-or-files)
-    code))
-
-
-(defvar pyt--run-once-used-keys nil)
-
-
-(defmacro pyt--run-once (key &rest body)
-  (declare (indent defun))
-  (assert (symbolp (eval key)) nil "Key must be a symbol")
-  `(unless (member ,key pyt--run-once-used-keys)
-     (add-to-list 'pyt--run-once-used-keys ,key)
-     ,@body))
-
-
-                                        ;-----{Fixes upstream bug <25.2RC}-----;
 
 ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25753#44
 (when (version< emacs-version "25.2")
@@ -73,10 +19,14 @@ FORM is checked at compile time."
       (python-shell-completion-native-get-completions
        (get-buffer-process (current-buffer))
        nil "_"))))
-
-
 (setq python-shell-prompt-detect-failure-warning nil)
 
+; /end fixes                                                                                        ;
+;---------------------------------------------------------------------------------------------------;
+
+;---------------------------------------------------------------------------------------------------;
+;                                    Python repl setup procedures                                   ;
+;---------------------------------------------------------------------------------------------------;
 
 (setq
  python-shell-interpreter "ipython"
@@ -90,20 +40,6 @@ FORM is checked at compile time."
  python-shell-completion-module-string-code
  "';'.join(module_completion('''%s'''))\n"
  )
-
-
-;;; smartrep
-(pyt--eval-after-load (smartrep python)
-                      (smartrep-define-key
-                       python-mode-map
-                       "C-c"
-                       '(("C-p" . beginning-of-defun)
-                         ("C-n" . end-of-defun)
-                         (">"   . python-indent-shift-right)
-                         ("<"   . python-indent-shift-left))))
-
-(add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
-(setq py-autopep8-options '("--max-line-length=110"))
 
 
 (defun sdev-use-ipython (&optional ipython)
@@ -150,7 +86,6 @@ With prefix arg, prompt for the command to use."
               python-shell-interpreter-args "-i " + ipython_py))))
    (t
     (error "I don't know how to set ipython settings for this Emacs"))))
-
 
 
 (defun sdev-use-cpython (&optional cpython)
@@ -205,7 +140,6 @@ else:
    (t
     (error "I don't know how to set ipython settings for this Emacs"))))
 
-
 (defun sdev-use-remote (&optional ipython)
   (interactive)
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
@@ -213,58 +147,12 @@ else:
         python-shell-prompt-regexp ">>> "
         python-shell-prompt-output-regexp ""))
 
-(defun run-python-locally (&rest args)
-  (interactive (progn (require 'nadvice)
-                      (advice-eval-interactive-spec
-                       (cadr (interactive-form #'run-python)))))
-  (let ((default-directory user-emacs-directory))
-    (apply #'run-python args)))
+; /end repl                                                                                         ;
+;---------------------------------------------------------------------------------------------------;
 
-
-(eval-when-compile (require 'cl-lib))
-(defun nadvice/python-shell-send-string/fix-local-process
-    (old-fun string &optional process)
-  (cl-letf ((old-psstf (symbol-function #'python-shell--save-temp-file))
-            ((symbol-function #'python-shell--save-temp-file)
-             (lambda (string)
-               (let ((default-directory
-                       ;; if buffer is a remote file, but the process is not
-                       ;; save the temp file locally, instead of remotely
-                       (if (and buffer-file-name
-                                (file-remote-p buffer-file-name)
-                                (not (plist-get 'remote-tty
-                                                (process-plist process))))
-                           user-emacs-directory
-                         default-directory)))
-                 (funcall old-psstf string)))))
-    (funcall old-fun string process)))
-
-(advice-add 'python-shell-send-string :around
-            #'nadvice/python-shell-send-string/fix-local-process)
-
-
-(defun get-selection ()
-  "Get the text selected in current buffer as string"
-  (interactive)
-  (print (buffer-substring-no-properties (region-beginning) (region-end)))
-  )
-
-(setq tiqsi-python-buffer "*Python*")
-
-(defun send-py-line ()
-  (interactive)
-  (let ((py-temp (thing-at-point 'line t)) )
-    (comint-send-string tiqsi-python-buffer py-temp)))
-
-(defun send-py-region(begin end)
-  (interactive "r")
-  (comint-send-string tiqsi-python-buffer
-		      (buffer-substring-no-properties begin end))
-  (comint-send-string tiqsi-python-buffer "\n")
-  )
-
-
-                                        ;-----------{I-menu merging}-----------;
+;---------------------------------------------------------------------------------------------------;
+;                                           Imenu merging                                           ;
+;---------------------------------------------------------------------------------------------------;
 
 ;; Python mode
 (defun my-merge-imenu ()
@@ -272,6 +160,7 @@ else:
   (let ((mode-imenu (imenu-default-create-index-function))
         (custom-imenu (imenu--generic-function imenu-generic-expression)))
     (append mode-imenu custom-imenu)))
+
 
 (defun my-python-menu-hook()
   (interactive)
@@ -287,10 +176,17 @@ else:
   ;;             (setq company-backends (list comp-back)))))
   )
 
+
 (add-hook 'python-mode-hook 'my-python-menu-hook)
 
-                                        ;-----------{Mccabe python }-----------;
-;; requires pip install mccabe
+; /end Imenu                                                                                        ;
+;---------------------------------------------------------------------------------------------------;
+
+;---------------------------------------------------------------------------------------------------;
+;                                         McCabe Complexity                                         ;
+;---------------------------------------------------------------------------------------------------;
+; requires pip install mccabe                                                                       ;
+
 
 (defun sdev/py-mccabe()
   "Get the mccabe complexity for this buffer."
@@ -298,92 +194,17 @@ else:
   (message
    (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
 
-
-;;; Indentation for python
-
-;; Ignoring electric indentation
-(defun electric-indent-ignore-python (char)
-  "Ignore electric indentation for python-mode"
-  (if (equal major-mode 'python-mode)
-      'no-indent
-    nil))
-(add-hook 'electric-indent-functions 'electric-indent-ignore-python)
-
-;; Enter key executes newline-and-indent
-(defun set-newline-and-indent ()
-  "Map the return key with `newline-and-indent'"
-  (local-set-key (kbd "RET") 'newline-and-indent))
-(add-hook 'python-mode-hook 'set-newline-and-indent)
-
-(defun sdev/py-sort-imports ()
-  (interactive)
-  (mark-whole-buffer)
-  (py-isort-region))
+; /end McCabe                                                                                       ;
+;---------------------------------------------------------------------------------------------------;
 
 
-                                        ; DISABLED to work with Ipython3 and prevent Inline matplotlib issues
-;; (setq ein:use-auto-complete-superpack t
-;;       ein:use-smartrep t)
-
-(add-hook 'ein:connect-mode-hook 'ein:jedi-setup)
-
-
-
-                                        ;-----------------{Ac}-----------------;
-
-;; (defun my-ac-jedi-setup ()
-;;   (jedi:setup)
-;;   ;; override `ac-sources':
-;;   (setq ac-sources '(ac-source-jedi-direct)))
-
-;; (add-hook 'python-mode-hook 'my-ac-jedi-setup)
-;; (add-hook 'inferior-python-mode-hook 'my-ac-jedi-setup)
-;; ;; (inferior-python-mode)
-
-;; (setq ac-auto-show-menu    0)
-;; (setq ac-delay             0)
-;; (setq ac-menu-height       5)
-;; (setq ac-auto-start t)
-;; (setq ac-show-menu-immediately-on-auto-complete 0)
-;; (setq ac-quick-help-delay 0)
+;---------------------------------------------------------------------------------------------------;
+;Debugging                                                                                          ;
+;---------------------------------------------------------------------------------------------------;
+; Highlight the call to ipdb                                                                        ;
+; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/                           ;
 
 
-                                        ;-------{Python Language Server}-------;
-
-
-;; (add-hook 'python-mode-hook #'lsp-python-enable)
-;; (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-
-
-                                        ;---------------{Company}--------------;
-
-;; (use-package company-jedi             ;;; company-mode completion back-end for Python JEDI
-;;   :straight t
-;;   :ensure t
-;;   :config
-;;   ;; (setq jedi:environment-virtualenv (list (expand-file-name "~/.emacs.d/.python-environments/")))
-;;   (add-hook 'python-mode-hook 'jedi:setup)
-;;   ;; (setq jedi:complete-on-dot t)
-;;   (setq jedi:use-shortcuts t)
-;;   (defun config/enable-company-jedi ()
-;;     (add-to-list 'company-backends 'company-jedi)
-;;     (company-mode 1)
-;;     (auto-complete-mode 0))
-;;   (add-hook 'python-mode-hook 'config/enable-company-jedi))
-;; (global-auto-complete-mode 0)
-
-                                        ;-----------{Code generation}----------;
-
-;; (package-install 'pygen)
-;; (try-require 'pygen)
-;; (add-hook 'python-mode-hook 'pygen-mode)
-                                        ;(shell-command "pip install rope")
-
-
-                                        ;----{debugging}----;
-
-                                        ; Highlight the call to ipdb
-                                        ; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/
 (defun annotate-pdb ()
   (interactive)
   (highlight-lines-matching-regexp "import ipdb")
@@ -404,7 +225,12 @@ else:
     ;; (save-buffer)
     ))
 
-                                        ;-------{mypy}------;
+; / end debugging                                                                                   ;
+;---------------------------------------------------------------------------------------------------;
+
+;---------------------------------------------------------------------------------------------------;
+;                                              Linting                                              ;
+;---------------------------------------------------------------------------------------------------;
 
 (flycheck-define-checker
     python-mypy ""
@@ -419,146 +245,57 @@ else:
 (add-to-list 'flycheck-checkers 'python-mypy t)
 (flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
+; /end lint                                                                                         ;
+;---------------------------------------------------------------------------------------------------;
 
-                                        ;--------{disable ac for python}-------;
+;---------------------------------------------------------------------------------------------------;
+;                                           LSP mode setup                                          ;
+;---------------------------------------------------------------------------------------------------;
 
-(defun disable-autocomplete() (interactive)
-       (auto-complete-mode 0))
+(use-package lsp-mode
+  :straight t
+  :hook (python-mode . lsp)
+  :commands lsp)
 
-(defadvice auto-complete-mode (around disable-auto-complete-for-python)
-  (unless (eq major-mode 'python-mode) ad-do-it))
-(ad-activate 'auto-complete-mode)
+;; optionally
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
+(use-package company-lsp
+  :straight t
+  :commands company-lsp)
+(use-package helm-lsp
+  :straight t
+  :commands helm-lsp-workspace-symbol)
+(use-package lsp-treemacs
+  :straight t
+  :commands lsp-treemacs-errors-list)
+;; optionally if you want to use debugger
+(use-package dap-mode
+  :straight t  )
+
+(use-package dap-python
+  :straight t)
+
+; /end lsp                                                                                          ;
+;---------------------------------------------------------------------------------------------------;
+
+;---------------------------------------------------------------------------------------------------;
+;                                           Miscellaneous                                           ;
+;---------------------------------------------------------------------------------------------------;
+
+;; Enter key executes newline-and-indent
+(defun set-newline-and-indent ()
+  "Map the return key with `newline-and-indent'"
+  (local-set-key (kbd "RET") 'newline-and-indent))
+(add-hook 'python-mode-hook 'set-newline-and-indent)
 
 
-(defun tiqsi-py-on-save(current-line)
+(defun sdev/py-sort-imports ()
   (interactive)
-  (blacken-buffer)
-  (sdev/py-sort-imports)
-  (delete-trailing-whitespace)
-  (goto-line current-line)
-  )
+  (mark-whole-buffer)
+  (py-isort-region))
 
-
-(defun tiqsi-py-before-save-hook ()
-  (when (eq major-mode 'python-mode)
-    (let ((current-line (string-to-number (format-mode-line "%l"))))
-      (tiqsi-py-on-save current-line)
-      )))
-
-;; (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
-
-;---------------------------------------------------------------------------------
-
-(setq test-test "birthday = df.birthday[0]
-age = time_since(df.birthday[0]).days // 365
-age_range = (age-5, age+5)
-profile_deleted = deleted_status(df)
-profile_disabled = disabled_status(df)")
-
-(defun parse-l ()
-  (parsec-collect*
-   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
-					 (parsec-or (parsec-letter)
-						    (parsec-str "\"")
-						    (parsec-digit)
-						    (parsec-str "-")
-						    (parsec-str "[")
-						    (parsec-str "]")
-						    (parsec-str ".")
-						    (parsec-str "_"))))
-   (parsec-optional* (parsec-lookahead "="))))
-
-(defun parse-r ()
-  (parsec-collect*
-   (parsec-optional* (parsec-str "="))
-   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
-					 (parsec-or (parsec-letter)
-						    (parsec-str "\"")
-						    (parsec-digit)
-						    (parsec-str "-")
-						    (parsec-str "[")
-						    (parsec-str "]")
-						    (parsec-str ".")
-						    (parsec-str "_"))))
-   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))
-
-(parsec-with-input test-test
-      (parsec-many
-       (parsec-collect
-	(car(parse-l))
-	(car(parse-r))))
-      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof))))
-
-(defun evcxr-parse-toml (input)
-  (parsec-with-input input
-    (parsec-many
-     (parsec-collect*
-      (car (evcxr-parse-title))
-      (parsec-many
-       (parsec-collect
-	(car(evcxr-parse-l))
-	(car(evcxr-parse-r))))
-      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))))
-
-
-(parsec-with-input test-test
-  (parsec-many
-   (parsec-collect*
-   (parsec-many-as-string (parsec-letter))
-   (parsec-many-as-string (parsec-optional* (parsec-str "=")))
-   (parsec-many-as-string (parsec-optional*(parsec-any-ch)))
-   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))
-   ))
-  )
-
-(defun split-lines (input)
-  (interactive)
-  (parsec-with-input input
-    (parsec-many
-    (car(parsec-collect
-     (parsec-many-as-string (parsec-re "."))
-     (parsec-optional (parsec-eol-or-eof))
-     )))))
-
-(parsec-with-input (car
-		    (split-lines test-test))
-  (parsec-collect
-   (parsec-endby (parsec-str "=") (parsec-many-as-string(parsec-letter))))
-)
-
-(defun parse-l (input)
-  (interactive)
-  ((let ((left (car input)))
-     (setq left ()
-  ))
-  (car (split-lines input))))
-
-
-(defun evcxr-eval-region (begin end)
-  "Evaluate region between BEGIN and END."
-  (interactive "r")
-  (buffer-substring-no-properties begin end)
-)
-;---------------------------------------------------------------------------------
-
-					;---{Keybindings}---;
-
-;; redefine jedi's C-. (jedi:goto-definition)
-;; to remember position, and set C-, to jump back
-(define-key python-mode-map (kbd "C-.") 'jedi:jump-to-definition)
-(define-key python-mode-map (kbd "C-,") 'jedi:jump-back)
-(define-key python-mode-map (kbd "C-c d") 'jedi:show-doc)
-(define-key python-mode-map (kbd "C-<tab>") 'jedi:complete)
-
-(define-key python-mode-map (kbd "C-c t s") 'sdev/py-sort-imports)
-
-;; (define-key python-mode-map (kbd "C-c em") 'elpy-multiedit-python-symbol-at-point)
-;; (define-key python-mode-map (kbd "C-c er") 'elpy-refactor)
-;; (define-key python-mode-map (kbd "C-c ef") 'elpy-format-code)
-
-(define-key python-mode-map (kbd "C-c C-x r") 'python-shell-send-region)
-(define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
-;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 
 
 (provide 'programming-python)

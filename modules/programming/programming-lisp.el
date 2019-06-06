@@ -11,12 +11,11 @@
 ;; Set the default lisp you want to use (here it's SBCL).
 
 (when tiqsi-linux
-  (progn
-    (load (expand-file-name "~/quicklisp/slime-helper.el"))
-    (setq inferior-lisp-program "sbcl")))
+   (progn
+     (load (expand-file-name "~/quicklisp/slime-helper.el"))
+     (setq inferior-lisp-program "sbcl")))
 
 (when tiqsi-win32
-
   (progn
     (load (expand-file-name "C:/Users/andre/.roswell/helper.el"))
     (setq inferior-lisp-program "ros -Q run")))
@@ -119,9 +118,9 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 
 
-(try!
- (when tiqsi-linux
-    (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el"))))
+
+(when tiqsi-linux
+  (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el")))
 
 ;; (require 'sly-quicklisp-autoloads)
 
