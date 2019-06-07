@@ -98,8 +98,7 @@ RUN conda update -n base conda && \
     pip install black
 
 RUN git clone --recursive https://github.com/Andersbakken/rtags.git && \
-    cd rtags && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 . && make && \
-    export PATH=$PATH:/mnt/rtags/bin
+    cd rtags && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 . && make 
 
 # install rustup toolchain
 RUN curl https://sh.rustup.rs -sSf | \
@@ -109,7 +108,7 @@ ENV RUSTUP_HOME=/rust
 
 ENV CARGO_HOME=/cargo
 
-ENV PATH=/cargo/bin:/rust/bin:$PATH
+ENV PATH="/cargo/bin:/rust/bin:${PATH}"
 
 RUN apt-get install pkg-config libssl-dev -y && echo "(curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain nightly --no-modify-path) && rustup default nightly" > /install-rust.sh && chmod 755 /install-rust.sh && \
     bash install-rust.sh && \
@@ -128,6 +127,16 @@ RUN wget "https://github.com/elm/compiler/releases/download/0.19.0/binaries-for-
     tar xzf binaries-for-linux.tar.gz && \
     mv elm /usr/local/bin/
 
+RUN wget "https://download.visualstudio.microsoft.com/download/pr/7e4b403c-34b3-4b3e-807c-d064a7857fe8/95c738f08e163f27867e38c602a433a1/dotnet-sdk-3.0.100-preview5-011568-linux-x64.tar.gz" &&\
+	mkdir -p /dotnet && tar zxf dotnet-sdk-3.0.100-preview5-011568-linux-x64.tar.gz -C /dotnet
+
+
+ENV PATH="${PATH}:/rtags/bin"
+ENV DOTNET_ROOT="/dotnet"
+ENV PATH="${PATH}:$DOTNET_ROOT"
+
+
+
 # Install docker
 RUN apt update && \
     apt install apt-transport-https ca-certificates curl software-properties-common -y && \
@@ -136,8 +145,6 @@ RUN apt update && \
     apt update && \
     apt-cache policy docker-ce && \
     apt install docker-ce -y
-
-
 
 
 #---------------------------------------------------------------------------------------------------#
@@ -157,6 +164,13 @@ RUN apt-get install firefox -y && \
 RUN apt-get install chicken-bin -y && \
     cd `csi -p '(chicken-home)'` && \
     curl http://3e8.org/pub/chicken-doc/chicken-doc-repo.tgz | tar zx
+
+
+
+RUN	git clone https://github.com/Microsoft/python-language-server.git && \
+	cd python-language-server/src/LanguageServer/Impl && \
+	dotnet publish -c Release -r linux-x64 && \
+	ln -sf $(git rev-parse --show-toplevel)/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer /usr/bin/
 
 
 ADD ./ /tiqsi-emacs
