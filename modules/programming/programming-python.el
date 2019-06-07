@@ -1,5 +1,5 @@
 ;;; programming-python.el --- Tiqsi python programming support
-q
+
 ;;; Commentary:
 ;;
 
@@ -235,7 +235,7 @@ else:
 (flycheck-define-checker
     python-mypy ""
     :command ("mypy"
-              "--ignore-missing-imports" "--fast-parser"
+              "--ignore-missing-imports"
               "--python-version" "3.6"
               source-original)
     :error-patterns
@@ -253,29 +253,158 @@ else:
 ;---------------------------------------------------------------------------------------------------;
 
 (use-package lsp-mode
-  :straight t
-  :hook (python-mode . lsp)
-  :commands lsp)
+  :commands lsp
+  :hook (prog-mode . lsp))
 
-;; optionally
+;; TODO: make the window disappear/behave normally && hide line numbers
+(defun my/hide-frame-line-numbers (frame _window)
+  "Hides line nunmbers from a specific frame in a winow."
+  (select-frame frame)
+  (display-line-numbers-mode -1))
+
 (use-package lsp-ui
-  :straight t
-  :commands lsp-ui-mode)
-(use-package company-lsp
-  :straight t
-  :commands company-lsp)
-(use-package helm-lsp
-  :straight t
-  :commands helm-lsp-workspace-symbol)
-(use-package lsp-treemacs
-  :straight t
-  :commands lsp-treemacs-errors-list)
-;; optionally if you want to use debugger
-(use-package dap-mode
-  :straight t  )
+  :commands lsp-ui-mode
+  :hook (lsp-mode . lsp-ui-mode)
+  :config
+  (setq lsp-ui-sideline-ignore-duplicate t)
+  ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
+  )
 
-(use-package dap-python
-  :straight t)
+(use-package company-lsp
+  :commands company-lsp
+  :config
+  (push 'company-lsp company-backends)
+  (setq company-lsp-async t
+        company-lsp-cache-candidates 'auto
+        company-lsp-enable-recompletion t))
+
+
+;; With use-package:
+(use-package company-box
+  :straight t
+  :hook (company-mode . company-box-mode))
+
+(progn
+ (push 'company-lsp company-backends)
+ (setq company-transformers nil
+       company-lsp-async t
+       company-lsp-cache-candidates nil)
+ (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
+ )
+(add-hook 'python-mode-hook 'lsp)
+
+
+(use-package lsp-python-ms
+  :ensure nil
+  :hook (python-mode . lsp)
+  :config
+
+  ;; for dev build of language server
+  ;; (setq lsp-python-ms-dir
+  ;;       (expand-file-name "~/python-language-server/output/bin/Release/"))
+  ;; for executable of language server, if it's not symlinked on your PATH
+  (setq lsp-python-ms-executable
+        "~/python-language-server/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer"))
+
+(require 'lsp-ui)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake.
+  (setq lsp-ui-doc-enable t
+   lsp-ui-doc-use-childframe t
+   lsp-ui-doc-position 'top
+   lsp-ui-doc-include-signature t
+   lsp-ui-sideline-enable nil
+   lsp-ui-flycheck-enable t
+   lsp-ui-flycheck-list-position 'right
+   lsp-ui-flycheck-live-reporting t
+   lsp-ui-peek-enable t
+   lsp-ui-peek-list-width 60
+   lsp-ui-peek-peek-height 25)
+;; make sure we have lsp-imenu everywhere we have LSP
+(require 'lsp-ui-imenu)
+(add-hook 'lsp-after-open-hook 'lsp-ui-imenu)
+
+(straight-use-package
+ '(helm-lsp
+   :type git
+   :host github
+   :repo "emacs-lsp/helm-lsp"
+   :config
+   (progn
+
+     )))
+
+(defun netrom/helm-lsp-workspace-symbol-at-point ()
+  (interactive)
+  (let ((current-prefix-arg t))
+    (call-interactively #'helm-lsp-workspace-symbol)))
+
+(defun netrom/helm-lsp-global-workspace-symbol-at-point ()
+  (interactive)
+  (let ((current-prefix-arg t))
+    (call-interactively #'helm-lsp-global-workspace-symbol)))
+
+(setq netrom--general-lsp-hydra-heads
+      '(;; Xref
+	("d" xref-find-definitions "Definitions" :column "Xref")
+	("D" xref-find-definitions-other-window "-> other win")
+	("r" xref-find-references "References")
+	("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
+	("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
+
+	;; Peek
+	("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
+	("C-r" lsp-ui-peek-find-references "References")
+	("C-i" lsp-ui-peek-find-implementation "Implementation")
+
+	;; LSP
+	("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
+	("C-a" lsp-execute-code-action "Execute code action")
+	("R" lsp-rename "Rename")
+	("t" lsp-goto-type-definition "Type definition")
+	("i" lsp-goto-implementation "Implementation")
+	("f" helm-imenu "Filter funcs/classes (Helm)")
+	("C-c" lsp-describe-session "Describe session")
+
+	;; Flycheck
+	("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
+
+      netrom--misc-lsp-hydra-heads
+      '(;; Misc
+	("q" nil "Cancel" :column "Misc")
+	("b" pop-tag-mark "Back")))
+
+;; Create general hydra.
+(eval `(defhydra netrom/lsp-hydra (:color blue :hint nil)
+	 ,@(append
+	    netrom--general-lsp-hydra-heads
+	    netrom--misc-lsp-hydra-heads)))
+
+(add-hook 'lsp-mode-hook
+	  (lambda () (local-set-key (kbd "C-c C-g") 'netrom/lsp-hydra/body)))
+
+
+
+(straight-use-package
+ '(lsp-treemacs
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-treemacs"
+   :commands lsp-treemacs-errors-list
+   :config
+   (progn
+     )
+))
+
+
+
+
+;; (use-package dap-mode
+;;   :straight t  )
+
+;; (use-package dap-python
+;;   :straight t)
 
 ; /end lsp                                                                                          ;
 ;---------------------------------------------------------------------------------------------------;

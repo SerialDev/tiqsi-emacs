@@ -150,6 +150,7 @@
 
 ;-------------{Programming}------------;
 
+(straight-require 'helm)
 ;-{elisp libraries}-;
 
 (straight-require 'elisp-slime-nav)
@@ -198,7 +199,7 @@
 ;---{Intellisense}--;
 
 (straight-require 'rtags)
-(straight-require 'jdee)
+;; (straight-require 'jdee)
 (straight-require 'racer)
 
 

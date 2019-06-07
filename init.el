@@ -39,7 +39,7 @@
 (package-initialize)
 
 ;; Debug?
-;; (setq debug-on-error t)
+(setq debug-on-error t)
 
 
 ;----{About User}---;
