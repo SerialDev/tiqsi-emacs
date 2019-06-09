@@ -3,6 +3,7 @@
 ;;; Commentary:
 ;;
 
+;;; Code:
 
 ;---------------------------------------------------------------------------------------------------;
 ;Fixes upstream bug <25.2RC                                                                         ;
@@ -10,6 +11,7 @@
 
 
 ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25753#44
+
 (when (version< emacs-version "25.2")
   (defun python-shell-completion-native-try ()
     "Return non-nil if can trigger native completion."
@@ -265,8 +267,28 @@ else:
 (use-package lsp-ui
   :commands lsp-ui-mode
   :hook (lsp-mode . lsp-ui-mode)
+  :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   :config
   (setq lsp-ui-sideline-ignore-duplicate t)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)                                                                                                                          
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)                                                                                                                            
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(add-hook 'lsp-mode-hook 'lsp-ui-mode)
+(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake.
+(setq lsp-ui-doc-enable t
+   lsp-ui-doc-use-childframe t
+   lsp-ui-doc-position 'top
+   lsp-ui-doc-include-signature t
+   lsp-ui-sideline-enable t
+   lsp-ui-flycheck-enable t
+   lsp-ui-sideline-ignore-duplicate t
+   lsp-ui-sideline-show-flycheck t
+   lsp-ui-flycheck-list-position 'right
+   lsp-ui-flycheck-live-reporting t
+   lsp-ui-peek-enable t
+   lsp-ui-peek-list-width 60
+   lsp-ui-peek-peek-height 25)
+
   ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
   )
 
@@ -292,6 +314,7 @@ else:
  (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
  )
 (add-hook 'python-mode-hook 'lsp)
+(add-hook 'python-mode-hook 'flycheck-mode)
 
 
 (use-package lsp-python-ms
@@ -307,23 +330,14 @@ else:
         "~/python-language-server/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer"))
 
 (require 'lsp-ui)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake.
-  (setq lsp-ui-doc-enable t
-   lsp-ui-doc-use-childframe t
-   lsp-ui-doc-position 'top
-   lsp-ui-doc-include-signature t
-   lsp-ui-sideline-enable nil
-   lsp-ui-flycheck-enable t
-   lsp-ui-flycheck-list-position 'right
-   lsp-ui-flycheck-live-reporting t
-   lsp-ui-peek-enable t
-   lsp-ui-peek-list-width 60
-   lsp-ui-peek-peek-height 25)
 ;; make sure we have lsp-imenu everywhere we have LSP
 (require 'lsp-ui-imenu)
 (add-hook 'lsp-after-open-hook 'lsp-ui-imenu)
+(add-hook 'lsp-after-open-hook 'lsp-ui-mode)
+(add-hook 'lsp-after-open-hook 'lsp-ui-flycheck-list--view)
+(flycheck-mode 1)
+(lsp-ui-mode 1)
+
 
 (straight-use-package
  '(helm-lsp

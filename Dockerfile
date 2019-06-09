@@ -172,18 +172,19 @@ RUN	git clone https://github.com/Microsoft/python-language-server.git && \
 	dotnet publish -c Release -r linux-x64 && \
 	ln -sf $(git rev-parse --show-toplevel)/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer /usr/bin/
 
+RUN apt-get install clang-tools-7 && update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-7 100
 
 ADD ./ /tiqsi-emacs
 
 RUN cp /tiqsi-emacs/PragmataPro.ttf /usr/local/share/fonts
 
-ENV DISPLAY=169.254.60.134:0
+ENV DISPLAY=192.168.100.13:0
 
 ENV LC_ALL=C.UTF-8
 
 ENV LANG=C.UTF-8
 
-RUN echo "XLIB_SKIP_ARGB_VISUALS=1 emacs -q -l /tiqsi-emacs/init.el &" >> /tiqsi-emacs/launch-tiqsi.sh && \
+RUN echo "XLIB_SKIP_ARGB_VISUALS=1 emacs -q -l /mnt/personal_repos/tiqsi-emacs/init.el &" >> /tiqsi-emacs/launch-tiqsi.sh && \
     chmod 777 /tiqsi-emacs/launch-tiqsi.sh
 
 WORKDIR /tiqsi-emacs/
