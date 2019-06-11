@@ -116,8 +116,50 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 ;;    :repo "joaotavora/sly-quicklisp"
 ;; ))
 
+(define-advice eval-print-last-sexp (:around (old-fun &rest args) add-prefix)
+  "Prepend ;; =>."
+  (let ((op (point)))
+    (apply old-fun args)
+    (save-excursion
+      (goto-char op)
+      (forward-line 1)
+      (insert ";; => "))))
 
 
+
+
+(define-advice elisp--preceding-sexp (:around (old-fun) multiline-comment)
+  "Support sexp in multiline comment."
+  (condition-case err
+      (funcall old-fun)
+    (scan-error
+     (if (nth 4 (syntax-ppss))
+         (let ((work-buffer (current-buffer))
+               (temp-buffer (generate-new-buffer " *temp*"))
+               found sexp error)
+           (with-current-buffer temp-buffer
+             (delay-mode-hooks (emacs-lisp-mode)))
+           (save-excursion
+             (comment-normalize-vars)
+             (while (and (comment-beginning)
+                         (not found))
+               (let ((code (buffer-substring-no-properties
+                            (point) (line-end-position))))
+                 (with-current-buffer temp-buffer
+                   (goto-char (point-min))
+                   (insert code ?\n)
+                   (goto-char (point-max))
+                   (condition-case err
+                       (setq sexp (funcall old-fun)
+                             found t)
+                     (scan-error (setq error err)))))
+               (when (= -1 (forward-line -1))
+                 (error "elisp--preceding-sexp@multiline-comment error"))
+               (goto-char (line-end-position))))
+           (cond (found sexp)
+                 (error (signal (car error) (cdr error)))
+                 (t (error "elisp--preceding-sexp@multiline-comment error"))))
+       (signal (car err) (cdr err))))))
 
 (when tiqsi-linux
   (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el")))

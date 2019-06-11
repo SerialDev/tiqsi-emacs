@@ -65,18 +65,77 @@ This command switches to browser."
 
 ;-{Insert comments}-;
 
+(setq sdev/msg-len 76)
+
 (defun sdev/insert-msg (string)
   (interactive "sString for inside centered message: ")
   (insert comment-start)
   (insert
-    (sdev/truncate 99 (s-center 99 string ) ))
+    (sdev/truncate sdev/msg-len (s-center sdev/msg-len string ) ))
   (insert (s-trim comment-start))
   (newline))
 
+
+(defmacro tiqsi-comment--between ( &rest content)
+  `(progn
+    (insert (s-trim comment-start))
+    (insert " ")
+    ,@content
+    (insert " ")
+    (insert (s-trim comment-start))
+    (newline)))
+
+(defun tiqsi-comment--insert-end ()
+  (interactive)
+  (tiqsi-comment--between
+  (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-")))))
+
+(defun tiqsi-comment--insert-sep ()
+  (interactive)
+  (tiqsi-comment--between
+  (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-   ")))))
+
+(defun tiqsi-comment--insert-msg (string)
+  (interactive "sString for inside centered message: ")
+  (tiqsi-comment--between
+   (insert (sdev/truncate sdev/msg-len (s-center (- sdev/msg-len 3) string)))))
+
+
+(defun tiqsi-comment--insert-msg-right (string)
+  (tiqsi-comment--between
+   (insert (sdev/truncate sdev/msg-len (s-pad-right (- sdev/msg-len 3) " " string)))))
+
+(defun tiqsi-comment--line-to-msg()
+  (interactive)
+  (move-beginning-of-line 1)
+  (tiqsi-comment--insert-msg-right (s-trim-right (thing-at-point 'line t)))
+  (kill-whole-line 1)
+  )
+
+(defun tiqsi-comment--line-to-msg-centered()
+  (interactive)
+  (move-beginning-of-line 1)
+  (tiqsi-comment--insert-msg (s-trim-right (thing-at-point 'line t)))
+  (kill-whole-line 1)
+ )
+
+
+(defun tiqsi-comment--line-to-msg-centered-end()
+  (interactive)
+  (move-beginning-of-line 1)
+    (tiqsi-comment--between
+     (insert (sdev/truncate sdev/msg-len
+			    (s-center (- sdev/msg-len 3) (s-prepend " end/ "
+(s-append " \\end "    (s-trim-right (thing-at-point 'line t))))))))
+  (kill-whole-line 1)
+ )
+
+
+; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
 (defun sdev/insert-msg-right (string)
-  (insert comment-start)
-  (insert
-    (sdev/truncate 99 (s-pad-right 99 " " string ) ))
+  (insert (s-trim comment-start))  (insert
+    (sdev/truncate sdev/msg-len (s-pad-right sdev/msg-len " " string ) ))
   (insert (s-trim comment-start))
   (newline))
 
@@ -101,7 +160,7 @@ This command switches to browser."
   (interactive )
   (insert comment-start)
   (insert
-    (sdev/truncate 99 (s-pad-left 99 "-" "" ) ))
+    (sdev/truncate sdev/msg-len (s-pad-left sdev/msg-len "-" "" ) ))
   (insert (s-trim comment-start))
   (newline))
 
@@ -776,22 +835,27 @@ sEnter flag: ")
 
 ;; ;---{Keybindings}---;
 
-(global-set-key (kbd "C-;") 'sdev/line-to-msg)
-(global-set-key (kbd "C-:") 'sdev/line-to-msg-centered)
-(global-set-key (kbd "C-p") 'tiqsi-comments--sep)
-(global-set-key (kbd "C-P") 'tiqsi-comments--sep-footer)
-(global-set-key (kbd "C-@") 'sdev/insert-msg)
-(global-set-key (kbd "M-;") 'sdev/insert-belongs)
-(global-set-key (kbd "C-~") 'sdev/insert-sep)
-(global-set-key (kbd "C-}") 'sdev/insert-sep-small)
-(global-set-key (kbd "C-{") 'sdev/insert-sep-mini)
-(global-set-key (kbd "C-M-'") 'sdev/insert-comment)
+(global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
+(global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
+(global-set-key (kbd "C-'") 'tiqsi-comment--insert-end)
+(global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
+(global-set-key (kbd "C-~") 'tiqsi-comment--line-to-msg-centered-end)
+
+;; (global-set-key (kbd "C-p") 'tiqsi-comments--sep)
+;; (global-set-key (kbd "C-P") 'tiqsi-comments--sep-footer)
+;; (global-set-key (kbd "M-;") 'sdev/insert-belongs)
+;; (global-set-key (kbd "C-~") 'sdev/insert-sep)
+;; (global-set-key (kbd "C-}") 'sdev/insert-sep-small)
+;; (global-set-key (kbd "C-{") 'sdev/insert-sep-mini)
+;; (global-set-key (kbd "C-M-'") 'sdev/insert-comment)
+
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
-(global-set-key (kbd "M-(") 'sdev/py-paren)
-(global-set-key (kbd "M-\"") 'sdev/py-quotes)
 
-(global-set-key (kbd "C-'") 'sdev/insert-end)
+;; (global-set-key (kbd "M-(") 'sdev/py-paren)
+;; (global-set-key (kbd "M-\"") 'sdev/py-quotes)
+
+
 
 
 
