@@ -412,10 +412,40 @@ else:
 ))
 
 
+(use-package lsp-java
+  :straight t)
 
+(use-package dap-mode
+  :straight t
+  :config
+  (progn
+    (add-hook 'python-mode-hook (lambda () (progn
+					     (require 'dap-mode)
+					     (require 'dap-ui)
+					     (require 'dap-python)
+					     (dap-mode 1)
+					     (dap-ui-mode 1))
+				  ))
+    ))
 
-;; (use-package dap-mode
-;;   :straight t  )
+(defun dap-set-windows()
+  (interactive)
+  (dap-ui-locals)
+  (dap-ui-repl)
+ (dap-ui-sessions)
+  )
+
+(eval-after-load "dap-mode"
+  '(progn
+     (dap-register-debug-provider "python" 'dap-python--populate-start-file-args)
+     (dap-register-debug-template "Python :: Run Configuration"
+				 (list :type "python"
+				       :args ""
+				       :cwd nil
+				       :target-module nil
+				       :request "launch"
+				       :name "Python :: Run Configuration"))))
+
 
 ;; (use-package dap-python
 ;;   :straight t)
