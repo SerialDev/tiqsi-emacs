@@ -129,6 +129,18 @@
 (defun nil-bell ())
 (setq ring-bell-function 'nil-bell)
 
+
+(defun which-os ()
+  "Display OS information."
+  (interactive)
+  (if (eq system-type 'gnu/linux)
+      (if (shell-command-to-string "type -p lsb_release > /dev/null")
+          (message (concat (substring (shell-command-to-string "lsb_release -sd") 1 (- (length (shell-command-to-string "lsb_release -sd")) 2)) " (" (substring (shell-command-to-string "lsb_release -sr") 0 (- (length (shell-command-to-string "lsb_release -sr")) 1)) " '" (substring (shell-command-to-string "lsb_release -sc") 0 (- (length (shell-command-to-string "lsb_release -sc")) 1)) "'" " release, using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
+        (if (shell-command-to-string "type -p guix > /dev/null")
+            (message (concat "Guix System " (shell-command-to-string "guix system -V | awk 'NR==1{printf $5}'") " (using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
+          (message "Cannot determine distro.")))   
+    (message system-type)))
+
 ;                                            Keybindings                                            ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
