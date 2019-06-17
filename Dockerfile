@@ -172,7 +172,18 @@ RUN	git clone https://github.com/Microsoft/python-language-server.git && \
 	dotnet publish -c Release -r linux-x64 && \
 	ln -sf $(git rev-parse --show-toplevel)/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer /usr/bin/
 
-RUN apt-get install clang-tools-7 && update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-7 100
+
+# ------------------------------------------------------------------------- #
+#                                 Install Go                                #
+# ------------------------------------------------------------------------- #
+RUN curl -O https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz && tar xvf go1.10.3.linux-amd64.tar.gz && \
+	chown -R root:root ./go && mv go /usr/local
+
+ENV GOPATH="${HOME}/work"
+ENV PATH="${PATH}:/usr/local/go/bin:${GOPATH}/bin"
+
+
+# RUN apt-get install clang-tools-7 && update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-7 100
 
 ADD ./ /tiqsi-emacs
 
@@ -184,7 +195,8 @@ ENV LC_ALL=C.UTF-8
 
 ENV LANG=C.UTF-8
 
-RUN echo "XLIB_SKIP_ARGB_VISUALS=1 emacs -q -l /mnt/personal_repos/tiqsi-emacs/init.el &" >> /tiqsi-emacs/launch-tiqsi.sh && \
+RUN echo "XLIB_SKIP_ARGB_VISUALS=1 emacs -q -l /tiqsi-emacs/init.el &" >> /tiqsi-emacs/launch-tiqsi.sh && \
     chmod 777 /tiqsi-emacs/launch-tiqsi.sh
+
 
 WORKDIR /tiqsi-emacs/
