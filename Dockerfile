@@ -182,6 +182,7 @@ RUN curl -O https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz && tar xvf go1.
 ENV GOPATH="${HOME}/work"
 ENV PATH="${PATH}:/usr/local/go/bin:${GOPATH}/bin"
 
+RUN go get golang.org/x/tools/cmd/...
 
 # RUN apt-get install clang-tools-7 && update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-7 100
 

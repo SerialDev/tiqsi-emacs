@@ -26,6 +26,9 @@
 ;;; Commentary:
 ;; 
 
+(use-package go-mode
+  :straight t
+  )
 
 (provide 'programming-go)
 

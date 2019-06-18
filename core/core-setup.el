@@ -53,6 +53,18 @@
 
 ;-----------------{UX}-----------------;
 
+; cfrs.el  Child Frame Read String                                          ;
+; ------------------------------------------------------------------------- ;
+
+
+(straight-use-package
+ '(cfrs
+   :type git
+   :host github
+   :repo "Alexander-Miller/cfrs"
+))
+
+
 
 ;(use-package dashboard
 ;  :straight t
