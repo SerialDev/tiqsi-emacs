@@ -89,6 +89,17 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   (delete-forward-char 1)
   )
 
+
+(straight-use-package
+ '(coleslaw
+   :type git
+   :host github
+   :repo "equwal/coleslaw"
+   :config
+   (coleslaw-setup)
+   ))
+
+
 ;; (straight-use-package
 ;;  '(sly
 ;;    :type git
