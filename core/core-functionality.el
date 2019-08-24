@@ -135,6 +135,16 @@ Single Capitals as you type."
 
 (setq enable-local-variables nil)
 
+;                          Base64 Encode clipboard                          ;
+; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
+
+(defun b64-clipboard ()
+  (interactive)
+  (insert(base64-encode-string
+   (with-temp-buffer
+     (yank)
+     (buffer-string)))))
+
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

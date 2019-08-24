@@ -182,7 +182,8 @@ RUN curl -O https://dl.google.com/go/go1.10.3.linux-amd64.tar.gz && tar xvf go1.
 ENV GOPATH="${HOME}/work"
 ENV PATH="${PATH}:/usr/local/go/bin:${GOPATH}/bin"
 
-RUN go get golang.org/x/tools/cmd/...
+RUN git clone https://github.com/udhos/update-golang  && cd update-golang && ./update-golang.sh && cd .. && \
+    go get golang.org/x/tools/cmd/... && go get github.com/gopherjs/gopherjs
 
 # RUN apt-get install clang-tools-7 && update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-7 100
 
