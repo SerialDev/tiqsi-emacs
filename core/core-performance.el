@@ -118,17 +118,17 @@
 ;;           (propertize (format fmt line) 'face 'linum))))
 
 
-(global-disable-mode 'async-bytecomp-package-mode)
-(global-disable-mode 'auto-composition-mode)
-(global-disable-mode 'auto-compression-mode)
-(global-disable-mode 'auto-encryption-mode)
-(global-disable-mode 'diff-auto-refine-mode)
-(global-disable-mode 'eldoc-mode)
-(global-disable-mode 'global-eldoc-mode)
-(global-disable-mode 'global-git-commit-mode)
-(global-disable-mode 'global-magit-file-mode)
-(global-disable-mode 'line-number-mode)
-(global-disable-mode 'shell-dirtrack-mode)
+;; (global-disable-mode 'async-bytecomp-package-mode)
+;; (global-disable-mode 'auto-composition-mode)
+;; (global-disable-mode 'auto-compression-mode)
+;; (global-disable-mode 'auto-encryption-mode)
+;; (global-disable-mode 'diff-auto-refine-mode)
+;; (global-disable-mode 'eldoc-mode)
+;; (global-disable-mode 'global-eldoc-mode)
+;; (global-disable-mode 'global-git-commit-mode)
+;; (global-disable-mode 'global-magit-file-mode)
+;; (global-disable-mode 'line-number-mode)
+;; (global-disable-mode 'shell-dirtrack-mode)
 
 (provide 'core-performance)
 
