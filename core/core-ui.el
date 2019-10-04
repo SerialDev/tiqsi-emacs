@@ -222,6 +222,17 @@
    :config (progn (volatile-highlights-mode t))
 ))
 
+
+(use-package highlight-parentheses
+  :straight t
+  :ensure t
+  :config (progn
+            (global-highlight-parentheses-mode 1)
+))
+
+
+
+
 ;                                          Highlight thing                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
@@ -321,8 +332,6 @@
 
 ;                                               Paren                                               ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-
-(global-highlight-parentheses-mode 1)
 
 (when (try-require 'paren)
   (GNUEmacs
