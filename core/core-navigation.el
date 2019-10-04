@@ -76,7 +76,16 @@ insert `%'."
       (when (looking-at "^    ")
         (replace-match "")))))
 
-(drag-stuff-global-mode 1)
+
+
+(use-package drag-stuff
+  :straight t
+  :ensure t
+  :config (progn
+	    (drag-stuff-global-mode 1)
+	    ))
+
+
 
 ;; Shift the selected region right if distance is positive, left if
 ;; negative
