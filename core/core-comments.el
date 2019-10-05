@@ -77,12 +77,11 @@
 (defun tiqsi-comment--line-to-msg-centered-end()
   (interactive)
   (move-beginning-of-line 1)
-    (tiqsi-comment--between
-     (insert (sdev/truncate sdev/msg-len
-			    (s-center (- sdev/msg-len 3) (s-prepend "   \\___ "
-(s-append " ___/   "    (s-trim-right (thing-at-point 'line t))))))))
-  (kill-whole-line 1)
- )
+  (tiqsi-comment--between
+   (insert (sdev/truncate sdev/msg-len
+			  (s-center (- sdev/msg-len 3) (s-prepend "   \\ַַַ "
+(s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t))))))))
+  (kill-whole-line 1))
 
 
 (defun tiqsi-comment--line-to-msg-centered-begin()
@@ -92,8 +91,7 @@
      (insert (sdev/truncate sdev/msg-len
 			    (s-center (- sdev/msg-len 3) (s-prepend "   /¯¯¯ "
 (s-append " ¯¯¯\\   "    (s-trim-right (thing-at-point 'line t))))))))
-  (kill-whole-line 1)
-  )
+  (kill-whole-line 1))
 
 ;                          /¯¯¯  Keybindings  ¯¯¯\                          ;
 
@@ -103,11 +101,10 @@
 (global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
 (global-set-key (kbd "C-~") 'tiqsi-comment--line-to-msg-centered-end)
 
-
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
 
-;                          \___  Keybindings  ___/                          ;
+;                          \ַַַ  Keybindings  ַַַ/                          ;
 
 (provide 'core-comments)
 
