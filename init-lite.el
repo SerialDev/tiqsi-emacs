@@ -188,8 +188,14 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-functions.el")
 (load-expand  "core/core-debug.el")
 (load-expand  "core/core-secrets.el")
-
 (load-expand  "core/core-completion.el")
+
+
+(load-expand  "modules/modes/modes-ido.el")
+
+(global-set-key (kbd "M-x") 'smex)
+(global-set-key (kbd "C-x b") 'ido-switch-buffer)
+
 ;; (load-expand  "core/core-setup.el")
 
 

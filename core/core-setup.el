@@ -87,8 +87,6 @@
 
 (straight-require 'ivy)
 (straight-require 'hydra)
-(straight-require 'ido)
-(straight-require 'ido-completing-read+)
 (straight-require 'find-dired)
 (straight-require 'direx)
 

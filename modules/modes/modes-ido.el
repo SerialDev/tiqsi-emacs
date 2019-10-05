@@ -30,32 +30,39 @@
 (ido-mode 1)
 
 
-                                        ; IDO mode
-                                        ;(use-package ido
-                                        ;  :ensure t
-                                        ;  :init  (setq ido-enable-flex-matching t
-                                        ;               ido-ignore-extensions t
-                                        ;               ido-use-virtual-buffers t
-                                        ;               ido-everywhere t)
-                                        ;  :config
-                                        ;  (ido-mode 1)
-                                        ;  (ido-everywhere 1)
-                                        ;  (add-to-list 'completion-ignored-extensions ".pyc"))
+; IDO mode
+;(use-package ido
+;  :ensure t
+;  :init  (setq ido-enable-flex-matching t
+;               ido-ignore-extensions t
+;               ido-use-virtual-buffers t
+;               ido-everywhere t)
+;  :config
+;  (ido-mode 1)
+;  (ido-everywhere 1)
+;  (add-to-list 'completion-ignored-extensions ".pyc"))
 
-                                        ;Add to IDO, the FLX package:
-                                        ;(use-package flx-ido
-                                        ;   :ensure t
-                                        ;   :init (setq ido-enable-flex-matching t
-                                        ;               ido-use-faces nil)
-                                        ;   :config (flx-ido-mode 1))
+;Add to IDO, the FLX package:
+;(use-package flx-ido
+;   :ensure t
+;   :init (setq ido-enable-flex-matching t
+;               ido-use-faces nil)
+;   :config (flx-ido-mode 1))
 
-                                        ; Make IDO work vertically
-                                        ;(use-package ido-vertical-mode
-                                        ;  :ensure t
-                                        ;  :init               ; I like up and down arrow keys:
-                                        ;  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
-                                        ;  :config
-                                        ;  (ido-vertical-mode 1))
+(use-package smex
+  :ensure t
+  :straight t
+  :init
+  )
+
+;; Make IDO work vertically
+(use-package ido-vertical-mode
+  :ensure t
+  :straight t
+ :init               ; I like up and down arrow keys:
+ (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+ :config
+ (ido-vertical-mode 1))
 
 
 (defun ido-imenu ()

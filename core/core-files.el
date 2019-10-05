@@ -215,7 +215,12 @@ Visit the file after creation."
 sInsert str to search: ")
   (compile (format "tree -f %s | grep %s" dir str)))
 
-                                        ;---{keybindings}---;
+;; Ido find file requirements
+(straight-require 'ido)
+(straight-require 'ido-completing-read+)
+
+
+;---{keybindings}---;
 
 (define-key global-map [M-t] 'load-todo)
 (define-key global-map [M-T] 'load-log)

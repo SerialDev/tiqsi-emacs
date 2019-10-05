@@ -1,4 +1,4 @@
-;;; core-ui.el --- Tiqsi ui elements  -*- lexical-binding: t -*-
+﻿;;; core-ui.el --- Tiqsi ui elements  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-  Andres Mariscal
 
@@ -367,6 +367,109 @@
 
 (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
 (semantic-mode 1)
+
+
+(straight-require 'fill-column-indicator)
+(straight-require 'visual-fill-column)
+(straight-require 'whitespace)
+
+(setq whitespace-style '(face trailing tabs))
+
+(setq whitespace-display-mappings
+      '((space-mark 32 [183])            ; normal space
+        (newline-mark 10 [?↷ 10])))      ; newline
+
+(setq whitespace-line-column 79)
+
+(eval-after-load 'whitespace
+  (lambda ()
+    (set-face-attribute 'whitespace-newline nil :foreground "#d3d7cf")
+    (set-face-attribute 'whitespace-tab nil :background nil :underline "#d3d7cf")
+    (set-face-attribute 'whitespace-trailing nil :background nil :underline "#a40000")))
+
+(defun whitespace-post-command-hook() nil) ; workaround for cursor slowdown
+
+(add-hook 'prog-mode-hook 'whitespace-mode)
+
+(setq whitespace-display-mappings
+      '((space-mark 32 [183])            ; normal space
+        (newline-mark 10 [?↷ 10])))      ; newline
+
+
+(eval-after-load 'whitespace
+  (lambda ()
+    (set-face-attribute 'whitespace-newline nil :foreground "#d3d7cf")))
+
+(defvar my-visual-line-state nil)
+
+(defun my-visual-line-mode-hook ()
+  (when visual-line-mode
+    (setq my-visual-line-state
+          `(whitespace-style ,whitespace-style
+            whitespace-mode ,whitespace-mode
+            auto-fill-mode ,auto-fill-function))
+
+    (when whitespace-mode
+      whitespace-mode -1)
+
+    ;; display newline characters with whitespace-mode
+    (make-local-variable 'whitespace-style)
+    (setq whitespace-style '(newline newline-mark))
+    (whitespace-mode)
+
+    ;; disable auto-fill-mode
+    (when auto-fill-function
+      (auto-fill-mode -1))
+
+    ;; visually wrap text at fill-column
+    (visual-fill-column-mode)))
+
+(add-hook 'visual-line-mode-hook 'my-visual-line-mode-hook)
+
+(defun my-visual-line-mode-off ()
+  (interactive)
+  (visual-fill-column-mode--disable)
+  (visual-line-mode -1)
+  ;; revert the state before activating visual-line-mode
+  (when my-visual-line-state
+    (let ((ws-style (plist-get my-visual-line-state 'whitespace-style))
+          (ws-mode (plist-get my-visual-line-state 'whitespace-mode))
+          (af-mode (plist-get my-visual-line-state 'auto-fill-mode)))
+
+      (when whitespace-mode
+        (whitespace-mode -1))
+      (when ws-style (setq whitespace-style ws-style))
+      (when ws-mode (whitespace-mode 1))
+
+      (when af-mode (auto-fill-mode 1)))))
+
+
+(defun my-visual-line-mode-toggle ()
+  (interactive)
+  (if visual-line-mode
+      (my-visual-line-mode-off)
+    (visual-line-mode 1)))
+
+
+(add-hook 'mu4e-view-mode-hook 'visual-line-mode)
+
+(add-hook 'mu4e-compose-mode-hook
+  (defun my-mu4e-visual-line-reply ()
+    "Activate visual-line-mode for specific services like GitHub."
+    (let ((msg mu4e-compose-parent-message))
+      (when (and msg (mu4e-message-contact-field-matches
+                      msg :from '(".*@github.com$" ".*@upwork.com$")))
+        (visual-line-mode)))))
+
+
+;; (key-seq-define-global "qm" 'my-visual-line-mode-toggle)
+
+
+
+
+;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+
+
 
 ;                                            Keybindings                                            ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;

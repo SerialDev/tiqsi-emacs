@@ -309,7 +309,10 @@ Adapted from `describe-function-or-variable'."
   (define-key global-map (kbd "C-x C-x") #'save-buffers-kill-terminal)
   )
 
-(global-set-key (kbd "C-M-<return>") 'chunyang-elisp-function-or-variable-quickhelp)
+
+(global-set-key (kbd "C-M-<return>")
+'chunyang-elisp-function-or-variable-quickhelp)
+
 (global-set-key (kbd "M-<return>") 'xref-find-definitions-other-window)
 (define-key emacs-lisp-mode-map  (kbd "M-h") 'helpful-at-point)
 
