@@ -30,10 +30,36 @@
 
 ;;; Code:
 
+;; Asynchronous execution
+
+(straight-use-package
+ '(dired-async
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
+
+(straight-use-package
+ '(async-bytecomp
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
+
+(straight-use-package
+ '(async
+   :type git
+   :host github
+   :repo "jwiegley/emacs-async"
+))
+
+
 
 (autoload 'dired-async-mode "dired-async.el" nil t)
 (dired-async-mode 1)
 (async-bytecomp-package-mode 1)
+
+;; Garbage collection 
 
 (setq undo-limit 20000000)
 (setq undo-strong-limit 40000000)
@@ -117,18 +143,6 @@
 ;;                             (if window-system "" " "))))
 ;;           (propertize (format fmt line) 'face 'linum))))
 
-
-;; (global-disable-mode 'async-bytecomp-package-mode)
-;; (global-disable-mode 'auto-composition-mode)
-;; (global-disable-mode 'auto-compression-mode)
-;; (global-disable-mode 'auto-encryption-mode)
-;; (global-disable-mode 'diff-auto-refine-mode)
-;; (global-disable-mode 'eldoc-mode)
-;; (global-disable-mode 'global-eldoc-mode)
-;; (global-disable-mode 'global-git-commit-mode)
-;; (global-disable-mode 'global-magit-file-mode)
-;; (global-disable-mode 'line-number-mode)
-;; (global-disable-mode 'shell-dirtrack-mode)
 
 (provide 'core-performance)
 

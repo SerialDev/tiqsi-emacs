@@ -177,6 +177,8 @@ of an error, just add the package to a list of missing packages."
       (message (format "%s SUCCESS: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name  ))
       (message (format "%s FAILURE: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name))))
 
+(load-expand  "core/core-performance.el")
+
 (load-expand  "core/core-os.el")
 (load-expand  "core/core-editing.el")
 (load-expand  "core/core-ui.el")
@@ -186,9 +188,8 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-functions.el")
 (load-expand  "core/core-debug.el")
 (load-expand  "core/core-secrets.el")
-(load-expand  "core/core-performance.el")
 
-;; (load-expand  "core/core-completion.el")
+(load-expand  "core/core-completion.el")
 ;; (load-expand  "core/core-setup.el")
 
 

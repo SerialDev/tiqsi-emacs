@@ -27,35 +27,12 @@
 ;;
 
 
-;; Asynchronous execution
-
-(straight-use-package
- '(dired-async
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
-
-(straight-use-package
- '(async-bytecomp
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
-
-(straight-use-package
- '(async
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
 
 
 ;-----------------{UX}-----------------;
 
 ; cfrs.el  Child Frame Read String                                          ;
 ; ------------------------------------------------------------------------- ;
-
 
 (straight-use-package
  '(cfrs
@@ -137,10 +114,6 @@
 (straight-require 'helpful)
 (straight-require '0xc)
 (straight-require 'parsec)
-
-(straight-require 'popup)
-(straight-require 'pos-tip)
-(straight-require 'popup-pos-tip)
 
 ;-----{needed?}-----;
 

@@ -33,45 +33,47 @@
 ; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/                 ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(defun ac-source-dabbrev (abbrev)
-  (interactive)
-  (dabbrev--reset-global-variables)
-  (let ((dabbrev-check-all-buffers t))
-    (sort (dabbrev--find-all-expansions abbrev t) #'string<)))
+;; (defun ac-source-dabbrev (abbrev)
+;;   (interactive)
+;;   (dabbrev--reset-global-variables)
+;;   (let ((dabbrev-check-all-buffers t))
+;;     (sort (dabbrev--find-all-expansions abbrev t) #'string<)))
 
-(defvar ac-source-dabbrev-words
-  '((candidates
-     . (lambda () (all-completions ac-target
-                                   (ac-source-dabbrev ac-target)))))
-  "Get all the completions using dabbrev")
+;; (defvar ac-source-dabbrev-words
+;;   '((candidates
+;;      . (lambda () (all-completions ac-target
+;;                                    (ac-source-dabbrev ac-target)))))
+;;   "Get all the completions using dabbrev")
 
 
-(defun ac-self-insert ()
-  (interactive)
-  (self-insert-command 1)
-  (ac-start))
+;; (define-key ac-complete-mode-map (kbd "DEL")
+;;   (lambda ()
+;;     (interactive)
+;;     (backward-delete-char-untabify 1)
+;;     (ac-start)))
 
-(defun ac-fix-keymap ()
-  (let ((i 32))
-    (while (<= i ?z)
-      (define-key ac-complete-mode-map
-        (make-string 1 i) 'ac-self-insert)
-      (incf i))))
+;; (defun ac-self-insert ()
+;;   (interactive)
+;;   (self-insert-command 1)
+;;   (ac-start))
 
-(ac-fix-keymap)
+;; (defun ac-fix-keymap ()
+;;   (let ((i 32))
+;;     (while (<= i ?z)
+;;       (define-key ac-complete-mode-map
+;;         (make-string 1 i) 'ac-self-insert)
+;;       (incf i))))
 
-(define-key ac-complete-mode-map (kbd "DEL")
-  (lambda ()
-    (interactive)
-    (backward-delete-char-untabify 1)
-    (ac-start)))
+;; (ac-fix-keymap)
 
 ;; (setq ac-auto-start nil)
-(setq tab-always-indent 'complete)
 
-(setq-default ac-sources '(ac-source-dabbrev-words ac-source-abbrev ac-source-words-in-buffer))
 
-(add-to-list 'completion-styles 'initials t)
+;; (setq tab-always-indent 'complete)
+
+;; (setq-default ac-sources '(ac-source-dabbrev-words ac-source-abbrev ac-source-words-in-buffer))
+
+;; (add-to-list 'completion-styles 'initials t)
 
 ; ------------------------------------------------------------------------------------------------  ;
 ;                  TODO mode specific enable since I use AC alot instead of company                 ;
@@ -82,6 +84,12 @@
 ;; (setq company-quickhelp-delay 0.01)
 
 
+;; Set up pos-tip for popups
+(straight-require 'popup)
+(straight-require 'pos-tip)
+(straight-require 'popup-pos-tip)
+
+;; TODO: DEBUG 
 (defun core-completion-describe-function (function)
   "Display the full documentation of FUNCTION (a symbol) in tooltip."
   (interactive (list (function-called-at-point)))
