@@ -40,13 +40,6 @@
     (newline)))
 
 
-(defmacro tiqsi-comment--between-nocomment ( &rest content)
-  `(progn
-    (insert " ")
-    ,@content
-    (insert " ")
-    (newline)))
-
 
 (defun tiqsi-comment--insert-end ()
   (interactive)
@@ -83,36 +76,52 @@
  )
 
 
-(defun tiqsi-comment--line-to-msg-centered-end()
-  (interactive)
-  (move-beginning-of-line 1)
-  (tiqsi-comment--between
-   (insert
-    (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
-			  (s-center (- sdev/msg-len 3) (s-prepend "   \\ַַַ "
-(s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t)))))))))
-  (kill-whole-line 1))
+
+
+(defmacro tiqsi-comment--between-nocomment ( &rest content)
+  `(progn
+    (insert " ")
+    ,@content
+    (insert " ")
+    (insert (s-trim comment-start))
+    (sdev/del-end-line)
+    (move-beginning-of-line 1)
+    (insert (s-trim comment-start))
+    ))
+
 
 
 (defun tiqsi-comment--line-to-msg-centered-begin()
   (interactive)
   (move-beginning-of-line 1)
-    (tiqsi-comment--between
+    (tiqsi-comment--between-nocomment
      (insert
       (s-replace "    " "ַ ַ " (sdev/truncate
        sdev/msg-len
        (s-center
 	(- sdev/msg-len 3)
-	(s-prepend "   /¯¯¯ "
-		   (s-append " ¯¯¯\\   "
+	(s-prepend "   /¯¯¯"
+		   (s-append " ¯¯¯\\  "
 			     (s-trim-right
 			      (thing-at-point 'line t)))))))
       )
      )
-  (kill-whole-line 1))
+
+)
+
+(defun tiqsi-comment--line-to-msg-centered-end()
+  (interactive)
+  (move-beginning-of-line 1)
+  (tiqsi-comment--between-nocomment
+   (insert
+    (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
+			  (s-center (- sdev/msg-len 3) (s-prepend "   \\ַַַ "
+								  (s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t))))))))
+     )
+)
 
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  /¯¯¯ ; Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
+; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
 
 (global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
 (global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
@@ -123,7 +132,7 @@
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ ; Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ  Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 
 (provide 'core-comments)

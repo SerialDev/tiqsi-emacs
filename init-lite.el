@@ -189,6 +189,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-debug.el")
 (load-expand  "core/core-secrets.el")
 (load-expand  "core/core-completion.el")
+(load-expand  "core/core-comments.el")
 
 
 (load-expand  "modules/modes/modes-ido.el")
