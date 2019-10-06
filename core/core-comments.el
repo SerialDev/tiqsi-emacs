@@ -39,6 +39,15 @@
     (insert (s-trim comment-start))
     (newline)))
 
+
+(defmacro tiqsi-comment--between-nocomment ( &rest content)
+  `(progn
+    (insert " ")
+    ,@content
+    (insert " ")
+    (newline)))
+
+
 (defun tiqsi-comment--insert-end ()
   (interactive)
   (tiqsi-comment--between
@@ -78,9 +87,10 @@
   (interactive)
   (move-beginning-of-line 1)
   (tiqsi-comment--between
-   (insert (sdev/truncate sdev/msg-len
+   (insert
+    (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
 			  (s-center (- sdev/msg-len 3) (s-prepend "   \\ַַַ "
-(s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t))))))))
+(s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t)))))))))
   (kill-whole-line 1))
 
 
@@ -88,23 +98,33 @@
   (interactive)
   (move-beginning-of-line 1)
     (tiqsi-comment--between
-     (insert (sdev/truncate sdev/msg-len
-			    (s-center (- sdev/msg-len 3) (s-prepend "   /¯¯¯ "
-(s-append " ¯¯¯\\   "    (s-trim-right (thing-at-point 'line t))))))))
+     (insert
+      (s-replace "    " "ַ ַ " (sdev/truncate
+       sdev/msg-len
+       (s-center
+	(- sdev/msg-len 3)
+	(s-prepend "   /¯¯¯ "
+		   (s-append " ¯¯¯\\   "
+			     (s-trim-right
+			      (thing-at-point 'line t)))))))
+      )
+     )
   (kill-whole-line 1))
 
-;                          /¯¯¯  Keybindings  ¯¯¯\                          ;
+
+; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  /¯¯¯ ; Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
 
 (global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
 (global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
 (global-set-key (kbd "C-'") 'tiqsi-comment--insert-end)
 (global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
-(global-set-key (kbd "C-~") 'tiqsi-comment--line-to-msg-centered-end)
-
+(global-set-key (kbd "C-c >") 'tiqsi-comment--line-to-msg-centered-end)
+(global-set-key (kbd "C-c <") 'tiqsi-comment--line-to-msg-centered-begin)
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
 
-;                          \ַַַ  Keybindings  ַַַ/                          ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ ; Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+
 
 (provide 'core-comments)
 
