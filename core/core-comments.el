@@ -115,8 +115,8 @@
   (tiqsi-comment--between-nocomment
    (insert
     (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
-			  (s-center (- sdev/msg-len 3) (s-prepend "   \\ַַַ "
-								  (s-append " ַַַ/   "    (s-trim-right (thing-at-point 'line t))))))))
+(s-center (- sdev/msg-len 3) (s-prepend "  \\ַַַ"
+(s-append " ַַַ/ "    (s-trim-right (thing-at-point 'line t))))))))
      )
 )
 
@@ -137,4 +137,4 @@
 
 (provide 'core-comments)
 
-;;; private-misc.el ends here
+;;; core-comments.el ends here
