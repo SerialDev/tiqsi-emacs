@@ -30,27 +30,6 @@
 ;; ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
 
 
-                                        ;----{Completion}---;
-
-(add-hook 'c++-mode-hook 'irony-mode)
-(add-hook 'c-mode-hook 'irony-mode)
-(add-hook 'objc-mode-hook 'irony-mode)
-
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async))
-
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-(require 'company-irony-c-headers)
-(eval-after-load 'company
-  '(add-to-list
-    'company-backends '(company-irony-c-headers company-irony)))
-
-
                                         ;----{Formatting}---;
 
 ;;  (cond ((file-exists-p buffer-file-name) t)
@@ -60,43 +39,6 @@
 ;;         ((string-match "[.]cpp" buffer-file-name) (tiqsi-source-format)))
 
                                         ;----{Navigation}---;
-
-;;
-;; Grep for the symbol under the cursor.  Works only for C / C++ / H / RC
-;; files
-;;
-(defun grep-curdir-symbol-at-point ()
-  "Grep current directory for symbol at cursor."
-  (interactive)
-  (grep (concat "grep -n -e " (current-word)  " *.c *.cpp *.h *.rc NUL"
-                )))
-
-
-(defun tiqsi-find-corresponding-file ()
-  "Find the file that corresponds to this one."
-  (interactive)
-  (setq CorrespondingFileName nil)
-  (setq BaseFileName (file-name-sans-extension buffer-file-name))
-  (if (string-match "\\.c" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".h")))
-  (if (string-match "\\.h" buffer-file-name)
-      (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
-        (setq CorrespondingFileName (concat BaseFileName ".cpp"))))
-  (if (string-match "\\.hin" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".cin")))
-  (if (string-match "\\.cin" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".hin")))
-  (if (string-match "\\.cpp" buffer-file-name)
-      (setq CorrespondingFileName (concat BaseFileName ".h")))
-  (if CorrespondingFileName (find-file CorrespondingFileName)
-    (error "Unable to find a corresponding file")))
-
-(defun tiqsi-find-corresponding-file-other-window ()
-  "Find the file that corresponds to this one."
-  (interactive)
-  (find-file-other-window buffer-file-name)
-  (tiqsi-find-corresponding-file)
-  (other-window -1))
 
 
 (when tiqsi-linux
@@ -714,12 +656,6 @@ foo.cpp and in the same directory as the current header file, foo.h."
     	(async-shell-command (format "%s && %s.exe" command meson-executable-name))
       (async-shell-command (format "%s && ./%s" command meson-executable-name)))))
 
-(defun close-side-come-back ()
-  (interactive)
-  (sdev/jump-window)
-  (kill-current-buffer)
-  (sdev/jump-window))
-
 
 (defun tiqsi-cmake-run-executable()
   (interactive)
@@ -1137,13 +1073,6 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
       (list (format "%s %%S: %%j " (system-name))
             '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
-(defun show-file-name ()
-  "Show the full path file name in the minibuffer."
-  (interactive)
-  (message (buffer-file-name)))
-
-(defun current-buffer-path()
-  (file-name-directory (buffer-file-name)))
 
 
 (defun lock-compilation-directory ()
@@ -1161,7 +1090,9 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 (defun make-without-asking ()
   "Make the current build."
   (interactive)
-  (if (find-project-directory) (compile tiqsi-makescript))
+  (if
+      (find-project-directory)
+      (compile tiqsi-makescript))
   (other-window 1))
 
 (defun run-without-asking ()
@@ -1289,13 +1220,13 @@ _v_: Find virtuals at point
 (define-key c-mode-base-map (kbd "C-?") 'irony-get-type)
 
 (global-set-key "\C-ci" 'ewd-insert-new-method)
-(define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
-(define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+
 ; Alternate bindings for F-keyless setups (ie MacOS X terminal)
 
 (define-key c++-mode-map "\ec" 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map "\eC" 'tiqsi-find-corresponding-file-other-window)
 (define-key c++-mode-map "\es" 'tiqsi-save-buffer)
+
 ;; (define-key c++-mode-map [S-tab] 'indent-for-tab-command)
 (define-key c++-mode-map "\t" 'indent-for-tab-command)
 (define-key c++-mode-map (kbd "<backtab>")'un-indent-by-removing-4-spaces)
@@ -1324,7 +1255,6 @@ _v_: Find virtuals at point
 ;; (define-key global-map (kbd "M-n") 'run-without-asking)
 (define-key global-map (kbd "M-m") 'compile-c-lang)
 (define-key global-map (kbd "M-n") 'run-c-lang)
-(define-key global-map (kbd "M-/") 'close-side-come-back)
 (define-key c-mode-base-map (kbd "C-<down>") 'insert-semicolon)
 
 

@@ -241,6 +241,14 @@ Repeated invocations toggle between the two most recently open buffers."
   (interactive)
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
+
+(defun close-side-come-back ()
+  (interactive)
+  (sdev/jump-window)
+  (kill-current-buffer)
+  (sdev/jump-window))
+
+
                                         ;------{Window}-----;
 
 ;; swap 2 windows
@@ -455,6 +463,8 @@ one, an error is signaled."
 (global-set-key (kbd "C-c 2") 'next-buffer)
 (global-set-key (kbd "C-c 1") 'previous-buffer)
                                         ;(global-set-key (kbd "%") 'match-paren)
+
+(define-key global-map (kbd "M-/") 'close-side-come-back)
 
 
 (provide 'core-navigation)

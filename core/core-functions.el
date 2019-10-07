@@ -289,7 +289,19 @@ Adapted from `describe-function-or-variable'."
              vdoc-short)
             :margin t)))))
 
-                                        ;                    TODO make a defun for this with python                    ;
+;                    TODO make a defun for this with python                    ;
+
+; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   /¯¯¯ Buffer defuns ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  ;
+
+(defun show-file-name ()
+  "Show the full path file name in the minibuffer."
+  (interactive)
+  (message (buffer-file-name)))
+
+(defun current-buffer-path()
+  (file-name-directory (buffer-file-name)))
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 
                                         ;--{Key completion}-;
