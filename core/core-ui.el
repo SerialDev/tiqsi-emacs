@@ -119,8 +119,10 @@
   "check if font exists"
   (if (null (x-list-fonts font)) nil t))
 
-(if (font-exists-p "PragmataPro")
-    (setq tiqsi-font "PragmataPro")
+(if (boundp 'x-list-fonts)
+    (if (font-exists-p "PragmataPro")
+	(setq tiqsi-font "PragmataPro")
+      (setq tiqsi-font "Courier New"))
   (setq tiqsi-font "Courier New"))
 
 
@@ -236,7 +238,6 @@
 ;                                          Highlight thing                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(straight-require 'highlight-thing)
 
 (use-package highlight-thing
   :straight t
@@ -244,7 +245,6 @@
   :config (progn
 	    (setq highlight-thing-delay-seconds 0.15) ;; default at 0.5
 	    ))
-
 
 ;                                         Enforce Line Limit                                        ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
@@ -368,10 +368,21 @@
 (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
 (semantic-mode 1)
 
+(use-package fill-column-indicator
+  :straight t
+  :ensure t
+  :config )
 
-(straight-require 'fill-column-indicator)
-(straight-require 'visual-fill-column)
-(straight-require 'whitespace)
+(use-package visual-fill-column
+  :straight t
+  :ensure t
+  :config )
+
+
+(use-package whitespace
+  :straight t
+  :ensure t
+  :config )
 
 (setq whitespace-style '(face trailing tabs))
 

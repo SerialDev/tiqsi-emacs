@@ -177,6 +177,9 @@ of an error, just add the package to a list of missing packages."
       (message (format "%s SUCCESS: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name  ))
       (message (format "%s FAILURE: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name))))
 
+(straight-require 'evil)
+
+
 (load-expand  "core/core-performance.el")
 
 (load-expand  "core/core-os.el")
@@ -197,6 +200,7 @@ of an error, just add the package to a list of missing packages."
 
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)
+(global-set-key (kbd "C-c v") 'evil-mode)
 
 ;; (load-expand  "core/core-setup.el")
 

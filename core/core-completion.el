@@ -83,11 +83,20 @@
 ;; (company-quickhelp-mode 1)
 ;; (setq company-quickhelp-delay 0.01)
 
-
 ;; Set up pos-tip for popups
-(straight-require 'popup)
-(straight-require 'pos-tip)
-(straight-require 'popup-pos-tip)
+
+(use-package popup
+  :straight t
+  :ensure t
+  :config )
+
+(use-package pos-tip
+  :straight t
+  :ensure t
+  :config )
+
+;; TODO fix this for msys2
+;; (straight-require 'popup-pos-tip)
 
 ;; TODO: DEBUG 
 (defun core-completion-describe-function (function)

@@ -77,6 +77,8 @@
   (when (display-graphic-p)
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
 
+(if (boundp 'w32-send-sys-command)
+    (progn
 
 (defun maximize-frame ()
   "Maximize the current frame"
@@ -94,6 +96,13 @@
   "Maximize the current frame"
   (interactive)
   (w32-send-sys-command 61488))
+)
+(defun maximize-frame ()
+  "Maximize the current frame"
+  (interactive)
+  (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
+  (when tiqsi-win32   (message "w32-send-sys-command not interned"))))
+
 
 ;                                               Linux                                               ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;

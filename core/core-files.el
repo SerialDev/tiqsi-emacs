@@ -68,7 +68,7 @@
 
                                         ;---{MAP to MODE}---;
 
-                                        ; Accepted file extensions and their appropriate modes
+; Accepted file extensions and their appropriate modes
 (setq auto-mode-alist
       (append
        '(("\\.cpp$"    . c++-mode)
@@ -76,10 +76,10 @@
          ("\\.cin$"    . c++-mode)
          ("\\.inl$"    . c++-mode)
          ("\\.rdc$"    . c++-mode)
-         ("\\.h$"    . c++-mode)
-         ("\\.c$"   . c++-mode)
-         ("\\.cc$"   . c++-mode)
-         ("\\.c8$"   . c++-mode)
+;         ("\\.h$"    . c++-mode)
+         ("\\.c$"   . c-mode)
+         ("\\.cc$"   . c-mode)
+         ("\\.c8$"   . c-mode)
          ("\\.txt$" . indented-text-mode)
          ("\\.emacs$" . emacs-lisp-mode)
          ("\\.gen$" . gen-mode)
@@ -216,8 +216,16 @@ sInsert str to search: ")
   (compile (format "tree -f %s | grep %s" dir str)))
 
 ;; Ido find file requirements
-(straight-require 'ido)
-(straight-require 'ido-completing-read+)
+
+(use-package ido
+  :straight t
+  :ensure t
+  :config )
+
+(use-package ido-completing-read+
+  :straight t
+  :ensure t
+  :config )
 
 
 ;---{keybindings}---;

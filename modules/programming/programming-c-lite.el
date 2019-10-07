@@ -39,6 +39,8 @@
 	  (add-hook 'c-mode-common-hook 'google-make-newline-indent)
 	  ))
 
+(straight-require 'cc-mode)
+
 ; ------------------------------------------------------------------------- ;
 ;https://stackoverflow.com/questions/3312114/how-to-tell-emacs-to-open-h-file-in-c-mode
 ; ------------------------------------------------------------------------- ;
@@ -183,11 +185,39 @@ header"
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ Navigation ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
+; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ /¯¯¯ Snippets ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ     ;
+
+(defun tiqsi--c-insert-std-version ()
+  (interactive)
+  (insert
+"
+#if __STD_VERSION__ == 201710L
+    /* It's C18 */
+#elif __STD_VERSION__ == 201112L
+    /* It's C11 */
+#elif __ STD_VERSION__ == 199901L
+    /* it's C99 */
+#elif __STDC__ == 1
+    /* it's C90 */
+#else
+    /* it's not standard conforming */
+#endif
+"))
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \ַַַ Snippets ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+
 
 ; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
 
-(define-key c-mode-base-map [f12] 'tiqsi-find-corresponding-file)
-(define-key c-mode-base-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+
+(eval-after-load 'c-mode
+  (progn  
+    (define-key c-mode-map [f12] 'tiqsi-find-corresponding-file)
+    (define-key c-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+  ))
+
+(define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
+(define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
