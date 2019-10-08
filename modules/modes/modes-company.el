@@ -26,6 +26,10 @@
 ;;; Commentary:
 ;;
 
+;; TODO check this out more
+;(straight-require 'company-childframe)
+
+
 (use-package company
   :straight t
   :ensure t
@@ -73,10 +77,12 @@
 (face-attribute 'default :background)
 
 (use-package company-statistics
-  :straight t)
+  :straight t
+  :ensure t)
 
 (use-package company-quickhelp
   :straight t
+  :ensure t
   :if (display-graphic-p)
   :init
   (setq pos-tip-foreground-color "#c5c8c6")
@@ -115,7 +121,6 @@ point."
     (indent-or-expand arg)))
 
 (enable-company)
-(global-auto-complete-mode 0)
 (define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
 
 ;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)

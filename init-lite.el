@@ -196,6 +196,7 @@ of an error, just add the package to a list of missing packages."
 
 
 (load-expand  "modules/modes/modes-ido.el")
+(load-expand  "modules/modes/modes-company.el")
 (load-expand  "modules/programming/programming-c-lite.el")
 
 (global-set-key (kbd "M-x") 'smex)

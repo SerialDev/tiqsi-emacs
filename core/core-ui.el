@@ -119,10 +119,9 @@
   "check if font exists"
   (if (null (x-list-fonts font)) nil t))
 
-(if (boundp 'x-list-fonts)
-    (if (font-exists-p "PragmataPro")
-	(setq tiqsi-font "PragmataPro")
-      (setq tiqsi-font "Courier New"))
+
+(if (font-exists-p "PragmataPro")
+    (setq tiqsi-font "PragmataPro")
   (setq tiqsi-font "Courier New"))
 
 
@@ -471,11 +470,6 @@
       (when (and msg (mu4e-message-contact-field-matches
                       msg :from '(".*@github.com$" ".*@upwork.com$")))
         (visual-line-mode)))))
-
-
-;; (key-seq-define-global "qm" 'my-visual-line-mode-toggle)
-
-
 
 
 ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))

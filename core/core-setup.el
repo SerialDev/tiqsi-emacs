@@ -124,7 +124,6 @@
 (require 'paren)
 
 ;; (straight-require 'posframe)
-;(straight-require 'company-childframe)
 
 ;; (straight-require 'company-jedi)
 ;; (straight-require 'jedi)
@@ -189,12 +188,9 @@
 
 (straight-require 'irony) ;; C & CPP completion support
 (straight-require 'auto-complete)
-(straight-require 'company-statistics)
-(straight-require 'company-quickhelp)
 (straight-require 'dabbrev)
 
 (straight-require 'ac-racer)
-(straight-require 'slime-company)
 
 ;----{utilities}----;
 
@@ -292,14 +288,6 @@
    :repo "Andersbakken/rtags"
 ))
 
-
-;; C & CPP Header completion
-(straight-use-package
- '(company-irony-c-headers
-   :type git
-   :host github
-   :repo "hotpxl/company-irony-c-headers"
-))
 
 
 (straight-use-package

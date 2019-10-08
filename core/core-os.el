@@ -38,7 +38,7 @@
 
 ;                                          Determine Emacs                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-; Emacs type: are we running GNU Emacs?                                                           ;
+; Emacs type: are we running GNU Emacs?                                                             ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defmacro GNUEmacs (&rest body)

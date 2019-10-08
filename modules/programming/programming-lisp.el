@@ -4,6 +4,7 @@
 ;; Standard using SBCL
 ;; Elisp functions will go on this one too
 
+(straight-require 'slime-company)
 
 ;; Replace "sbcl" with the path to your implementation
 ;; Do some standard SLIME configuration.

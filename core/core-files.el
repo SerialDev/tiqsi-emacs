@@ -222,10 +222,14 @@ sInsert str to search: ")
   :ensure t
   :config )
 
-(use-package ido-completing-read+
-  :straight t
-  :ensure t
-  :config )
+
+(straight-use-package
+ '(ido-completing-read+
+   :type git
+   :host github
+   :repo "DarwinAwardWinner/ido-completing-read-plus"
+))
+
 
 
 ;---{keybindings}---;

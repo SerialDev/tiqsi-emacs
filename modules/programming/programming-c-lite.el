@@ -90,6 +90,17 @@ header"
 ; C & CPP completion support                                                ;
 ; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
 
+
+;; C & CPP Header completion
+(straight-use-package
+ '(company-irony-c-headers
+   :type git
+   :host github
+   :ensure t
+   :repo "hotpxl/company-irony-c-headers"
+))
+
+
 (use-package irony
  :straight t
  :ensure t
@@ -107,12 +118,6 @@ header"
 
    (add-hook 'irony-mode-hook 'my-irony-mode-hook)
    (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-
-   (use-package company-irony-c-headers
-    :straight t
-    :ensure t
-    :config)
 
    (eval-after-load 'company
      '(add-to-list
