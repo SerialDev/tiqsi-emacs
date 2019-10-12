@@ -34,11 +34,24 @@
 
 
 
-(defun valgrind--run(string)
+(defun tiqsi--tool-valgrind--run(string)
   (interactive "sString for file_name: ")
   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
     (compile (s-concat "valgrind --leak-check=full --track-origins=yes -v " (current-buffer-path) string ))
   )
+
+(defun tiqsi--tool-strace--run(string)
+  (interactive "sString for command: ")
+    (compile (s-concat "strace -f " string ))
+  )
+
+
+(defun tiqsi--tool-coz--run(string arguments)
+  (interactive "sString file_name for causal profiling:  
+sString arguments for causal profiler: ")
+    (compile (s-concat "coz run  " " --- " (current-buffer-path) string ))
+  )
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ Tooling ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
