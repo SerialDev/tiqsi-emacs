@@ -29,6 +29,19 @@
 ;; apt-get install libclang-dev
 ;; ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
 
+; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  /¯¯¯ Tooling ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ     ;
+ ;; valgrind --leak-check=full --track-origins=yes -v
+
+
+
+(defun valgrind--run(string)
+  (interactive "sString for file_name: ")
+  ;; (let ((input (cfrs-read "Text: " "Initial Input")))
+    (compile (s-concat "valgrind --leak-check=full --track-origins=yes -v " (current-buffer-path) string ))
+  )
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ Tooling ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+
 ; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   /¯¯¯ Functionality ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  ;
 
 (use-package google-c-style
