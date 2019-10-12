@@ -52,6 +52,16 @@ sString arguments for causal profiler: ")
     (compile (s-concat "coz run  " " --- " (current-buffer-path) string ))
   )
 
+(defun tiqsi--tool-address-sanitizer--run(string)
+  "In order to use AddressSanitizer
+  you will need to compile and link
+  your program using clang with the
+  -fsanitize=address switch"
+  (interactive "sString for files to compile: ")
+    (compile (s-concat "clang -fsanitize=address -O1 -fno-omit-frame-pointer -g  " string " && " (current-buffer-path) "a.out" ))
+  )
+
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ Tooling ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
