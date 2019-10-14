@@ -37,13 +37,21 @@
 (defun tiqsi--tool-valgrind--run(string)
   (interactive "sString for file_name: ")
   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
-    (compile (s-concat "valgrind --leak-check=full --track-origins=yes -v " (current-buffer-path) string ))
+    (compile (s-concat "valgrind --leak-check=full --track-origins=yes --show-leak-kinds=all -v " (current-buffer-path) string ))
   )
 
 (defun tiqsi--tool-strace--run(string)
   (interactive "sString for command: ")
     (compile (s-concat "strace -f " string ))
   )
+
+
+(defun tiqsi--tool-c-quick-run()
+  (interactive)
+  ;; (let ((input (cfrs-read "Text: " "Initial Input")))
+    (compile (s-concat "clang  " "main.c" "  && ./a.out" ))
+  )
+
 
 
 (defun tiqsi--tool-coz--run(string arguments)
