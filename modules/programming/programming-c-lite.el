@@ -29,8 +29,9 @@
 ;; apt-get install libclang-dev
 ;; ninja -t compdb `ninja -t rules | grep 'CXX_COMPILER_'`
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  /¯¯¯ Tooling ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ     ;
- ;; valgrind --leak-check=full --track-origins=yes -v
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Tooling ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
+
+;; valgrind --leak-check=full --track-origins=yes -v
 
 
 
@@ -55,7 +56,7 @@
 
 
 (defun tiqsi--tool-coz--run(string arguments)
-  (interactive "sString file_name for causal profiling:  
+  (interactive "sString file_name for causal profiling:
 sString arguments for causal profiler: ")
     (compile (s-concat "coz run  " " --- " (current-buffer-path) string ))
   )
@@ -71,9 +72,9 @@ sString arguments for causal profiler: ")
 
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \ַַַ Tooling ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Tooling _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   /¯¯¯ Functionality ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ  ;
+; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Functionality ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
 
 (use-package google-c-style
  :straight t
@@ -115,9 +116,9 @@ header"
         ((string= major-mode "c++-mode")
          (c-mode))))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Functionality ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Functionality _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ UI ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    ;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ UI ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (use-package preproc-font-lock
  :straight t
@@ -125,10 +126,11 @@ header"
  :config
     (preproc-font-lock-global-mode 1))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ UI ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ UI _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Completion ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    ;
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Completion ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 ; ------------------------------------------------------------------------- ;
 ; C & CPP completion support                                                ;
@@ -182,10 +184,9 @@ header"
  )
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ Completion ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Completion _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Navigation ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    ;
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Navigation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 ; ------------------------------------------------------------------------- ;
 ; Grep for the symbol under the cursor.  Works only for C / C++ / H / RC    ;
@@ -232,9 +233,10 @@ header"
   (other-window -1))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ Navigation ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Navigation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ /¯¯¯ Snippets ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ     ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Snippets ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
 
 (defun tiqsi--c-insert-std-version ()
   (interactive)
@@ -253,14 +255,14 @@ header"
 #endif
 "))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \ַַַ Snippets ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Snippets _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
 (eval-after-load 'c-mode
-  (progn  
+  (progn
     (define-key c-mode-map [f12] 'tiqsi-find-corresponding-file)
     (define-key c-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
   ))
@@ -268,8 +270,7 @@ header"
 (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \ַַַ Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
-
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 (provide 'programming-c-lite)
 

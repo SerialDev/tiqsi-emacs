@@ -96,7 +96,7 @@
   (move-beginning-of-line 1)
     (tiqsi-comment--between-nocomment
      (insert
-      (s-replace "    " "ַ ַ " (sdev/truncate
+      (s-replace "    " "_ _ " (sdev/truncate
        sdev/msg-len
        (s-center
 	(- sdev/msg-len 3)
@@ -115,13 +115,29 @@
   (tiqsi-comment--between-nocomment
    (insert
     (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
-(s-center (- sdev/msg-len 3) (s-prepend "  \\ַַַ"
-(s-append " ַַַ/ "    (s-trim-right (thing-at-point 'line t))))))))
+(s-center (- sdev/msg-len 3) (s-prepend "  \\_ _"
+(s-append " _ _/ "    (s-trim-right (thing-at-point 'line t))))))))
      )
 )
 
+(defun tiqsi-comment--enclose (string)
+  (interactive "sString to enclose with: ")
 
-; ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ    /¯¯¯ Keybindings ¯¯¯\ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ ַ   ;
+  (move-beginning-of-line 1)
+  (newline)
+  (insert string)
+  (move-beginning-of-line 1)
+  (tiqsi-comment--line-to-msg-centered-end)
+  (avy-pop-mark)
+  (move-beginning-of-line 1)
+  (insert string)
+  (move-beginning-of-line 1)
+  (tiqsi-comment--line-to-msg-centered-begin)
+  (move-end-of-line 1)
+  (newline)
+  )
+
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 (global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
 (global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
@@ -131,6 +147,8 @@
 (global-set-key (kbd "C-c <") 'tiqsi-comment--line-to-msg-centered-begin)
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ  Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
