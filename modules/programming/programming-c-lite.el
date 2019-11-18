@@ -54,6 +54,20 @@
   )
 
 
+(defun tiqsi--tool-clang-static-analyser(string)
+  (interactive "sString for files to compile: ")
+  ;; (let ((input (cfrs-read "Text: " "Initial Input")))
+    (compile (s-concat "scan-build clang "(current-buffer-path)  string ))
+  )
+
+
+(defun tiqsi--tool-clang-tidy(string)
+  (interactive "sString for files to compile: ")
+  ;; (let ((input (cfrs-read "Text: " "Initial Input")))
+    (compile (s-concat "clang-tidy "(current-buffer-path)  string ))
+  )
+
+
 
 (defun tiqsi--tool-coz--run(string arguments)
   (interactive "sString file_name for causal profiling:
