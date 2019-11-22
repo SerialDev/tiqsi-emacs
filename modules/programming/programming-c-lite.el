@@ -249,6 +249,28 @@ header"
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Navigation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Compilation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+
+
+(if tiqsi-win32
+    (defun compile (data)
+      (if (get-buffer "*shell*")
+	  (progn
+	    (kill-buffer "*shell*")
+	    (send-to-shell data)
+	    (send-to-shell "exit")
+	    (sdev/jump-window))
+	(progn
+	  (send-to-shell data)
+	  (send-to-shell "exit")
+	  (sdev/jump-window))
+	)
+      )
+  (message "compile defined"))
+
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Compilation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Snippets ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
 

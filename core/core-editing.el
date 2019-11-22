@@ -28,8 +28,7 @@
 
 
 
-                                        ;----{Commenting}---;
-
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Commenting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
@@ -56,8 +55,9 @@
   (copy-region-as-kill (mark) (point)))
 
 
-                                        ;----{Replacing}----;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Commenting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Replacing ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (defun tiqsi-replace-in-region (old-word new-word)
   "Perform a replace-string in the current region."
@@ -76,7 +76,19 @@
     (replace-string FromString ToString)))
 
 
-                                        ;------{Saving}-----;
+(defun perlish-fix-regexps (regexp)
+  "Simple translation of a perlish REGEXP to an emacs one."
+  (let ( (new-pattern regexp) )
+    (setq new-pattern (replace-regexp-in-string "(" "\\\\(" new-pattern))
+    (setq new-pattern (replace-regexp-in-string ")" "\\\\)" new-pattern))
+    (setq new-pattern (replace-regexp-in-string "|" "\\\\|" new-pattern))
+    (setq new-pattern (replace-regexp-in-string "\\\\\"" "\"" new-pattern))
+    new-pattern))
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Replacing _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Saving ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
 (defun tiqsi-save-buffer ()
@@ -89,7 +101,9 @@
   (save-buffer))
 
 
-                                        ;----{Inserting}----;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Saving _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Inserting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (defun tiqsi-copy-rectangle (start end)
   "Copy the region-rectangle instead of `kill-rectangle'."
@@ -184,7 +198,9 @@ If there's no region, the current line will be duplicated."
     (one-shot-keybinding "d" 'duplicate-current-line)))
 
 
-                                        ;---{Indentation}---;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Inserting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Indentation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 (defun indent-buffer ()
   "Indents an entire buffer using the default intenting scheme."
@@ -196,7 +212,10 @@ If there's no region, the current line will be duplicated."
   (jump-to-register 'o))
 
 
-                                        ;---{Modification}--;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Indentation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+
+
+; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Modification ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
 ;; unrelated, but a nice spot for it
@@ -303,7 +322,9 @@ If there's no region, the current line will be duplicated."
      (t (backward-char)))))
 
 
-                                        ;------{Toggle}-----;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Modification _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Toggle ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
 (try-require 'origami)
@@ -418,8 +439,9 @@ If there's no region, the current line will be duplicated."
     (error "Point isn't in a string")))
 
 
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Toggle _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-                                        ;-----{Deleting}----;
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Deleting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
 
 
 (defun sdev/del-beg-line()
@@ -463,7 +485,9 @@ region if active."
         (move-beginning-of-line nil)
         (kill-whole-line)))))
 
-                                        ;----{Kill Ring}----;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Deleting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Kill Ring ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (use-package undo-tree
   :straight t
@@ -495,7 +519,10 @@ region if active."
   (insert (completing-read "Pick an element: "
                            (preprocess-kill-ring))))
 
-                                        ;---{Keybindings}---;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Kill Ring _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+
 (define-key global-map [f8] 'tiqsi-replace-string)
 
                                         ; Editting
@@ -544,6 +571,7 @@ region if active."
                                         ; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
                                         ; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
 
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 (provide 'core-editing)
 
 ;;; core-editing.el ends here
