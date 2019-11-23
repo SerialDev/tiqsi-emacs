@@ -210,10 +210,6 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 
 
-(define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
-(define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
-(define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
-
 (provide 'programming-lisp)
 
 ;;; programming-lisp.el ends here
