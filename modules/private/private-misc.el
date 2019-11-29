@@ -46,6 +46,19 @@ This command switches to browser."
     (eww myUrl) ; emacs's own browser
     ))
 
+(defun insert-image-from-url (&optional url)
+  (interactive)
+  (unless url (setq url (url-get-url-at-point)))
+  (unless url
+    (error "Couldn't find URL."))
+  (let ((buffer (url-retrieve-synchronously url)))
+    (unwind-protect
+         (let ((data (with-current-buffer buffer
+                       (goto-char (point-min))
+                       (search-forward "\n\n")
+                       (buffer-substring (point) (point-max)))))
+           (insert-image (create-image data nil t)))
+      (kill-buffer buffer))))
 
 (defun my-lookup-google ()
   "Look up the word under cursor in Google.

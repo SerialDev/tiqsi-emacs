@@ -26,6 +26,10 @@
 ;;; Commentary:
 ;;
 
+(straight-require 'hydra)
+(straight-require 'rust-mode)
+(straight-require 'cargo)
+(straight-require 'racer)
 
 (setq exec-path (append exec-path '("/home/usr/.cargo/bin")))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
@@ -54,6 +58,16 @@
              (add-hook 'rust-mode-hook 'cargo-minor-mode)
              (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
              (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+
+
+(when tiqsi-win32
+  (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "where racer")) "racer.exe")  )
+  ;; (setq exec-path (append exec-path (file-name-directory (shell-command-to-string "where cargo"))))
+  (setq racer-rust-src-path
+      (concat (string-trim
+               (shell-command-to-string "rustc --print sysroot"))
+              "/lib/rustlib/src/rust/src"))
+  )
 
 
                                         ;-{Static checking}-;
