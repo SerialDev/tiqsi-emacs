@@ -31,38 +31,35 @@
 (straight-require 'cargo)
 (straight-require 'racer)
 
+
 (setq exec-path (append exec-path '("/home/usr/.cargo/bin")))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-(add-hook 'rust-mode-hook  #'company-mode)
-(add-hook 'rust-mode-hook  #'racer-mode)
-(add-hook 'racer-mode-hook #'eldoc-mode)
-(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-(setq rust-format-on-save t)
 
-;; (custom-set-variables
-;;  '(racer-cmd (expand-file-name "/cargo/bin/racer"))
-;;  '(racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")))
+(setq racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
 
-(add-hook 'rust-mode-hook
-          '(lambda ()
-             (setq tab-width 2)
-             (setq racer-cmd (expand-file-name "/cargo/bin/racer"))
-             (setq racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
-             ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
-             ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
-             (setq company-tooltip-align-annotations t)
-             (add-hook 'rust-mode-hook #'racer-mode)
-             (add-hook 'racer-mode-hook #'eldoc-mode)
-             (add-hook 'racer-mode-hook #'company-mode)
-             (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-             (add-hook 'rust-mode-hook 'cargo-minor-mode)
-             (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-             (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+(add-hook
+ 'rust-mode-hook
+ '(lambda ()
+    (setq tab-width 2)
+    (setq racer-cmd (expand-file-name "/cargo/bin/racer"))
+
+    ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
+    ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
+    (setq company-tooltip-align-annotations t)
+    (add-hook 'rust-mode-hook #'racer-mode)
+    (add-hook 'racer-mode-hook #'eldoc-mode)
+    (add-hook 'racer-mode-hook #'company-mode)
+    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+    (add-hook 'rust-mode-hook 'cargo-minor-mode)
+    (setq rust-format-on-save t)
+    (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+    (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+
 
 
 (when tiqsi-win32
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "where racer")) "racer.exe")  )
-  ;; (setq exec-path (append exec-path (file-name-directory (shell-command-to-string "where cargo"))))
+  (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "where cargo"))) ))
   (setq racer-rust-src-path
       (concat (string-trim
                (shell-command-to-string "rustc --print sysroot"))
