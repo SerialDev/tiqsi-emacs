@@ -32,17 +32,12 @@
 (straight-require 'racer)
 
 
-(setq exec-path (append exec-path '("/home/usr/.cargo/bin")))
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-
-(setq racer-rust-src-path (expand-file-name "/rust/toolchains/nightly-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src"))
 
 (add-hook
  'rust-mode-hook
  '(lambda ()
     (setq tab-width 2)
-    (setq racer-cmd (expand-file-name "/cargo/bin/racer"))
-
     ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
     ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
     (setq company-tooltip-align-annotations t)
@@ -55,7 +50,16 @@
     (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
     (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
 
+(when tiqsi-linux
 
+  (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "which cargo") ) )))
+  (setq racer-rust-src-path
+      (concat (string-trim
+               (shell-command-to-string "rustc --print sysroot"))
+              "/lib/rustlib/src/rust/src"))
+  (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "which racer")) "racer")  )
+
+)
 
 (when tiqsi-win32
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "where racer")) "racer.exe")  )
