@@ -131,6 +131,39 @@ _|_: Doc Tree     _k_: Check         _q_: Clippy
 
 
 
+(defun current-line ()
+     (string-to-number (car (cdr(s-split " " (what-line)))))
+     )
+
+
+
+(defun tiqsi--rust-print-src()
+    (interactive)
+  (let ((match-end  (s-split "END"   (shell-command-to-string (format-mode-line "racer find-definition %l %c /mnt/c/workspace/work_den/personal/projects/book-progress/rust/gamedev/quick_pong/src/main.rs") ))))
+  (if (s-equals? (car match-end) "")
+      1
+    (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
+(cl-multiple-value-bind
+    (name row col path type extra)
+    (s-split ","  match-match )
+
+  (with-temp-buffer
+    (insert-file-contents path)
+    (goto-line (string-to-number row))
+    (print (buffer-substring-no-properties (point)
+    (search-forward "}" )))
+    )
+  )
+))))
+
+
+
+(string-to-number (format-mode-line "%l"))
+
+(string-to-number (format-mode-line "%c"))
+
+
+
 (defun racer-ui-tooltip ()
   "Show the docstring in a tooltip.
 The tooltip's face is `racer-tooltip'
