@@ -135,11 +135,11 @@ _|_: Doc Tree     _k_: Check         _q_: Clippy
      (string-to-number (car (cdr(s-split " " (what-line)))))
      )
 
-
+(format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name)))
 
 (defun tiqsi--rust-print-src()
     (interactive)
-  (let ((match-end  (s-split "END"   (shell-command-to-string (format-mode-line "racer find-definition %l %c /mnt/c/workspace/work_den/personal/projects/book-progress/rust/gamedev/quick_pong/src/main.rs") ))))
+  (let ((match-end  (s-split "END"   (shell-command-to-string (format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name))) ))))
   (if (s-equals? (car match-end) "")
       1
     (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
@@ -160,7 +160,7 @@ _|_: Doc Tree     _k_: Check         _q_: Clippy
 
 (defun tiqsi--racer-insert-struct-point()
     (interactive)
-  (let (  (b-name (buffer-name)) (match-end  (s-split "END"   (shell-command-to-string (format-mode-line "racer find-definition %l %c /mnt/c/workspace/work_den/personal/projects/book-progress/rust/gamedev/quick_pong/src/main.rs") ))))
+  (let (  (b-name (buffer-name)) (match-end  (s-split "END"   (shell-command-to-string (format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name))) ))))
   ;; (let ((match-end  (s-split "END"  ttt )) (b-name (buffer-name)))
   (if (s-equals? (car match-end) "")
       1
@@ -217,8 +217,8 @@ See `racer-describe'."
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
 (define-key rust-mode-map (kbd "C-t") 'racer-ui-tooltip )
 
-(define-key rust-mode-map (kbd "C-p") 'tiqsi--rust-print-src )
-(define-key rust-mode-map (kbd "C-i") 'tiqsi--racer-insert-struct-point )
+(define-key rust-mode-map (kbd "M-p") 'tiqsi--rust-print-src )
+(define-key rust-mode-map (kbd "M-i") 'tiqsi--racer-insert-struct-point )
 
 (provide 'programming-rust)
 

@@ -41,7 +41,7 @@
 (package-initialize)
 
 ;; Debug?
-(setq debug-on-error t)
+;; (setq debug-on-error t)
 
 
 ;----{About User}---;
@@ -177,6 +177,10 @@ of an error, just add the package to a list of missing packages."
       (message (format "%s SUCCESS: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name  ))
       (message (format "%s FAILURE: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name))))
 
+(straight-require 'evil)
+
+(straight-require 'company)
+(straight-require 'color)
 (straight-require 'evil)
 
 
