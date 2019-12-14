@@ -46,6 +46,18 @@
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
+(defun ts-parcel-build()
+  (interactive)
+  (compile
+   (s-prepend
+    (s-append
+     (car(s-split "src" (current-buffer-path))) "npx parcel build " ) "index.html")))
+
+(define-key typescript-mode-map (kbd "C-c C-c") 'ts-parcel-build)
+
+
+
+
 (provide 'programming-typescript)
 
 ;;; programming-typescript.el ends here
