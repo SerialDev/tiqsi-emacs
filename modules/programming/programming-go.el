@@ -73,6 +73,49 @@
   :commands yas-minor-mode
   :hook (go-mode . yas-minor-mode))
 
+(use-package projectile
+  :straight t
+  )
+
+
+(defun my-projectile-project-find-function (dir)
+  (let ((root (projectile-project-root dir)))
+    (and root (cons 'transient root))))
+
+(projectile-mode t)
+
+(with-eval-after-load 'project
+  (add-to-list 'project-find-functions 'my-projectile-project-find-function))
+
+(defun find-projectile-project ()
+  (let ((probe (locate-dominating-file default-directory ".projectile")))
+    (when probe `(projectile . ,probe))))
+
+(add-hook 'project-find-functions 'find-projectile-project 'append)
+
+
+(defun go-build()
+  (interactive)
+  (compile
+   "go build main.go"))
+
+(defun go-run()
+  (interactive)
+  (compile
+   "go run main.go"))
+
+
+(defun go-build-win()
+  (interactive)
+  (compile
+   "env GOOS=windows GOARCH=amd64 go build main.go"))
+
+(define-key go-mode-map (kbd "C-c C-c") 'go-build)
+(define-key go-mode-map (kbd "C-c C-r") 'go-run)
+(define-key go-mode-map (kbd "C-c C-w") 'go-build-win)
+
+
+
 (provide 'programming-go)
 
 ;;; programming-go.el ends here

@@ -1,5 +1,10 @@
 #!/bin/sh
 
+add_env () {
+    echo "export PATH=$1$PATH" >> ~/.bashrc
+}
+
+
 
 sudo apt-get update && \
 sudo apt-get install --no-install-recommends -y \
@@ -37,24 +42,24 @@ sudo apt-get install pkg-config -y && \
 sudo apt-get install clang -y && \
 sudo apt-get install cmake -y
 
-sudo apt-get install -y openssh-server && \
-    sudo mkdir /var/run/sshd && \
-    sudo echo 'root:root' |chpasswd && \
-    sudo sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config & \
-    sudo sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config & \
-    sudo mkdir /root/.ssh
+# sudo apt-get install -y openssh-server && \
+#     sudo mkdir /var/run/sshd && \
+#     sudo echo 'root:root' |chpasswd && \
+#     sudo sed -ri 's/^#?PermitRootLogin\s+.*/PermitRootLogin yes/' /etc/ssh/sshd_config & \
+#     sudo sed -ri 's/UsePAM yes/#UsePAM yes/g' /etc/ssh/sshd_config & \
+#     sudo mkdir /root/.ssh
 
-sudo apt-get clean && \
-sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# sudo apt-get clean && \
+# sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-sudo curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
+# sudo curl -fsSL https://raw.githubusercontent.com/cask/cask/master/go | python
 
-sudo apt-get update && apt-get install opam -y && \
-sudo opam init && \
-sudo opam install utop -y && \
-sudo opam install tuareg -y && \
-sudo opam install merlin -y && \
-sudo opam user-setup install
+# sudo apt-get update && apt-get install opam -y && \
+# sudo opam init && \
+# sudo opam install utop -y && \
+# sudo opam install tuareg -y && \
+# sudo opam install merlin -y && \
+# sudo opam user-setup install
 
 sudo apt-get install nodejs -y && \
 sudo apt-get install npm -y && \
@@ -70,11 +75,12 @@ sudo curl -L "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}
 sudo dpkg -i tini.deb && \
 sudo rm tini.deb && \
 sudo apt-get clean
-
+ 
 sudo echo 'export PATH=/opt/conda/bin:$PATH' > sudo /etc/profile.d/conda.sh && \
 sudo wget --quiet https://repo.continuum.io/archive/Anaconda3-5.1.0-Linux-x86_64.sh -O ~/anaconda.sh && \
 sudo /bin/bash ~/anaconda.sh -b -p /opt/conda && \
 sudo rm ~/anaconda.sh
+add_env /opt/conda/bin
 
 sudo conda update -n base conda && \
 sudo conda install pytorch -c pytorch && \
