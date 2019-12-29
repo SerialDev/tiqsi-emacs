@@ -53,6 +53,22 @@
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :commands lsp
+;; :hook (prog-mode . lsp))
+
+;; (use-package lsp-ui
+;;   :ensure t
+;;   :commands lsp-ui-mode)
+
+;; (use-package company-lsp
+;;   :ensure t
+;;   :commands company-lsp
+;;   :config
+;; (push 'company-lsp company-backends))
+
+
 
 (provide 'programming-javascript)
 

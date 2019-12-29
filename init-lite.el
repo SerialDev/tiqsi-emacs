@@ -183,6 +183,9 @@ of an error, just add the package to a list of missing packages."
 (straight-require 'color)
 (straight-require 'evil)
 
+(straight-use-package
+ '(selectrum :host github :repo "raxod502/selectrum"))
+
 
 (load-expand  "core/core-performance.el")
 
@@ -205,6 +208,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/programming/programming-python-lite.el")
 (load-expand  "modules/programming/programming-go.el")
 (load-expand  "modules/programming/programming-rust.el")
+(load-expand  "modules/programming/programming-javascript.el")
 
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)
