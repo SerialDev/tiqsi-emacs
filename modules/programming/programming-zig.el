@@ -34,9 +34,16 @@
 	    ))
 
 
+
+ (buffer-file-name)
+
 (defun zig-compile ()
   (interactive)
   (compile "zig compile main.zig"))
+
+(defun zig-test()
+  (interactive)
+  (compile "zig test main.zig"))
 
 (provide 'programming-zig)
 
