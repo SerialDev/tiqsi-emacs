@@ -13,8 +13,10 @@
 
 (when tiqsi-linux
    (progn
-     (load (expand-file-name "~/quicklisp/slime-helper.el"))
-     (setq inferior-lisp-program "sbcl")))
+     ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+     (setq inferior-lisp-program "sbcl")
+    (load (expand-file-name "~/.roswell/helper.el"))
+))
 
 (when tiqsi-win32
   (progn
@@ -26,14 +28,24 @@
 (setq slime-contribs '(slime-fancy))
 (slime-setup '(slime-fancy slime-company))
 
+(setf slime-lisp-implementations
+      `((sbcl    ("sbcl" "--dynamic-space-size" "2000"))
+        (roswell ("ros" "-Q" "run"))))
+(setf slime-default-lisp 'roswell)
 
-(add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
-;; Stop SLIME's REPL from grabbing DEL,
-;; which is annoying when backspacing over a '('
-(defun override-slime-repl-bindings-with-paredit ()
-  (define-key slime-repl-mode-map
-    (read-kbd-macro paredit-backward-delete-key) nil))
-(add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
+(use-package paredit
+  :straight t
+  :config
+  (progn
+    
+    (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
+    ;; Stop SLIME's REPL from grabbing DEL,
+    ;; which is annoying when backspacing over a '('
+    (defun override-slime-repl-bindings-with-paredit ()
+      (define-key slime-repl-mode-map
+	(read-kbd-macro paredit-backward-delete-key) nil))
+    (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
+    ))
 
 ;; Elisp go-to-definition with M-. and back again with M-,
 (autoload 'elisp-slime-nav-mode "elisp-slime-nav")
@@ -91,14 +103,14 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   )
 
 
-(straight-use-package
- '(coleslaw
-   :type git
-   :host github
-   :repo "equwal/coleslaw"
-   :config
-   (coleslaw-setup)
-   ))
+;; (straight-use-package
+;;  '(coleslaw
+;;    :type git
+;;    :host github
+;;    :repo "equwal/coleslaw"
+;;    :config
+;;    (coleslaw-setup)
+;;    ))
 
 
 ;; (straight-use-package
@@ -200,6 +212,7 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (define-key slime-mode-map (kbd "C-c C-s") 'slime-eval-last-expression)
 (define-key slime-mode-map (kbd "C-c s") 'slime-eval-last-expression-in-repl)
 (define-key slime-mode-map (kbd "C-c C-p") 'slime)
+(define-key lisp-mode-map (kbd "C-c C-p") 'slime)
 (define-key slime-mode-map (kbd "C-r") 'slime-reindent-defun)
 
 ;; Sly
