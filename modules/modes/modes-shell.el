@@ -93,12 +93,13 @@
 			     ))
 		   )
 	  )
-    (generate-new-buffer "*Tip Frame Buffer*")
 
+    (generate-new-buffer "*Tip Frame Buffer*")
 
     (set-frame-position tip-frame
 			(- (car (window-absolute-pixel-position)) (frame-char-width))
 			(+ (cdr (window-absolute-pixel-position)) (frame-char-size)))
+
 
     (let ((current-frame (selected-frame) ))
       (make-frame-visible tip-frame)
@@ -132,8 +133,8 @@
 ;  -------------------------------------------------------------------------------- ;
 
 
-(make-tip-frame "")
-(async-shell-command "ls" "*Tip Frame Buffer*")
+;; (make-tip-frame "")
+;; (async-shell-command "ls" "*Tip Frame Buffer*")
 
 (defun tooltip-command (shell-command-to-execute)
   (while-no-input
@@ -154,11 +155,85 @@
 )
 
 (create-tooltip-command "ls" "ls")
-(create-tooltip-command "running-processes" "ps aux | wc -l")
+(create-tooltip-command "count-running-processes" "ps aux | wc -l")
 (create-tooltip-command "display-uid" "cut -d ':' -f 1,3 /etc/passwd | sort -t ':' -k2n - | tr ':' '\t'")
 (create-tooltip-command "process-memory" "ps aux | awk '{if ($5 != 0 ) print $2,$5,$6,$11}' | sort -k2n")
 (create-tooltip-command "top-largest" "du -sk /var/log/* | sort -r -n | head -10")
 (create-tooltip-command "count-all-files" "ls |xargs -n1 wc -l | sort -r -n")
+(create-tooltip-command "show-memory-usage" "free -c 1 -mhs 1")
+(create-tooltip-command "show-uptime" "uptime")
+(create-tooltip-command "show-running-processes" "ps aux") ;; Make visual-line-mode active
+(create-tooltip-command "show-process-tree" "pstree")
+(create-tooltip-command "show-kernel-ring-buffer" "dmesg | tail -20")
+(create-tooltip-command "show-maximum-n-processes" "cat /proc/sys/kernel/pid_max")
+(create-tooltip-command "show-system-version" "cat /etc/*-release")
+(create-tooltip-command "show-current-jobs" "jobs -l" )
+(create-tooltip-command "show-system-info" "uname -a" )
+(create-tooltip-command "show-system-platform" "uname -i" )
+(create-tooltip-command "show-system-alias-list" "alias -p" )
+(create-tooltip-command "show-disk-usage" "df -h" )
+(create-tooltip-command "show-dir-usage" "du -h" )
+(create-tooltip-command "show-dir-tree" "tree" )
+(create-tooltip-command "show-cpu-info" "lscpu" )
+(create-tooltip-command "show-libs-in-cache" "ldconfig -p" )
+(create-tooltip-command "count-num-cores" "nproc --all" )
+(create-tooltip-command "show-running-services" "service --status-all" )
+
+;; (create-tooltip-command "show-kernel-alert" "dmesg - -level=alert")
+
+;; Print or control the kernel ring buffer
+;; dmesg
+
+;; TODO: improve the macro || alternative macro for the following use-cases 
+
+;; Copy your default public key to remote user
+;; ssh-copy-id <user_name>@<server_IP>
+
+;; Display file status (size; access, modify and change time, etc) of a file (e.g. filename.txt)
+;; stat filename.txt
+
+;; Print information related to USB
+;; $ dmesg | grep -i usb
+
+;; Print with human readable time
+;; $ dmesg  - -ctime
+
+;; Print dmesg based on facility 
+;; dmesg --facility=daemon
+;; kern - kernel messages
+;; user - random user-level messages
+;; mail - mail system
+;; daemon - system daemons
+;; auth - security/authorization messages
+;; syslog - messages generated internally by syslogd
+;; lpr - line printer subsystem
+;; news - network news subsystemt
+
+;; Print log level
+;; dmesg - -level=err
+;; Supported levels
+;; emerg - system is unusable
+;; alert - action must be taken immediately
+;; crit - critical conditions
+;; err - error conditions
+;; warn - warning conditions
+;; notice - normal but significant condition
+;; info - informational
+;; debug - debug-level messages
+
+
+;; Print shared library dependencies (e.g. for ‘ls’)
+;; ldd /bin/ls
+
+
+;; Which ports are listening for TCP connections from the network
+;; nmap -sT -O localhost
+;; #notice that some companies might not like you using nmap
+
+
+
+;; Kill all process of a program
+;; kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')
 
 (provide 'modes-shell)
 

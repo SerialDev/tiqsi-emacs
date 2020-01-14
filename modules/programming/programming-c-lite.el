@@ -69,7 +69,7 @@
 (defun tiqsi--tool-cpp-quick-run()
   (interactive)
   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
-    (compile (s-concat "clang++  " "main.cpp" "  && ./a.out" ))
+    (compile (s-concat "clang++  " "main.cpp -g -Wall" "  && ./a.out" ))
   )
 
 
@@ -103,31 +103,64 @@ sString arguments for causal profiler: ")
     (compile (s-concat "clang -fsanitize=address -O1 -fno-omit-frame-pointer -g  " string " && " (current-buffer-path) "a.out" ))
   )
 
+(setq llvm "clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz")
+(setq clang-v " clang_9.0.1")
+
+
+(defun bashrc_funcs ()
+  (send-to-shell "add_env () {     echo \"export PATH=$1:$PATH\" >> ~/.bashrc ; }")
+  (send-to-shell "add_rc () {     echo \"$1\" >> ~/.bashrc ; }")
+  )
+
 (defun install-llvm-clang ()
   "Install desired clang from bin source.
    TODO: send-after-finish"
   (interactive)
-  (let ((llvm "clang+llvm-9.0.0-x86_64-pc-linux-gnu.tar.xz" ) )
-    (send-to-shell (s-prepend "wget http://releases.llvm.org/9.0.0/" llvm))
-    (send-to-shell (s-prepend "tar xf" llvm)) ;; Edit this so that tar works based on type
-    (send-to-shell (s-prepend "rm" llvm))
+  (let ((llvm "clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz" )
+	(clang-v " clang_9.0.1"))
+    (send-to-shell (s-prepend "wget https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/" llvm))
+    (send-to-shell (s-prepend "tar xf " llvm)) ;; Edit this so that tar works based on type
+    (send-to-shell (s-prepend "rm " llvm))
     (send-to-shell (s-prepend
 		    (s-prepend
 		     "mv "
 		     (s-join "\\."(butlast (s-split "\\." llvm)
 					   2)))
-		    " clang_9.0.0"))
-    (send-to-shell (s-prepend "sudo mv clang_9.0.0" "/usr/local"))
-    (send-to-shell "add_env () {     echo \"export PATH=$1:$PATH\" >> ~/.bashrc ; }")
-    (send-to-shell "add_env /usr/local/clang_9.0.0/bin")
-    (send-to-shell "add_rc () {     echo \"$1\" >> ~/.bashrc ; }")
-    (send-to-shell "add_rc export LD_LIBRARY_PATH=/usr/local/clang_9.0.0/lib:$LD_LIBRARY_PATH")
-    (send-to-shell "export PATH=/usr/local/clang_9.0.0/bin:$PATH")
-    (send-to-shell "export LD_LIBRARY_PATH=/usr/local/clang_9.0.0/lib:$LD_LIBRARY_PATH")
+		    clang-v))
+    (send-to-shell (s-prepend "sudo mv" (s-prepend clang-v " /usr/local")))
+    (bashrc_funcs)
+    (send-to-shell "add_env /usr/local/clang_9.0.1/bin")
+    (send-to-shell "add_rc export LD_LIBRARY_PATH=/usr/local/clang_9.0.1/lib:$LD_LIBRARY_PATH")
+    (send-to-shell "export PATH=/usr/local/clang_9.0.1/bin:$PATH")
+    (send-to-shell "export LD_LIBRARY_PATH=/usr/local/clang_9.0.1/lib:$LD_LIBRARY_PATH")
   )
   )
 
+(defun install-coz ()
+  
+
+  )
+
+
+;; (let (( ))
+;;   (send-to-shell "sudo apt-get install docutils-common libelfin-dev nodejs -y")
+;;   (send-to-shell (s-prepend "cd " "/mnt/c/sdev_machine/"))
+;;   (send-to-shell "git clone https://github.com/plasma-umass/coz.git")
+;;   (send-to-shell "cd coz && make")
+;;   (send-to-shell "cd .. && sudo mv coz /usr/local/bin/")
+;;   (bashrc_funcs)
+;;   (send-to-shell "add_env /usr/local/bin/coz")
+;;   )
+
+
 ;; https://github.com/MaskRay/ccls.git
+;; apt-get install rapidjson-dev
+;; cd ccls
+;; mkdir Release
+;; cd Release
+;; cmake ..
+;; make
+;; add_env <current_dir>
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Tooling _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
