@@ -105,6 +105,18 @@
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Inserting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
+
+
+(defun md-insert-base64 (b64-name b64-data)
+  (interactive "sEnter name:
+sEnter b64 data: ")
+  (insert
+   (s-prepend
+    (s-prepend "![" (s-prepend b64-name "]"))
+    (s-prepend "(data:image/png;base64," (s-prepend b64-data ")" )))
+   )
+  )
+
 (defun tiqsi-copy-rectangle (start end)
   "Copy the region-rectangle instead of `kill-rectangle'."
   (interactive "r")
