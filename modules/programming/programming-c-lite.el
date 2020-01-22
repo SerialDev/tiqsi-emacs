@@ -112,6 +112,10 @@ sString arguments for causal profiler: ")
   (send-to-shell "add_rc () {     echo \"$1\" >> ~/.bashrc ; }")
   )
 
+(setq llvm "clang+llvm-9.0.1-x86_64-linux-gnu-ubuntu-16.04.tar.xz" )
+(setq clang-v " clang_9.0.1")
+
+
 (defun install-llvm-clang ()
   "Install desired clang from bin source.
    TODO: send-after-finish"
@@ -123,7 +127,7 @@ sString arguments for causal profiler: ")
     (send-to-shell (s-prepend "rm " llvm))
     (send-to-shell (s-prepend
 		    (s-prepend
-		     "mv "
+ 		     "mv "
 		     (s-join "\\."(butlast (s-split "\\." llvm)
 					   2)))
 		    clang-v))
@@ -137,7 +141,7 @@ sString arguments for causal profiler: ")
   )
 
 (defun install-coz ()
-  
+
 
   )
 
@@ -153,14 +157,18 @@ sString arguments for causal profiler: ")
 ;;   )
 
 
-;; https://github.com/MaskRay/ccls.git
-;; apt-get install rapidjson-dev
-;; cd ccls
-;; mkdir Release
-;; cd Release
-;; cmake ..
-;; make
-;; add_env <current_dir>
+(defun install-ccls()
+  (send-to-shell "cd")
+  (send-to-shell "git clone https://github.com/MaskRay/ccls.git")
+  (send-to-shell "cd ccls && mkdir Release && cd Release")
+  (send-to-shell "cmake ..")
+  (send-to-shell "make")
+  (send-to-shell "cd .. && mv Release /usr/local/ccls/")
+  (bashrc_funcs)
+  (send-to-shell "add_env /usr/local/ccls ")
+  (send-to-shell "cd .. && rm -rf ccls")
+  )
+
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Tooling _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
