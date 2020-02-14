@@ -285,7 +285,7 @@
 (size-indication-mode t)
 
 ;; don't commit trailing whitespace 
-(setq-default show-trailing-whitespace nil)
+(setq-default show-trailing-whitespace t)
 (setq-default default-indicate-empty-lines t)
 
 (defun toggle-whitespace ()

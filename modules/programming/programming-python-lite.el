@@ -239,11 +239,18 @@ else:
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Jupyter Notebooks ¯¯¯\_ _ _ _ _ _ _ _ _ _    ;
 
-(add-hook 'poly-ein-mode-hook '(lambda ()
+(use-package ein
+  :straight t
+  :ensure t
+  :config(progn
+
+	   (add-hook 'poly-ein-mode-hook '(lambda ()
 				 (set (make-local-variable 'linum-mode) nil)))
 
-(define-key poly-ein-mode-map (kbd "C-n") 'ein:worksheet-goto-next-input-km)
-(define-key poly-ein-mode-map (kbd "C-b") 'ein:worksheet-goto-prev-input-km)
+	   (define-key poly-ein-mode-map (kbd "C-n") 'ein:worksheet-goto-next-input-km)
+	   (define-key poly-ein-mode-map (kbd "C-b") 'ein:worksheet-goto-prev-input-km)
+
+	   ))
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Jupyter Notebooks _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
