@@ -90,6 +90,7 @@
 (make-face 'font-lock-done-face)
 (make-face 'font-lock-fn-face)
 (make-face 'font-lock-nus-face)
+(make-face 'font-lock-wip-face)
 
 (mapc (lambda (mode)
         (font-lock-add-keywords
@@ -98,6 +99,7 @@
            ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
            ("\\<\\(CHECK\\)" 1 'font-lock-check-face t)
            ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
+           ("\\<\\(WIP\\)" 1 'font-lock-wip-face t)
            ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
            ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
 	   ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
@@ -112,6 +114,7 @@
 (modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
 (modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
 (modify-face 'font-lock-nus-face "Grey21" nil nil t nil t nil nil)
+(modify-face 'font-lock-wip-face "systemYellowColor" nil nil t nil t nil nil)
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
@@ -525,7 +528,7 @@
            (insert-image (create-image data nil t)))
       (kill-buffer buffer))))
 
-(insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335") 
+(insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
 
 
 
