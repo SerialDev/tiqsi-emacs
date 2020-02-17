@@ -82,15 +82,28 @@
 
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
+(make-face 'font-lock-check-face)
+(make-face 'font-lock-done-face)
+(make-face 'font-lock-fn-face)
+
 (mapc (lambda (mode)
         (font-lock-add-keywords
          mode
          '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
+           ("\\<\\(CHECK\\)" 1 'font-lock-check-face t)
+           ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
+           ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
+           ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
+
+	   )))
       fixme-modes)
 
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
+(modify-face 'font-lock-check-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
+(modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
 
 
 ;                                           Line Highlight                                          ;
@@ -285,7 +298,7 @@
 (size-indication-mode t)
 
 ;; don't commit trailing whitespace 
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace nil)
 (setq-default default-indicate-empty-lines t)
 
 (defun toggle-whitespace ()
