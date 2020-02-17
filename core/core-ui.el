@@ -284,9 +284,18 @@
 
 (size-indication-mode t)
 
-;; don't commit trailing whitespace
+;; don't commit trailing whitespace 
 (setq-default show-trailing-whitespace t)
 (setq-default default-indicate-empty-lines t)
+
+(defun toggle-whitespace ()
+  (interactive)
+  (if (equal show-trailing-whitespace nil)
+      (setq show-trailing-whitespace t)
+    (setq show-trailing-whitespace nil))
+
+      )
+
 
 ;; "Never, ever split a window.  Why would anyone EVER want you to do that??"
 (setq split-window-preferred-function nil)
@@ -395,7 +404,8 @@
   (lambda ()
     (set-face-attribute 'whitespace-newline nil :foreground "#d3d7cf")
     (set-face-attribute 'whitespace-tab nil :background nil :underline "#d3d7cf")
-    (set-face-attribute 'whitespace-trailing nil :background nil :underline "#a40000")))
+    (set-face-attribute 'whitespace-trailing nil :background nil :underline "#a40000")
+    ))
 
 (defun whitespace-post-command-hook() nil) ; workaround for cursor slowdown
 
