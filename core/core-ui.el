@@ -75,6 +75,10 @@
 
 (setq echo-keystrokes 0.0001)
 
+; _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Face modifiers ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
+
+
+
 ;                                          Brigth red TODO                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
@@ -85,6 +89,7 @@
 (make-face 'font-lock-check-face)
 (make-face 'font-lock-done-face)
 (make-face 'font-lock-fn-face)
+(make-face 'font-lock-nus-face)
 
 (mapc (lambda (mode)
         (font-lock-add-keywords
@@ -95,6 +100,8 @@
            ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
            ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
            ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
+	   ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
+
 
 	   )))
       fixme-modes)
@@ -104,7 +111,10 @@
 (modify-face 'font-lock-check-face "Yellow" nil nil t nil t nil nil)
 (modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
 (modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
+(modify-face 'font-lock-nus-face "Dark Grey" nil nil t nil t nil nil)
 
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 ;                                           Line Highlight                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
@@ -497,6 +507,30 @@
 
 ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+
+
+(defun insert-image-from-url (&optional url)
+  (interactive)
+  (unless url (setq url (url-get-url-at-point)))
+  (unless url
+    (error "Couldn't find URL."))
+  (let ((buffer (url-retrieve-synchronously url)))
+    (unwind-protect
+         (let ((data (with-current-buffer buffer
+                       (goto-char (point-min))
+                       (search-forward "\n\n")
+                       (buffer-substring (point) (point-max)))))
+           (insert-image (create-image data nil t)))
+      (kill-buffer buffer))))
+
+(insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335") 
+
+
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 
 ;                                            Keybindings                                            ;
