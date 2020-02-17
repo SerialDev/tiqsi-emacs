@@ -30,6 +30,31 @@
 ;                                            Determine OS                                           ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
+(defmacro with-system (type &rest body)
+  "Evaluate BODY if `system-type' equals TYPE."
+  (declare (indent defun))
+  `(when (eq system-type ',type)
+     ,@body))
+
+(with-system darwin
+  (message "OSX laptop!"))
+
+(with-system windows
+  (message "windows laptop!"))
+
+(with-system gnu/linux
+      (if
+	  (string-match "Microsoft"
+			(with-temp-buffer (shell-command "uname -r" t)
+					  (goto-char (point-max))
+					  (delete-char -1)
+					  (buffer-string)))
+	  (message "Running under Linux subsystem for Windows")
+	(message "Not running under Linux subsystem for Windows")
+	)
+      )
+
+
 (setq tiqsi-aquamacs (featurep 'aquamacs))
 (setq tiqsi-linux (featurep 'x))
 (setq tiqsi-win32 (not (or tiqsi-aquamacs tiqsi-linux)))
