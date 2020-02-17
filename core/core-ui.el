@@ -111,7 +111,7 @@
 (modify-face 'font-lock-check-face "Yellow" nil nil t nil t nil nil)
 (modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
 (modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
-(modify-face 'font-lock-nus-face "Dark Grey" nil nil t nil t nil nil)
+(modify-face 'font-lock-nus-face "Grey21" nil nil t nil t nil nil)
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
