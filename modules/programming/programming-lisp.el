@@ -33,6 +33,17 @@
   )
 
 
+
+(defmacro ros-commands (&rest commands)
+  `(send-to-shell
+   (concat 
+    (concat "ros --eval '" ,@commands)
+    "'")
+   )
+
+  )
+
+
 ;; (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
 (slime-setup '(slime-fancy slime-company))
