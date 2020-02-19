@@ -11,17 +11,26 @@
 (slime-setup '(slime-fancy slime-tramp))
 ;; Set the default lisp you want to use (here it's SBCL).
 
-(when tiqsi-linux
+(with-system gnu/linux
    (progn
      ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
      (setq inferior-lisp-program "sbcl")
     (load (expand-file-name "~/.roswell/helper.el"))
-))
+    )
+   )
 
-(when tiqsi-win32
+(with-system darwin
+  (setq inferior-lisp-program "sbcl")
+  (load (expand-file-name "~/.roswell/helper.el"))
+  (message "ros ready for OSX")
+     )
+
+
+(with-system windows
   (progn
     (load (expand-file-name "C:/Users/andre/.roswell/helper.el"))
-    (setq inferior-lisp-program "ros -Q run")))
+    (setq inferior-lisp-program "ros -Q run"))
+  )
 
 
 ;; (setq inferior-lisp-program "sbcl")
@@ -37,7 +46,6 @@
   :straight t
   :config
   (progn
-    
     (add-hook 'slime-repl-mode-hook (lambda () (paredit-mode +1)))
     ;; Stop SLIME's REPL from grabbing DEL,
     ;; which is annoying when backspacing over a '('
