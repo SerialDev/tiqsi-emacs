@@ -75,6 +75,10 @@
 
 (setq echo-keystrokes 0.0001)
 
+; _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Face modifiers ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
+
+
+
 ;                                          Brigth red TODO                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
@@ -82,16 +86,38 @@
 
 (make-face 'font-lock-fixme-face)
 (make-face 'font-lock-note-face)
+(make-face 'font-lock-check-face)
+(make-face 'font-lock-done-face)
+(make-face 'font-lock-fn-face)
+(make-face 'font-lock-nus-face)
+(make-face 'font-lock-wip-face)
+
 (mapc (lambda (mode)
         (font-lock-add-keywords
          mode
          '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t))))
+           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
+           ("\\<\\(CHECK\\)" 1 'font-lock-check-face t)
+           ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
+           ("\\<\\(WIP\\)" 1 'font-lock-wip-face t)
+           ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
+           ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
+	   ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
+
+
+	   )))
       fixme-modes)
 
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
+(modify-face 'font-lock-check-face "Yellow" nil nil t nil t nil nil)
+(modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
+(modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
+(modify-face 'font-lock-nus-face "Grey21" nil nil t nil t nil nil)
+(modify-face 'font-lock-wip-face "systemYellowColor" nil nil t nil t nil nil)
 
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 ;                                           Line Highlight                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
@@ -285,7 +311,7 @@
 (size-indication-mode t)
 
 ;; don't commit trailing whitespace 
-(setq-default show-trailing-whitespace t)
+(setq-default show-trailing-whitespace nil)
 (setq-default default-indicate-empty-lines t)
 
 (defun toggle-whitespace ()
@@ -484,6 +510,30 @@
 
 ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+
+
+(defun insert-image-from-url (&optional url)
+  (interactive)
+  (unless url (setq url (url-get-url-at-point)))
+  (unless url
+    (error "Couldn't find URL."))
+  (let ((buffer (url-retrieve-synchronously url)))
+    (unwind-protect
+         (let ((data (with-current-buffer buffer
+                       (goto-char (point-min))
+                       (search-forward "\n\n")
+                       (buffer-substring (point) (point-max)))))
+           (insert-image (create-image data nil t)))
+      (kill-buffer buffer))))
+
+(insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
+
+
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 
 ;                                            Keybindings                                            ;
