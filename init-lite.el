@@ -169,13 +169,26 @@ of an error, just add the package to a list of missing packages."
 (defmacro cond-require (item do-this)
   `(if (require ',item nil 'noerror)
        (try! ',do-this)
-     (message (format "FAILURE-COND-CHECK %s: %s %s %s %s" ',item (current-time-microseconds) (calling-function) (format-mode-line "%l") buffer-file-name))))
+     (message (format "FAILURE-COND-CHECK %s: %s %s %s %s" ',item
+		      (current-time-microseconds) (calling-function)
+		      (format-mode-line "%l") buffer-file-name))))
 
-(defun try!(func)
-  (if (ignore-errors
-	(funcall func))
-      (message (format "%s SUCCESS: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name  ))
-      (message (format "%s FAILURE: %s %s %s %s" (current-time-microseconds) func (calling-function) (format-mode-line "%l") buffer-file-name))))
+(defmacro try!( func)
+  `(if (ignore-errors
+	,func)
+     (message (format "t:%s --SUCCESS-- argl:%s l:%s path:%s"
+		      ,(current-time-microseconds)
+		      ,(help-function-arglist 'func)
+		      ,(format-mode-line "%l")
+		      ,buffer-file-name))
+
+     (message (format "t:%s --FAILURE-- argl:%s l:%s path:%s"
+		      ,(current-time-microseconds)
+		      ,(help-function-arglist 'func)
+		      ,(format-mode-line "%l")
+		      ,buffer-file-name))
+     ))
+
 
 (straight-require 'evil)
 
@@ -214,6 +227,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/programming/programming-zig.el")
 
 (load-expand  "modules/programming/programming-lisp.el")
+
 
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)
