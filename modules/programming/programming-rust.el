@@ -50,7 +50,7 @@
     (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
     (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
 
-(when tiqsi-linux
+(with-system gnu/linux
 
   (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "which cargo") ) )))
   (setq racer-rust-src-path
@@ -60,6 +60,22 @@
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "which racer")) "racer")  )
 
 )
+
+
+
+(with-system darwin
+  (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "which cargo") ) )))
+  (setq racer-rust-src-path
+      (concat (string-trim
+               (shell-command-to-string "rustc --print sysroot"))
+              "/lib/rustlib/src/rust/src"))
+
+  (if-command-exists "racer"
+		     (setq racer-cmd
+			   (s-prepend (file-name-directory
+				       (shell-command-to-string "which racer")) "racer")  )
+		     ))
+
 
 (when tiqsi-win32
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "where racer")) "racer.exe")  )

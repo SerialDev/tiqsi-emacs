@@ -61,6 +61,25 @@
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
 (setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
+; ------------------------------------------------------------------------- ;
+;                           Conditional execution                           ;
+; ------------------------------------------------------------------------- ;
+
+(with-system darwin
+  (defmacro if-command-exists(data &rest commands)
+    `(let ((command-to-use   (shell-command-to-string (s-append "which" ,data))  ))
+       (if (equal command-to-use "") nil ,@commands ))
+    )
+)
+
+(with-system gnu/linux
+  (defmacro if-command-exists(data &rest commands)
+    `(let ((command-to-use   (shell-command-to-string (s-append "which" ,data))  ))
+       (if (equal command-to-use "") nil ,@commands ))
+    )
+)
+
+
 ;                                          Determine Emacs                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 ; Emacs type: are we running GNU Emacs?                                                             ;
