@@ -30,6 +30,16 @@
 (straight-require 'rust-mode)
 (straight-require 'cargo)
 (straight-require 'racer)
+(straight-require 'parsec)
+
+(straight-use-package
+ '(evcxr
+   :type git
+   :host github
+   :repo "serialdev/evcxr-mode"
+   :config
+   (add-hook 'rust-mode-hook #'evcxr-minor-mode)
+   ))
 
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
