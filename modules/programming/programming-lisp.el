@@ -12,11 +12,12 @@
 ;; Set the default lisp you want to use (here it's SBCL).
 
 (with-system gnu/linux
+  (try!
    (progn
      ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
      (setq inferior-lisp-program "sbcl")
-    (load (expand-file-name "~/.roswell/helper.el"))
-    )
+     (load (expand-file-name "~/.roswell/helper.el"))
+    ))
    )
 
 (with-system darwin

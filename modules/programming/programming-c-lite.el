@@ -282,6 +282,13 @@ header"
    )
  )
 
+(defun tiqsi--c-get-type()
+  (eglot-find-typeDefinition "current_slice_1")
+  (eglot--lsp-xrefs-for-method :textDocument/typeDefinition "current_slice_1")
+
+  (eglot--current-server)
+  (jsonrpc-request)
+  )
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Completion _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
