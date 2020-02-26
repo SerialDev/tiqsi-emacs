@@ -35,9 +35,22 @@
 
 (require 'compile)
 
-(defun tiqsi-compile(compile_string)
+(defun tiqsi-compile(compile-string)
   (interactive "sString to compile: ")
-  (compile compile_string))
+  (if (boundp 'tiqsi-compile--command)
+      (progn
+	(compile tiqsi-compile--command)
+	(setq tiqsi-compile--command compile-string))
+    (progn
+      (setq tiqsi-compile--command compile-string)
+      (compile tiqsi-compile--command))
+  ))
+
+(defun tiqsi-compile--no-message()
+  (interactive)
+  (if (boundp 'tiqsi-compile--command)
+      (compile tiqsi-compile--command)
+    (call-interactively 'tiqsi-compile) ))
 
 (defun send-to-shell(command-string)
   (shell)
@@ -404,6 +417,8 @@ header"
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
 
 (define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+(define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
