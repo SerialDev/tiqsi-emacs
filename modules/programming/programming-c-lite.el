@@ -33,6 +33,11 @@
 
 ;; valgrind --leak-check=full --track-origins=yes -v
 
+(require 'compile)
+
+(defun tiqsi-compile(compile_string)
+  (interactive "sString to compile: ")
+  (compile compile_string))
 
 (defun send-to-shell(command-string)
   (shell)
@@ -397,6 +402,8 @@ header"
 
 (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+
+(define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
