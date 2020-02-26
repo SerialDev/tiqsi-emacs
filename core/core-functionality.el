@@ -70,6 +70,28 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
       (select-window win)
       )))
 
+; _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Region utilities ¯¯¯\_ _ _ _ _ _ _ _ _ _     ;
+
+
+; ------------------------------------------------------------------------- ;
+;                            Get text from region                           ;
+; ------------------------------------------------------------------------- ;
+
+(defun get-selection ()
+  "Get the text selected in current buffer as string"
+  (buffer-substring-no-properties (region-beginning) (region-end)))
+
+
+(defmacro with-current-region (&rest data)
+  "Local variable: current-region-text accessible from macro"
+  (interactive)
+  `(let ((current-region-text ,(get-selection) ))
+     ,@data
+    ))
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Region utilities _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+
+
                                         ;----{M-x short}----;
 
 (defun display-extended-command-shorter (command)
