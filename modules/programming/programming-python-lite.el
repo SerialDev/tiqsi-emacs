@@ -216,6 +216,48 @@ else:
     (replace-regexp ".*ipdb.set_trace().*\n" "" nil (point-min) (point-max))
     ;; (save-buffer)
     ))
+
+; ------------------------------------------------------------------------- ;
+;                             TODO: nice feature                            ;
+; ------------------------------------------------------------------------- ;
+;                         Automatic printf debugging                        ;
+; ------------------------------------------------------------------------- ;
+;                  Automatically generate a print command:                  ;
+;                 -> Under every for with print(num: {for_i})               ;
+;               -> Under every if with print(num {if_var_test})             ;
+;                              - include elif & else                        ;
+;                       -> Maybe an extra string to put.                    ;
+; ------------------------------------------------------------------------- ;
+; def parse_value(value, fn:list, resource:list):                           ;
+;     for name in value.keys():                                             ;
+;         if type(value[name]) == list:                                     ;
+;             temp = []                                                     ;
+;             params = []                                                   ;
+;             for parameter in value[name]:                                 ;
+;                 if type(parameter) == str:                                ;
+;                     params.append((parameter, None))                      ;
+;                 else:                                                     ;
+;                     parameter_l = list(parameter.keys())[0]               ;
+;                     params.append((parameter_l, parameter[parameter_l]))  ;
+;             temp.append((name, params))                                   ;
+;             fn.append(temp)                                               ;
+;             return fn, resource                                           ;
+;         elif type(value[name] == dict):                                   ;
+;             if type(value[name]) == dict:                                 ;
+;                 if value[name] is not dict:                               ;
+;                     fn.append((name, (None, None)))                       ;
+;                     print('empty')                                        ;
+;                     return fn, resource                                   ;
+;                 elif type(value[name]) == str:                            ;
+;                     fn.append((name, (value[name], None)))                ;
+;                     return fn, resource                                   ;
+;         else:                                                             ;
+;             resource.append(name)                                         ;
+;             return fn, resource                                           ;
+; ------------------------------------------------------------------------- ;
+
+
+
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Debugging ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Linting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
@@ -368,6 +410,8 @@ sEnter Doctest result: ")
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Documentation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+
+
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Miscellaneous _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
