@@ -40,17 +40,39 @@
   (if (boundp 'tiqsi-compile--command)
       (progn
 	(compile tiqsi-compile--command)
-	(setq tiqsi-compile--command compile-string))
+	(setq tiqsi-compile--command compile-string)
+	)
     (progn
       (setq tiqsi-compile--command compile-string)
-      (compile tiqsi-compile--command))
+      (compile tiqsi-compile--command)
+      )
   ))
 
 (defun tiqsi-compile--no-message()
   (interactive)
   (if (boundp 'tiqsi-compile--command)
-      (compile tiqsi-compile--command)
+      (progn 
+	(compile tiqsi-compile--command)
+	)
     (call-interactively 'tiqsi-compile) ))
+
+
+; ------------------------------------------------------------------------- ;
+;              TODO: Macro to handle shell termination sentinel             ;
+; ------------------------------------------------------------------------- ;
+;; (defun set-compilation-mode(buffer msg)
+;;   (unless (and
+;; 	   (string-match "^Process shell exited" msg))
+;;     (not (string= (buffer-name buffer) "*grep*"))
+;;     (insert "done:")))
+
+;; (add-hook 'compilation-finish-functions 'set-compilation-mode)
+
+;; (with-current-buffer "*shell*"
+;; 	  (compilation-mode 1))
+; ------------------------------------------------------------------------- ;
+
+
 
 (defun send-to-shell(command-string)
   (shell)

@@ -256,6 +256,32 @@ else:
 ;             return fn, resource                                           ;
 ; ------------------------------------------------------------------------- ;
 
+(setq test_t """def parse_value(value, fn:list, resource:list):
+    for name in value.keys():
+        if type(value[name]) == list:
+            temp = []
+            params = []
+            for parameter in value[name]:
+                if type(parameter) == str:
+                    params.append((parameter, None))
+                else:
+                    parameter_l = list(parameter.keys())[0]
+                    params.append((parameter_l, parameter[parameter_l]))
+            temp.append((name, params))
+            fn.append(temp)
+            return fn, resource
+        elif type(value[name] == dict):
+            if type(value[name]) == dict:
+                if value[name] is not dict:
+                    fn.append((name, (None, None)))
+                    print('empty')
+                    return fn, resource
+                elif type(value[name]) == str:
+                    fn.append((name, (value[name], None)))
+                    return fn, resource
+        else:
+            resource.append(name)
+            return fn, resource""")
 
 
 
@@ -421,4 +447,3 @@ sEnter Doctest result: ")
 (provide 'programming-python-lite)
 
 ;;; programming-python-lite.el ends here
-

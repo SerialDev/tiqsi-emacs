@@ -27,9 +27,12 @@
 ;;
 
 
-                                        ;{Describe Keybindings};
-
 ;;; Code
+
+; ------------------------------------------------------------------------- ;
+;                            Describe Keybindings                           ;
+; ------------------------------------------------------------------------- ;
+
 (defun describe-map (map)
   "Describe the key bindings of MAP.
 posted by:
@@ -56,7 +59,9 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
       (error (concat (symbol-name map) " has no bindings set.")))))
 
 
-                                        ;{GOTO visible window};
+; ------------------------------------------------------------------------- ;
+;                            GOTO visible window                            ;
+; ------------------------------------------------------------------------- ;
 
 (defun pop-to-buffer-or-window (buffer)
   "Like `pop-to-buffer' BUFFER, but find any visible window."

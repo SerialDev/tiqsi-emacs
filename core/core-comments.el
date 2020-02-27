@@ -39,8 +39,6 @@
     (insert (s-trim comment-start))
     (newline)))
 
-
-
 (defun tiqsi-comment--insert-end ()
   (interactive)
   (tiqsi-comment--between
