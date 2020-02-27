@@ -317,7 +317,6 @@ Adapted from `describe-function-or-variable'."
       (pop-to-buffer buf)
       )))
 
-(launch-in-other-buffer (call-interactively 'gdb))
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
