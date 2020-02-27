@@ -38,8 +38,6 @@ selected frame."
       (call-interactively #'ace-window)
     (call-interactively #'other-window)))
 
-
-
                                         ;---{keybindings}---;
 
 (global-set-key (kbd "M-w") 'sdev/jump-window)

@@ -301,6 +301,24 @@ Adapted from `describe-function-or-variable'."
 (defun current-buffer-path()
   (file-name-directory (buffer-file-name)))
 
+(defmacro launch-in-other-buffer (&rest data)
+  `(progn
+    (other-window 1)
+    ,@data
+    (other-window 1)
+  ))
+
+(defmacro launch-in-other-buffer(&rest data)
+  `(let ((buf (current-buffer) ))
+    (progn
+      ,@data
+      (rotate-windows)
+      (other-window 1)
+      (pop-to-buffer buf)
+      )))
+
+(launch-in-other-buffer (call-interactively 'gdb))
+
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 

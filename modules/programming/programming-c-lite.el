@@ -70,7 +70,6 @@
 
 ;; (with-current-buffer "*shell*"
 ;; 	  (compilation-mode 1))
-; ------------------------------------------------------------------------- ;
 
 
 
@@ -403,6 +402,17 @@ header"
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Compilation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Debugging ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
+
+(defun gdb-other-buffer ()
+  (interactive)
+  (launch-in-other-buffer (call-interactively 'gdb))
+  )
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Debugging _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Snippets ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
 
