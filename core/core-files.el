@@ -230,7 +230,15 @@ sInsert str to search: ")
    :repo "DarwinAwardWinner/ido-completing-read-plus"
 ))
 
+; ------------------------------------------------------------------------- ;
+;                        Use Prescient and selectrum                        ;
+; ------------------------------------------------------------------------- ;
 
+(straight-use-package
+ '(selectrum :host github :repo "raxod502/selectrum"))
+
+(straight-use-package
+  '(selectrum :host github :repo "raxod502/selectrum"))
 
 ;---{keybindings}---;
 

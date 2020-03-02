@@ -555,8 +555,8 @@ _j_: jedi:related-names
 
                                         ;---{Keybindings}---;
 
-(global-set-key (kbd "M-x") 'helm-smex)
-(global-set-key (kbd "M-X") 'helm-smex-major-mode-commands)
+;; (global-set-key (kbd "M-x") 'helm-smex) ;; Offloaded to selectrum now
+;; (global-set-key (kbd "M-X") 'helm-smex-major-mode-commands) ;; Offloaded to selectrum now
                                         ;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 
@@ -566,7 +566,7 @@ _j_: jedi:related-names
 ;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
 ;(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
 ;(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-(define-key global-map (kbd "C-c b") 'helm-mini) ;; Browse Open Buffers
+;; (define-key global-map (kbd "C-c b") 'helm-mini) ;; Browse Open Buffers ;; Offloaded to selectrum now
 (global-set-key (kbd "C-<return>") 'ac-complete-with-helm)
 
 (define-key global-map (kbd "M-i") 'helm-swoop-back-to-last-point)
