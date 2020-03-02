@@ -44,6 +44,18 @@ insert `%'."
         (t (self-insert-command (or arg 1)))))
 
 
+; TODO: debug this                                                          ;
+; ------------------------------------------------------------------------- ;
+;           CTRLF Searching to replace isearch base functionality           ;
+; ------------------------------------------------------------------------- ;
+
+(straight-use-package
+ '(ctrlf :host github :repo "raxod502/ctrlf"))
+
+;; (ctrlf-mode 1) ;; ERROR at the moment
+
+
+
                                         ;--{Nav primitives}-;
 
 (defun previous-blank-line ()
@@ -396,8 +408,8 @@ one, an error is signaled."
 
                                         ;---{Keybindings}---;
 
-(define-key global-map "\ef" 'find-file)
-(define-key global-map "\eF" 'find-file-other-window)
+(define-key global-map (kbd "M-f") 'find-file)
+(define-key global-map (kbd "M-F") 'find-file-other-window)
 (global-set-key (kbd "C-c g") 'my-toggle-window-split)
 
 (global-set-key (kbd "C-x b")  'helm-mini)
@@ -453,7 +465,7 @@ one, an error is signaled."
 (global-set-key (kbd "C-c 3") 'switch-to-buffer)
 (global-set-key (kbd "C-c 2") 'next-buffer)
 (global-set-key (kbd "C-c 1") 'previous-buffer)
-                                        ;(global-set-key (kbd "%") 'match-paren)
+(global-set-key (kbd "C-c )") 'match-paren)
 
 (define-key global-map (kbd "M-/") 'close-side-come-back)
 
