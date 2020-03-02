@@ -528,7 +528,7 @@
            (insert-image (create-image data nil t)))
       (kill-buffer buffer))))
 
-(insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
+;; (insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
 
 
 
