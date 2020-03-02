@@ -388,7 +388,7 @@ _B_: Search buffers      _b_: Interactive search buffers
 
   ("z" scroll-up-line)
   ("a" scroll-down-line)
-  ("i" idomenu)
+  ("i" (lambda() (print "not implemented"))) ;; Used to be idomenu
 
   ("u" winner-undo)
   ("r" winner-redo)
@@ -400,8 +400,8 @@ _B_: Search buffers      _b_: Interactive search buffers
 
   ("p" previous-buffer)
   ("n" next-buffer)
-  ("b" ido-switch-buffer)
-  ("f" ido-find-file)
+  ("b" switch-buffer)
+  ("f" find-file)
   ("F" projectile-find-file)
 
   ("s" split-window-below)

@@ -99,7 +99,7 @@
         (buffer (current-buffer))
         (name (buffer-name)))
     (if (not (and filename (file-exists-p filename)))
-        (ido-kill-buffer)
+      (kill-buffer (buffer-name (current-buffer)))
       (when (yes-or-no-p "Are you sure you want to remove this file? ")
         (delete-file filename)
         (kill-buffer buffer)
@@ -215,20 +215,6 @@ Visit the file after creation."
 sInsert str to search: ")
   (compile (format "tree -f %s | grep %s" dir str)))
 
-;; Ido find file requirements
-
-(use-package ido
-  :straight t
-  :ensure t
-  :config )
-
-
-(straight-use-package
- '(ido-completing-read+
-   :type git
-   :host github
-   :repo "DarwinAwardWinner/ido-completing-read-plus"
-))
 
 ; ------------------------------------------------------------------------- ;
 ;                        Use Prescient and selectrum                        ;
@@ -239,6 +225,8 @@ sInsert str to search: ")
 
 (straight-use-package
   '(selectrum :host github :repo "raxod502/selectrum"))
+
+(selectrum-mode 1)
 
 ;---{keybindings}---;
 

@@ -393,15 +393,6 @@ one, an error is signaled."
       (select-window other-win))))
 
 
-(defun my-switch-to-buffer (buffer)
-  (interactive
-   (list (ido-read-buffer "Switch to buffer: ")))
-  ;; get-buffer-window (with second argument t) will return
-  ;; nil if the buffer is not open in any window across any
-  ;; frame
-  (unless (get-buffer-window buffer 0)
-    (pop-to-buffer buffer nil t)))
-
 
                                         ;---{Keybindings}---;
 
@@ -459,7 +450,7 @@ one, an error is signaled."
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-c w") 'rotate-windows)
 
-(global-set-key (kbd "C-c 3") 'my-switch-to-buffer)
+(global-set-key (kbd "C-c 3") 'switch-to-buffer)
 (global-set-key (kbd "C-c 2") 'next-buffer)
 (global-set-key (kbd "C-c 1") 'previous-buffer)
                                         ;(global-set-key (kbd "%") 'match-paren)

@@ -27,27 +27,22 @@
 ;;; Commentary:
 ;;
 
+;; Ido find file requirements
+
+(use-package ido
+  :straight t
+  :ensure t
+  :config )
+
+
+(straight-use-package
+ '(ido-completing-read+
+   :type git
+   :host github
+   :repo "DarwinAwardWinner/ido-completing-read-plus"
+))
+
 (ido-mode 1)
-
-
-; IDO mode
-;(use-package ido
-;  :ensure t
-;  :init  (setq ido-enable-flex-matching t
-;               ido-ignore-extensions t
-;               ido-use-virtual-buffers t
-;               ido-everywhere t)
-;  :config
-;  (ido-mode 1)
-;  (ido-everywhere 1)
-;  (add-to-list 'completion-ignored-extensions ".pyc"))
-
-;Add to IDO, the FLX package:
-;(use-package flx-ido
-;   :ensure t
-;   :init (setq ido-enable-flex-matching t
-;               ido-use-faces nil)
-;   :config (flx-ido-mode 1))
 
 (use-package smex
   :ensure t
@@ -107,6 +102,18 @@ Symbols matching the text at point are put first in the completion list."
            (position (cdr (assoc selected-symbol name-and-pos))))
       (push-mark (point))
       (goto-char position))))
+
+
+;; (defun my-switch-to-buffer (buffer)
+;;   (interactive
+;;    (list (ido-read-buffer "Switch to buffer: ")))
+;;   ;; get-buffer-window (with second argument t) will return
+;;   ;; nil if the buffer is not open in any window across any
+;;   ;; frame
+;;   (unless (get-buffer-window buffer 0)
+;;     (pop-to-buffer buffer nil t)))
+;; Replaced by selectrum
+
 
 
 (provide 'modes-ido)

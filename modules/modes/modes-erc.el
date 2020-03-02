@@ -40,12 +40,13 @@
    ((string= "#fpco" (buffer-name))
     (call-interactively 'haskell-mode-tag-find))))
 
+
 (defun erc-insert-emoticon ()
   "Prompt to insert an emoticon."
   (interactive)
-  (let* ((category (ido-completing-read "Category: " (mapcar 'car *japanese-emoticons*)))
+  (let* ((category (completing-read "Category: " (mapcar 'car *japanese-emoticons*)))
          (choices (assoc category *japanese-emoticons*)))
-    (when choices (insert (ido-completing-read "Emoticon: " (cdr choices))))))
+    (when choices (insert (completing-read "Emoticon: " (cdr choices))))))
 
 (defvar
   *japanese-emoticons*

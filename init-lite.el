@@ -215,7 +215,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-comments.el")
 
 
-(load-expand  "modules/modes/modes-ido.el")
+;; (load-expand  "modules/modes/modes-ido.el")
 (load-expand  "modules/modes/modes-company.el")
 (load-expand  "modules/modes/modes-shell.el")
 (load-expand  "modules/modes/modes-avy.el")
@@ -230,7 +230,7 @@ of an error, just add the package to a list of missing packages."
 
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
-;; (global-set-key (kbd "C-x b") 'ido-switch-buffer) ;; Offloaded to selectrum now
+(global-set-key (kbd "C-x b") 'switch-buffer) 
 (global-set-key (kbd "C-c v") 'evil-mode)
 
 ;; (load-expand  "core/core-setup.el")

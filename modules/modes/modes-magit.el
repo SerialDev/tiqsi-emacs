@@ -47,11 +47,6 @@
     (apply magit-push-popup-fun args)))
 (advice-add 'magit-push-popup :around #'magit-push-arguments-maybe-upstream)
 
-;;Combined with ido completion this allows pushing a new branch with P P RET:
-
-;; NOTE: requires ido-completing-read+
-(setq magit-completing-read-function #'magit-ido-completing-read)
-
 (defun sdev/magit-stage-and-commit()
   (interactive)
   (magit-stage)
