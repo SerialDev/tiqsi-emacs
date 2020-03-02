@@ -5,6 +5,7 @@
 ;; Elisp functions will go on this one too
 
 (straight-require 'slime-company)
+(straight-require 'hydra)
 
 ;; Replace "sbcl" with the path to your implementation
 ;; Do some standard SLIME configuration.

@@ -48,6 +48,14 @@
       )
   ))
 
+(defun tiqsi-compile--reset-string(compile-string)
+  (interactive "sString to compile: ")
+  (progn
+    (setq tiqsi-compile--command compile-string)
+    (compile tiqsi-compile--command)
+    ))
+  
+
 (defun tiqsi-compile--no-message()
   (interactive)
   (if (boundp 'tiqsi-compile--command)
@@ -450,6 +458,7 @@ header"
 
 (define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
 (define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
+(define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;

@@ -256,7 +256,7 @@ else:
 ;             return fn, resource                                           ;
 ; ------------------------------------------------------------------------- ;
 
-(setq test_t """def parse_value(value, fn:list, resource:list):
+(setq test_t "def parse_value(value, fn:list, resource:list):
     for name in value.keys():
         if type(value[name]) == list:
             temp = []
@@ -281,7 +281,7 @@ else:
                     return fn, resource
         else:
             resource.append(name)
-            return fn, resource""")
+            return fn, resource")
 
 
 
