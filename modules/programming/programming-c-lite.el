@@ -460,6 +460,10 @@ header"
 (define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
 (define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
 
+(define-key rust-mode-map (kbd "C-c c") 'tiqsi-compile--no-message)
+(define-key rust-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+(define-key rust-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
