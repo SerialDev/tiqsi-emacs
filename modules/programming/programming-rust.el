@@ -240,11 +240,22 @@ See `racer-describe'."
            (with-current-buffer (concat "\n" (buffer-string) "\n\n"))
            (message 'racer-tooltip nil nil 1000)))
 
+
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+
+
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
 (define-key rust-mode-map (kbd "C-t") 'racer-ui-tooltip )
 
 (define-key rust-mode-map (kbd "M-p") 'tiqsi--rust-print-src )
 (define-key rust-mode-map (kbd "M-i") 'tiqsi--racer-insert-struct-point )
+
+(define-key rust-mode-map (kbd "C-c c") 'tiqsi-compile--no-message)
+(define-key rust-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+(define-key rust-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 (provide 'programming-rust)
 

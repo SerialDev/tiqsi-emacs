@@ -54,12 +54,12 @@
     (setq tiqsi-compile--command compile-string)
     (compile tiqsi-compile--command)
     ))
-  
+
 
 (defun tiqsi-compile--no-message()
   (interactive)
   (if (boundp 'tiqsi-compile--command)
-      (progn 
+      (progn
 	(compile tiqsi-compile--command)
 	)
     (call-interactively 'tiqsi-compile) ))
@@ -459,10 +459,6 @@ header"
 (define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
 (define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
 (define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
-
-(define-key rust-mode-map (kbd "C-c c") 'tiqsi-compile--no-message)
-(define-key rust-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
-(define-key rust-mode-map (kbd "C-c n") 'flymake-goto-next-error)
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
