@@ -18,6 +18,8 @@
 ;; (install-traad)
 
 
+(executable-find "t")
+
 (defvar jedi:goto-stack '())
 
 

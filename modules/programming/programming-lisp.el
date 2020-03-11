@@ -243,6 +243,8 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 ;; (define-key sly-mode-map (kbd "C-c s") 'sly-eval-last-expression)
 
 
+(define-key emacs-lisp-mode-map (kbd "C-c C-e") 'pp-macroexpand-last-sexp)
+
 
 (provide 'programming-lisp)
 

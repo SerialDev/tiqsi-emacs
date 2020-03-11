@@ -26,6 +26,7 @@
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Python Repl _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+
 (setq
  python-shell-interpreter "ipython"
  python-shell-interpreter-args "--matplotlib=qt5"
@@ -38,6 +39,8 @@
  python-shell-completion-module-string-code
  "';'.join(module_completion('''%s'''))\n"
  )
+
+
 
 
 (defun sdev-use-ipython (&optional ipython)
