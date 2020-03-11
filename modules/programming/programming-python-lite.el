@@ -138,6 +138,113 @@ else:
    (t
     (error "I don't know how to set ipython settings for this Emacs"))))
 
+
+(defun sdev-use-cpython-3 (&optional cpython)
+  "Set defaults to use the standard interpreter instead of IPython.
+
+With prefix arg, prompt for the command to use."
+  (interactive (list (when current-prefix-arg
+                       (read-file-name "Python command: "))))
+  (when (not cpython)
+    (setq cpython "python3"))
+  (when (not (executable-find cpython))
+    (error "Command %S not found" cpython))
+  (cond
+   ;; Emacs 24 until 24.3
+   ((boundp 'python-python-command)
+    (setq python-python-command cpython))
+   ;; Emacs 24.3 and onwards.
+   ((and (version<= "24.3" emacs-version)
+         (not (boundp 'python-shell-interpreter-interactive-arg)))
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"
+          python-shell-prompt-regexp ">>> "
+          python-shell-prompt-output-regexp ""
+          python-shell-completion-setup-code
+          "try:
+    import readline
+except ImportError:
+    def __COMPLETER_all_completions(text): []
+else:
+    import rlcompleter
+    readline.set_completer(rlcompleter.Completer().complete)
+    def __COMPLETER_all_completions(text):
+        import sys
+        completions = []
+        try:
+            i = 0
+            while True:
+                res = readline.get_completer()(text, i)
+                if not res: break
+                i += 1
+                completions.append(res)
+        except NameError:
+            pass
+        return completions"
+          python-shell-completion-module-string-code ""
+          python-shell-completion-string-code
+          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+   ;; Emacs 24.4
+   ((boundp 'python-shell-interpreter-interactive-arg)
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"))
+   (t
+    (error "I don't know how to set ipython settings for this Emacs"))))
+
+
+(defun sdev-use-cpython (&optional cpython)
+  "Set defaults to use the standard interpreter instead of IPython.
+
+With prefix arg, prompt for the command to use."
+  (interactive (list (when current-prefix-arg
+                       (read-file-name "Python command: "))))
+  (when (not cpython)
+    (setq cpython "python"))
+  (when (not (executable-find cpython))
+    (error "Command %S not found" cpython))
+  (cond
+   ;; Emacs 24 until 24.3
+   ((boundp 'python-python-command)
+    (setq python-python-command cpython))
+   ;; Emacs 24.3 and onwards.
+   ((and (version<= "24.3" emacs-version)
+         (not (boundp 'python-shell-interpreter-interactive-arg)))
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"
+          python-shell-prompt-regexp ">>> "
+          python-shell-prompt-output-regexp ""
+          python-shell-completion-setup-code
+          "try:
+    import readline
+except ImportError:
+    def __COMPLETER_all_completions(text): []
+else:
+    import rlcompleter
+    readline.set_completer(rlcompleter.Completer().complete)
+    def __COMPLETER_all_completions(text):
+        import sys
+        completions = []
+        try:
+            i = 0
+            while True:
+                res = readline.get_completer()(text, i)
+                if not res: break
+                i += 1
+                completions.append(res)
+        except NameError:
+            pass
+        return completions"
+          python-shell-completion-module-string-code ""
+          python-shell-completion-string-code
+          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+   ;; Emacs 24.4
+   ((boundp 'python-shell-interpreter-interactive-arg)
+    (setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"))
+   (t
+    (error "I don't know how to set ipython settings for this Emacs"))))
+
+
 (defun sdev-use-remote (&optional ipython)
   (interactive)
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"

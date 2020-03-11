@@ -447,18 +447,30 @@ header"
 ; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
+;                                   c-mode                                  ;
+; ------------------------------------------------------------------------- ;
+
 (eval-after-load 'c-mode
   (progn
     (define-key c-mode-map [f12] 'tiqsi-find-corresponding-file)
     (define-key c-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+    (define-key c-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+    (define-key c-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
+    (define-key c-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
   ))
 
-(define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
-(define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+;                                  c++-mode                                 ;
+; ------------------------------------------------------------------------- ;
 
-(define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
-(define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
-(define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+(eval-after-load 'c++-mode
+  (progn
+    (define-key c++-mode-map [f12] 'tiqsi-find-corresponding-file)
+    (define-key c++-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+
+    (define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+    (define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
+    (define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+))
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;

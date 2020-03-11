@@ -229,7 +229,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand "modules/modes/modes-ido.el")
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
-(global-set-key (kbd "C-x b") 'switch-buffer) 
+(global-set-key (kbd "C-x b") 'ido-switch-buffer)
 (global-set-key (kbd "C-c v") 'evil-mode)
 
 ;; (load-expand  "core/core-setup.el")
