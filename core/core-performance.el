@@ -57,7 +57,7 @@
 ;; (dired-async-mode 1)
 ;; (async-bytecomp-package-mode 1)
 
-;; Garbage collection 
+;; Garbage collection
 
 (setq undo-limit 20000000)
 (setq undo-strong-limit 40000000)
@@ -123,6 +123,56 @@
       (cancel-timer my-linum-current-timer))
     (setq my-linum-current-timer
           (run-with-idle-timer 1 nil #'linum-update-current))))
+
+
+
+(defun clear-buffer-long-printouts-line()
+  (if (>
+       (save-excursion
+	 (goto-char (point-max))
+	 (string-to-number (format-mode-line "%l")))
+       1000
+       )
+      (comint-clear-buffer)
+    nil))
+
+
+(defun clear-buffer-long-printouts-col()
+  (if (>
+       (save-excursion
+	 (goto-char (point-max))
+	 (string-to-number (format-mode-line "%c")))
+       1000
+       )
+      (comint-clear-buffer)
+    nil))
+
+(defun clear-buffer-long-printouts()
+  (interactive)
+  (progn
+    (clear-buffer-long-printouts-line)
+    (clear-buffer-long-printouts-col)))
+
+
+
+(defun long-printout-teardown()
+    (run-with-timer
+     0 5 'clear-buffer-long-printouts))
+
+
+;;;###autoload
+(define-minor-mode clear-huge-repl-mode
+  "clear massive printouts to not slow emacs to a crawl"
+  :keymap (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "C-c f") 'clear-buffer-long-printouts)
+            map))
+
+;;;###autoload
+(progn
+  (add-hook 'comint-mode-hook 'clear-huge-repl-mode)
+  (add-hook 'inferior-python-mode 'clear-huge-repl-mode)
+  (add-hook 'clear-huge-repl-mode-hook 'long-printout-teardown)
+  )
 
 
 ;; (defun my-line-count (line)
