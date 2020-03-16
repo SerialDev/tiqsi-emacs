@@ -27,6 +27,29 @@
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Python Repl _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
+
+(straight-require 'popwin)
+
+;; (popwin-mode 1)
+
+(defun tiqsi-py-view-plt(image_name)
+  (interactive "sImage to view: ")
+  (let ((image  image_name))
+
+    (progn
+      (comint-send-string "*Python*" (s-prepend
+				      (s-prepend "matplotlib.pyplot.savefig(" image) ")\n") )
+      (popwin:find-file image)
+      )))
+
+(setq popwin:popup-window-height 35)
+(setq popwin:popup-window-width 15)
+
+
+;; (push '(".*.png" :regexp t :height 40 :width 15) popwin:special-display-config)
+
+;; (global-set-key (kbd))
+
 (setq
  python-shell-interpreter "ipython"
  python-shell-interpreter-args "--matplotlib=qt5"

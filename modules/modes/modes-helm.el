@@ -90,7 +90,7 @@
 (straight-require 'ac-helm) ;; Interactive ac with Helm
 (straight-require 'helm-pydoc) ;; Helm Python documentation
 (straight-require 'helm-descbinds) ;; Keybindings interactive search
-(when tiqsi-win32
+(with-system win32
   (straight-require 'helm-w32-launcher)) ;; Start Menu Support
 (straight-require 'helm-chrome) ;; Chrome Bookmarks support
 

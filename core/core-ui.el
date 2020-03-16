@@ -517,6 +517,8 @@
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
+
+
 (defun insert-image-from-url (&optional url)
   (interactive)
   (unless url (setq url (url-get-url-at-point)))
@@ -534,8 +536,12 @@
 ;; (insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
 
 
-
-
+ (defun my-turn-current-window-into-frame ()
+  (interactive)
+  (let ((buffer (current-buffer)))
+    (unless (one-window-p)
+      (delete-window))
+    (display-buffer-pop-up-frame buffer nil)))
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
