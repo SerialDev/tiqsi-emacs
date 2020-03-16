@@ -91,6 +91,7 @@
 (make-face 'font-lock-fn-face)
 (make-face 'font-lock-nus-face)
 (make-face 'font-lock-wip-face)
+(make-face 'font-lock-experimental-face)
 
 (mapc (lambda (mode)
         (font-lock-add-keywords
@@ -102,6 +103,7 @@
            ("\\<\\(WIP\\)" 1 'font-lock-wip-face t)
            ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
            ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
+           ("\\<\\(Experimental!\\)" 1 'font-lock-experimental-face t)
 	   ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
 
 
@@ -114,6 +116,7 @@
 (modify-face 'font-lock-done-face "Green" nil nil t nil t nil nil)
 (modify-face 'font-lock-fn-face "Blue" nil nil t nil t nil nil)
 (modify-face 'font-lock-nus-face "Grey21" nil nil t nil t nil nil)
+(modify-face 'font-lock-experimental-face "Purple" nil nil t nil t nil nil)
 (modify-face 'font-lock-wip-face "systemYellowColor" nil nil t nil t nil nil)
 
 
