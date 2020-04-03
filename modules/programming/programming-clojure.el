@@ -66,6 +66,30 @@
   :ensure t
 )
 
+
+(use-package clojure-mode
+  :straight t
+  :ensure t
+)
+
+
+(use-package monroe
+  :straight t
+  :ensure t
+  :config
+  (progn
+    (add-hook 'clojure-mode-hook 'clojure-enable-monroe)
+    (setf monroe-detail-stacktraces 'true))
+
+)
+
+
+(use-package cider
+  :straight t
+  :ensure t
+)
+
+
 (setq nrepl-hide-special-buffers t)
 (setq cider-cljs-repl-type "figwheel")
 (setq cider-default-cljs-repl "figwheel")
@@ -262,6 +286,10 @@
   (if (looking-at "{") (forward-char -1))
   (while (not (looking-at "{")) (backward-char 1))
   )
+
+(setq monroe-nrepl-server-cmd "boot")
+(setq monroe-nrepl-server-cmd-args "repl -S")
+(setq monroe-nrepl-server-project-file "build.boot")
 
 
 

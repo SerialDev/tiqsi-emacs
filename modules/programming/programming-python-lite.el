@@ -38,7 +38,7 @@
 
     (progn
       (comint-send-string "*Python*" (s-prepend
-				      (s-prepend "matplotlib.pyplot.savefig(" image) ")\n") )
+				      (s-prepend "matplotlib.pyplot.savefig(\"" image) "\")\n") )
       (popwin:find-file image)
       )))
 
@@ -389,6 +389,8 @@ else:
 ;             return fn, resource                                           ;
 ; ------------------------------------------------------------------------- ;
 
+
+
 (setq test_t "def parse_value(value, fn:list, resource:list):
     for name in value.keys():
         if type(value[name]) == list:
@@ -417,6 +419,14 @@ else:
             return fn, resource")
 
 
+; ------------------------------------------------------------------------- ;
+;         TODO pprint pandas dataframes when in python inferior mode        ;
+; ------------------------------------------------------------------------- ;
+
+;; Out[1188]: 
+;;                                                   email            role                              shist
+;; 1514  8544ac18bb8509e055de298ed5d135b77fa7a31e897b8d...  Trust & Safety  (Trust & Safety, Empty histogram)
+;; 1515  9d4ccfb4ba08ad49d03df15b1a85cab2c16f55909a1da4...  Trust & Safety  (Trust & Safety, Empty histogram)
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Debugging ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 

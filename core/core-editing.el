@@ -129,6 +129,19 @@ sEnter b64 data: ")
    )
   )
 
+
+(defun md-insert-url (link-name link-url)
+  (interactive "sEnter name:
+sEnter b64 data: ")
+  (insert
+   (s-prepend
+    (s-prepend "[" (s-prepend link-name "]"))
+    (s-prepend "(" (s-prepend link-url ")" )))
+   )
+  )
+
+
+
 (defun tiqsi-copy-rectangle (start end)
   "Copy the region-rectangle instead of `kill-rectangle'."
   (interactive "r")

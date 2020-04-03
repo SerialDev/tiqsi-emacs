@@ -35,7 +35,7 @@
 ;; http://www.mygooglest.com/fni/dot-emacs.html
 ;; https://github.com/sjrmanning/.emacs.d/blob/master/core/sm-defuns.el
 ;; https://github.com/xuchunyang/region-state.el
-;;  https://github.com/larstvei/dot-emacs#global-scale-mode GLOBAL SCALE MODE ;; TODO: Make sure this works well, extend to work with minimap
+;; https://github.com/larstvei/dot-emacs#global-scale-mode GLOBAL SCALE MODE ;; TODO: Make sure this works well, extend to work with minimap
 ;; http://xenodium.com/#installing-emacs-spaceline
 ;; https://github.com/antonj/Highlight-Indentation-for-Emacs
 ;; https://github.com/k-talo/volatile-highlights.el
