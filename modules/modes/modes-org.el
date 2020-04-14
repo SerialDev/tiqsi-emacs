@@ -25,6 +25,59 @@
 
 ;;; Commentary:
 ;;
+
+
+(straight-use-package
+ '(ox-reveal
+   :type git
+   :host github
+   :repo "yjwen/org-reveal"
+))
+
+(setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
+
+
+(defun tiqsi-org-mode-before-save-hook ()
+  (when (eq major-mode 'org-mode)
+    (progn
+      (org-reveal-export-to-html)
+      (pos-tip-show "exported")
+      )
+
+    ))
+
+(add-hook 'before-save-hook #'tiqsi-org-mode-before-save-hook)
+
+
+
+(defun tiqsi-org-reveal-insert-img()
+  (interactive)
+  (let ((title (read-string "Enter  title:") )
+	(image_name (read-string "Enter  image_name:")) )
+
+(insert (message 
+"** %s\n\
+   :PROPERTIES:\n\
+   :reveal_background: images/%s\n\
+   :reveal_background_size: 600px\n\
+   :reveal_background_trans: slide\n\
+   :reveal_background_opacity: 0.2\n\
+   :END:\n\
+
+** \n\
+   :PROPERTIES:\n\
+   :reveal_background: images/%s\n\
+   :reveal_background_size: 600px\n\
+   :reveal_background_trans: slide\n\
+   :reveal_background_opacity: 1\n\
+   :END:\n\
+" title image_name image_name)
+
+  ))
+  )
+
+
+
 ;; Setting up Org Mode TODO: Fri, 25 Nov 2016, 10:01 alot more editing needed
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 
@@ -141,6 +194,10 @@
                                         ;(print image-library-alist)
 
 
+
+
+
+
 ;; Override Markdown Mode's image overlays so the image markdown code and the image are both visible!
 (eval-after-load "markdown-mode"
   '(defun markdown-display-inline-images ()
@@ -190,6 +247,9 @@ or \\[markdown-toggle-inline-images]."
 ;; Useful keybindings when using Clojure from Org
 (org-defkey org-mode-map "\C-x\C-e" 'cider-eval-last-sexp)
 (org-defkey org-mode-map "\C-c\C-d" 'cider-doc)
+
+
+(org-defkey org-mode-map "\C-c\C-i" 'tiqsi-org-reveal-insert-img)
 
 (provide 'modes-org)
 

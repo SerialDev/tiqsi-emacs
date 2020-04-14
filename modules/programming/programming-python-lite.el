@@ -423,10 +423,33 @@ else:
 ;         TODO pprint pandas dataframes when in python inferior mode        ;
 ; ------------------------------------------------------------------------- ;
 
+
 ;; Out[1188]: 
 ;;                                                   email            role                              shist
 ;; 1514  8544ac18bb8509e055de298ed5d135b77fa7a31e897b8d...  Trust & Safety  (Trust & Safety, Empty histogram)
 ;; 1515  9d4ccfb4ba08ad49d03df15b1a85cab2c16f55909a1da4...  Trust & Safety  (Trust & Safety, Empty histogram)
+
+
+(defun tag-word-or-region (tag)
+    "Surround current word or region with a given tag."
+    (interactive "sEnter tag (without <>): ")
+    (let (pos1 pos2 bds start-tag end-tag)
+    (setq start-tag (concat "<" tag ">"))
+    (setq end-tag (concat "</" tag ">"))
+    (if (and transient-mark-mode mark-active)
+        (progn
+            (goto-char (region-end))
+            (insert end-tag)
+            (goto-char (region-beginning))
+            (insert start-tag))
+        (progn
+            (setq bds (bounds-of-thing-at-point 'symbol))
+            (goto-char (cdr bds))
+            (insert end-tag)
+            (goto-char (car bds))
+            (insert start-tag)))))
+
+
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Debugging ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 

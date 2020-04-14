@@ -260,8 +260,18 @@
             (global-highlight-parentheses-mode 1)
 ))
 
+; _ _ _ _ _ _ _ _ _ _    /¯¯¯ Select from a list ¯¯¯\_ _ _ _ _ _ _ _ _ _    ;
+
+(defmacro pick-one(info &rest body)
+  "Prompt user to pick a choice from a list
+usage (pick-one test (1 2))
+"
+  (interactive)
+ `(message "%s" (ido-completing-read+ ,info ',@body))
+  )
 
 
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Select from a list _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
 ;                                          Highlight thing                                          ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;

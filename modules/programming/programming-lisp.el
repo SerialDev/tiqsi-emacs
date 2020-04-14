@@ -42,7 +42,6 @@
     (concat "ros --eval '" ,@commands)
     "'")
    )
-
   )
 
 
