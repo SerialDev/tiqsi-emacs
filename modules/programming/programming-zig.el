@@ -43,17 +43,26 @@
 
 (defun zig-compile ()
   (interactive)
-  (compile (s-prepend "zig build-exe " (buffer-name)) ))
+  (async-shell-command
+   (s-prepend "zig build-exe " (buffer-name))
+        "*zig-compilation*" "*Zig-error*"
+		       ))
 
 (defun zig-test()
   (interactive)
-  (compile (s-prepend "zig test " (buffer-name)) ))
+  (async-shell-command
+   (s-prepend "zig test " (buffer-name))
+   "*zig-test*" "*Zig-error*"))
 
 
 (defun zig-run()
   (interactive)
-  (compile (s-prepend
-	    (s-prepend "zig build-exe" (buffer-name)) " && ./main")))
+  (async-shell-command
+   (s-prepend
+    (s-prepend "zig build-exe " (buffer-name)) " && ./main")
+     "*zig-compilation*" "*Zig-error*"
+   )
+  )
 
 
 (define-key zig-mode-map (kbd "C-c C-c") 'zig-compile)

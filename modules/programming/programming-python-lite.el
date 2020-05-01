@@ -474,6 +474,8 @@ else:
 
 ; _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Jupyter Notebooks ¯¯¯\_ _ _ _ _ _ _ _ _ _    ;
 
+
+
 (use-package ein
   :straight t
   :ensure t
@@ -502,6 +504,12 @@ else:
   (interactive)
   (mark-whole-buffer)
   (py-isort-region))
+
+(use-package hy-mode
+  :straight t
+  :ensure t
+  :config(progn))
+
 
 
 ; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Documentation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;

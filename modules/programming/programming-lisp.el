@@ -44,6 +44,20 @@
    )
   )
 
+ 
+(defun get-last-sexp (&optional bounds)
+  "Return the sexp preceding the point."
+  (interactive)
+  (let ((points     (save-excursion
+           (list (point)
+                 (progn (backward-sexp 1)
+                        (skip-chars-forward "[:blank:]")
+                        (when (looking-at-p "\n") (forward-char 1))
+                        (point)))) ))
+    (buffer-substring-no-properties  (car points) (cadr points) )
+  ))
+
+
 
 ;; (setq inferior-lisp-program "sbcl")
 (setq slime-contribs '(slime-fancy))
@@ -207,6 +221,18 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 
 (when tiqsi-linux
   (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el")))
+
+
+; ------------------------------------------------------------------------- ;
+;                              Hy repl support                              ;
+; ------------------------------------------------------------------------- ;
+
+(straight-use-package
+ '(ihy
+   :type git
+   :host github
+   :repo "serialdev/ihy-mode"
+))
 
 ;; (require 'sly-quicklisp-autoloads)
 
