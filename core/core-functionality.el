@@ -92,7 +92,9 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
   (interactive)
   `(let ((current-region-text ,(get-selection) ))
      ,@data
-    ))
+     ))
+
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Region utilities _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 

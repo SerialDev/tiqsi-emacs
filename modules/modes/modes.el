@@ -49,6 +49,21 @@
 (load-expand  "modules/modes/modes-flyspell.el")
 (load-expand  "modules/modes/modes-shell.el")
 
+
+; ------------------------------------------------------------------------- ;
+;                        TODO Refactor in the future                        ;
+; ------------------------------------------------------------------------- ;
+
+
+(straight-use-package
+ '(emacs-refactor
+   :type git
+   :host github
+   :ensure t
+   :repo "Wilfred/emacs-refactor"
+))
+
+
 (provide 'modes)
 
 ;;; modes.el ends here

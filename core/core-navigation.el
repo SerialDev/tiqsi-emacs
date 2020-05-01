@@ -467,6 +467,13 @@ one, an error is signaled."
 (global-set-key (kbd "C-c 1") 'previous-buffer)
 (global-set-key (kbd "C-c )") 'match-paren)
 
+
+(global-set-key (kbd "C-M-<left>") 'windmove-left)
+(global-set-key (kbd "C-M-<right>") 'windmove-right)
+(global-set-key (kbd "C-M-<up>") 'windmove-up)
+(global-set-key (kbd "C-M-<down>") 'windmove-down)
+
+
 (define-key global-map (kbd "M-/") 'close-side-come-back)
 
 

@@ -43,16 +43,17 @@
 
 (defun zig-compile ()
   (interactive)
-  (compile "zig build-exe  main.zig"))
+  (compile (s-prepend "zig build-exe " (buffer-name)) ))
 
 (defun zig-test()
   (interactive)
-  (compile "zig test main.zig"))
+  (compile (s-prepend "zig test " (buffer-name)) ))
 
 
 (defun zig-run()
   (interactive)
-  (compile "zig build-exe main.zig && ./main"))
+  (compile (s-prepend
+	    (s-prepend "zig build-exe" (buffer-name)) " && ./main")))
 
 
 (define-key zig-mode-map (kbd "C-c C-c") 'zig-compile)
