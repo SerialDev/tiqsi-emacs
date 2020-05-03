@@ -136,6 +136,21 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   (delete-forward-char 1)
   )
 
+; ------------------------------------------------------------------------- ;
+;                                  Overlays                                 ;
+; ------------------------------------------------------------------------- ;
+
+(straight-use-package
+ '(eros
+   :type git
+   :host github
+   :repo "xiongtx/eros"
+   :config
+   (eros-mode 1) 
+   ))
+
+; ------------------------------------------------------------------------- ;
+
 
 ;; (straight-use-package
 ;;  '(coleslaw

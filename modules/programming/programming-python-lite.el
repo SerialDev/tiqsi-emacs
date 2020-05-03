@@ -63,6 +63,32 @@
  "';'.join(module_completion('''%s'''))\n"
  )
 
+; ------------------------------------------------------------------------- ;
+;                            Truncate Huge lines                            ;
+; ------------------------------------------------------------------------- ;
+
+(defvar python-shell-output-chunks nil)
+(defun python-shell-filter-long-lines (string)
+  (push string python-shell-output-chunks)
+  (if (not (string-match comint-prompt-regexp string))
+      ""
+    (let* ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
+           (split-str (split-string out "\n"))
+           (max-len (* 2 (window-width)))
+           (disp-left (round (* (/ 1.0 3) (window-width))))
+           (disp-right disp-left)
+           (truncated (mapconcat
+                       (lambda (x)
+                         (if (> (length x) max-len)
+                             (concat (substring x 0 disp-left) " ... (*TRUNCATED*) ... " (substring x (- disp-right)))
+                           x))
+                       split-str "\n")))
+      (setq python-shell-output-chunks nil)
+      truncated)))
+
+(add-hook 'comint-preoutput-filter-functions #'python-shell-filter-long-lines)
+
+; ------------------------------------------------------------------------- ;
 
 
 
@@ -466,6 +492,13 @@ else:
 ;;     ((error line-start (file-name) ":" line ": error:" (message) line-end))
 ;;     :modes python-mode)
 
+(eval-after-load 'python-mode
+  (progn
+    (define-key python-mode-map (kbd "C-c n") 'flycheck-next-error)
+    (define-key python-mode-map (kbd "C-c p") 'flycheck-previous-error)
+    (define-key python-mode-map (kbd "C-c l") 'flycheck-list-errors)
+    ))
+
 ;; (add-to-list 'flycheck-checkers 'python-mypy t)
 ;; (flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
@@ -510,6 +543,8 @@ else:
   :ensure t
   :config(progn))
 
+(with-system darwin
+  (sdev-use-ipython))
 
 
 ; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Documentation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
@@ -616,6 +651,7 @@ sEnter Doctest result: ")
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Miscellaneous _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+
 
 
 (provide 'programming-python-lite)
