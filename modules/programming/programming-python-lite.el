@@ -492,13 +492,6 @@ else:
 ;;     ((error line-start (file-name) ":" line ": error:" (message) line-end))
 ;;     :modes python-mode)
 
-(eval-after-load 'python-mode
-  (progn
-    (define-key python-mode-map (kbd "C-c n") 'flycheck-next-error)
-    (define-key python-mode-map (kbd "C-c p") 'flycheck-previous-error)
-    (define-key python-mode-map (kbd "C-c l") 'flycheck-list-errors)
-    ))
-
 ;; (add-to-list 'flycheck-checkers 'python-mypy t)
 ;; (flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
@@ -556,7 +549,6 @@ else:
 	(var-type (car(cdr(s-split ":" var-string))))
 	(var-desc (cdr(cdr(s-split ":" var-string))))
 	)
-
     (insert (s-prepend var-name " : "))
     (insert (s-prepend var-type "\n"))
     (insert (s-prepend (s-prepend "   " (format "%s" (car var-desc))) "\n") )
@@ -652,6 +644,13 @@ sEnter Doctest result: ")
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Miscellaneous _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
+
+;; (eval-after-load 'python-mode
+;;   (progn
+;;     (define-key python-mode-map (kbd "C-c n") 'flycheck-next-error)
+;;     (define-key python-mode-map (kbd "C-c p") 'flycheck-previous-error)
+;;     (define-key python-mode-map (kbd "C-c l") 'flycheck-list-errors)
+;;     ))
 
 
 (provide 'programming-python-lite)
