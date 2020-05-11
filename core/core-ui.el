@@ -555,6 +555,21 @@ usage (pick-one test (1 2))
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
+; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Themes ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+
+;                                   Themes                                  ;
+; ------------------------------------------------------------------------- ;
+
+(use-package exotica-theme
+  :straight t
+  :ensure t
+  :config
+  (progn 
+    (load-theme 'exotica t)
+    (setq exotica-theme-enable-italics t)
+    ))
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Themes _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 ;                                            Keybindings                                            ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
