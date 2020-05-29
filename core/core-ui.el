@@ -199,6 +199,9 @@
 ;                                               Beacon                                              ;
 ; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
+;                           TODO: Asyc the beacon                             ;
+; ------------------------------------------------------------------------- ;
+
 (use-package beacon
   :straight t
   :ensure t
@@ -536,7 +539,7 @@ usage (pick-one test (1 2))
     (error "Couldn't find URL."))
   (let ((buffer (url-retrieve-synchronously url)))
     (unwind-protect
-         (let ((data (with-current-buffer buffer
+          (let ((data (with-current-buffer buffer
                        (goto-char (point-min))
                        (search-forward "\n\n")
                        (buffer-substring (point) (point-max)))))

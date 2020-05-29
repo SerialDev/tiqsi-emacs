@@ -30,9 +30,11 @@
 (straight-use-package
  '(ox-reveal
    :type git
+   :require t
    :host github
    :repo "yjwen/org-reveal"
 ))
+
 
 (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 
@@ -47,8 +49,6 @@
     ))
 
 (add-hook 'before-save-hook #'tiqsi-org-mode-before-save-hook)
-
-
 
 (defun tiqsi-org-reveal-insert-img()
   (interactive)

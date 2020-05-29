@@ -68,23 +68,40 @@
 ; ------------------------------------------------------------------------- ;
 
 (defvar python-shell-output-chunks nil)
+
+;; (defun python-shell-filter-long-lines (string)
+;;   (push string python-shell-output-chunks)
+;;   (if (not (string-match comint-prompt-regexp string))
+;;       ""
+;;     (let* ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
+;;            (split-str (split-string out "\n"))
+;;            (max-len (* 2 (window-width)))
+;;            (disp-left (round (* (/ 1.0 3) (window-width))))
+;;            (disp-right disp-left)
+;;            (truncated (mapconcat
+;;                        (lambda (x)
+;;                          (if (> (length x) max-len)
+;;                              (concat (substring x 0 disp-left) " ... (*TRUNCATED*) ... " (substring x (- disp-right)))
+;;                            x))
+;;                        split-str "\n")))
+;;       (setq python-shell-output-chunks nil)
+;;       truncated)))
+
+;; TODO Further edit this to handle different regexp matches , ps! loving the
+;; performance boost from not hitting gap buffer limitations
 (defun python-shell-filter-long-lines (string)
   (push string python-shell-output-chunks)
-  (if (not (string-match comint-prompt-regexp string))
+    (if (not (string-match comint-prompt-regexp string))
       ""
-    (let* ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
-           (split-str (split-string out "\n"))
-           (max-len (* 2 (window-width)))
-           (disp-left (round (* (/ 1.0 3) (window-width))))
-           (disp-right disp-left)
-           (truncated (mapconcat
-                       (lambda (x)
-                         (if (> (length x) max-len)
-                             (concat (substring x 0 disp-left) " ... (*TRUNCATED*) ... " (substring x (- disp-right)))
-                           x))
-                       split-str "\n")))
-      (setq python-shell-output-chunks nil)
-      truncated)))
+      (let ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
+	    (max-len (window-width))
+	    )
+	(setq python-shell-output-chunks nil)
+	(if (> (length out) max-len)
+	    ;; (mapconcat '(lambda (x) (s-word-wrap 90 x) )(s-split "\s+" out) "")
+	    (s-prepend "\n" (s-word-wrap 80 (s-trim out)))
+	  out)    
+)))
 
 (add-hook 'comint-preoutput-filter-functions #'python-shell-filter-long-lines)
 
@@ -639,6 +656,25 @@ sEnter Doctest result: ")
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Documentation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
+(defun get-cwd()
+  (file-name-nondirectory (directory-file-name (file-name-directory buffer-file-name))))
+
+(defun deploy-gcloud()
+  (interactive)
+  (let ((current-command  (s-prepend
+			   (s-prepend "gcloud functions deploy "
+				      (s-replace "-" "_" (get-cwd)))
+			   " --runtime python37 --trigger-http --allow-unauthenticated") ))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
+(defun describe-gcloud()
+  (interactive)
+  (let ((current-command  (s-prepend "gcloud functions describe "
+				      (s-replace "-" "_" (get-cwd)))))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
 
 
 
