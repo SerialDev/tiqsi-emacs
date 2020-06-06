@@ -34,5 +34,22 @@
   (interactive)
   )
 
+(straight-use-package
+ '(hierarchy
+   :type git
+   :host github
+   :ensure t
+   :repo "DamienCassou/hierarchy"
+))
+
+
+(straight-use-package
+ '(json-navigator
+   :type git
+   :host github
+   :ensure t
+   :repo "DamienCassou/json-navigator"
+))
+
 
 ;;; modes-json.el ends here

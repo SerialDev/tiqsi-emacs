@@ -41,6 +41,30 @@
         )))
 
 
+
+; ------------------------------------------------------------------------- ;
+
+(defmacro multiple-async-shell-commands (buffer-name &rest commands)
+  "Run COMMANDS in sequences, each runs asynchronously.
+   Based on continuation passing"
+  (cl-labels ((aux (commands)
+                   (pcase commands
+                     (`(,command . ,rest)
+                      `(set-process-sentinel
+                        (start-process-shell-command
+                         ,@(if (stringp command) `("Shell" ,buffer-name ,command) command))
+                        (lambda (_ _)
+                          ,(aux rest)))))))
+    (aux commands)))
+
+(multiple-async-shell-commands "*Output*"
+			       "echo 1; sleep 1"
+                               "echo 2; sleep 1"
+                               "echo 3; sleep 1")
+
+; ------------------------------------------------------------------------- ;
+
+
 ;; --------------------------------Create a frame with tooltip---------------------
 ;; TODO Make tip based on tip char len + height
 (setq tip-frame-params
@@ -86,10 +110,7 @@
 				     (width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))
 				     ))
 			   `(
-			     ;; (height . 5)
-			     ;; (height . ,(frame-char-height))
 			     (height . ,(*(frame-char-height) 2))
-			     ;; (height . ,(/ (frame-char-height) 2))
 			     ))
 		   )
 	  )
@@ -133,7 +154,7 @@
 ;  -------------------------------------------------------------------------------- ;
 
 
-;; (make-tip-frame "")
+;; (make-tip-frame "e")
 ;; (async-shell-command "ls" "*Tip Frame Buffer*")
 
 (defun tooltip-command (shell-command-to-execute)
@@ -145,14 +166,46 @@
   (close-tip-frame)
   )
 
+; ------------------------------------------------------------------------- ;
+;                           TODO: Make this async                           ;
+; ------------------------------------------------------------------------- ;
+
 (defmacro create-tooltip-command(command-name command-to-execute)
   (let ((current-command (s-prepend "command-tooltip-" command-name) ))
     `(defun ,(intern current-command) ()
        (interactive)
-       (tooltip-command ,command-to-execute)
+       (pos-tip-show (shell-command-to-string ,command-to-execute))
        )
   )
 )
+
+
+
+(straight-use-package
+ '(extractor
+   :type git
+   :host github
+   :ensure t
+   :repo "DamienCassou/extractor-el"
+))
+
+
+(straight-use-package
+ '(etop-mode
+   :type git
+   :host github
+   :ensure t
+   :repo "DamienCassou/etop-mode"
+))
+
+
+(when-executable
+ "nmap"
+ (progn
+   ;; Which ports are listening for TCP connections from the network
+   ;; #notice that some companies might not like you using nmap
+   (create-tooltip-command "ports-listening-tcp" "nmap -sT -O localhost")
+))
 
 (create-tooltip-command "ls" "ls")
 (create-tooltip-command "count-running-processes" "ps aux | wc -l")
@@ -179,10 +232,11 @@
 (create-tooltip-command "count-num-cores" "nproc --all" )
 (create-tooltip-command "show-running-services" "service --status-all" )
 
-;; (create-tooltip-command "show-kernel-alert" "dmesg - -level=alert")
-
 ;; Print or control the kernel ring buffer
 ;; dmesg
+;; (create-tooltip-command "show-kernel-alert" "dmesg - -level=alert")
+;; (create-tooltip-command "show-kernel-memory" "dmesg | grep -i memory")
+
 
 ;; TODO: improve the macro || alternative macro for the following use-cases 
 
@@ -226,14 +280,13 @@
 ;; ldd /bin/ls
 
 
-;; Which ports are listening for TCP connections from the network
-;; nmap -sT -O localhost
-;; #notice that some companies might not like you using nmap
-
 
 
 ;; Kill all process of a program
 ;; kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')
+
+; ------------------------------------------------------------------------- ;
+
 
 (provide 'modes-shell)
 

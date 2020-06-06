@@ -524,11 +524,11 @@ else:
   :ensure t
   :config(progn
 
-	   (add-hook 'poly-ein-mode-hook '(lambda ()
-				 (set (make-local-variable 'linum-mode) nil)))
+	   ;; (add-hook 'poly-ein-mode-hook '(lambda ()
+	   ;; 			 (set (make-local-variable 'linum-mode) nil)))
 
-	   (define-key poly-ein-mode-map (kbd "C-n") 'ein:worksheet-goto-next-input-km)
-	   (define-key poly-ein-mode-map (kbd "C-b") 'ein:worksheet-goto-prev-input-km)
+	   ;; (define-key poly-ein-mode-map (kbd "C-n") 'ein:worksheet-goto-next-input-km)
+	   ;; (define-key poly-ein-mode-map (kbd "C-b") 'ein:worksheet-goto-prev-input-km)
 
 	   ))
 
@@ -664,7 +664,7 @@ sEnter Doctest result: ")
   (let ((current-command  (s-prepend
 			   (s-prepend "gcloud functions deploy "
 				      (s-replace "-" "_" (get-cwd)))
-			   " --runtime python37 --trigger-http --allow-unauthenticated") ))
+			   " --runtime python37 --trigger-http") ))
     (pos-tip-show current-command)
     (async-shell-command current-command)))
 
@@ -676,6 +676,37 @@ sEnter Doctest result: ")
     (pos-tip-show current-command)
     (async-shell-command current-command)))
 
+
+(defun list-logs-gcloud()
+  (interactive)
+  (let ((current-command  "gcloud logging logs list "
+				      ))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
+
+(defun list-current-cfun-log-gcloud()
+  (interactive)
+  (let ((current-command  (s-prepend(s-prepend "gcloud logging read \"resource.type=cloud_function AND resource.labels.function_name="
+				      (s-replace "-" "_" (get-cwd))) "\" --freshness=10M --order=desc --format=json --limit=10")  ))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
+
+(defun list-current-cfun-log-error-gcloud()
+  (interactive)
+  (let ((current-command  (s-prepend(s-prepend "gcloud logging read \"severity>=ERROR AND resource.type=cloud_function AND resource.labels.function_name="
+				      (s-replace "-" "_" (get-cwd))) "\" --freshness=10M --order=desc --format=json --limit=10")  ))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
+;; resource.type="cloud_function"
+;; resource.labels.function_name="detect_np_stats"
+;; resource.labels.region="us-central1"
+;; logName="projects/endpoint-forensics-collector/logs/cloudfunctions.googleapis.com%2Fcloud-functions"
 
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Miscellaneous _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
