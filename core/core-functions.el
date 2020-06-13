@@ -317,6 +317,16 @@ Adapted from `describe-function-or-variable'."
       (pop-to-buffer buf)
       )))
 
+(defun retrieve-region-as-line()
+  (let ((current-command  (replace-regexp-in-string "\n[[:space:]]?" " "
+					    (buffer-substring-no-properties (region-beginning) (region-end)))) )
+    current-command))
+
+(defun retrieve-region()
+  (let ((current-command (buffer-substring-no-properties (region-beginning) (region-end)))) 
+    current-command))
+
+
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
