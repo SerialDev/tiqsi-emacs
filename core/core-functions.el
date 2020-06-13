@@ -331,6 +331,22 @@ Adapted from `describe-function-or-variable'."
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 
+
+(defmacro multiple-async-shell-commands (buffer-name &rest commands)
+  "Run COMMANDS in sequences, each runs asynchronously.
+   Based on continuation passing"
+  (cl-labels ((aux (commands)
+                   (pcase commands
+                     (`(,command . ,rest)
+                      `(set-process-sentinel
+                        (start-process-shell-command
+                         ,@(if (stringp command) `("Shell" ,buffer-name ,command) command))
+                        (lambda (_ _)
+                          ,(aux rest)))))))
+    (aux commands))
+  )
+
+
                                         ;--{Key completion}-;
 
 (use-package which-key
