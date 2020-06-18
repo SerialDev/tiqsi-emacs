@@ -110,10 +110,62 @@
   (compile
    "env GOOS=windows GOARCH=amd64 go build main.go"))
 
-(define-key go-mode-map (kbd "C-c C-c") 'go-build)
-(define-key go-mode-map (kbd "C-c C-r") 'go-run)
+(define-key go-mode-map (kbd "C-c C-b") 'go-build)
+(define-key go-mode-map (kbd "C-c C-e") 'go-run)
 (define-key go-mode-map (kbd "C-c C-w") 'go-build-win)
 
+
+; ------------------------------------------------------------------------- ;
+;                           GORE REPL integration                           ;
+; ------------------------------------------------------------------------- ;
+; TODO: Find alternatives as this repl leaves alot to be desired            ;
+; ------------------------------------------------------------------------- ;
+
+(straight-use-package
+ '(gore-mode
+   :type git
+   :host github
+   :ensure t
+   :repo "sergey-pashaev/gore-mode"
+))
+
+(defun run-gore-other-buffer ()
+  (interactive)
+  (launch-in-other-buffer (run-gore)))
+
+
+(setq gore-shell-buffer-name "*gore*")
+
+(defun gore-eval-region (begin end)
+  "Evaluate region between BEGIN and END."
+  (interactive "r")
+  (let ((buf (current-buffer) ))
+    (let ((current-command (replace-regexp-in-string "\n[[:space:]]?" " "(buffer-substring-no-properties begin end))) ))
+      (pop-to-buffer gore-shell-buffer-name)
+      (insert current-command)
+      (gore-send-expr)
+      (pop-to-buffer buf)))
+
+
+
+; ------------------------------------------------------------------------- ;
+;                                 Go install                                ;
+; ------------------------------------------------------------------------- ;
+
+(defmacro go--get-github(repo)
+  `(multiple-async-shell-commands "*Output*"
+				  ,(s-prepend
+				   (s-prepend "go get github.com/" repo)
+				   "/...")
+				  "echo \"Done\"")
+  )
+
+
+(go--get-github "sbinet/igo")
+
+
+(define-key go-mode-map (kbd "C-c C-p") 'run-gore-other-buffer)
+(define-key go-mode-map (kbd "C-c C-r") 'gore-eval-region)
 
 
 (provide 'programming-go)

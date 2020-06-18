@@ -330,8 +330,6 @@ Adapted from `describe-function-or-variable'."
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ Buffer defuns ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-
-
 (defmacro multiple-async-shell-commands (buffer-name &rest commands)
   "Run COMMANDS in sequences, each runs asynchronously.
    Based on continuation passing"
@@ -343,11 +341,9 @@ Adapted from `describe-function-or-variable'."
                          ,@(if (stringp command) `("Shell" ,buffer-name ,command) command))
                         (lambda (_ _)
                           ,(aux rest)))))))
-    (aux commands))
-  )
+    (aux commands)))
 
-
-                                        ;--{Key completion}-;
+; _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Key Completion ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
 
 (use-package which-key
   :straight t
@@ -357,7 +353,10 @@ Adapted from `describe-function-or-variable'."
 	    (setq which-key-idle-delay 0.5)))
 
 
-                                        ;---{Keybindings}---;
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Key Completion _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+
+; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+
 
 (with-eval-after-load 'emacs
   (define-key global-map (kbd "C-x C-c") nil)
@@ -370,6 +369,9 @@ Adapted from `describe-function-or-variable'."
 
 (global-set-key (kbd "M-<return>") 'xref-find-definitions-other-window)
 (define-key emacs-lisp-mode-map  (kbd "M-h") 'helpful-at-point)
+
+
+; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 (provide 'core-functions)
 

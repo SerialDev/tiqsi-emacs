@@ -669,6 +669,16 @@ sEnter Doctest result: ")
     (async-shell-command current-command)))
 
 
+(defun deploy-gcloud-u()
+  (interactive)
+  (let ((current-command  (s-prepend
+			   (s-prepend "gcloud functions deploy "
+				      (s-replace "-" "_" (get-cwd)))
+			   " --runtime python37 --trigger-http --allow-unauthenticated") ))
+    (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
 (defun describe-gcloud()
   (interactive)
   (let ((current-command  (s-prepend "gcloud functions describe "

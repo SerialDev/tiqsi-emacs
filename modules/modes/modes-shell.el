@@ -44,29 +44,20 @@
 
 ; ------------------------------------------------------------------------- ;
 
-(defmacro multiple-async-shell-commands (buffer-name &rest commands)
-  "Run COMMANDS in sequences, each runs asynchronously.
-   Based on continuation passing"
-  (cl-labels ((aux (commands)
-                   (pcase commands
-                     (`(,command . ,rest)
-                      `(set-process-sentinel
-                        (start-process-shell-command
-                         ,@(if (stringp command) `("Shell" ,buffer-name ,command) command))
-                        (lambda (_ _)
-                          ,(aux rest)))))))
-    (aux commands)))
 
 (multiple-async-shell-commands "*Output*"
 			       "echo 1; sleep 1"
-                               "echo 2; sleep 1"
-                               "echo 3; sleep 1")
+			       "echo 2; sleep 1"
+			       "echo 2; sleep 1"
+			       "echo 3; sleep 1")
+
 
 ; ------------------------------------------------------------------------- ;
 
 
 ;; --------------------------------Create a frame with tooltip---------------------
 ;; TODO Make tip based on tip char len + height
+
 (setq tip-frame-params
       '(
 	(minibuffer . nil)
@@ -104,18 +95,12 @@
 
 (defun make-tip-frame (tip &rest args)
   (setq tip-frame (make-frame
-		   (append (append tip-frame-params
-				   `(
-				     ;; (width . ,(+ (* (frame-char-width) (length tip)) (frame-char-width)))
-				     (width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))
-				     ))
-			   `(
-			     (height . ,(*(frame-char-height) 2))
-			     ))
-		   )
-	  )
+		   (append (append
+			    tip-frame-params
+			    `((width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))))
+			   `((height . ,(*(frame-char-height) 2))))))
 
-    (generate-new-buffer "*Tip Frame Buffer*")
+    ;; (generate-new-buffer "*Tip Frame Buffer*")
 
     (set-frame-position tip-frame
 			(- (car (window-absolute-pixel-position)) (frame-char-width))
@@ -125,16 +110,15 @@
     (let ((current-frame (selected-frame) ))
       (make-frame-visible tip-frame)
       (select-frame tip-frame)
-      (pop-to-buffer "*Tip Frame Buffer*")
-      (with-current-buffer "*Tip Frame Buffer*"
+      (pop-to-buffer "*Tip Frame*")
+      (with-current-buffer "*Tip Frame*"
 	(fundamental-mode)
 	(setq-local beacon-mode nil)
 	(setq mode-line-format nil)
-	;; (set-background-color "#5F55FF")
+	(set-background-color "#5F55FF")
 	(linum-mode -1)
 	(insert  tip)
 	)
-
       (frame--set-input-focus current-frame)
       (frame-restack current-frame tip-frame)
       )
@@ -143,7 +127,7 @@
 
 
 (defun close-tip-frame()
-  (with-current-buffer "*Tip Frame Buffer*"
+  (with-current-buffer "*Tip Frame*"
     (delete-region (point-min) (point-max)))
   (delete-frame tip-frame))
 
@@ -232,6 +216,10 @@
 (create-tooltip-command "count-num-cores" "nproc --all" )
 (create-tooltip-command "show-running-services" "service --status-all" )
 
+; ------------------------------------------------------------------------- ;
+;                                Improvements                               ;
+; ------------------------------------------------------------------------- ;
+
 ;; Print or control the kernel ring buffer
 ;; dmesg
 ;; (create-tooltip-command "show-kernel-alert" "dmesg - -level=alert")
@@ -280,11 +268,14 @@
 ;; ldd /bin/ls
 
 
+;; This will show whether the target is a builtin, a function, an alias or an external executable
+;; type -a lshw
 
 
 ;; Kill all process of a program
 ;; kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')
 
+; ------------------------------------------------------------------------- ;
 ; ------------------------------------------------------------------------- ;
 
 
