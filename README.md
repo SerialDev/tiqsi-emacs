@@ -1,7 +1,19 @@
 # tiqsi-emacs
 
+    __________________
+   |__________________|
+     \\ \ \ / / // 
+      \\_|_|_|_//
+ Tiqsi |        | 
+       | o    o | Emacs
+    __________________
+   |__________________|
+        \______/
+      
+
+
 Fully self contained emacs IDE experience.  
-Considers usage on windows(WSL) , linux, and cloud remote  
+Considers usage on windows(WSL) , linux, OSx, and cloud remote  
 connection[for repl usage] a first class citizen.  
 
 
@@ -77,4 +89,9 @@ Added repl support
 ```
 C# & F# Supported
 ```
+
+
+
+
+
 
