@@ -1,6 +1,6 @@
 # tiqsi-emacs
 
-    __________________
+``` __________________
    |__________________|
      \\ \ \ / / // 
       \\_|_|_|_//
@@ -10,7 +10,7 @@
    |__________________|
         \______/
       
-
+```
 
 Fully self contained emacs IDE experience.  
 Considers usage on windows(WSL) , linux, OSx, and cloud remote  
