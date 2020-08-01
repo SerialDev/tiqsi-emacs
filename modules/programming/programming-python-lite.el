@@ -87,23 +87,24 @@
 ;;       (setq python-shell-output-chunks nil)
 ;;       truncated)))
 
-;; TODO Further edit this to handle different regexp matches , ps! loving the
-;; performance boost from not hitting gap buffer limitations
-(defun python-shell-filter-long-lines (string)
-  (push string python-shell-output-chunks)
-    (if (not (string-match comint-prompt-regexp string))
-      ""
-      (let ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
-	    (max-len (window-width))
-	    )
-	(setq python-shell-output-chunks nil)
-	(if (> (length out) max-len)
-	    ;; (mapconcat '(lambda (x) (s-word-wrap 90 x) )(s-split "\s+" out) "")
-	    (s-prepend "\n" (s-word-wrap 80 (s-trim out)))
-	  out)    
-)))
+;; TODO IMPROVE THIS IS AWESOME 
+;; ;; TODO Further edit this to handle different regexp matches , ps! loving the
+;; ;; performance boost from not hitting gap buffer limitations
+;; (defun python-shell-filter-long-lines (string)
+;;   (push string python-shell-output-chunks)
+;;     (if (not (string-match comint-prompt-regexp string))
+;;       ""
+;;       (let ((out (mapconcat #'identity (nreverse python-shell-output-chunks) ""))
+;; 	    (max-len (window-width))
+;; 	    )
+;; 	(setq python-shell-output-chunks nil)
+;; 	(if (> (length out) max-len)
+;; 	    ;; (mapconcat '(lambda (x) (s-word-wrap 90 x) )(s-split "\s+" out) "")
+;; 	    (s-prepend "\n" (s-word-wrap 80 (s-trim out)))
+;; 	  out)    
+;; )))
 
-(add-hook 'comint-preoutput-filter-functions #'python-shell-filter-long-lines)
+;; (add-hook 'comint-preoutput-filter-functions #'python-shell-filter-long-lines)
 
 ; ------------------------------------------------------------------------- ;
 
@@ -664,9 +665,18 @@ sEnter Doctest result: ")
   (let ((current-command  (s-prepend
 			   (s-prepend "gcloud functions deploy "
 				      (s-replace "-" "_" (get-cwd)))
-			   " --runtime python37 --trigger-http") ))
+			   " --runtime python37 --ingress-settings internal-only --trigger-http ") ))
     (pos-tip-show current-command)
     (async-shell-command current-command)))
+
+(defun deploy-gcloud-local()
+  (interactive)
+  (let ((current-command  (s-prepend
+			   (s-prepend "functions-framework --target "
+				      (s-replace "-" "_" (get-cwd)))
+			   "  ") ))
+    (pos-tip-show current-command)
+    (shell-command current-command)))
 
 
 (defun deploy-gcloud-u()
@@ -674,8 +684,20 @@ sEnter Doctest result: ")
   (let ((current-command  (s-prepend
 			   (s-prepend "gcloud functions deploy "
 				      (s-replace "-" "_" (get-cwd)))
-			   " --runtime python37 --trigger-http --allow-unauthenticated") ))
+			   " --service-account detect-np-misuse@cloudflare-detection-response.iam.gserviceaccount.com --runtime python37  --trigger-http --allow-unauthenticated") ))
     (pos-tip-show current-command)
+    (async-shell-command current-command)))
+
+
+;; TODO fix
+(defun deploy-gcloud-topic-u()
+  (interactive)
+  (let ((current-command  (s-prepend
+			   (s-prepend "gcloud functions deploy schedule-np-detect --trigger-topic "
+				      (s-replace "-" "_" (get-cwd)))
+			   " --runtime python37 --allow-unauthenticated") ))
+    (pos-tip-show current-command)
+    (insert current-command)
     (async-shell-command current-command)))
 
 

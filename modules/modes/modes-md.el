@@ -79,13 +79,13 @@
 	  (s-trim
 	   (s-collapse-whitespace
 	     (get-selection)  ) )))
-     
+
      (let (( ocurrences (count-occurences " " data)) )
        (insert "| ")
        (insert (s-replace " " " | " data) )
        (insert " |")
        (insert "\n")
-       
+
        (dotimes (i ocurrences)
 	 (if (eq i 0)
 	     (insert "| ----- |")
@@ -114,11 +114,31 @@
    (s-prepend "markmap " (buffer-name) ) ))
 
 
-
-
-
 (define-key markdown-mode-map (kbd "C-c gg") 'writegood-grade-level)
 (define-key markdown-mode-map  (kbd "C-c ge") 'writegood-reading-ease)
+
+
+; ------------------------------------------------------------------------- ;
+;                    Jira markdown support & integration                    ;
+; ------------------------------------------------------------------------- ;
+
+
+
+
+
+
+
+
+(straight-use-package
+ '(org-jira
+   :type git
+   :host github
+   :repo "ahungry/org-jira"
+
+))
+
+(setq jiralib-url tiqsi-jira-url)
+
 
 
 (provide 'modes-md)
