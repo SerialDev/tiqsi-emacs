@@ -1,10 +1,11 @@
 ```
-    __________________
-   |__________________|    Fully self contained emacs IDE experience.  
-     \\ \ \ / / // 
-      \\_|_|_|_//          Considers usage on windows(WSL) , linux, OSx, and,
- Tiqsi |        | 
-       | o    o | Emacs    cloud remote connection[for repl usage] a first class citizen.
+
+    __________________     Fully self contained emacs IDE experience.  
+   |__________________|   
+      \\ \ \ / / //        Considers usage on windows(WSL) , linux, OSx, and,
+      \\_|_|_|_//          cloud remote connection[for repl usage] a first class citizen.
+ Tiqsi |        |          
+       | o    o | Emacs    
     __________________
    |__________________|
         \______/
