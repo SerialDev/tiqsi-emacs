@@ -1,21 +1,15 @@
-# tiqsi-emacs
-
-``` __________________
-   |__________________|
+```
+    __________________
+   |__________________|    Fully self contained emacs IDE experience.  
      \\ \ \ / / // 
-      \\_|_|_|_//
+      \\_|_|_|_//          Considers usage on windows(WSL) , linux, OSx, and,
  Tiqsi |        | 
-       | o    o | Emacs
+       | o    o | Emacs    cloud remote connection[for repl usage] a first class citizen.
     __________________
    |__________________|
         \______/
       
 ```
-
-Fully self contained emacs IDE experience.  
-Considers usage on windows(WSL) , linux, OSx, and cloud remote  
-connection[for repl usage] a first class citizen.  
-
 
 ### BNFC
 ```

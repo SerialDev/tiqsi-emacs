@@ -752,6 +752,24 @@ sEnter Doctest result: ")
 ;;     ))
 
 
+
+
+(setq tiqsi-python-buffer "*Python*")
+
+(defun send-py-line ()
+  (interactive)
+  (let ((py-temp (thing-at-point 'line t)) )
+    (comint-send-string tiqsi-python-buffer py-temp)))
+
+(defun send-py-region(begin end)
+  (interactive "r")
+  (comint-send-string tiqsi-python-buffer
+		      (buffer-substring-no-properties begin end))
+  (comint-send-string tiqsi-python-buffer "\n")
+  )
+
+;; (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
+
 (provide 'programming-python-lite)
 
 ;;; programming-python-lite.el ends here
