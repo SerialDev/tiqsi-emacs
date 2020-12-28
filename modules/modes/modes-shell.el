@@ -158,12 +158,16 @@
   (let ((current-command (s-prepend "command-tooltip-" command-name) ))
     `(defun ,(intern current-command) ()
        (interactive)
-       (pos-tip-show (shell-command-to-string ,command-to-execute))
-       )
-  )
-)
+       (pos-tip-show (shell-command-to-string ,command-to-execute)))))
 
+(defmacro create-tooltip-prompt-command(command-name command-to-execute prompt)
+  (let ((current-command (s-prepend "command-tooltip-" command-name) ))
+    `(defun ,(intern current-command) (,(intern prompt))
+       (interactive ,(s-prepend "sEnter " (s-prepend prompt ": ")))
+       (pos-tip-show (shell-command-to-string (s-prepend ,command-to-execute ,(intern prompt)))))))
 
+;;:8181
+(command-tooltip-test)
 
 (straight-use-package
  '(extractor
@@ -191,6 +195,12 @@
    (create-tooltip-command "ports-listening-tcp" "nmap -sT -O localhost")
 ))
 
+
+(with-system darwin
+  ()
+)
+
+
 (create-tooltip-command "ls" "ls")
 (create-tooltip-command "count-running-processes" "ps aux | wc -l")
 (create-tooltip-command "display-uid" "cut -d ':' -f 1,3 /etc/passwd | sort -t ':' -k2n - | tr ':' '\t'")
@@ -207,6 +217,16 @@
 (create-tooltip-command "show-current-jobs" "jobs -l" )
 (create-tooltip-command "show-system-info" "uname -a" )
 (create-tooltip-command "show-system-platform" "uname -i" )
+(create-tooltip-command "show-system-processor" "uname -mp" )
+;; TODO make a version that asks what port (of the macro) 
+(create-tooltip-command "show-open-ports" "sudo ss -tulpn" )
+(create-tooltip-prompt-command "find-application-using-port" "netstat -ap | grep :" "port" )
+
+;; TODO allow for internal {} f-string style replacement
+(create-tooltip-prompt-command "kill-all-processes-of-a-program" "kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')netstat -ap | grep :" "program-name" )
+
+
+;;
 (create-tooltip-command "show-system-alias-list" "alias -p" )
 (create-tooltip-command "show-disk-usage" "df -h" )
 (create-tooltip-command "show-dir-usage" "du -h" )
