@@ -165,7 +165,16 @@
 ;----{Platforms}----;
 
 (straight-require 'ob-ipython)
-(straight-require 'ein)
+
+(straight-use-package
+ '(ein
+   :type git
+   :host github
+   :repo "millejoh/emacs-ipython-notebook"
+))
+
+
+
 (straight-require 'cider)
 
 
@@ -329,6 +338,20 @@
    :host github
    :repo "ensime/ensime-emacs"
 ))
+
+; ------------------------------------------------------------------------- ;
+;                                   Docker                                  ;
+; ------------------------------------------------------------------------- ;
+
+;; Open files in Docker containers like so: /docker:drunk_bardeen:/etc/passwd
+
+(straight-use-package
+ '(docker-tramp
+   :type git
+   :host github
+   :repo "emacs-pe/docker-tramp.el"
+))
+
 
 ;---{Requirements}--;
 

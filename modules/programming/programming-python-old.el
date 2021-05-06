@@ -271,6 +271,7 @@ else:
   )
 
 (setq tiqsi-python-buffer "*Python*")
+(setq tiqsi-python-buffer "*Python*")
 
 (defun send-py-line ()
   (interactive)

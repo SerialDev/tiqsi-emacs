@@ -63,6 +63,12 @@
                                         ; (setq dired-omit-files
                                         ;       (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$"))))
 
+
+(defun jump-to-hetzner ()
+  (interactive)
+  (find-file-literally "/ssh:root@135.181.198.90:deploy/main.py")
+  )
+
 (provide 'modes-dired)
 
 ;;; modes-dired.el ends here

@@ -131,7 +131,7 @@
        (save-excursion
 	 (goto-char (point-max))
 	 (string-to-number (format-mode-line "%l")))
-       1000
+       10000
        )
       (comint-clear-buffer)
     nil))
@@ -142,7 +142,7 @@
        (save-excursion
 	 (goto-char (point-max))
 	 (string-to-number (format-mode-line "%c")))
-       1000
+       10000
        )
       (comint-clear-buffer)
     nil))
@@ -174,6 +174,11 @@
   (add-hook 'clear-huge-repl-mode-hook 'long-printout-teardown)
   )
 
+
+(setq max-specpdl-size 5000)  ; default is 1000, increase the backtrace level
+
+
+;; (adaptive-wrap-prefix-mode nil)
 
 ;; (defun my-line-count (line)
 ;;   (let ((count (bound-and-true-p my-line-count)))

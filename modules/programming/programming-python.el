@@ -463,12 +463,12 @@ else:
   (local-set-key (kbd "RET") 'newline-and-indent))
 (add-hook 'python-mode-hook 'set-newline-and-indent)
 
+(straight-require 'py-isort)
 
 (defun sdev/py-sort-imports ()
   (interactive)
   (mark-whole-buffer)
   (py-isort-region))
-
 
 
 (provide 'programming-python)

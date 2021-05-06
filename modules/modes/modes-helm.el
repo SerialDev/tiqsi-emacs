@@ -324,15 +324,15 @@
 
 (defhydra hydra-gtags (:color blue :hint nil)
   "
-^Symbols^                      ^History^
------------------------------------------------------------
-_t_: Find tags                 _h_: Show tags stack
-_T_: Find tags other window    _n_: Next tag in history
-_r_: Find rtag                 _p_: Previous tag in history
-_s_: Select tag
-_x_: Xref find
-_l_: List tags in this function
-"
+` ` _ _ _ _ _ _ _ _ _` ` ` ` | ^Symbols^                      ^History^
+`  |_ _ _ _ _ _ _ _ _ |` ` ` | -----------------------------------------------------------
+` ` ` \\\\ \\ \\ // ///` ` ` ` ` | _t_: Find tags                 _h_: Show tags stack
+` ` `  \\\\_|_|_| // ` ` ` ` ` | _T_: Find tags other window    _n_: Next tag in history
+ Tiqsi |        |` ` ` ` ` ` | _r_: Find rtag                 _p_: Previous tag in history
+` ` `  | o    o | Emacs` ` ` | _s_: Select tag
+` ` _ _ _ _ _ _ _ _ _  ` ` ` | _x_: Xref find
+`  |_ _ _ _ _ _ _ _ _ |` ` ` | _l_: List tags in this function
+` ` ` ` \\_ _ _ /` ` ` ` ` ` `| "
   ("r" helm-gtags-find-rtag)
   ("t" helm-gtags-find-tag)
   ("T" helm-gtags-find-tag-other-window)
@@ -347,12 +347,16 @@ _l_: List tags in this function
 
 (defhydra hydra-helm-ag (:color blue :hint nil)
   "
-^Search^                 ^Interactive^
-------------------------------------------------------
-_A_: Search              _a_: Interactive search
-_F_: Search this file    _f_: Interactive search this file
-_S_: Search project      _s_: Interactive search project
-_B_: Search buffers      _b_: Interactive search buffers
+								  ^Search^                 ^Interactive^
+` ` _ _ _ _ _ _ _ _ _` ` ` ` | ------------------------------------------------------
+`  |_ _ _ _ _ _ _ _ _ |` ` ` | _A_: Search              _a_: Interactive search
+` ` ` \\\\ \\ \\ // ///` ` ` ` ` | _F_: Search this file    _f_: Interactive search this file
+` ` `  \\\\_|_|_| // ` ` ` ` ` |  _S_: Search project      _s_: Interactive search project
+ Tiqsi |        |` ` ` ` ` ` |    _B_: Search buffers      _b_: Interactive search buffers
+` ` `  | o    o | Emacs` ` ` |    
+` ` _ _ _ _ _ _ _ _ _  ` ` ` |    
+`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
+` ` ` ` \\_ _ _ /` ` ` ` ` ` `|   
 "
   ("A" helm-ag)
   ("F" helm-ag-this-file)
@@ -377,13 +381,17 @@ _B_: Search buffers      _b_: Interactive search buffers
 
 (defhydra hydra-window-stuff (:hint nil)
   "
-          Split: _v_ert  _s_:horz
-         Delete: _c_lose  _o_nly
-  Switch Window: _h_:left  _j_:down  _k_:up  _l_:right
-        Buffers: _p_revious  _n_ext  _b_:select  _f_ind-file  _F_projectile
-         Winner: _u_ndo  _r_edo
-         Resize: _H_:splitter left  _J_:splitter down  _K_:splitter up  _L_:splitter right
-           Move: _a_:up  _z_:down  _i_menu"
+								            Split: _v_ert  _s_:horz
+` ` _ _ _ _ _ _ _ _ _` ` ` ` | Delete: _c_lose  _o_nly
+`  |_ _ _ _ _ _ _ _ _ |` ` ` | Switch Window: _h_:left  _j_:down  _k_:up  _l_:right
+` ` ` \\\\ \\ \\ // ///` ` ` ` ` | Buffers: _p_revious  _n_ext  _b_:select  _f_ind-file  _F_projectile
+` ` `  \\\\_|_|_| // ` ` ` ` ` | Winner: _u_ndo  _r_edo
+ Tiqsi |        |` ` ` ` ` ` | Resize: _H_:splitter left  _J_:splitter down  _K_:splitter up  _L_:splitter right
+` ` `  | o    o | Emacs` ` ` | Move: _a_:up  _z_:down  _i_menu
+` ` _ _ _ _ _ _ _ _ _  ` ` ` |    
+`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
+` ` ` ` \\_ _ _ /` ` ` ` ` ` `|   
+"
 
 
   ("z" scroll-up-line)
@@ -555,8 +563,8 @@ _j_: jedi:related-names
 
                                         ;---{Keybindings}---;
 
-;; (global-set-key (kbd "M-x") 'helm-smex) ;; Offloaded to selectrum now
-;; (global-set-key (kbd "M-X") 'helm-smex-major-mode-commands) ;; Offloaded to selectrum now
+(global-set-key (kbd "M-x") 'helm-smex) ;; Offloaded to selectrum now
+(global-set-key (kbd "M-X") 'helm-smex-major-mode-commands) ;; Offloaded to selectrum now
                                         ;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 

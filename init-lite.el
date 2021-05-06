@@ -154,6 +154,16 @@ of an error, just add the package to a list of missing packages."
 (straight-require 'use-package)
 
 
+(straight-use-package
+ '(uml-mode
+   :type git
+   :host github
+   :ensure t
+   :repo "ianxm/emacs-uml"
+))
+
+
+
 (defun calling-function ()
   (let ((n 6) ;; nestings in this function + 1 to get out of it
         func
@@ -196,8 +206,19 @@ of an error, just add the package to a list of missing packages."
 (straight-require 'color)
 (straight-require 'evil)
 
-(straight-use-package
- '(selectrum :host github :repo "raxod502/selectrum"))
+
+;; (straight-use-package 'selectrum)
+
+;; (straight-use-package 'prescient)
+;; (straight-use-package 'ivy-prescient)
+;; (straight-use-package 'company-prescient)
+;; (straight-use-package 'selectrum-prescient)
+
+;; (selectrum-mode +1)
+
+;; ;; (selectrum-prescient-mode +1)
+
+;; (prescient-persist-mode +1)
 
 
 (load-expand  "core/core-performance.el")
@@ -225,11 +246,11 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/programming/programming-javascript.el")
 (load-expand  "modules/programming/programming-zig.el")
 (load-expand  "modules/programming/programming-clojure.el")
-(load-expand  "modules/programming/programming-python-lite.el")
 
 (load-expand "modules/modes/modes-ido.el")
 (load-expand  "modules/modes/modes-helm.el")
 (load-expand  "modules/programming/programming-lisp.el")
+(load-expand  "modules/programming/programming-python-lite.el")
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)

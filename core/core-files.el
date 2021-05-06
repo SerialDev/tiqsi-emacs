@@ -220,13 +220,13 @@ sInsert str to search: ")
 ;                        Use Prescient and selectrum                        ;
 ; ------------------------------------------------------------------------- ;
 
-(straight-use-package
- '(selectrum :host github :repo "raxod502/selectrum"))
+;; (straight-use-package
+;;  '(selectrum :host github :repo "raxod502/selectrum"))
 
-(straight-use-package
-  '(selectrum :host github :repo "raxod502/selectrum"))
+;; (straight-use-package
+;;   '(selectrum :host github :repo "raxod502/selectrum"))
 
-(selectrum-mode 1)
+;; (selectrum-mode 1)
 
 ;---{keybindings}---;
 

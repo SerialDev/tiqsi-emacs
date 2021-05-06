@@ -53,6 +53,32 @@
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 
 
+(use-package jsx-mode
+  :ensure t
+  :straight t
+)
+
+
+
+
+(defun comment-jsx 
+  (start end)
+  (interactive "r")
+  (let ((current-region (buffer-substring start end)))
+    (progn
+      (goto-char start)
+      (move-beginning-of-line 1)
+      (insert "{/* ")
+      (goto-char end)
+      (move-end-of-line 1)
+      (insert " */}")
+    )
+    ) 
+  )
+
+
+
+
 ;; (use-package lsp-mode
 ;;   :ensure t
 ;;   :commands lsp
@@ -68,7 +94,15 @@
 ;;   :config
 ;; (push 'company-lsp company-backends))
 
+;; (define-key js-mode-map (kbd "C-c \\") 'comment-jsx)
 
+;; (lsp-ui-peek-mode 1)
+;; (define-key lsp-mode-map (kbd "C-c d") 'lsp-describe-session)
+;; (define-key lsp-mode-map (kbd "C-c i") 'lsp-describe-thing-at-point)
+;; (define-key lsp-mode-map (kbd "C-c <right>") 'lsp-rename)
+;; (define-key lsp-mode-map (kbd "C-c <up>") 'lsp-goto-implementation)
+;; (define-key lsp-mode-map (kbd "C-c <left>") 'lsp-goto-type-definition)
+;; (define-key lsp-mode-map (kbd "C-c <down>") 'lsp-find-references)
 
 (provide 'programming-javascript)
 

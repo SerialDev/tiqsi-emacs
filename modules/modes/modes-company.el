@@ -121,6 +121,7 @@ point."
     (indent-or-expand arg)))
 
 (enable-company)
+
 (define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
 
 ;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)

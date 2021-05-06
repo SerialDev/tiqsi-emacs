@@ -556,6 +556,47 @@ region if active."
   (insert (completing-read "Pick an element: "
                            (preprocess-kill-ring))))
 
+
+(defun my-kill-thing-at-point (thing)
+  "Kill the `thing-at-point' for the specified kind of THING."
+  (let ((bounds (bounds-of-thing-at-point thing)))
+    (if bounds
+        (kill-region (car bounds) (cdr bounds))
+      (error "No %s at point" thing))))
+
+(defun my-kill-word-at-point ()
+  "Kill the word at point."
+  (interactive)
+  (my-kill-thing-at-point 'word))
+
+(defun file-name-no-path()
+  (interactive)
+
+      (s-prepend(file-name-base (buffer-file-name))
+		(s-prepend "." (file-name-extension (buffer-file-name))))
+)
+
+
+(defun print-current()
+  (interactive)
+  (let ((current-data (thing-at-point 'symbol) ))
+    (progn (my-kill-word-at-point)
+	   (insert
+	    (s-prepend "\""
+	    (s-prepend 
+		       (s-prepend
+			(s-prepend (file-name-no-path) "  :: line " )
+			(s-prepend (number-to-string (line-number-at-pos)) " :: var: " ))
+	    (s-prepend(s-prepend current-data "\", ") current-data)))
+	    )
+  )))
+
+
+
+
+
+(setq current-data "test")
+
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Kill Ring _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
 ; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;

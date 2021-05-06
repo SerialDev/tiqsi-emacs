@@ -164,10 +164,13 @@
   (let ((current-command (s-prepend "command-tooltip-" command-name) ))
     `(defun ,(intern current-command) (,(intern prompt))
        (interactive ,(s-prepend "sEnter " (s-prepend prompt ": ")))
-       (pos-tip-show (shell-command-to-string (s-prepend ,command-to-execute ,(intern prompt)))))))
+       (pos-tip-show (shell-command-to-string (s-prepend ,command-to-execute ,(intern prompt))))
+
+       )))
+
+
 
 ;;:8181
-(command-tooltip-test)
 
 (straight-use-package
  '(extractor
@@ -222,6 +225,8 @@
 (create-tooltip-command "show-open-ports" "sudo ss -tulpn" )
 (create-tooltip-prompt-command "find-application-using-port" "netstat -ap | grep :" "port" )
 
+
+
 ;; TODO allow for internal {} f-string style replacement
 (create-tooltip-prompt-command "kill-all-processes-of-a-program" "kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')netstat -ap | grep :" "program-name" )
 
@@ -235,6 +240,22 @@
 (create-tooltip-command "show-libs-in-cache" "ldconfig -p" )
 (create-tooltip-command "count-num-cores" "nproc --all" )
 (create-tooltip-command "show-running-services" "service --status-all" )
+
+
+(defun tidy-html(current-val)
+  (interactive "sString Add: ")
+   (let ((current-region-text
+	  current-val ))
+     (progn
+       (print current-region-text)
+      (kill-new
+       (shell-command-to-string
+	(s-prepend
+	 (s-prepend "echo '" current-region-text )
+	 "' | tidy --show-body-only yes -i 4 -w 75 -m -quiet --force-output y -wrap 0 2>/dev/null " ))))))
+
+
+
 
 ; ------------------------------------------------------------------------- ;
 ;                                Improvements                               ;
@@ -299,6 +320,14 @@
 ; ------------------------------------------------------------------------- ;
 
 
+
+;; Open files in Docker containers like so: /docker:drunk_bardeen:/etc/passwd
+
+
+
+
+
 (provide 'modes-shell)
 
 ;;; modes-shell.el ends here
+

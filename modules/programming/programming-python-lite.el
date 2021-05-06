@@ -322,6 +322,16 @@ else:
         python-shell-prompt-regexp ">>> "
         python-shell-prompt-output-regexp ""))
 
+
+
+(defun sdev-use-hetzner (&optional ipython)
+  (interactive)
+  (setq python-shell-interpreter  "ssh root@135.181.198.90 -t \"/opt/conda/bin/python $@\""
+        python-shell-interpreter-args "-i"
+        python-shell-prompt-regexp ">>> "
+        python-shell-prompt-output-regexp ""))
+
+
 ; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Python Repl ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
@@ -686,6 +696,7 @@ sEnter Doctest result: ")
 				      (s-replace "-" "_" (get-cwd)))
 			   " --service-account detect-np-misuse@cloudflare-detection-response.iam.gserviceaccount.com --runtime python37  --trigger-http --allow-unauthenticated") ))
     (pos-tip-show current-command)
+    (kill-new current-command)
     (async-shell-command current-command)))
 
 
@@ -751,15 +762,90 @@ sEnter Doctest result: ")
 ;;     (define-key python-mode-map (kbd "C-c l") 'flycheck-list-errors)
 ;;     ))
 
+; ------------------------------------------------------------------------- ;
+
+;; Optionally delete echoed input (after checking it).
+(when (and comint-process-echoes (not artificial))
+  (let ((echo-len (- comint-last-input-end
+                     comint-last-input-start)))
+    ;; Wait for all input to be echoed:
+    (while (and (> (+ comint-last-input-end echo-len)
+                   (point-max))
+                (accept-process-output proc)
+                (zerop
+                 (compare-buffer-substrings
+                  nil comint-last-input-start
+                  (- (point-max) echo-len)
+                  ;; Above difference is equivalent to
+                  ;; (+ comint-last-input-start
+                  ;;    (- (point-max) comint-last-input-end))
+                  nil comint-last-input-end (point-max)))))
+    (if (and
+         (<= (+ comint-last-input-end echo-len)
+             (point-max))
+         (zerop
+          (compare-buffer-substrings
+           nil comint-last-input-start comint-last-input-end
+           nil comint-last-input-end
+           (+ comint-last-input-end echo-len))))
+        ;; Certain parts of the text to be deleted may have
+        ;; been mistaken for prompts.  We have to prevent
+        ;; problems when `comint-prompt-read-only' is non-nil.
+        (let ((inhibit-read-only t))
+          (delete-region comint-last-input-end
+                         (+ comint-last-input-end echo-len))
+          (when comint-prompt-read-only
+            (save-excursion
+              (goto-char comint-last-input-end)
+              (comint-update-fence)))))))
+
+(defun comint-run-thing-process (process command)
+  "Send COMMAND to PROCESS."
+  (let ((output-buffer " *Comint Redirect Work Buffer*"))
+    (with-current-buffer (get-buffer-create output-buffer)
+      (erase-buffer)
+      (comint-redirect-send-command-to-process command
+                                               output-buffer process nil t)
+      ;; Wait for the process to complete
+      (set-buffer (process-buffer process))
+      (while (and (null comint-redirect-completed)
+                  (accept-process-output process)))
+      ;; Collect the output
+      (set-buffer output-buffer)
+      (goto-char (point-min))
+      ;; Skip past the command, if it was echoed
+      (and (looking-at command)
+           (forward-line))
+      ;; Grab the rest of the buffer
+      (buffer-substring-no-properties (point) (- (point-max) 1)))))
+
+; ------------------------------------------------------------------------- ;
 
 
-
+;; (setq tiqsi-python-buffer "*shell*")
 (setq tiqsi-python-buffer "*Python*")
 
 (defun send-py-line ()
   (interactive)
   (let ((py-temp (thing-at-point 'line t)) )
     (comint-send-string tiqsi-python-buffer py-temp)))
+
+
+
+
+(defun send-py-line-p ()
+  (interactive)
+  (let ((py-temp (thing-at-point 'line t)) )
+
+    (comint-send-string tiqsi-python-buffer
+			(s-prepend
+			 py-temp
+			 (s-prepend
+			  (s-prepend
+			   "; print( "py-temp)
+			  " )) ")))))
+
+
 
 (defun send-py-region(begin end)
   (interactive "r")
@@ -768,7 +854,41 @@ sEnter Doctest result: ")
   (comint-send-string tiqsi-python-buffer "\n")
   )
 
+
+; ------------------------------------------------------------------------- ;
+; ------------------------------------------------------------------------- ;
+
+
+;; ;;; ein:notebook-save-notebook-command when in ein mode
+;;   (defun save-buffer (&optional arg)
+;;     (interactive "p")
+;;     (if (eq major-mode 'ein:notebook-multilang-mode)
+;;         (ein:notebook-save-notebook-command)
+;;       (let ((modp (buffer-modified-p))
+;;             (make-backup-files (or (and make-backup-files (not (eq arg 0)))
+;;                                    (memq arg '(16 64)))))
+;;         (and modp (memq arg '(16 64)) (setq buffer-backed-up nil))
+;;         (if (and modp (buffer-file-name))
+;;             (message "Saving file %s..." (buffer-file-name)))
+;;         (basic-save-buffer)
+;;         (and modp (memq arg '(4 64)) (setq buffer-backed-up nil)))))
+
+;; ;;; advice /defadvice that fails
+;; (defun save-ein()
+;;     (if (eq major-mode 'ein:notebook-multilang-mode)
+;;       (ein:notebook-save-notebook-command))))
+;; (advice-add 'save-buffer :before #'save-ein)
+
+
+; ------------------------------------------------------------------------- ;
+;                                Keybindings                                ;
+; ------------------------------------------------------------------------- ;
+
+
+
 ;; (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
+;; (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
+;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 
 (provide 'programming-python-lite)
 

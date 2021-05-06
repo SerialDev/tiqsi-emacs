@@ -111,7 +111,7 @@
    "env GOOS=windows GOARCH=amd64 go build main.go"))
 
 (define-key go-mode-map (kbd "C-c C-b") 'go-build)
-(define-key go-mode-map (kbd "C-c C-e") 'go-run)
+(define-key go-mode-map (kbd "C-c C-c") 'go-run)
 (define-key go-mode-map (kbd "C-c C-w") 'go-build-win)
 
 
@@ -164,8 +164,16 @@
 (go--get-github "sbinet/igo")
 
 
+(defun go--stdout ()
+  (interactive)
+  (insert "fmt.Fprintf(os.Stdout, \"%v\\n\", "))
+
+
+
+
 (define-key go-mode-map (kbd "C-c C-p") 'run-gore-other-buffer)
 (define-key go-mode-map (kbd "C-c C-r") 'gore-eval-region)
+(define-key go-mode-map (kbd "C-c C-o") 'go--stdout)
 
 
 (provide 'programming-go)

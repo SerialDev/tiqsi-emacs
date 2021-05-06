@@ -60,7 +60,6 @@ enjoy using a lot.
 
     `(s-format ,fmt 'aget (list ,@agetter))))
 
-
 ;; truncate if long
 (defun sdev/truncate (len s)
   "If S is longer than LEN, cut it down to LEN - 3 and add ... at the end."
