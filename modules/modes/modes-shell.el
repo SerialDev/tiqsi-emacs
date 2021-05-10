@@ -240,6 +240,7 @@
 (create-tooltip-command "show-libs-in-cache" "ldconfig -p" )
 (create-tooltip-command "count-num-cores" "nproc --all" )
 (create-tooltip-command "show-running-services" "service --status-all" )
+(create-tooltip-command "show-weather-forecast" "curl wttr.in/hel" )
 
 
 (defun tidy-html(current-val)
@@ -304,14 +305,204 @@
 ;; info - informational
 ;; debug - debug-level messages
 
+;; Set audible alarm when an IP address comes online
+;; ping -i 60 -a IP_address
+
+;; List of commands used most often
+;; history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head
+
+;; Display the top ten running processes - sorted by memory usage
+;; ps aux | sort -nk +4 | tail
+
+;; Delete all files in a folder that don't match a certain file extension
+;; rm !(*.foo|*.bar|*.baz)
+
+;; Kill a process locking a file 
+;; fuser -k filename
+
+;; Dup finder
+;; find -not -empty -type f -printf "%s\n" | sort -rn | uniq -d | xargs -I{} -n1 find -type f -size {}c -print0 | xargs -0 md5sum | sort | uniq -w32 --all-repeated=separate
+
+;; Find the process you are looking for minus the grepped one
+;; ps aux | grep [p]rocess-name
+
+;; Extract tarball from internet without local saving
+;; wget -qO - "http://www.tarball.com/tarball.gz" | tar zxvf -
+
+;; Copy your ssh public key to a server from a machine that doesn't have ssh-copy-id
+;; cat ~/.ssh/id_rsa.pub | ssh user@machine "mkdir ~/.ssh; cat >> ~/.ssh/authorized_keys"
+
+;; Graphical tree of sub-directories
+;; ls -R | grep ":$" | sed -e 's/:$//' -e 's/[^-][^\/]*\//--/g' -e 's/^/ /' -e 's/-/|/'
+
+;; intercept stdout/stderr of another process
+;; strace -ff -e trace=write -e write=1,2 -p SOME_PID
+
+;; Make directory including intermediate directories
+;; mkdir -p a/long/directory/path
+
+;; Easily search running processes (alias).
+;; alias 'ps?'='ps ax | grep '
+
+;; Graph # of connections for each hosts.
+;; netstat -an | grep ESTABLISHED | awk '{print $5}' | awk -F: '{print $1}' | sort | uniq -c | awk '{ printf("%s\t%s\t",$2,$1) ; for (i = 0; i < $1; i++) {printf("*")}; print "" }'
+
+;; Monitor the queries being run by MySQL
+;; watch -n 1 mysqladmin --user=<user> --password=<password> processlist
+
+;; Show numerical values for each of the 256 colors in bash
+;; for code in {0..255}; do echo -e "\e[38;05;${code}m $code: Test"; done
+
+;; Recursively remove all empty directories
+;; find . -type d -empty -delete
+
+;; Processor / memory bandwidth in GB/s
+;; dd if=/dev/zero of=/dev/null bs=1M count=32768
+
+;; pretend to be busy in office to enjoy a cup of coffee
+;; cat /dev/urandom | hexdump -C | grep "ca fe"
+
+;; Create a persistent connection to a machine
+;; ssh -MNf <user>@<host>
+
+;; Nice weather forecast on your shell
+;; curl wttr.in/<city>
+
+;; Show a 4-way scrollable process tree with full details. whenb a process breaks remember awwfux
+;; ps awwfux | less -S
+
+;; Attach screen over ssh
+;; ssh -t remote_host screen -r
+
+;; snapshot of the open files for a PID 1234 then waits 10 seconds and takes another
+;; snapshot of the same PID, it then displays the difference between each snapshot
+;; to give you an insight into what the application is doing.
+;; diff <(lsof -p 1234) <(sleep 10; lsof -p 1234)
+
+;; which program does this port belong to
+;; lsof -i tcp:80
+
+;; Draw kernel module dependancy graph.
+;; lsmod | perl -e 'print "digraph \"lsmod\" {";<>;while(<>){@_=split/\s+/; print "\"$_[0]\" -> \"$_\"\n" for split/,/,$_[3]}print "}"' | dot -Tpng | display -
+
+;; Compare two directory trees.
+;; diff <(cd dir1 && find | sort) <(cd dir2 && find | sort)
+
+;; Download all images from a site
+;; wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" http://example.com/images
+
+;; Find out how much data is waiting to be written to disk
+;; grep ^Dirty /proc/meminfo
+
+;; Show apps using itnernet connection at the moment 
+;; lsof -P -i -n | cut -f 1 -d " "| uniq | tail -n +2
+
+;; Recursively change permissions on files, leave directories alone.
+;; find ./ -type f -exec chmod 644 {} \;
+
+;; Find files that have been modified on your system in the past 60 minutes
+;; sudo find / -mmin 60 -type f
+
+;; Intercept, monitor and manipulate a TCP connection.
+;; Forwards localhost:1234 to machine:port, running all data through your chain of piped commands. The above command logs inbound and outbound traffic to two files. Tip: replace tee with sed to manipulate the data in real time (use "sed -e 's/400 Bad Request/200 OK/'" to tweak a web server's responses ;-) Limitless possibilities.
+;; mkfifo /tmp/fifo; cat /tmp/fifo | nc -l -p 1234 | tee -a to.log | nc machine port | tee -a from.log > /tmp/fifo
+
+;; run complex remote shell cmds over ssh, without escaping quotes
+;; Much simpler method. More portable version: ssh host -l user "`cat cmd.txt`"
+;; ssh host -l user $(<cmd.txt)
+
+;; output your microphone to a remote computer's speaker
+;; arecord -f dat | ssh -C user@host aplay -f dat
+
+;; analyze traffic remotely over ssh w/ wireshark
+;; ssh root@server.com 'tshark -f "port !22" -w -' | wireshark -k -i -
+
+;; Lists all listening ports together with the PID of the associated process
+;; lsof -Pan -i tcp -i udp
+
+;; easily find megabyte eating files or directories
+;; alias dush="du -sm *|sort -n|tail"
+
+;; exit without saving history
+;; also works perfectly in shells that don't have $$ if you do something like kill -9 `readlink /proc/self`
+;; kill -9 $$
+
+;; find all file larger than 500M
+;; find / -type f -size +500M
+
+;; live ssh network throughput test
+;; using /dev/random (combined with compression) would give a good indication of the throughput.
+;; pv /dev/zero|ssh $host 'cat > /dev/null'
+
+;; List the number and type of active network connections
+;; netstat -ant | awk '{print $NF}' | grep -v '[a-z]' | sort | uniq -c
+
+;; Brute force discover
+;; sudo zcat /var/log/auth.log.*.gz | awk '/Failed password/&&!/for invalid user/{a[$9]++}/Failed password for invalid user/{a["*" $11]++}END{for (i in a) printf "%6s\t%s\n", a[i], i|"sort -n"}'
+
+;; Resume scp of a big file
+;; rsync --partial --progress --rsh=ssh $file_source $user@$host:$destination_file
+
+;; Analyse an Apache access log for the most common IP addresses
+;; tail -10000 access_log | awk '{print $1}' | sort | uniq -c | sort -n | tail
+
+;; Analyse compressed Apache access logs for the most commonly requested pages
+;; zcat access_log.*.gz | awk '{print $7}' | sort | uniq -c | sort -n | tail -n 20
+
+;; processes per user counter
+;; ps hax -o user | sort | uniq -c
+
+;; convert filenames in current directory to lowercase
+;; rename -f 'y/A-Z/a-z/' *
+
+;; Limit the cpu usage of a process
+;; sudo cpulimit -p pid -l 50
+
+;; List alive hosts in specific subnet
+;; nmap -sP 192.168.1.0/24
+
+;; Matrix style
+;; echo -e "\e[32m"; while :; do for i in {1..16}; do r="$(($RANDOM % 2))"; if [[ $(($RANDOM % 5)) == 1 ]]; then if [[ $(($RANDOM % 4)) == 1 ]]; then v+="\e[1m $r "; else v+="\e[2m $r "; fi; else v+=" "; fi; done; echo -e "$v"; v=""; done
+
+;; sniff network traffic on a given interface and displays the IP addresses of the machines communicating with the current host (one IP per line)
+;; sudo tcpdump -i wlan0 -n ip | awk '{ print gensub(/(.*)\..*/,"\\1","g",$3), $4, gensub(/(.*)\..*/,"\\1","g",$5) }' | awk -F " > " '{print $1"\n"$2}'
+
+;; List all open ports and their owning executables
+;; lsof -i -P | grep -i "listen"
+
+;; List files accessed by a command
+;; strace -ff -e trace=file chmod 2>&1 | sed -n 's/^[^"]*"\([^"]*\)".*/\1/p'  | sort | uniq
+
+;; get all pdf and zips from a website using wget
+;; If the site uses https, use: wget --reject html,htm --accept pdf,zip -rl1 --no-check-certificate https-url
+;; wget --reject html,htm --accept pdf,zip -rl1 url
+
+;; Show me a histogram of the busiest minutes in a log file
+;; cat /var/log/secure.log | awk '{print substr($0,0,12)}' | uniq -c | sort -nr | awk '{printf("\n%s ",$0) ; for (i = 0; i<$1 ; i++) {printf("*")};}'
+
+;; Generate a Random MAC address
+;; MAC=`(date; cat /proc/interrupts) | md5sum | sed -r 's/^(.{10}).*$/\1/; s/([0-9a-f]{2})/\1:/g; s/:$//;'`
+
+;; All IP connected to my host
+;; netstat -nut | awk -F'[ :]+' '/SHED *$/{print $6}' | sort -u 
+
+;; Create a script of the last executed command
+;; echo "!!" > foo.sh
+
+;; network activity in realtime
+;; lsof -i
+
+;; Show apps that use internet connection at the moment
+;; lsof -P -i -n
+
+;; Sharing file through http 80 port
+;; nc -v -l 80 < file.ext
 
 ;; Print shared library dependencies (e.g. for ‘ls’)
 ;; ldd /bin/ls
 
-
 ;; This will show whether the target is a builtin, a function, an alias or an external executable
 ;; type -a lshw
-
 
 ;; Kill all process of a program
 ;; kill -9 $(ps aux | grep 'program_name' | awk '{print $2}')
