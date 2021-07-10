@@ -58,7 +58,44 @@
   :straight t
 )
 
+(use-package nodejs-repl
+  :ensure t
+  :straight t
+)
 
+
+;; (defun nvm-which ()
+;;   (let* ((shell (concat (getenv "SHELL") " -l -c 'nvm which'"))
+;;          (output (shell-command-to-string shell)))
+;;     (cadr (split-string output "[\n]+" t))))
+
+
+  ;; (defun nvm-which ()
+  ;;   (let ((output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which")))
+  ;;     (if (cl-search "Node Version" output)
+  ;;         (setq output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which current"))
+  ;;     (setq output (cadr (split-string output "[\n]+" t))))
+  ;;   (message output)
+  ;;   output))
+
+;; (setq nodejs-repl-command #'nvm-which)
+;; (setq nodejs-repl-command "node --experimental-repl-await ")
+;; (setq nodejs-repl-command "NODE_PATH=$(npm root -g) node")
+(setq nodejs-repl-command "node")
+
+(setenv "NODE_PATH" "/usr/local/lib/node_modules")
+
+;; NODE_PATH=$(npm root -g) 
+(add-hook 'js-mode-hook
+          (lambda ()
+            (define-key js-mode-map (kbd "C-x C-s") 'nodejs-repl-send-last-expression)
+            (define-key js-mode-map (kbd "C-c C-a") 'nodejs-repl-send-line)
+            (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+            (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+            (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+            (define-key js-mode-map (kbd "C-c C-p") 'nodejs-repl)
+            (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)
+	    ))
 
 
 (defun comment-jsx 

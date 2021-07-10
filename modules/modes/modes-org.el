@@ -36,7 +36,21 @@
 ))
 
 
+(straight-use-package
+ '(org-re-reveal
+   :type git
+   :require t
+   :host github
+   :repo "emacsmirror/org-re-reveal"
+))
+(require 'org)
+(require 'ox)
+
+(require 'org-re-reveal)
+
+
 (setq org-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
+(setq org-re-reveal-root "https://cdn.jsdelivr.net/npm/reveal.js")
 
 
 (defun tiqsi-org-mode-before-save-hook ()
@@ -47,6 +61,8 @@
       )
 
     ))
+
+
 
 (add-hook 'before-save-hook #'tiqsi-org-mode-before-save-hook)
 
@@ -75,6 +91,9 @@
 
   ))
   )
+
+
+
 
 
 

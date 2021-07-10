@@ -886,6 +886,13 @@ sEnter Doctest result: ")
 
 
 
+;; (defun send-js-line ()
+;;   (interactive)
+;;   (let ((py-temp (thing-at-point 'line t)) )
+;;     (comint-send-string "*eshell*" py-temp)))
+
+;; (define-key js-mode-map (kbd "C-c C-a") 'send-js-line)
+
 ;; (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
 ;; (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
 ;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
