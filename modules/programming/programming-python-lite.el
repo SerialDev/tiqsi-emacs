@@ -830,6 +830,9 @@ sEnter Doctest result: ")
   (let ((py-temp (thing-at-point 'line t)) )
     (comint-send-string tiqsi-python-buffer py-temp)))
 
+(define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
+
+(define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 
 
 
@@ -853,6 +856,26 @@ sEnter Doctest result: ")
 		      (buffer-substring-no-properties begin end))
   (comint-send-string tiqsi-python-buffer "\n")
   )
+
+
+(defun toggle-camelcase-underscores ()
+  "Toggle between camelcase and underscore notation for the symbol at point."
+  (interactive)
+  (save-excursion
+    (let* ((bounds (bounds-of-thing-at-point 'symbol))
+           (start (car bounds))
+           (end (cdr bounds))
+           (currently-using-underscores-p (progn (goto-char start)
+                                                 (re-search-forward "_" end t))))
+      (if currently-using-underscores-p
+          (progn
+            (upcase-initials-region start end)
+            (replace-string "_" "" nil start end)
+            (downcase-region start (1+ start)))
+        (replace-regexp "\\([A-Z]\\)" "_\\1" nil (1+ start) end)
+        (downcase-region start (cdr (bounds-of-thing-at-point 'symbol)))))))
+
+(define-key python-mode-map (kbd "C-c C-_") 'toggle-camelcase-underscores)
 
 
 ; ------------------------------------------------------------------------- ;
@@ -893,7 +916,6 @@ sEnter Doctest result: ")
 
 ;; (define-key js-mode-map (kbd "C-c C-a") 'send-js-line)
 
-;; (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
 ;; (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
 ;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 

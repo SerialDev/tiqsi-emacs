@@ -1,0 +1,3 @@
+<div id="{id_name}"
+style="overflow: auto; height: {height_px}px; max-height: 98%;">
+content</div>

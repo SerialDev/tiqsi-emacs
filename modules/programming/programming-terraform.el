@@ -28,10 +28,13 @@
 
 
 (straight-require 'terraform-mode)
+(straight-require 'terraform-doc)
 
 (straight-require 'dockerfile-mode)
+(add-hook 'terraform-mode-hook #'terraform-format-on-save-mode)
 
 (add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
+(add-to-list 'auto-mode-alist '(".tf" . terraform-mode))
 
 
 (provide 'programming-terraform)
