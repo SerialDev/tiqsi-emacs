@@ -45,7 +45,7 @@
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
 (setq tide-completion-detailed t
-      tide-always-show-documentation t)
+  tide-always-show-documentation t)
 
 ;; formats the buffer before saving
 (add-hook 'before-save-hook 'tide-format-before-save)
@@ -56,12 +56,12 @@
 (use-package jsx-mode
   :ensure t
   :straight t
-)
+  )
 
 (use-package nodejs-repl
   :ensure t
   :straight t
-)
+  )
 
 
 ;; (defun nvm-which ()
@@ -70,13 +70,13 @@
 ;;     (cadr (split-string output "[\n]+" t))))
 
 
-  ;; (defun nvm-which ()
-  ;;   (let ((output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which")))
-  ;;     (if (cl-search "Node Version" output)
-  ;;         (setq output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which current"))
-  ;;     (setq output (cadr (split-string output "[\n]+" t))))
-  ;;   (message output)
-  ;;   output))
+;; (defun nvm-which ()
+;;   (let ((output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which")))
+;;     (if (cl-search "Node Version" output)
+;;         (setq output (shell-command-to-string "source ~/.nvm/nvm.sh; nvm which current"))
+;;     (setq output (cadr (split-string output "[\n]+" t))))
+;;   (message output)
+;;   output))
 
 ;; (setq nodejs-repl-command #'nvm-which)
 ;; (setq nodejs-repl-command "node --experimental-repl-await ")
@@ -85,20 +85,20 @@
 
 (setenv "NODE_PATH" "/usr/local/lib/node_modules")
 
-;; NODE_PATH=$(npm root -g) 
+;; NODE_PATH=$(npm root -g)
 (add-hook 'js-mode-hook
-          (lambda ()
-            (define-key js-mode-map (kbd "C-x C-s") 'nodejs-repl-send-last-expression)
-            (define-key js-mode-map (kbd "C-c C-a") 'nodejs-repl-send-line)
-            (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
-            (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
-            (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
-            (define-key js-mode-map (kbd "C-c C-p") 'nodejs-repl)
-            (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)
-	    ))
+  (lambda ()
+    (define-key js-mode-map (kbd "C-x C-s") 'nodejs-repl-send-last-expression)
+    (define-key js-mode-map (kbd "C-c C-a") 'nodejs-repl-send-line)
+    (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
+    (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
+    (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
+    (define-key js-mode-map (kbd "C-c C-p") 'nodejs-repl)
+    (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)
+    ))
 
 
-(defun comment-jsx 
+(defun comment-jsx
   (start end)
   (interactive "r")
   (let ((current-region (buffer-substring start end)))
@@ -109,8 +109,8 @@
       (goto-char end)
       (move-end-of-line 1)
       (insert " */}")
+      )
     )
-    ) 
   )
 
 

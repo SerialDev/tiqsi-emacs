@@ -48,7 +48,7 @@
 (setq rtags-completions-enabled t)
 (eval-after-load 'company
   '(add-to-list
-    'company-backends 'company-rtags))
+     'company-backends 'company-rtags))
 
 (setq rtags-autostart-diagnostics t)
 (setq rtags-enable-standard-keybindings t)
@@ -60,7 +60,7 @@
 (defun rtags:jump-to-definition ()
   (interactive)
   (add-to-list 'rtags:goto-stack
-               (list (buffer-name) (point)))
+    (list (buffer-name) (point)))
   (rtags-find-symbol-at-point))
 
 
@@ -87,14 +87,14 @@
   (setq-local flycheck-check-syntax-automatically nil))
 
 (when
-    (require 'rtags nil :noerror)
+  (require 'rtags nil :noerror)
   ;; company completion setup
   (setq rtags-autostart-diagnostics t)
   (rtags-diagnostics)
   (setq rtags-completions-enabled t)
   (eval-after-load 'company
     '(add-to-list
-      'company-backends 'company-rtags))
+       'company-backends 'company-rtags))
   ;; use rtags flycheck mode -- clang warnings shown inline
   (try-require 'flycheck-rtags)
   ;; c-mode-common-hook is also called by c++-mode
@@ -105,61 +105,65 @@
                                         ;---{Indentation}---;
 
 (c-add-style "microsoft"
-             '("stroustrup"
-               (c-offsets-alist
-                (innamespace . -)
-                (inline-open . 0)
-                (inher-cont . c-lineup-multi-inher)
-                (arglist-cont-nonempty . +)
-                (template-args-cont . +))))
+  '("stroustrup"
+     (c-offsets-alist
+       (innamespace . -)
+       (inline-open . 0)
+       (inher-cont . c-lineup-multi-inher)
+       (arglist-cont-nonempty . +)
+       (template-args-cont . +))))
 (setq c-default-style "microsoft")
 
                                         ; C++ indentation style
 (defconst tiqsi-big-fun-c-style
   '(;(c-electric-pound-behavior   . t)
-    (c-tab-always-indent         . t)
-    (c-comment-only-line-offset  . 0)
-    (c-hanging-braces-alist      . ((class-open)
-                                    (class-close)
-                                    (defun-open)
-                                    (defun-close)
-                                    (inline-open)
-                                    (inline-close)
-                                    (brace-list-open)
-                                    (brace-list-close)
-                                    (brace-list-intro)
-                                    (brace-list-entry)
-                                    (block-open)
-                                    (block-close)
-                                    (substatement-open)
-                                    (statement-case-open)
-                                    (class-open)))
+     (c-tab-always-indent         . t)
+     (c-comment-only-line-offset  . 0)
+     (c-hanging-braces-alist      .
+       ((class-open)
+         (class-close)
+         (defun-open)
+         (defun-close)
+         (inline-open)
+         (inline-close)
+         (brace-list-open)
+         (brace-list-close)
+         (brace-list-intro)
+         (brace-list-entry)
+         (block-open)
+         (block-close)
+         (substatement-open)
+         (statement-case-open)
+         (class-open)))
 
-    (c-hanging-colons-alist      . ((inher-intro)
-                                    (case-label)
-                                    (label)
-                                    (access-label)
-                                    (access-key)
-                                    (member-init-intro)))
+     (c-hanging-colons-alist      .
+       ((inher-intro)
+         (case-label)
+         (label)
+         (access-label)
+         (access-key)
+         (member-init-intro)))
 
-    (c-cleanup-list              . (scope-operator
-                                    list-close-comma
-                                    defun-close-semi))
+     (c-cleanup-list              .
+       (scope-operator
+         list-close-comma
+         defun-close-semi))
 
-    (c-offsets-alist             . ((arglist-close         .  c-lineup-arglist)
-                                    (label                 . -4)
-                                    (access-label          . -4)
-                                    (substatement-open     .  0)
-                                    (statement-case-intro  .  4)
-                                    (statement-block-intro .  4)
-                                    (case-label            .  4)
-                                    (block-open            .  0)
-                                    (inline-open           .  0)
-                                    (topmost-intro-cont    .  0)
-                                    (knr-argdecl-intro     . -4)
-                                    (brace-list-open       .  0)
-                                    (brace-list-intro      .  4)))
-    (c-echo-syntactic-information-p . t))
+     (c-offsets-alist             .
+       ((arglist-close         .  c-lineup-arglist)
+         (label                 . -4)
+         (access-label          . -4)
+         (substatement-open     .  0)
+         (statement-case-intro  .  4)
+         (statement-block-intro .  4)
+         (case-label            .  4)
+         (block-open            .  0)
+         (inline-open           .  0)
+         (topmost-intro-cont    .  0)
+         (knr-argdecl-intro     . -4)
+         (brace-list-open       .  0)
+         (brace-list-intro      .  4)))
+     (c-echo-syntactic-information-p . t))
   "Casey's Big Fun C++ Style")
 
 ;; (add-hook 'c-mode-common-hook 'tiqsi-big-fun-c-hook)
@@ -176,11 +180,11 @@
   ;; other customizations can go here
 
   (setq
-   ;; use gdb-many-windows by default
-   gdb-many-windows t
-   ;; Non-nil means display source file containing the main routine at startup
-   gdb-show-main t
-   )
+    ;; use gdb-many-windows by default
+    gdb-many-windows t
+    ;; Non-nil means display source file containing the main routine at startup
+    gdb-show-main t
+    )
 
   (cwarn-mode 1)
   (setq c++-tab-always-indent t)
@@ -246,7 +250,7 @@
   (interactive)
   (setq classname (file-name-sans-extension (file-name-nondirectory   buffer-file-name)))
   (insert
-   "/**
+    "/**
   * " classname".h
   *
   * Author: SerialDev
@@ -281,11 +285,11 @@ Return nil otherwise."
   (save-excursion
     (let ((brace (assoc 'inclass (c-guess-basic-syntax))))
       (if (null brace) '()        (goto-char (cdr brace))
-          (let ((class-open (assoc 'class-open (c-guess-basic-syntax))))
-            (if class-open (goto-char (cdr class-open)))
-            (if (looking-at "^class[ \t]+\\([A-Za-z_][^ \t:{]*\\)")
-                (buffer-substring (match-beginning 1) (match-end 1))
-              (error "Error parsing class definition!")))))))
+        (let ((class-open (assoc 'class-open (c-guess-basic-syntax))))
+          (if class-open (goto-char (cdr class-open)))
+          (if (looking-at "^class[ \t]+\\([A-Za-z_][^ \t:{]*\\)")
+            (buffer-substring (match-beginning 1) (match-end 1))
+            (error "Error parsing class definition!")))))))
 
 ;; Insert function prototype in current header file and matching
 ;; function body in implementation file.
@@ -297,14 +301,14 @@ operator.  This function expects the implementation file to be named
 foo.cpp and in the same directory as the current header file, foo.h."
   (interactive "sReturn type:\nsPrototype: ")
   (let ((classname (ewd-classname))
-        (c-tab-always-indent t))
+         (c-tab-always-indent t))
     (if (null classname) (message "Not in class definition!")
       (unless (string-equal rettype "") (setq rettype (concat rettype " ")))
       (insert rettype proto ";")
       (c-indent-command)
       (save-window-excursion
         (find-file (concat (file-name-sans-extension (buffer-file-name))
-                           ".cpp"))
+                     ".cpp"))
         (end-of-buffer)
         (insert "\n\n")
         (insert-function-comment)
@@ -314,7 +318,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
                                         ;---{Compilation}---;
 
-                                        ; Setup my compilation mode
+;; Setup my compilation mode
 (defun tiqsi-big-fun-compilation-hook ()
   (make-local-variable 'truncate-lines)
   (setq truncate-lines nil))
@@ -326,54 +330,54 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 
 (if tiqsi-win32
-    (defun compile (data)
+  (defun compile (data)
 
-      (if (get-buffer "*shell*")
-	  (progn
-	    (kill-buffer "*shell*")
-	    (send-to-shell data)
-	    (send-to-shell "exit")
-	    (sdev/jump-window))
-	(progn
-	  (send-to-shell data)
-	  (send-to-shell "exit")
-	  (sdev/jump-window))
-	)
+    (if (get-buffer "*shell*")
+      (progn
+        (kill-buffer "*shell*")
+        (send-to-shell data)
+        (send-to-shell "exit")
+        (sdev/jump-window))
+      (progn
+        (send-to-shell data)
+        (send-to-shell "exit")
+        (sdev/jump-window))
       )
+    )
   (message "compile defined"))
 
 
 (defun compile-c-lang()
   (interactive)
   (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
-      (compile-meson)
+    (compile-meson)
     (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
-	(compile-cmake)
+      (compile-cmake)
       (make-without-asking))))
 
 (defun compile-meson()
   (if (file-directory-p "build")
-      (progn ( message "compiling")
-	     (if (file-exists-p "meson.build") 
-		 (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
-	       (compile "cd .. && build && ninja -t compdb cxx cc > compile_commands.json && ninja")))
+    (progn ( message "compiling")
+      (if (file-exists-p "meson.build")
+        (compile "cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+        (compile "cd .. && build && ninja -t compdb cxx cc > compile_commands.json && ninja")))
     (progn
       (message "Generating meson & compiling")
-      (if (file-exists-p "meson.build") 
-	  (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
-	(compile "cd .. && meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
+      (if (file-exists-p "meson.build")
+        (compile "meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja")
+        (compile "cd .. && meson build && cd build && ninja -t compdb cxx cc > compile_commands.json && ninja"))
 
       (add-to-rtags))))
 
 (defun compile-cmake()
   (interactive)
   (if (file-directory-p "build")
-      (progn
-	(message "compiling"
-		 (compile "cd build && cmake .. && make"))
-	(add-to-rtags))
+    (progn
+      (message "compiling"
+        (compile "cd build && cmake .. && make"))
+      (add-to-rtags))
     (progn (message "Creating Build directory before building"
-		    (compile "mkdir build && cd build && cmake .. && make")))))
+             (compile "mkdir build && cd build && cmake .. && make")))))
 
 
 ;; Tiqsi find file
@@ -384,9 +388,9 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun tiqsi-find-file-in-hierarchy (current-dir fname)
   "Search for a file named FNAME upwards through the directory hierarchy, starting from CURRENT-DIR"
   (let ((file (concat current-dir fname))
-        (parent (tiqsi-parent-directory (expand-file-name current-dir))))
+         (parent (tiqsi-parent-directory (expand-file-name current-dir))))
     (if (file-exists-p file)
-        file
+      file
       (when parent
         (tiqsi-find-file-in-hierarchy parent fname)))))
 
@@ -402,8 +406,8 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun tiqsi-search-file-get-string(filename)
   (tiqsi-get-string-from-file
-		       (tiqsi-find-file-in-hierarchy
-			(file-name-directory buffer-file-name) filename ))
+    (tiqsi-find-file-in-hierarchy
+      (file-name-directory buffer-file-name) filename ))
   )
 
 (defun tiqsi--join (sep string-list)
@@ -415,20 +419,20 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defmacro tiqsi--parsec-with-index (data &rest parsers )
   `(let ((parsec-result  (parsec-with-input ,data
-			,@parsers))
-	 (idx (parsec-with-input ,data
-		(parsec-query
-		 ,@parsers
-		 :end ))) )
-         (cons parsec-result idx)))
+                           ,@parsers))
+          (idx (parsec-with-input ,data
+                 (parsec-query
+                   ,@parsers
+                   :end ))) )
+     (cons parsec-result idx)))
 
 
 (defun tiqsi--parsec-alphanumeric ()
   (parsec-or
-   (parsec-or
-    (parsec-eol-or-eof)
-    (parsec-letter))
-   (parsec-digit)))
+    (parsec-or
+      (parsec-eol-or-eof)
+      (parsec-letter))
+    (parsec-digit)))
 
 (defun tiqsi--parsec-ascii-special-chars-no-brackets ()
   (parsec-re "['\\!%#\"$ &\*\+\-/,\.:;\|^_`~=\?]")
@@ -440,14 +444,14 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun tiqsi--parsec-all-ascii-no-brackets ()
   (parsec-or
-   (tiqsi--parsec-ascii-special-chars-no-brackets-pound)
-   (tiqsi--parsec-alphanumeric)))
+    (tiqsi--parsec-ascii-special-chars-no-brackets-pound)
+    (tiqsi--parsec-alphanumeric)))
 
 
 
 
 (defun tiqsi--parsec-whitespace ()
-     (parsec-re"[ \t\r\n\v\f]"))
+  (parsec-re"[ \t\r\n\v\f]"))
 
 
 (defun tiqsi--parsec-brackets()
@@ -456,102 +460,102 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun tiqsi--parsec-all-ascii()
   (parsec-or
-   (tiqsi--parsec-brackets)
-   (tiqsi--parsec-all-ascii-no-brackets)
-   )
-)
+    (tiqsi--parsec-brackets)
+    (tiqsi--parsec-all-ascii-no-brackets)
+    )
+  )
 
 
 (defun tiqsi--parsec-all-ascii-no-brackets-except (&optional bracket)
   (parsec-or
-  (parsec-re (format "['\\!%s#\"$ &\*\+\-/,\.:;\|^_` ~=\?]" bracket))
+    (parsec-re (format "['\\!%s#\"$ &\*\+\-/,\.:;\|^_` ~=\?]" bracket))
     (tiqsi--parsec-alphanumeric)))
 
 
 (defun tiqsi--parsec-between-round-brackets(&optional bracket)
   (parsec-between
-   (parsec-ch ?\()
-   (parsec-ch ?\))
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets-except bracket)
-    )))
+    (parsec-ch ?\()
+    (parsec-ch ?\))
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets-except bracket)
+      )))
 
 (defun tiqsi--parsec-between-square-brackets()
   (parsec-between
-   (parsec-ch ?\[)
-   (parsec-ch ?\])
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets)
-    )))
+    (parsec-ch ?\[)
+    (parsec-ch ?\])
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets)
+      )))
 
 (defun tiqsi--parsec-between-curly-brackets()
   (parsec-between
-   (parsec-ch ?\{)
-   (parsec-ch ?\})
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets)
-    )))
+    (parsec-ch ?\{)
+    (parsec-ch ?\})
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets)
+      )))
 
 (defun tiqsi--parsec-between-angle-brackets()
   (parsec-between
-   (parsec-ch ?\<)
-   (parsec-ch ?\>)
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets)
-    )))
+    (parsec-ch ?\<)
+    (parsec-ch ?\>)
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets)
+      )))
 
 (defun tiqsi--parsec-between-single-quotes()
   (parsec-between
-   (parsec-ch ?\')
-   (parsec-ch ?\')
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets)
-    )))
+    (parsec-ch ?\')
+    (parsec-ch ?\')
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets)
+      )))
 
 (defun tiqsi--parsec-between-double-quotes()
   (parsec-between
-   (parsec-ch ?\")
-   (parsec-ch ?\")
-   (parsec-many-as-string
-    (tiqsi--parsec-all-ascii-no-brackets)
-    )))
+    (parsec-ch ?\")
+    (parsec-ch ?\")
+    (parsec-many-as-string
+      (tiqsi--parsec-all-ascii-no-brackets)
+      )))
 
 (defun tiqsi--parsec-retrieve-remaining-by-idx (data idx)
   (condition-case nil
-      (substring data idx nil)
+    (substring data idx nil)
     (error ""))
   )
 
 
 (defmacro tiqsi--parsec-with-remainder (data &rest parsers )
   `(let ((parsec-result  (parsec-with-input ,data
-			,@parsers))
-	 (idx (parsec-with-input ,data
-		(parsec-query
-		 ,@parsers
-		 :end ))) )
+                           ,@parsers))
+          (idx (parsec-with-input ,data
+                 (parsec-query
+                   ,@parsers
+                   :end ))) )
      (cons parsec-result
-	   (tiqsi--parsec-retrieve-remaining-by-idx ,data
-						    (if  (equal (car? idx) 'parsec-error)
-							0
-						      (- idx 1))
-						    ))))
+       (tiqsi--parsec-retrieve-remaining-by-idx ,data
+         (if  (equal (car? idx) 'parsec-error)
+           0
+           (- idx 1))
+         ))))
 
 
 (defmacro tiqsi--parsec-with-index-remainder (data &rest parsers )
   `(let ((parsec-result  (parsec-with-input ,data
-			,@parsers))
-	 (idx (parsec-with-input ,data
-		(parsec-query
-		 ,@parsers
-		 :end ))) )
+                           ,@parsers))
+          (idx (parsec-with-input ,data
+                 (parsec-query
+                   ,@parsers
+                   :end ))) )
      (cons parsec-result
-	   (cons idx
-		 (tiqsi--parsec-retrieve-remaining-by-idx ,data
- 							  (if  (equal (car? idx) 'parsec-error)
-							      0
-							    (- idx 1))
-							  )))))
+       (cons idx
+         (tiqsi--parsec-retrieve-remaining-by-idx ,data
+           (if  (equal (car? idx) 'parsec-error)
+             0
+             (- idx 1))
+           )))))
 
 
 ;; END tiqsi-find-file
@@ -562,98 +566,95 @@ foo.cpp and in the same directory as the current header file, foo.h."
 
 (defun tiqsi--cmake--parsec-pound-comment ()
   (parsec-or
-   (tiqsi--cmake--parsec-pound-comment-block)
-   (tiqsi--cmake--parsec-pound-comment-inline)
-   )
+    (tiqsi--cmake--parsec-pound-comment-block)
+    (tiqsi--cmake--parsec-pound-comment-inline)
+    )
   )
 
 (defun tiqsi--cmake--parsec-pound-comment-inline ()
   (parsec-collect
-  (parsec-ch ?\#)
-  (parsec-until-as-string
-     (parsec-ch ?\#)
-     )
+    (parsec-ch ?\#)
+    (parsec-until-as-string
+      (parsec-ch ?\#)
+      )
+    )
   )
-)
 
 (defun tiqsi--cmake--parsec-pound-comment-block ()
   (parsec-collect
-  (parsec-str "#[[")
-  (parsec-until-as-string
-     (parsec-str "]]")
-     )
+    (parsec-str "#[[")
+    (parsec-until-as-string
+      (parsec-str "]]")
+      )
+    )
   )
-)
 
 
 (defun tiqsi-parse-cmake-recurse  ( data)
   (if (equal data "")
-      (message "Done parsing cmake")
-	(let (
-	      (result (tiqsi--parsec-with-remainder data
-							(parsec-or
-							(parsec-collect
-							 (parsec-many-s
-							   (tiqsi--parsec-all-ascii-no-brackets )
-							  )
-							 (tiqsi--parsec-between-round-brackets "}{")
-							 )
-							(tiqsi--cmake--parsec-pound-comment)))))
-	  (add-to-list 'tiqsi-parse-cmake-result (car result))
-	  (tiqsi-parse-cmake-recurse (cdr result) ))))
+    (message "Done parsing cmake")
+    (let (
+           (result (tiqsi--parsec-with-remainder data
+                     (parsec-or
+                       (parsec-collect
+                         (parsec-many-s
+                           (tiqsi--parsec-all-ascii-no-brackets )
+                           )
+                         (tiqsi--parsec-between-round-brackets "}{")
+                         )
+                       (tiqsi--cmake--parsec-pound-comment)))))
+      (add-to-list 'tiqsi-parse-cmake-result (car result))
+      (tiqsi-parse-cmake-recurse (cdr result) ))))
 
 (defmacro tiqsi-parse-cmake (data)
 
   `(let ((tiqsi-parse-cmake-result '() ))
-      (tiqsi-parse-cmake-recurse ,data)
-      tiqsi-parse-cmake-result
-      )
-)
+     (tiqsi-parse-cmake-recurse ,data)
+     tiqsi-parse-cmake-result
+     )
+  )
 
 (defun tiqsi--cmake-find-and-parse ()
-      (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content))))
+  (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content))))
 
 
 (defun tiqsi-cmake-get-executable-name ()
   (interactive)
   (car
-   (split-string
-    (car
-     (cdr
-      (tiqsi--cmake-find-add-executable
-       (tiqsi--cmake-find-and-parse)))) " ")))
-       ;; (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content)))    ))) " ")))
+    (split-string
+      (car
+        (cdr
+          (tiqsi--cmake-find-add-executable
+            (tiqsi--cmake-find-and-parse)))) " ")))
+;; (tiqsi-parse-cmake (tiqsi--remove-newlines (tiqsi--get-cmakelist-content)))    ))) " ")))
 
 
 (defun tiqsi--cmake-find-add-executable (parsed-list)
   (condition-case nil
-      (message (caar parsed-list))
+    (message (caar parsed-list))
     (error nil))
   (if (or (equal (length (car parsed-list)) 1)
-	  (equal (caar parsed-list) "add_executable"))
-      (car parsed-list)
+        (equal (caar parsed-list) "add_executable"))
+    (car parsed-list)
     (tiqsi--cmake-find-add-executable (cdr parsed-list)))
   )
 
-
-
-
-; ------------------------------------------------------------------------------------------------- ;
-;                                           TODO                                                    ;
-; ------------------------------------------------------------------------------------------------- ;
-; fix this: meson-executable-name should be inferred from meson.build file                           ;
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+;; ------------------------------------------------------------------------------------------------- ;
+;;                                           TODO                                                    ;
+;; ------------------------------------------------------------------------------------------------- ;
+;; fix this: meson-executable-name should be inferred from meson.build file                           ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (setq meson-executable-name "demo")
 
 (defun run-meson ()
-(interactive)
+  (interactive)
   (let ((command (if (file-exists-p "meson.build")
-		     "cd build "
-		   "cd .. && cd build ") ))
+                   "cd build "
+                   "cd .. && cd build ") ))
 
     (if tiqsi-win32
-    	(async-shell-command (format "%s && %s.exe" command meson-executable-name))
+      (async-shell-command (format "%s && %s.exe" command meson-executable-name))
       (async-shell-command (format "%s && ./%s" command meson-executable-name)))))
 
 
@@ -669,9 +670,9 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun run-c-lang()
   (interactive)
   (if (or (file-exists-p "meson.build") (file-exists-p "../meson.build"))
-      (run-meson)
-  (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
-	(tiqsi-cmake-run-executable)
+    (run-meson)
+    (if (or (file-exists-p "CMakeLists.txt") (file-exists-p "../CMakeLists.txt"))
+      (tiqsi-cmake-run-executable)
       (run-without-asking))))
 
 
@@ -686,22 +687,22 @@ foo.cpp and in the same directory as the current header file, foo.h."
 (defun add-to-rtags()
   (interactive)
   (call-process-shell-command
-   (format "%src -J %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")
-			      nil 0)
+    (format "%src -J %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")
+    nil 0)
   (message
-   (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
+    (format "%src -J  %sbuild/%s" rtags-path (file-name-directory buffer-file-name) "compile_commands.json")))
 
 
-; ------------------------------------------------------------------------------------------------- ;
-;                                            Create Meson                                           ;
-; ------------------------------------------------------------------------------------------------- ;
-; Create Meson                                                                                      ;
-; project-name -> src -> main.cpp/c                                                                 ;
-;                     -> main.cpp/c                                                                 ;
-;              -> meson.build                                                                       ;
-;              -> .gitignore                                                                        ;
-;              -> README.md                                                                         ;
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+;; ------------------------------------------------------------------------------------------------- ;
+;;                                            Create Meson                                           ;
+;; ------------------------------------------------------------------------------------------------- ;
+;; Create Meson                                                                                      ;
+;; project-name -> src -> main.cpp/c                                                                 ;
+;;                     -> main.cpp/c                                                                 ;
+;;              -> meson.build                                                                       ;
+;;              -> .gitignore                                                                        ;
+;;              -> README.md                                                                         ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (defun tiqsi-create-meson (project-name)
   (interactive "sEnter Project Name:")
@@ -716,7 +717,7 @@ foo.cpp and in the same directory as the current header file, foo.h."
   (write-region (format "
 project('%s', 'c',
         default_options : ['c_std=c11'],
-	version : '1.0.0',
+        version : '1.0.0',
         license : 'GPL')
 
 src = ['src/main.c']
@@ -758,16 +759,16 @@ executable('%s', src, include_directories : incdir)" project-name project-name) 
 *.app
 /build"  ""  (format "%s/%s/.gitignore" (f-dirname (f-this-file ))     project-name)))
 
-; ------------------------------------------------------------------------------------------------- ;
-;                                            Create CMake                                           ;
-; ------------------------------------------------------------------------------------------------- ;
-; Create cmake                                                                                      ;
-; project-name -> src -> main.cpp/c                                                                 ;
-;                     -> main.cpp/c                                                                 ;
-;                     -> CMakeLists.txt                                                             ;
-;                     -> .gitignore                                                                 ;
-;                     -> README.md                                                                  ;
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+;; ------------------------------------------------------------------------------------------------- ;
+;;                                            Create CMake                                           ;
+;; ------------------------------------------------------------------------------------------------- ;
+;; Create cmake                                                                                      ;
+;; project-name -> src -> main.cpp/c                                                                 ;
+;;                     -> main.cpp/c                                                                 ;
+;;                     -> CMakeLists.txt                                                             ;
+;;                     -> .gitignore                                                                 ;
+;;                     -> README.md                                                                  ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (defun tiqsi-create-cmake (project-name)
   (interactive "sEnter Project Name:")
@@ -836,19 +837,19 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 (defun check-for-semicolon (string)
   (if (equal (car(cdr(split-string string ";"  ))) "")
-      (car(split-string string ";" ))
+    (car(split-string string ";" ))
     nil)
   )
 
-; ------------------------------------------------------------------------------------------------- ;
-;                                                TODO                                               ;
-; ------------------------------------------------------------------------------------------------- ;
-;                                                                                                   ;
-; parse (select (this ( now) ) ) -> ("select" "(this ( now) )")                                     ;
-;                                      -> ("select" ("this "(now)"))                                ;
-;                                      -> ("select" ("this ("now") ))                               ;
-;                                                                                                   ;
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
+;; ------------------------------------------------------------------------------------------------- ;
+;;                                                TODO                                               ;
+;; ------------------------------------------------------------------------------------------------- ;
+;;                                                                                                   ;
+;; parse (select (this ( now) ) ) -> ("select" "(this ( now) )")                                     ;
+;;                                      -> ("select" ("this "(now)"))                                ;
+;;                                      -> ("select" ("this ("now") ))                               ;
+;;                                                                                                   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ ;
 
 (setq test-parens "(select (this (now) ) ) ")
 
@@ -863,9 +864,9 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 
 (tiqsi--parsec-with-remainder test-parens
-			      (parsec-many-as-string (parsec-re "(") )
+  (parsec-many-as-string (parsec-re "(") )
 
-)
+  )
 
 
 ;; ;  -------------------------------------------------------------------------------- ;
@@ -889,20 +890,20 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; ;  -------------------------------------------------------------------------------- ;
 ;; (popup-tip "test")
 
-; TODO Parser for C declr to generate the tokens t be fed through
-; TODO Parse (<content>)(<content>) into (<content> . "(<content>)") to handle C-style cast
-; TODO spiral recursively
+;; TODO Parser for C declr to generate the tokens t be fed through
+;; TODO Parse (<content>)(<content>) into (<content> . "(<content>)") to handle C-style cast
+;; TODO spiral recursively
 (defun spiral--pointer-to(token)
   (let ((data   (tiqsi--parsec-with-remainder token
-				(parsec-str "*")
-				)
-		))
+                  (parsec-str "*")
+                  )
+          ))
     (cons
-     (if (equal
-	  (car?(car data)) 'parsec-error)
-	 ""
-       "pointer to ")
-     (cdr data))
+      (if (equal
+            (car?(car data)) 'parsec-error)
+        ""
+        "pointer to ")
+      (cdr data))
     )
   )
 
@@ -910,46 +911,46 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 (defun spiral--array(token)
   (let ((data
-	 (tiqsi--parsec-with-remainder token
-				       (tiqsi--parsec-between-square-brackets)
-				       )))
+          (tiqsi--parsec-with-remainder token
+            (tiqsi--parsec-between-square-brackets)
+            )))
     (cons
-     (if (equal
-	  (car?(car data)) 'parsec-error)
-	 ""
-       (if (= (length (car data)) 0)
-	   "Array of size  ~Undefined of"
-	 (format "Array of size %s of" (car data))))
-     (cdr data))))
+      (if (equal
+            (car?(car data)) 'parsec-error)
+        ""
+        (if (= (length (car data)) 0)
+          "Array of size  ~Undefined of"
+          (format "Array of size %s of" (car data))))
+      (cdr data))))
 
 
 (defun spiral--func(token)
   (let ((data   (tiqsi--parsec-with-remainder token
-  				(tiqsi--parsec-between-round-brackets)
-  				)
-  		))
+                  (tiqsi--parsec-between-round-brackets)
+                  )
+          ))
     (cons
-     (if (equal
-	  (car?(car data)) 'parsec-error)
-	 ""
-       (format "function passing - %s - returning  " (car data) ))
-     (cdr data))
+      (if (equal
+            (car?(car data)) 'parsec-error)
+        ""
+        (format "function passing - %s - returning  " (car data) ))
+      (cdr data))
     ))
 
 
 
 (setq testing
-      (tiqsi--parsec-with-remainder (check-for-semicolon test-ultimate)
-				    (parsec-collect
-				      (parsec-many-as-string
-				       (parsec-or
-					(parsec-letter)
-					(tiqsi--parsec-whitespace))
-				       )
-				      (tiqsi--parsec-between-round-brackets "(")
-				      )
-				    )
-)
+  (tiqsi--parsec-with-remainder (check-for-semicolon test-ultimate)
+    (parsec-collect
+      (parsec-many-as-string
+        (parsec-or
+          (parsec-letter)
+          (tiqsi--parsec-whitespace))
+        )
+      (tiqsi--parsec-between-round-brackets "(")
+      )
+    )
+  )
 
 ;; (testing)
 
@@ -966,33 +967,33 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; --------------------------------Create a frame with tooltip---------------------
 ;; TODO Make tip based on tip char len + height
 (setq tip-frame-params
-      '(
-	(minibuffer . nil)
-	(name . "*Tip Frame*")
-	(lambda () (setq mode-line-format nil))
-	(visibility . nil)
-	(minibuffer-frame-alist nil)
-	(vertical-scroll-bars . nil)
-	(horizontal-scroll-bars . nil)
-	(menu-bar-lines . 0)
-	(tool-bar-lines . 0)
-	(line-spacing . 0)
-	(unsplittable . t)
-	(undecorated . t)
-	(mouse-wheel-frame . nil)
-	(no-other-frame . t)
-	(cursor-type . nil)
-	(inhibit-double-buffering . t)
-	(drag-internal-border . t)
-	(no-special-glyphs . t)
-	(no-accept-focus . t)
-	(no-focus-on-map . t)
-	(internal-border-width . 1)
-	(right-fringe . 0)
-	(left-fringe . 0)
-	(top . -1)
-	(desktop-dont-save . t)
-	(left . -1)))
+  '(
+     (minibuffer . nil)
+     (name . "*Tip Frame*")
+     (lambda () (setq mode-line-format nil))
+     (visibility . nil)
+     (minibuffer-frame-alist nil)
+     (vertical-scroll-bars . nil)
+     (horizontal-scroll-bars . nil)
+     (menu-bar-lines . 0)
+     (tool-bar-lines . 0)
+     (line-spacing . 0)
+     (unsplittable . t)
+     (undecorated . t)
+     (mouse-wheel-frame . nil)
+     (no-other-frame . t)
+     (cursor-type . nil)
+     (inhibit-double-buffering . t)
+     (drag-internal-border . t)
+     (no-special-glyphs . t)
+     (no-accept-focus . t)
+     (no-focus-on-map . t)
+     (internal-border-width . 1)
+     (right-fringe . 0)
+     (left-fringe . 0)
+     (top . -1)
+     (desktop-dont-save . t)
+     (left . -1)))
 
 
 (defun frame--set-input-focus (frame)
@@ -1002,42 +1003,42 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 (defun make-tip-frame (tip &rest args)
   (setq tip-frame (make-frame
-		   (append (append tip-frame-params
-				   `(
-				     ;; (width . ,(+ (* (frame-char-width) (length tip)) (frame-char-width)))
-				     (width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))
-				     ))
-			   `(
-			     (height . 5)
-			     ;; (height . ,(frame-char-height))
-			     ;; (height . ,(/ (frame-char-height) 2))
-			     ))
-		   )
-	  )
-    (generate-new-buffer "*Tip Frame Buffer*")
-
-
-    (set-frame-position tip-frame
-			(- (car (window-absolute-pixel-position)) (frame-char-width))
-			(+ (cdr (window-absolute-pixel-position)) (frame-char-size)))
-
-    (let ((current-frame (selected-frame) ))
-      (make-frame-visible tip-frame)
-      (select-frame tip-frame)
-      (pop-to-buffer "*Tip Frame Buffer*")
-      (with-current-buffer "*Tip Frame Buffer*"
-	(fundamental-mode)
-	(setq-local beacon-mode nil)
-	(setq mode-line-format nil)
-	;; (set-background-color "#5F55FF")
-	(linum-mode -1)
-	(insert  tip)
-	)
-
-      (frame--set-input-focus current-frame)
-      (frame-restack current-frame tip-frame)
-      )
+                    (append (append tip-frame-params
+                              `(
+                                 ;; (width . ,(+ (* (frame-char-width) (length tip)) (frame-char-width)))
+                                 (width . ,(+ (* (/ (frame-char-width) 2) (length tip)) (frame-char-width)))
+                                 ))
+                      `(
+                         (height . 5)
+                         ;; (height . ,(frame-char-height))
+                         ;; (height . ,(/ (frame-char-height) 2))
+                         ))
+                    )
     )
+  (generate-new-buffer "*Tip Frame Buffer*")
+
+
+  (set-frame-position tip-frame
+    (- (car (window-absolute-pixel-position)) (frame-char-width))
+    (+ (cdr (window-absolute-pixel-position)) (frame-char-size)))
+
+  (let ((current-frame (selected-frame) ))
+    (make-frame-visible tip-frame)
+    (select-frame tip-frame)
+    (pop-to-buffer "*Tip Frame Buffer*")
+    (with-current-buffer "*Tip Frame Buffer*"
+      (fundamental-mode)
+      (setq-local beacon-mode nil)
+      (setq mode-line-format nil)
+      ;; (set-background-color "#5F55FF")
+      (linum-mode -1)
+      (insert  tip)
+      )
+
+    (frame--set-input-focus current-frame)
+    (frame-restack current-frame tip-frame)
+    )
+  )
 
 (defun close-tip-frame()
   (with-current-buffer "*Tip Frame Buffer*"
@@ -1047,8 +1048,7 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 ;; (make-tip-frame "whyssssssss")
 ;; (close-tip-frame)
 
-
-;  -------------------------------------------------------------------------------- ;
+;;  -------------------------------------------------------------------------------- ;
 
 (defun find-project-directory-recursive ()
   "Recursively search for a makefile."
@@ -1070,8 +1070,8 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
 
 
 (setq frame-title-format
-      (list (format "%s %%S: %%j " (system-name))
-            '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
+  (list (format "%s %%S: %%j " (system-name))
+    '(buffer-file-name "%f" (dired-directory dired-directory "%b"))))
 
 
 
@@ -1091,8 +1091,8 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
   "Make the current build."
   (interactive)
   (if
-      (find-project-directory)
-      (compile tiqsi-makescript))
+    (find-project-directory)
+    (compile tiqsi-makescript))
   (other-window 1))
 
 (defun run-without-asking ()
@@ -1125,15 +1125,15 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
   "Make a new frame for peeking definition"
   (when (or (not (rtags-called-interactively-p)) (rtags-sandbox-id-matches))
     (let (summary
-          doc-frame
-          x y
+           doc-frame
+           x y
           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-          ;; 1. Find the absolute position of the current beginning of the symbol at point, ;;
-          ;; in pixels.                                                                     ;;
+           ;; 1. Find the absolute position of the current beginning of the symbol at point, ;;
+           ;; in pixels.                                                                     ;;
           ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-          (abs-pixel-pos (save-excursion
-                           (beginning-of-thing 'symbol)
-                           (window-absolute-pixel-position))))
+           (abs-pixel-pos (save-excursion
+                            (beginning-of-thing 'symbol)
+                            (window-absolute-pixel-position))))
       (setq x (car abs-pixel-pos))
       ;; (setq y (cdr abs-pixel-pos))
       (setq y (+ (cdr abs-pixel-pos) (frame-char-height)))
@@ -1142,10 +1142,10 @@ add_executable(%s main.c)" project-name project-name)  ""  (format "%s/%s/src/CM
       ;; 2. Create a new invisible frame, with the current buffer in it. ;;
       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       (setq doc-frame (make-frame '((minibuffer . nil)
-                                    (name . "*RTags Peek*")
-                                    (width . 80)
-                                    (visibility . nil)
-                                    (height . 15))))
+                                     (name . "*RTags Peek*")
+                                     (width . 80)
+                                     (visibility . nil)
+                                     (height . 15))))
 
       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;; 3. Position the new frame right under the beginning of the symbol at point. ;;
@@ -1221,7 +1221,7 @@ _v_: Find virtuals at point
 
 (global-set-key "\C-ci" 'ewd-insert-new-method)
 
-; Alternate bindings for F-keyless setups (ie MacOS X terminal)
+;; Alternate bindings for F-keyless setups (ie MacOS X terminal)
 
 (define-key c++-mode-map "\ec" 'tiqsi-find-corresponding-file)
 (define-key c++-mode-map "\eC" 'tiqsi-find-corresponding-file-other-window)

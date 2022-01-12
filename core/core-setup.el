@@ -29,25 +29,25 @@
 
 
 
-;-----------------{UX}-----------------;
+;;-----------------{UX}-----------------;
 
-; cfrs.el  Child Frame Read String                                          ;
-; ------------------------------------------------------------------------- ;
+;; cfrs.el  Child Frame Read String                                          ;
+;; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(cfrs
-   :type git
-   :host github
-   :repo "Alexander-Miller/cfrs"
-))
+  '(cfrs
+     :type git
+     :host github
+     :repo "Alexander-Miller/cfrs"
+     ))
 
 
 
-;(use-package dashboard
-;  :straight t
-;  :ensure t
-;  :config
-;  (dashboard-setup-startup-hook))
+;;(use-package dashboard
+;;  :straight t
+;;  :ensure t
+;;  :config
+;;  (dashboard-setup-startup-hook))
 
 
 
@@ -59,21 +59,21 @@
   (setq ediff-diff-options "-w"))
 
 
-;-------{M-x}-------;
+                                        ;-------{M-x}-------;
 
 (straight-require 'spaceline)
 (straight-require 'spaceline-all-the-icons)
 (straight-require 'delight)
 
 
-;-----{Windows}-----;
+                                        ;-----{Windows}-----;
 
 (straight-require 'all-the-icons)
 (straight-require 'switch-window)
 (straight-require 'windmove)
 
 
-;------{Buffer}-----;
+                                        ;------{Buffer}-----;
 
 (straight-require 'stickyfunc-enhance)
 (straight-require 'stripe-buffer)
@@ -83,19 +83,19 @@
 (straight-require 'highlight-parentheses)
 (straight-require 'mic-paren)
 
-;------{Search}-----;
+                                        ;------{Search}-----;
 
 (straight-require 'ivy)
 (straight-require 'hydra)
 (straight-require 'find-dired)
 (straight-require 'direx)
 
-;-------{Git}-------;
+                                        ;-------{Git}-------;
 
 (straight-require 'magit)
 (straight-require 'git-gutter-fringe)
 
-;-------{Misc}------;
+                                        ;-------{Misc}------;
 
 (straight-require-lazy 'flyspell)
 (straight-require 'scratch)
@@ -107,15 +107,15 @@
 (straight-require-lazy 'adaptive-wrap)
 (straight-require-lazy 'camcorder)
 
-;---{helpful libs}--;
+                                        ;---{helpful libs}--;
 
 (straight-require 'helpful)
 (straight-require '0xc)
 (straight-require 'parsec)
 
-;-----{needed?}-----;
+                                        ;-----{needed?}-----;
 
-;--{cutting board}--;
+                                        ;--{cutting board}--;
 
 
 (require 'cc-mode)
@@ -128,12 +128,12 @@
 ;; (straight-require 'company-jedi)
 ;; (straight-require 'jedi)
 
-;---------------{Modules}--------------;
+                                        ;---------------{Modules}--------------;
 
-;-------------{Programming}------------;
+                                        ;-------------{Programming}------------;
 
 (straight-require 'helm)
-;-{elisp libraries}-;
+                                        ;-{elisp libraries}-;
 
 (straight-require 'elisp-slime-nav)
 ;; (straight-require 'slime-docker)
@@ -144,7 +144,7 @@
 (straight-require 'pcre2el) ;; Regexp syntax converter
 
 
-;---{Major Modes}---;
+                                        ;---{Major Modes}---;
 
 (straight-require 'clojure-mode)
 ;; (straight-require 'inf-clojure)
@@ -154,31 +154,31 @@
 (straight-require-lazy 'rust-mode)
 (straight-require 'textx-mode)
 (straight-require 'bnfc)
-(straight-require 'tide) ;; Typescript mode support 
-(straight-require 'geiser) ;; Scheme mode support 
+(straight-require 'tide) ;; Typescript mode support
+(straight-require 'geiser) ;; Scheme mode support
 (straight-require 'flymd) ;; Markdown mode support live editing
 
 (straight-require 'docker)
 (straight-require 'docker-compose-mode)
 (straight-require 'dockerfile-mode)
 
-;----{Platforms}----;
+                                        ;----{Platforms}----;
 
 (straight-require 'ob-ipython)
 
 (straight-use-package
- '(ein
-   :type git
-   :host github
-   :repo "millejoh/emacs-ipython-notebook"
-))
+  '(ein
+     :type git
+     :host github
+     :repo "millejoh/emacs-ipython-notebook"
+     ))
 
 
 
 (straight-require 'cider)
 
 
-;------{tools}------;
+                                        ;------{tools}------;
 
 (straight-require-lazy 'bug-hunter)
 
@@ -187,7 +187,7 @@
 (straight-require 'py-autopep8)
 
 
-;---{Intellisense}--;
+                                        ;---{Intellisense}--;
 
 (straight-require 'rtags)
 ;; (straight-require 'jdee)
@@ -201,13 +201,13 @@
 
 (straight-require 'ac-racer)
 
-;----{utilities}----;
+                                        ;----{utilities}----;
 
 (straight-require 'disaster)
 (straight-require 'cargo)
 
 
-;-----{Linters}-----;
+                                        ;-----{Linters}-----;
 
 (straight-require 'flymake)
 (straight-require 'flymake-easy)
@@ -218,7 +218,7 @@
 (straight-require 'semantic)
 
 
-;----{Navigation}---;
+                                        ;----{Navigation}---;
 
 (straight-require 'etags-select)
 (straight-require 'ctags-update)
@@ -231,7 +231,7 @@
 (straight-require 'xref)
 
 
-;---------------{Editing}--------------;
+                                        ;---------------{Editing}--------------;
 
 (straight-require 'origami)
 (straight-require 'paredit)
@@ -243,27 +243,27 @@
 (straight-require 'expand-region) ;; Select a code region by semantic units
 
 
-;----------------{Misc}----------------;
+                                        ;----------------{Misc}----------------;
 
 (straight-require 'typing)
 
 
-;-----{From git}----;
+                                        ;-----{From git}----;
 
 
 (straight-use-package
- '(evil
-   :type git
-   :host github
-   :repo "emacs-evil/evil"
-))
+  '(evil
+     :type git
+     :host github
+     :repo "emacs-evil/evil"
+     ))
 
-;(straight-use-package
-; '(matrix-client
-;   :type git
-;   :host github
-;   :repo "jgkamat/matrix-client-el"
-;))
+;;(straight-use-package
+;; '(matrix-client
+;;   :type git
+;;   :host github
+;;   :repo "jgkamat/matrix-client-el"
+;;))
 
 
 ;; (straight-use-package
@@ -288,40 +288,40 @@
 ;;   )
 ;; )
 
-;(straight-require 'blacken)
+                                        ;(straight-require 'blacken)
 
 (straight-use-package
- '(flycheck-rtags
-   :type git
-   :host github
-   :repo "Andersbakken/rtags"
-))
-
-
-
-(straight-use-package
- '(sdev-mypy
-   :type git
-   :host github
-   :repo "SerialDev/mypy-mode"
-))
+  '(flycheck-rtags
+     :type git
+     :host github
+     :repo "Andersbakken/rtags"
+     ))
 
 
 
 (straight-use-package
- '(fuzzy-format
-   :type git
-   :host github
-   :repo "emacsmirror/fuzzy-format"
-))
+  '(sdev-mypy
+     :type git
+     :host github
+     :repo "SerialDev/mypy-mode"
+     ))
+
 
 
 (straight-use-package
- '(dired-details
-   :type git
-   :host github
-   :repo "emacsmirror/dired-details"
-))
+  '(fuzzy-format
+     :type git
+     :host github
+     :repo "emacsmirror/fuzzy-format"
+     ))
+
+
+(straight-use-package
+  '(dired-details
+     :type git
+     :host github
+     :repo "emacsmirror/dired-details"
+     ))
 
 
 ;; (straight-use-package
@@ -333,27 +333,27 @@
 
 
 (straight-use-package
- '(ensime
-   :type git
-   :host github
-   :repo "ensime/ensime-emacs"
-))
+  '(ensime
+     :type git
+     :host github
+     :repo "ensime/ensime-emacs"
+     ))
 
-; ------------------------------------------------------------------------- ;
-;                                   Docker                                  ;
-; ------------------------------------------------------------------------- ;
+                                        ; ------------------------------------------------------------------------- ;
+                                        ;                                   Docker                                  ;
+                                        ; ------------------------------------------------------------------------- ;
 
 ;; Open files in Docker containers like so: /docker:drunk_bardeen:/etc/passwd
 
 (straight-use-package
- '(docker-tramp
-   :type git
-   :host github
-   :repo "emacs-pe/docker-tramp.el"
-))
+  '(docker-tramp
+     :type git
+     :host github
+     :repo "emacs-pe/docker-tramp.el"
+     ))
 
 
-;---{Requirements}--;
+                                        ;---{Requirements}--;
 
 (try-require 'browse-url) ; part of gnu emacs
 (try-require 'uniquify) ;; part of gnu emacs
@@ -361,7 +361,7 @@
 (try-require 'helm-eshell) ;; Eshell History support
 
 
-;----{From ~Lisp}---;
+                                        ;----{From ~Lisp}---;
 
 (load-expand "modules/misc/andersl/demax") ;; restore congif when maximized
 (try-require 'demax)
@@ -369,7 +369,7 @@
 (load-expand "modules/misc/tuhdo/org-recipes") ;; Org mode recipes
 (try-require 'org-recipes)
 
-; Does not have a melpa source: http://www.hczim.de/software/gas-mode.html
+                                        ; Does not have a melpa source: http://www.hczim.de/software/gas-mode.html
 (load-expand "modules/misc/hczim/gas-mode") ;; Assembly
 (try-require 'gas-mode)
 

@@ -5,9 +5,9 @@
 
 ;;; Code:
 
-;---------------------------------------------------------------------------------------------------;
-;Fixes upstream bug <25.2RC                                                                         ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;Fixes upstream bug <25.2RC                                                                         ;
+;;---------------------------------------------------------------------------------------------------;
 
 
 ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25753#44
@@ -16,32 +16,32 @@
   (defun python-shell-completion-native-try ()
     "Return non-nil if can trigger native completion."
     (let ((python-shell-completion-native-enable t)
-          (python-shell-completion-native-output-timeout
-           python-shell-completion-native-try-output-timeout))
+           (python-shell-completion-native-output-timeout
+             python-shell-completion-native-try-output-timeout))
       (python-shell-completion-native-get-completions
-       (get-buffer-process (current-buffer))
-       nil "_"))))
+        (get-buffer-process (current-buffer))
+        nil "_"))))
 (setq python-shell-prompt-detect-failure-warning nil)
 
-; /end fixes                                                                                        ;
-;---------------------------------------------------------------------------------------------------;
+;; /end fixes                                                                                        ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                    Python repl setup procedures                                   ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;                                    Python repl setup procedures                                   ;
+;;---------------------------------------------------------------------------------------------------;
 
 (setq
- python-shell-interpreter "ipython"
- python-shell-interpreter-args "--matplotlib=qt5"
- python-shell-prompt-regexp "In \\[[0-9]+\\]: "
- python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
- python-shell-completion-setup-code
- "from IPython.core.completerlib import module_completion"
- python-shell-completion-string-code
- "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
- python-shell-completion-module-string-code
- "';'.join(module_completion('''%s'''))\n"
- )
+  python-shell-interpreter "ipython"
+  python-shell-interpreter-args "--matplotlib=qt5"
+  python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+  python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+  python-shell-completion-setup-code
+  "from IPython.core.completerlib import module_completion"
+  python-shell-completion-string-code
+  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
+  python-shell-completion-module-string-code
+  "';'.join(module_completion('''%s'''))\n"
+  )
 
 
 (defun sdev-use-ipython (&optional ipython)
@@ -56,38 +56,38 @@ With prefix arg, prompt for the command to use."
   ;; Needed for IPython 5+
   (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
   (cond
-   ;; Emacs 24 until 24.3
-   ((boundp 'python-python-command)
-    (setq python-python-command ipython))
-   ;; Emacs 24.3
-   ((and (version<= "24.3" emacs-version)
-         (not (boundp 'python-shell-interpreter-interactive-arg)))
-    ;; This is from the python.el commentary.
-    ;; Settings for IPython 0.11:
-    (setq python-shell-interpreter ipython
-          python-shell-interpreter-args "--pylab"
-          python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-          python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-          python-shell-completion-setup-code
-          "from IPython.core.completerlib import module_completion"
-          python-shell-completion-module-string-code
-          "';'.join(module_completion('''%s'''))\n"
-          python-shell-completion-string-code
-          "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
-   ;; Emacs 24.4
-   ((boundp 'python-shell-interpreter-interactive-arg)
-    (setq python-shell-interpreter ipython
-          python-shell-interpreter-args "-i")
-    ;; Windows requires some special handling here, see #422
-    (let ((exe "C:\\Python27\\python.exe")
-          (ipython_py "C:\\Python27\\Scripts\\ipython-script.py"))
-      (when (and (eq system-type 'windows-nt)
-                 (file-exists-p exe)
-                 (file-exists-p ipython_py))
-        (setq python-shell-interpreter exe
-              python-shell-interpreter-args "-i " + ipython_py))))
-   (t
-    (error "I don't know how to set ipython settings for this Emacs"))))
+    ;; Emacs 24 until 24.3
+    ((boundp 'python-python-command)
+      (setq python-python-command ipython))
+    ;; Emacs 24.3
+    ((and (version<= "24.3" emacs-version)
+       (not (boundp 'python-shell-interpreter-interactive-arg)))
+      ;; This is from the python.el commentary.
+      ;; Settings for IPython 0.11:
+      (setq python-shell-interpreter ipython
+        python-shell-interpreter-args "--pylab"
+        python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+        python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+        python-shell-completion-setup-code
+        "from IPython.core.completerlib import module_completion"
+        python-shell-completion-module-string-code
+        "';'.join(module_completion('''%s'''))\n"
+        python-shell-completion-string-code
+        "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+    ;; Emacs 24.4
+    ((boundp 'python-shell-interpreter-interactive-arg)
+      (setq python-shell-interpreter ipython
+        python-shell-interpreter-args "-i")
+      ;; Windows requires some special handling here, see #422
+      (let ((exe "C:\\Python27\\python.exe")
+             (ipython_py "C:\\Python27\\Scripts\\ipython-script.py"))
+        (when (and (eq system-type 'windows-nt)
+                (file-exists-p exe)
+                (file-exists-p ipython_py))
+          (setq python-shell-interpreter exe
+            python-shell-interpreter-args "-i " + ipython_py))))
+    (t
+      (error "I don't know how to set ipython settings for this Emacs"))))
 
 
 (defun sdev-use-cpython (&optional cpython)
@@ -101,18 +101,18 @@ With prefix arg, prompt for the command to use."
   (when (not (executable-find cpython))
     (error "Command %S not found" cpython))
   (cond
-   ;; Emacs 24 until 24.3
-   ((boundp 'python-python-command)
-    (setq python-python-command cpython))
-   ;; Emacs 24.3 and onwards.
-   ((and (version<= "24.3" emacs-version)
-         (not (boundp 'python-shell-interpreter-interactive-arg)))
-    (setq python-shell-interpreter cpython
-          python-shell-interpreter-args "-i"
-          python-shell-prompt-regexp ">>> "
-          python-shell-prompt-output-regexp ""
-          python-shell-completion-setup-code
-          "try:
+    ;; Emacs 24 until 24.3
+    ((boundp 'python-python-command)
+      (setq python-python-command cpython))
+    ;; Emacs 24.3 and onwards.
+    ((and (version<= "24.3" emacs-version)
+       (not (boundp 'python-shell-interpreter-interactive-arg)))
+      (setq python-shell-interpreter cpython
+        python-shell-interpreter-args "-i"
+        python-shell-prompt-regexp ">>> "
+        python-shell-prompt-output-regexp ""
+        python-shell-completion-setup-code
+        "try:
     import readline
 except ImportError:
     def __COMPLETER_all_completions(text): []
@@ -132,43 +132,43 @@ else:
         except NameError:
             pass
         return completions"
-          python-shell-completion-module-string-code ""
-          python-shell-completion-string-code
-          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
-   ;; Emacs 24.4
-   ((boundp 'python-shell-interpreter-interactive-arg)
-    (setq python-shell-interpreter cpython
-          python-shell-interpreter-args "-i"))
-   (t
-    (error "I don't know how to set ipython settings for this Emacs"))))
+        python-shell-completion-module-string-code ""
+        python-shell-completion-string-code
+        "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+    ;; Emacs 24.4
+    ((boundp 'python-shell-interpreter-interactive-arg)
+      (setq python-shell-interpreter cpython
+        python-shell-interpreter-args "-i"))
+    (t
+      (error "I don't know how to set ipython settings for this Emacs"))))
 
 (defun sdev-use-remote (&optional ipython)
   (interactive)
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
-        python-shell-interpreter-args "-i"
-        python-shell-prompt-regexp ">>> "
-        python-shell-prompt-output-regexp ""))
+    python-shell-interpreter-args "-i"
+    python-shell-prompt-regexp ">>> "
+    python-shell-prompt-output-regexp ""))
 
-; /end repl                                                                                         ;
-;---------------------------------------------------------------------------------------------------;
+;; /end repl                                                                                         ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                           Imenu merging                                           ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;                                           Imenu merging                                           ;
+;;---------------------------------------------------------------------------------------------------;
 
 ;; Python mode
 (defun my-merge-imenu ()
   (interactive)
   (let ((mode-imenu (imenu-default-create-index-function))
-        (custom-imenu (imenu--generic-function imenu-generic-expression)))
+         (custom-imenu (imenu--generic-function imenu-generic-expression)))
     (append mode-imenu custom-imenu)))
 
 
 (defun my-python-menu-hook()
   (interactive)
   (add-to-list
-   'imenu-generic-expression
-   '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
+    'imenu-generic-expression
+    '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
   (setq imenu-create-index-function 'my-merge-imenu)
   ;; (eval-after-load "company"
   ;;     '(progn
@@ -181,30 +181,30 @@ else:
 
 (add-hook 'python-mode-hook 'my-python-menu-hook)
 
-; /end Imenu                                                                                        ;
-;---------------------------------------------------------------------------------------------------;
+;; /end Imenu                                                                                        ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                         McCabe Complexity                                         ;
-;---------------------------------------------------------------------------------------------------;
-; requires pip install mccabe                                                                       ;
+;;---------------------------------------------------------------------------------------------------;
+;;                                         McCabe Complexity                                         ;
+;;---------------------------------------------------------------------------------------------------;
+;; requires pip install mccabe                                                                       ;
 
 
 (defun sdev/py-mccabe()
   "Get the mccabe complexity for this buffer."
   (interactive)
   (message
-   (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
+    (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
 
-; /end McCabe                                                                                       ;
-;---------------------------------------------------------------------------------------------------;
+;; /end McCabe                                                                                       ;
+;;---------------------------------------------------------------------------------------------------;
 
 
-;---------------------------------------------------------------------------------------------------;
-;Debugging                                                                                          ;
-;---------------------------------------------------------------------------------------------------;
-; Highlight the call to ipdb                                                                        ;
-; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/                           ;
+;;---------------------------------------------------------------------------------------------------;
+;;Debugging                                                                                          ;
+;;---------------------------------------------------------------------------------------------------;
+;; Highlight the call to ipdb                                                                        ;
+;; src http://pedrokroger.com/2010/07/configuring-emacs-as-a-python-ide-2/                           ;
 
 
 (defun annotate-pdb ()
@@ -227,32 +227,32 @@ else:
     ;; (save-buffer)
     ))
 
-; / end debugging                                                                                   ;
-;---------------------------------------------------------------------------------------------------;
+;; / end debugging                                                                                   ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                              Linting                                              ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;                                              Linting                                              ;
+;;---------------------------------------------------------------------------------------------------;
 
 (flycheck-define-checker
-    python-mypy ""
-    :command ("mypy"
-              "--ignore-missing-imports"
-              "--python-version" "3.6"
-              source-original)
-    :error-patterns
-    ((error line-start (file-name) ":" line ": error:" (message) line-end))
-    :modes python-mode)
+  python-mypy ""
+  :command ("mypy"
+             "--ignore-missing-imports"
+             "--python-version" "3.6"
+             source-original)
+  :error-patterns
+  ((error line-start (file-name) ":" line ": error:" (message) line-end))
+  :modes python-mode)
 
 (add-to-list 'flycheck-checkers 'python-mypy t)
 (flycheck-add-next-checker 'python-pylint 'python-mypy t)
 
-; /end lint                                                                                         ;
-;---------------------------------------------------------------------------------------------------;
+;; /end lint                                                                                         ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                           LSP mode setup                                          ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;                                           LSP mode setup                                          ;
+;;---------------------------------------------------------------------------------------------------;
 
 (use-package lsp-mode
   :commands lsp
@@ -270,24 +270,24 @@ else:
   :init (add-hook 'lsp-mode-hook 'lsp-ui-mode)
   :config
   (setq lsp-ui-sideline-ignore-duplicate t)
-  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)                                                                                                                          
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)                                                                                                                            
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-(add-hook 'lsp-mode-hook 'lsp-ui-mode)
-(setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake.
-(setq lsp-ui-doc-enable t
-   lsp-ui-doc-use-childframe t
-   lsp-ui-doc-position 'top
-   lsp-ui-doc-include-signature t
-   lsp-ui-sideline-enable t
-   lsp-ui-flycheck-enable t
-   lsp-ui-sideline-ignore-duplicate t
-   lsp-ui-sideline-show-flycheck t
-   lsp-ui-flycheck-list-position 'right
-   lsp-ui-flycheck-live-reporting t
-   lsp-ui-peek-enable t
-   lsp-ui-peek-list-width 60
-   lsp-ui-peek-peek-height 25)
+  (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+  (setq lsp-prefer-flymake nil) ;; Prefer using lsp-ui (flycheck) over flymake.
+  (setq lsp-ui-doc-enable t
+    lsp-ui-doc-use-childframe t
+    lsp-ui-doc-position 'top
+    lsp-ui-doc-include-signature t
+    lsp-ui-sideline-enable t
+    lsp-ui-flycheck-enable t
+    lsp-ui-sideline-ignore-duplicate t
+    lsp-ui-sideline-show-flycheck t
+    lsp-ui-flycheck-list-position 'right
+    lsp-ui-flycheck-live-reporting t
+    lsp-ui-peek-enable t
+    lsp-ui-peek-list-width 60
+    lsp-ui-peek-peek-height 25)
 
   ;; (add-hook 'lsp-ui-doc-frame-hook #'my/hide-frame-line-numbers)
   )
@@ -297,8 +297,8 @@ else:
   :config
   (push 'company-lsp company-backends)
   (setq company-lsp-async t
-        company-lsp-cache-candidates 'auto
-        company-lsp-enable-recompletion t))
+    company-lsp-cache-candidates 'auto
+    company-lsp-enable-recompletion t))
 
 
 ;; With use-package:
@@ -307,12 +307,12 @@ else:
   :hook (company-mode . company-box-mode))
 
 (progn
- (push 'company-lsp company-backends)
- (setq company-transformers nil
-       company-lsp-async t
-       company-lsp-cache-candidates nil)
- (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
- )
+  (push 'company-lsp company-backends)
+  (setq company-transformers nil
+    company-lsp-async t
+    company-lsp-cache-candidates nil)
+  (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
+  )
 (add-hook 'python-mode-hook 'lsp)
 (add-hook 'python-mode-hook 'flycheck-mode)
 
@@ -327,7 +327,7 @@ else:
   ;;       (expand-file-name "~/python-language-server/output/bin/Release/"))
   ;; for executable of language server, if it's not symlinked on your PATH
   (setq lsp-python-ms-executable
-        "~/python-language-server/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer"))
+    "~/python-language-server/output/bin/Release/linux-x64/publish/Microsoft.Python.LanguageServer"))
 
 (require 'lsp-ui)
 ;; make sure we have lsp-imenu everywhere we have LSP
@@ -340,14 +340,14 @@ else:
 
 
 (straight-use-package
- '(helm-lsp
-   :type git
-   :host github
-   :repo "emacs-lsp/helm-lsp"
-   :config
-   (progn
+  '(helm-lsp
+     :type git
+     :host github
+     :repo "emacs-lsp/helm-lsp"
+     :config
+     (progn
 
-     )))
+       )))
 
 (defun netrom/helm-lsp-workspace-symbol-at-point ()
   (interactive)
@@ -360,56 +360,56 @@ else:
     (call-interactively #'helm-lsp-global-workspace-symbol)))
 
 (setq netrom--general-lsp-hydra-heads
-      '(;; Xref
-	("d" xref-find-definitions "Definitions" :column "Xref")
-	("D" xref-find-definitions-other-window "-> other win")
-	("r" xref-find-references "References")
-	("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
-	("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
+  '(;; Xref
+     ("d" xref-find-definitions "Definitions" :column "Xref")
+     ("D" xref-find-definitions-other-window "-> other win")
+     ("r" xref-find-references "References")
+     ("s" netrom/helm-lsp-workspace-symbol-at-point "Helm search")
+     ("S" netrom/helm-lsp-global-workspace-symbol-at-point "Helm global search")
 
-	;; Peek
-	("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
-	("C-r" lsp-ui-peek-find-references "References")
-	("C-i" lsp-ui-peek-find-implementation "Implementation")
+     ;; Peek
+     ("C-d" lsp-ui-peek-find-definitions "Definitions" :column "Peek")
+     ("C-r" lsp-ui-peek-find-references "References")
+     ("C-i" lsp-ui-peek-find-implementation "Implementation")
 
-	;; LSP
-	("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
-	("C-a" lsp-execute-code-action "Execute code action")
-	("R" lsp-rename "Rename")
-	("t" lsp-goto-type-definition "Type definition")
-	("i" lsp-goto-implementation "Implementation")
-	("f" helm-imenu "Filter funcs/classes (Helm)")
-	("C-c" lsp-describe-session "Describe session")
+     ;; LSP
+     ("p" lsp-describe-thing-at-point "Describe at point" :column "LSP")
+     ("C-a" lsp-execute-code-action "Execute code action")
+     ("R" lsp-rename "Rename")
+     ("t" lsp-goto-type-definition "Type definition")
+     ("i" lsp-goto-implementation "Implementation")
+     ("f" helm-imenu "Filter funcs/classes (Helm)")
+     ("C-c" lsp-describe-session "Describe session")
 
-	;; Flycheck
-	("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
+     ;; Flycheck
+     ("l" lsp-ui-flycheck-list "List errs/warns/notes" :column "Flycheck"))
 
-      netrom--misc-lsp-hydra-heads
-      '(;; Misc
-	("q" nil "Cancel" :column "Misc")
-	("b" pop-tag-mark "Back")))
+  netrom--misc-lsp-hydra-heads
+  '(;; Misc
+     ("q" nil "Cancel" :column "Misc")
+     ("b" pop-tag-mark "Back")))
 
 ;; Create general hydra.
 (eval `(defhydra netrom/lsp-hydra (:color blue :hint nil)
-	 ,@(append
-	    netrom--general-lsp-hydra-heads
-	    netrom--misc-lsp-hydra-heads)))
+         ,@(append
+             netrom--general-lsp-hydra-heads
+             netrom--misc-lsp-hydra-heads)))
 
 (add-hook 'lsp-mode-hook
-	  (lambda () (local-set-key (kbd "C-c C-g") 'netrom/lsp-hydra/body)))
+  (lambda () (local-set-key (kbd "C-c C-g") 'netrom/lsp-hydra/body)))
 
 
 
 (straight-use-package
- '(lsp-treemacs
-   :type git
-   :host github
-   :repo "emacs-lsp/lsp-treemacs"
-   :commands lsp-treemacs-errors-list
-   :config
-   (progn
-     )
-))
+  '(lsp-treemacs
+     :type git
+     :host github
+     :repo "emacs-lsp/lsp-treemacs"
+     :commands lsp-treemacs-errors-list
+     :config
+     (progn
+       )
+     ))
 
 
 (use-package lsp-java
@@ -420,42 +420,42 @@ else:
   :config
   (progn
     (add-hook 'python-mode-hook (lambda () (progn
-					     (require 'dap-mode)
-					     (require 'dap-ui)
-					     (require 'dap-python)
-					     (dap-mode 1)
-					     (dap-ui-mode 1))
-				  ))
+                                             (require 'dap-mode)
+                                             (require 'dap-ui)
+                                             (require 'dap-python)
+                                             (dap-mode 1)
+                                             (dap-ui-mode 1))
+                                  ))
     ))
 
 (defun dap-set-windows()
   (interactive)
   (dap-ui-locals)
   (dap-ui-repl)
- (dap-ui-sessions)
+  (dap-ui-sessions)
   )
 
 (eval-after-load "dap-mode"
   '(progn
      (dap-register-debug-provider "python" 'dap-python--populate-start-file-args)
      (dap-register-debug-template "Python :: Run Configuration"
-				 (list :type "python"
-				       :args ""
-				       :cwd nil
-				       :target-module nil
-				       :request "launch"
-				       :name "Python :: Run Configuration"))))
+       (list :type "python"
+         :args ""
+         :cwd nil
+         :target-module nil
+         :request "launch"
+         :name "Python :: Run Configuration"))))
 
 
 ;; (use-package dap-python
 ;;   :straight t)
 
-; /end lsp                                                                                          ;
-;---------------------------------------------------------------------------------------------------;
+;; /end lsp                                                                                          ;
+;;---------------------------------------------------------------------------------------------------;
 
-;---------------------------------------------------------------------------------------------------;
-;                                           Miscellaneous                                           ;
-;---------------------------------------------------------------------------------------------------;
+;;---------------------------------------------------------------------------------------------------;
+;;                                           Miscellaneous                                           ;
+;;---------------------------------------------------------------------------------------------------;
 
 ;; Enter key executes newline-and-indent
 (defun set-newline-and-indent ()

@@ -28,7 +28,7 @@
 
                                         ;----{Searching}----;
 
-                                        ; Commands
+;; Commands
 (set-variable 'grep-command "grep -irHn ")
 (when tiqsi-win32
   (set-variable 'grep-command "findstr -s -n -i -l "))
@@ -40,17 +40,17 @@
 insert `%'."
   (interactive "p")
   (cond ((looking-at "\\s\(") (forward-list 1) (backward-char 1))
-        ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
-        (t (self-insert-command (or arg 1)))))
+    ((looking-at "\\s\)") (forward-char 1) (backward-list 1))
+    (t (self-insert-command (or arg 1)))))
 
 
-; TODO: debug this                                                          ;
-; ------------------------------------------------------------------------- ;
-;           CTRLF Searching to replace isearch base functionality           ;
-; ------------------------------------------------------------------------- ;
+;; TODO: debug this                                                          ;
+;; ------------------------------------------------------------------------- ;
+;;           CTRLF Searching to replace isearch base functionality           ;
+;; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(ctrlf :host github :repo "raxod502/ctrlf"))
+  '(ctrlf :host github :repo "raxod502/ctrlf"))
 
 ;; (ctrlf-mode 1) ;; ERROR at the moment
 
@@ -94,8 +94,8 @@ insert `%'."
   :straight t
   :ensure t
   :config (progn
-	    (drag-stuff-global-mode 1)
-	    ))
+            (drag-stuff-global-mode 1)
+            ))
 
 
 
@@ -124,31 +124,31 @@ insert `%'."
 
 (defun sk/move-text-internal (arg)
   (cond
-   ((and mark-active transient-mark-mode)
-    (if (> (point) (mark))
+    ((and mark-active transient-mark-mode)
+      (if (> (point) (mark))
         (exchange-point-and-mark))
-    (let ((column (current-column))
-          (text (delete-and-extract-region (point) (mark))))
-      (forward-line arg)
-      (move-to-column column t)
-      (set-mark (point))
-      (insert text)
-      (exchange-point-and-mark)
-      (setq deactivate-mark nil)))
-   (t
-    (let ((column (current-column)))
-      (beginning-of-line)
-      (when (or (> arg 0) (not (bobp)))
-        (forward-line)
-        (when (or (< arg 0) (not (eobp)))
-          (transpose-lines arg)
-          (when (and (eval-when-compile
-                       '(and (>= emacs-major-version 24)
-                             (>= emacs-minor-version 3)))
-                     (< arg 0))
-            (forward-line -1)))
-        (forward-line -1))
-      (move-to-column column t)))))
+      (let ((column (current-column))
+             (text (delete-and-extract-region (point) (mark))))
+        (forward-line arg)
+        (move-to-column column t)
+        (set-mark (point))
+        (insert text)
+        (exchange-point-and-mark)
+        (setq deactivate-mark nil)))
+    (t
+      (let ((column (current-column)))
+        (beginning-of-line)
+        (when (or (> arg 0) (not (bobp)))
+          (forward-line)
+          (when (or (< arg 0) (not (eobp)))
+            (transpose-lines arg)
+            (when (and (eval-when-compile
+                         '(and (>= emacs-major-version 24)
+                            (>= emacs-minor-version 3)))
+                    (< arg 0))
+              (forward-line -1)))
+          (forward-line -1))
+        (move-to-column column t)))))
 
 
 (defun sk/move-text-down (arg)
@@ -166,18 +166,18 @@ insert `%'."
 
 (defun find-assignment ()
   (if (re-search-forward
-       "[^<>=!]=\\|\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>="
-       (save-excursion (end-of-line) (point)) t)
-      (progn
-        (goto-char (match-beginning 0))
-        (if (looking-at ".==")
-            nil
-          (if (looking-at "\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>=")
-              (set-mark (match-end 0))
-            (forward-char 1)
-            (set-mark (1+ (point))))
-          (delete-horizontal-space)
-          t))
+        "[^<>=!]=\\|\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>="
+        (save-excursion (end-of-line) (point)) t)
+    (progn
+      (goto-char (match-beginning 0))
+      (if (looking-at ".==")
+        nil
+        (if (looking-at "\\+=\\|-=\\|\\*=\\|/=\\|&=\\||=\\|\\^=\\|<<=\\|>>=")
+          (set-mark (match-end 0))
+          (forward-char 1)
+          (set-mark (1+ (point))))
+        (delete-horizontal-space)
+        t))
     nil))
 
 
@@ -242,7 +242,7 @@ point reaches the beginning or end of the buffer, stop there."
   ;; :bind ("C-c <SPC>" . avy-goto-word-1) ;; Need to get used to it
   :config (progn
             (setq avy-background t)))
-                                        ;(key-chord-define-global "jj"  #'avy-goto-word-1)
+;;(key-chord-define-global "jj"  #'avy-goto-word-1)
 
 
                                         ;-----{Buffers}-----;
@@ -268,44 +268,44 @@ Repeated invocations toggle between the two most recently open buffers."
   "If you have 2 windows, it swaps them."
   (interactive)
   (cond ((not (= (count-windows) 2))
-         (message "You need exactly 2 windows to do this."))
-        (t
-         (let* ((w1 (first (window-list)))
-                (w2 (second (window-list)))
-                (b1 (window-buffer w1))
-                (b2 (window-buffer w2))
-                (s1 (window-start w1))
-                (s2 (window-start w2)))
-           (set-window-buffer w1 b2)
-           (set-window-buffer w2 b1)
-           (set-window-start w1 s2)
-           (set-window-start w2 s1)))))
+          (message "You need exactly 2 windows to do this."))
+    (t
+      (let* ((w1 (first (window-list)))
+              (w2 (second (window-list)))
+              (b1 (window-buffer w1))
+              (b2 (window-buffer w2))
+              (s1 (window-start w1))
+              (s2 (window-start w2)))
+        (set-window-buffer w1 b2)
+        (set-window-buffer w2 b1)
+        (set-window-start w1 s2)
+        (set-window-start w2 s1)))))
 
 
 (defun rotate-windows ()
   "Rotate your windows"
   (interactive)
   (cond ((not (> (count-windows)1))
-         (message "You can't rotate a single window!"))
-        (t
-         (setq i 1)
-         (setq numWindows (count-windows))
-         (while  (< i numWindows)
-           (let* (
-                  (w1 (elt (window-list) i))
-                  (w2 (elt (window-list) (+ (% i numWindows) 1)))
+          (message "You can't rotate a single window!"))
+    (t
+      (setq i 1)
+      (setq numWindows (count-windows))
+      (while  (< i numWindows)
+        (let* (
+                (w1 (elt (window-list) i))
+                (w2 (elt (window-list) (+ (% i numWindows) 1)))
 
-                  (b1 (window-buffer w1))
-                  (b2 (window-buffer w2))
+                (b1 (window-buffer w1))
+                (b2 (window-buffer w2))
 
-                  (s1 (window-start w1))
-                  (s2 (window-start w2))
-                  )
-             (set-window-buffer w1  b2)
-             (set-window-buffer w2 b1)
-             (set-window-start w1 s2)
-             (set-window-start w2 s1)
-             (setq i (1+ i)))))))
+                (s1 (window-start w1))
+                (s2 (window-start w2))
+                )
+          (set-window-buffer w1  b2)
+          (set-window-buffer w2 b1)
+          (set-window-start w1 s2)
+          (set-window-start w2 s1)
+          (setq i (1+ i)))))))
 
 (defun my-toggle-window-split ()
   "Vertical split shows more of each line, horizontal split shows
@@ -313,27 +313,27 @@ more lines. This code toggles between them. It only works for
 frames with exactly two windows."
   (interactive)
   (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-             (next-win-buffer (window-buffer (next-window)))
-             (this-win-edges (window-edges (selected-window)))
-             (next-win-edges (window-edges (next-window)))
-             (this-win-2nd (not (and (<= (car this-win-edges)
-                                         (car next-win-edges))
-                                     (<= (cadr this-win-edges)
-                                         (cadr next-win-edges)))))
-             (splitter
+    (let* ((this-win-buffer (window-buffer))
+            (next-win-buffer (window-buffer (next-window)))
+            (this-win-edges (window-edges (selected-window)))
+            (next-win-edges (window-edges (next-window)))
+            (this-win-2nd (not (and (<= (car this-win-edges)
+                                      (car next-win-edges))
+                                 (<= (cadr this-win-edges)
+                                   (cadr next-win-edges)))))
+            (splitter
               (if (= (car this-win-edges)
-                     (car (window-edges (next-window))))
-                  'split-window-horizontally
+                    (car (window-edges (next-window))))
+                'split-window-horizontally
                 'split-window-vertically)))
-        (delete-other-windows)
-        (let ((first-win (selected-window)))
-          (funcall splitter)
-          (if this-win-2nd (other-window 1))
-          (set-window-buffer (selected-window) this-win-buffer)
-          (set-window-buffer (next-window) next-win-buffer)
-          (select-window first-win)
-          (if this-win-2nd (other-window 1))))))
+      (delete-other-windows)
+      (let ((first-win (selected-window)))
+        (funcall splitter)
+        (if this-win-2nd (other-window 1))
+        (set-window-buffer (selected-window) this-win-buffer)
+        (set-window-buffer (next-window) next-win-buffer)
+        (select-window first-win)
+        (if this-win-2nd (other-window 1))))))
 
 
 ;;;###autoload
@@ -343,9 +343,9 @@ If there is no split, ie now window on the left of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'left))
-         (buf-this-buf (window-buffer (selected-window))))
+          (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
-        (error "No left split")
+      (error "No left split")
       ;; swap top with this one
       (set-window-buffer (selected-window) (window-buffer other-win))
       ;; move this one to top
@@ -362,9 +362,9 @@ error is signaled."
   ;;  split, if possible."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'up))
-         (buf-this-buf (window-buffer (selected-window))))
+          (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
-        (error "No window above this one")
+      (error "No window above this one")
       ;; swap top with this one
       (set-window-buffer (selected-window) (window-buffer other-win))
       ;; move this one to top
@@ -378,10 +378,10 @@ If there is no split, ie now window under the current one, an
 error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'down))
-         (buf-this-buf (window-buffer (selected-window))))
+          (buf-this-buf (window-buffer (selected-window))))
     (if (or (null other-win)
-            (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
-        (error "No window under this one")
+          (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
+      (error "No window under this one")
       ;; swap top with this one
       (set-window-buffer (selected-window) (window-buffer other-win))
       ;; move this one to top
@@ -395,9 +395,9 @@ If there is no split, ie now window on the right of the current
 one, an error is signaled."
   (interactive)
   (let* ((other-win (windmove-find-other-window 'right))
-         (buf-this-buf (window-buffer (selected-window))))
+          (buf-this-buf (window-buffer (selected-window))))
     (if (null other-win)
-        (error "No right split")
+      (error "No right split")
       ;; swap top with this one
       (set-window-buffer (selected-window) (window-buffer other-win))
       ;; move this one to top
@@ -457,7 +457,7 @@ one, an error is signaled."
 ;; remap C-a to `smarter-move-beginning-of-line'
 
 (global-set-key [remap move-beginning-of-line]
-                'sk/smarter-move-beginning-of-line)
+  'sk/smarter-move-beginning-of-line)
 
 (global-set-key (kbd "C-=") 'er/expand-region)
 (global-set-key (kbd "C-c w") 'rotate-windows)

@@ -33,25 +33,25 @@
 ;; Asynchronous execution
 
 (straight-use-package
- '(dired-async
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
+  '(dired-async
+     :type git
+     :host github
+     :repo "jwiegley/emacs-async"
+     ))
 
 (straight-use-package
- '(async-bytecomp
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
+  '(async-bytecomp
+     :type git
+     :host github
+     :repo "jwiegley/emacs-async"
+     ))
 
 (straight-use-package
- '(async
-   :type git
-   :host github
-   :repo "jwiegley/emacs-async"
-))
+  '(async
+     :type git
+     :host github
+     :repo "jwiegley/emacs-async"
+     ))
 
 ;; (autoload 'dired-async-mode "dired-async.el" nil t)
 ;; (dired-async-mode 1)
@@ -84,7 +84,7 @@
   "Toggle whether to wrap lines at right window border."
   (interactive)
   (if (eq truncate-lines nil)
-      (set-variable 'truncate-lines 't)
+    (set-variable 'truncate-lines 't)
     (set-variable 'truncate-lines nil)
     ) )
 
@@ -92,7 +92,7 @@
   "Toggle line spacing between no extra space to extra half line height."
   (interactive)
   (if (eq line-spacing nil)
-      (setq-default line-spacing 0.5) ; add 0.5 height between lines
+    (setq-default line-spacing 0.5) ; add 0.5 height between lines
     (setq-default line-spacing nil)   ; no extra heigh between lines
     ))
 
@@ -122,29 +122,29 @@
     (when (timerp my-linum-current-timer)
       (cancel-timer my-linum-current-timer))
     (setq my-linum-current-timer
-          (run-with-idle-timer 1 nil #'linum-update-current))))
+      (run-with-idle-timer 1 nil #'linum-update-current))))
 
 
 
 (defun clear-buffer-long-printouts-line()
   (if (>
-       (save-excursion
-	 (goto-char (point-max))
-	 (string-to-number (format-mode-line "%l")))
-       10000
-       )
-      (comint-clear-buffer)
+        (save-excursion
+          (goto-char (point-max))
+          (string-to-number (format-mode-line "%l")))
+        10000
+        )
+    (comint-clear-buffer)
     nil))
 
 
 (defun clear-buffer-long-printouts-col()
   (if (>
-       (save-excursion
-	 (goto-char (point-max))
-	 (string-to-number (format-mode-line "%c")))
-       10000
-       )
-      (comint-clear-buffer)
+        (save-excursion
+          (goto-char (point-max))
+          (string-to-number (format-mode-line "%c")))
+        10000
+        )
+    (comint-clear-buffer)
     nil))
 
 (defun clear-buffer-long-printouts()
@@ -156,8 +156,8 @@
 
 
 (defun long-printout-teardown()
-    (run-with-timer
-     0 5 'clear-buffer-long-printouts))
+  (run-with-timer
+    0 5 'clear-buffer-long-printouts))
 
 
 ;;;###autoload

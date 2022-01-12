@@ -34,22 +34,22 @@
 
 ;;; Code:
 
+(setq lisp-indent-offset 2)
 
 
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("melpa" . "http://melpa.org/packages/")))
+                          ("melpa" . "http://melpa.org/packages/")))
 (package-initialize)
 
 ;; Debug?
 ;; (setq debug-on-error t)
 
-
-;----{About User}---;
+                                        ;----{About User}---;
 
 (setq user-full-name "C Andres Mariscal"
-      user-mail-address "carlos.mariscal.melgar@gmail.com")
+  user-mail-address "carlos.mariscal.melgar@gmail.com")
 
-;----{Backup Dir}---;
+                                        ;----{Backup Dir}---;
 
 ;; change backup so that current directory does not clutter
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
@@ -68,19 +68,19 @@
 library given as argument is successfully loaded. If not, instead
 of an error, just add the package to a list of missing packages."
   (condition-case err
-      ;; protected form
-      (progn
-        (message "Checking for library `%s'..." feature)
-        (if (stringp feature)
-            (load-library feature)
-          (require feature))
-        (message "Checking for library `%s'... Found" feature))
+    ;; protected form
+    (progn
+      (message "Checking for library `%s'..." feature)
+      (if (stringp feature)
+        (load-library feature)
+        (require feature))
+      (message "Checking for library `%s'... Found" feature))
     ;; error handler
     (file-error  ; condition
-     (progn
-       (message "Checking for library `%s'... Missing" feature)
-       (add-to-list 'missing-packages-list feature 'append))
-     nil)))
+      (progn
+        (message "Checking for library `%s'... Missing" feature)
+        (add-to-list 'missing-packages-list feature 'append))
+      nil)))
 
 
 
@@ -89,7 +89,7 @@ of an error, just add the package to a list of missing packages."
   `(require ,feature ,file 'noerror))
 
 
-;{Ensure Executables};
+                                        ;{Ensure Executables};
 ;; Add any executables that must be found
 
 
@@ -106,30 +106,30 @@ of an error, just add the package to a list of missing packages."
 ;;; timestamps in *Messages*
 (defun current-time-microseconds ()
   (let* ((nowtime (current-time))
-         (now-ms (nth 2 nowtime)))
+          (now-ms (nth 2 nowtime)))
     (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%d] " now-ms))))
 
 (defadvice message (before test-symbol activate)
   (if (not (string-equal (ad-get-arg 0) "%s%s"))
-      (let ((deactivate-mark nil)
-            (inhibit-read-only t))
-        (save-excursion
-          (set-buffer "*Messages*")
-          (goto-char (point-max))
-          (if (not (bolp))
-              (newline))
-          (insert (current-time-microseconds))))))
+    (let ((deactivate-mark nil)
+           (inhibit-read-only t))
+      (save-excursion
+        (set-buffer "*Messages*")
+        (goto-char (point-max))
+        (if (not (bolp))
+          (newline))
+        (insert (current-time-microseconds))))))
 
 
-;{Bootstrap Straight};
+                                        ;{Bootstrap Straight};
 
 (let ((bootstrap-file (concat user-emacs-directory "straight/repos/straight.el/bootstrap.el"))
-      (bootstrap-version 3))
+       (bootstrap-version 3))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+      (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -139,7 +139,7 @@ of an error, just add the package to a list of missing packages."
 
 (setq straight-use-package-by-default t)
 (setq use-package-verbose t
-      use-package-always-ensure t)
+  use-package-always-ensure t)
 
 (defun straight-require (module)
   (straight-use-package module)
@@ -155,48 +155,48 @@ of an error, just add the package to a list of missing packages."
 
 
 (straight-use-package
- '(uml-mode
-   :type git
-   :host github
-   :ensure t
-   :repo "ianxm/emacs-uml"
-))
+  '(uml-mode
+     :type git
+     :host github
+     :ensure t
+     :repo "ianxm/emacs-uml"
+     ))
 
 
 
 (defun calling-function ()
   (let ((n 6) ;; nestings in this function + 1 to get out of it
-        func
-        bt)
+         func
+         bt)
     (while (and (setq bt (backtrace-frame n))
-              (not func))
-        (setq n (1+ n)
-              func (and bt
-                      (nth 0 bt)
-                      (nth 1 bt))))
+             (not func))
+      (setq n (1+ n)
+        func (and bt
+               (nth 0 bt)
+               (nth 1 bt))))
     func))
 
 (defmacro cond-require (item do-this)
   `(if (require ',item nil 'noerror)
-       (try! ',do-this)
+     (try! ',do-this)
      (message (format "FAILURE-COND-CHECK %s: %s %s %s %s" ',item
-		      (current-time-microseconds) (calling-function)
-		      (format-mode-line "%l") buffer-file-name))))
+                (current-time-microseconds) (calling-function)
+                (format-mode-line "%l") buffer-file-name))))
 
 (defmacro try!( func)
   `(if (ignore-errors
-	,func)
+         ,func)
      (message (format "t:%s --SUCCESS-- argl:%s l:%s path:%s"
-		      ,(current-time-microseconds)
-		      ,(help-function-arglist 'func)
-		      ,(format-mode-line "%l")
-		      ,buffer-file-name))
+                ,(current-time-microseconds)
+                ,(help-function-arglist 'func)
+                ,(format-mode-line "%l")
+                ,buffer-file-name))
 
      (message (format "t:%s --FAILURE-- argl:%s l:%s path:%s"
-		      ,(current-time-microseconds)
-		      ,(help-function-arglist 'func)
-		      ,(format-mode-line "%l")
-		      ,buffer-file-name))
+                ,(current-time-microseconds)
+                ,(help-function-arglist 'func)
+                ,(format-mode-line "%l")
+                ,buffer-file-name))
      ))
 
 

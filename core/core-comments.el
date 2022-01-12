@@ -32,32 +32,32 @@
 
 (defmacro tiqsi-comment--between ( &rest content)
   `(progn
-    (insert (s-trim comment-start))
-    (insert " ")
-    ,@content
-    (insert " ")
-    (insert (s-trim comment-start))
-    (newline)))
+     (insert (s-trim comment-start))
+     (insert " ")
+     ,@content
+     (insert " ")
+     (insert (s-trim comment-start))
+     (newline)))
 
 (defun tiqsi-comment--insert-end ()
   (interactive)
   (tiqsi-comment--between
-  (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-")))))
+    (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-")))))
 
 (defun tiqsi-comment--insert-sep ()
   (interactive)
   (tiqsi-comment--between
-  (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-   ")))))
+    (insert(sdev/truncate sdev/msg-len (s-repeat 100 "-   ")))))
 
 (defun tiqsi-comment--insert-msg (string)
   (interactive "sString for inside centered message: ")
   (tiqsi-comment--between
-   (insert (sdev/truncate sdev/msg-len (s-center (- sdev/msg-len 3) string)))))
+    (insert (sdev/truncate sdev/msg-len (s-center (- sdev/msg-len 3) string)))))
 
 
 (defun tiqsi-comment--insert-msg-right (string)
   (tiqsi-comment--between
-   (insert (sdev/truncate sdev/msg-len (s-pad-right (- sdev/msg-len 3) " " string)))))
+    (insert (sdev/truncate sdev/msg-len (s-pad-right (- sdev/msg-len 3) " " string)))))
 
 (defun tiqsi-comment--line-to-msg()
   (interactive)
@@ -71,52 +71,52 @@
   (move-beginning-of-line 1)
   (tiqsi-comment--insert-msg (s-trim-right (thing-at-point 'line t)))
   (kill-whole-line 1)
- )
+  )
 
 
 
 
 (defmacro tiqsi-comment--between-nocomment ( &rest content)
   `(progn
-    (insert " ")
-    ,@content
-    (insert " ")
-    (insert (s-trim comment-start))
-    (sdev/del-end-line)
-    (move-beginning-of-line 1)
-    (insert (s-trim comment-start))
-    ))
+     (insert " ")
+     ,@content
+     (insert " ")
+     (insert (s-trim comment-start))
+     (sdev/del-end-line)
+     (move-beginning-of-line 1)
+     (insert (s-trim comment-start))
+     ))
 
 
 
 (defun tiqsi-comment--line-to-msg-centered-begin()
   (interactive)
   (move-beginning-of-line 1)
-    (tiqsi-comment--between-nocomment
-     (insert
+  (tiqsi-comment--between-nocomment
+    (insert
       (s-replace "    " "_ _ " (sdev/truncate
-       sdev/msg-len
-       (s-center
-	(- sdev/msg-len 3)
-	(s-prepend "   /¯¯¯"
-		   (s-append " ¯¯¯\\  "
-			     (s-trim-right
-			      (thing-at-point 'line t)))))))
+                                 sdev/msg-len
+                                 (s-center
+                                   (- sdev/msg-len 3)
+                                   (s-prepend "   /¯¯¯"
+                                     (s-append " ¯¯¯\\  "
+                                       (s-trim-right
+                                         (thing-at-point 'line t)))))))
       )
-     )
+    )
 
-)
+  )
 
 (defun tiqsi-comment--line-to-msg-centered-end()
   (interactive)
   (move-beginning-of-line 1)
   (tiqsi-comment--between-nocomment
-   (insert
-    (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
-(s-center (- sdev/msg-len 3) (s-prepend "  \\_ _"
-(s-append " _ _/ "    (s-trim-right (thing-at-point 'line t))))))))
-     )
-)
+    (insert
+      (s-replace "    " "¯ ¯ " (sdev/truncate sdev/msg-len
+                                 (s-center (- sdev/msg-len 3) (s-prepend "  \\_ _"
+                                                                (s-append " _ _/ "    (s-trim-right (thing-at-point 'line t))))))))
+    )
+  )
 
 (defun tiqsi-comment--enclose (string)
   (interactive "sString to enclose with: ")
@@ -135,7 +135,7 @@
   (newline)
   )
 
-; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 (global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
 (global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
@@ -146,9 +146,9 @@
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ  Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \ַַַ  Keybindings ַַַ/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 
 (provide 'core-comments)

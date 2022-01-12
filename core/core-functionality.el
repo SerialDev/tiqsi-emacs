@@ -29,9 +29,9 @@
 
 ;;; Code
 
-; ------------------------------------------------------------------------- ;
-;                            Describe Keybindings                           ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                            Describe Keybindings                           ;
+;; ------------------------------------------------------------------------- ;
 
 (defun describe-map (map)
   "Describe the key bindings of MAP.
@@ -39,12 +39,12 @@ posted by:
 From: Cyprian Laskowski <cyp@swagbelly.net>
 "
   (interactive
-   (list (intern (completing-read "Describe keymap: " obarray
-                                  #'(lambda (e)
-                                      (and (boundp e)
-                                           (string-match "-map$"
-                                                         (symbol-name e))))
-                                  t))))
+    (list (intern (completing-read "Describe keymap: " obarray
+                    #'(lambda (e)
+                        (and (boundp e)
+                          (string-match "-map$"
+                            (symbol-name e))))
+                    t))))
   (let (beg end)
     (with-temp-buffer
       (use-local-map (eval map))
@@ -52,35 +52,35 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
     (set-buffer "*Help*")
     (rename-buffer (generate-new-buffer-name (concat "*" (symbol-name map) " bindings*")))
     (setq beg (and (re-search-forward "^Major Mode Bindings:$" nil t) (1+ (match-end 0)))
-          end (and (re-search-forward "^Global Bindings:$" nil t) (match-beginning 0)))
+      end (and (re-search-forward "^Global Bindings:$" nil t) (match-beginning 0)))
     (if (and beg end)
-        (narrow-to-region beg end)
+      (narrow-to-region beg end)
       (narrow-to-region 1 1)
       (error (concat (symbol-name map) " has no bindings set.")))))
 
 
-; ------------------------------------------------------------------------- ;
-;                            GOTO visible window                            ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                            GOTO visible window                            ;
+;; ------------------------------------------------------------------------- ;
 
 (defun pop-to-buffer-or-window (buffer)
   "Like `pop-to-buffer' BUFFER, but find any visible window."
   (let* (win
-         )
+          )
     (setq win (get-buffer-window buffer t))
     (if (null win)
-        (pop-to-buffer buffer)
+      (pop-to-buffer buffer)
       (raise-frame (window-frame win))
       (select-frame (window-frame win))
       (select-window win)
       )))
 
-; _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Region utilities ¯¯¯\_ _ _ _ _ _ _ _ _ _     ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Region utilities ¯¯¯\_ _ _ _ _ _ _ _ _ _     ;
 
 
-; ------------------------------------------------------------------------- ;
-;                            Get text from region                           ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                            Get text from region                           ;
+;; ------------------------------------------------------------------------- ;
 
 (defun get-selection ()
   "Get the text selected in current buffer as string"
@@ -96,7 +96,7 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
 
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Region utilities _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Region utilities _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
 
                                         ;----{M-x short}----;
@@ -105,8 +105,8 @@ From: Cyprian Laskowski <cyp@swagbelly.net>
   "Display information on a shorter way to M-x a command."
   (interactive (list (read-extended-command)))
   (message "The command `%s' can be invoked with `M-x %s'"
-           command
-           (execute-extended-command--shorter command command)))
+    command
+    (execute-extended-command--shorter command command)))
 
 (use-package stripe-buffer
   :straight t
@@ -138,7 +138,7 @@ Single Capitals as you type."
   :init-value nil
   :lighter (" DC")
   (if sk/dubcaps-mode
-      (add-hook 'post-self-insert-hook #'sk/dcaps-to-scaps nil 'local)
+    (add-hook 'post-self-insert-hook #'sk/dcaps-to-scaps nil 'local)
     (remove-hook 'post-self-insert-hook #'sk/dcaps-to-scaps 'local)))
 
 (add-hook 'global-mode-hook #'sk/dubcaps-mode)
@@ -164,39 +164,39 @@ Single Capitals as you type."
 
 (setq enable-local-variables nil)
 
-;                          Base64 Encode clipboard                          ;
-; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
+;;                          Base64 Encode clipboard                          ;
+;; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
 
 (defun b64-clipboard ()
   (interactive)
   (insert(base64-encode-string
-   (with-temp-buffer
-     (yank)
-     (buffer-string)))))
+           (with-temp-buffer
+             (yank)
+             (buffer-string)))))
 
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(auto-save-default nil)
- '(auto-save-interval 0)
- '(auto-save-list-file-prefix nil)
- '(auto-save-timeout 0)
- '(auto-show-mode t t)
- '(delete-auto-save-files nil)
- '(delete-old-versions (quote other))
- '(imenu-auto-rescan t)
- '(imenu-auto-rescan-maxout 500000)
- '(kept-new-versions 5)
- '(kept-old-versions 5)
- '(make-backup-file-name-function (quote ignore))
- '(make-backup-files nil)
- '(mouse-wheel-follow-mouse nil)
- '(mouse-wheel-progressive-speed nil)
- '(mouse-wheel-scroll-amount (quote (15)))
- '(version-control nil))
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+  '(auto-save-default nil)
+  '(auto-save-interval 0)
+  '(auto-save-list-file-prefix nil)
+  '(auto-save-timeout 0)
+  '(auto-show-mode t t)
+  '(delete-auto-save-files nil)
+  '(delete-old-versions (quote other))
+  '(imenu-auto-rescan t)
+  '(imenu-auto-rescan-maxout 500000)
+  '(kept-new-versions 5)
+  '(kept-old-versions 5)
+  '(make-backup-file-name-function (quote ignore))
+  '(make-backup-files nil)
+  '(mouse-wheel-follow-mouse nil)
+  '(mouse-wheel-progressive-speed nil)
+  '(mouse-wheel-scroll-amount (quote (15)))
+  '(version-control nil))
 
 
 (defadvice set-mark-command (after no-bloody-t-m-m activate)
@@ -207,23 +207,23 @@ Single Capitals as you type."
   (if transient-mark-mode (setq transient-mark-mode nil)))
 
 
-; ------------------------------------------------------------------------- ;
-;                         Google cloud Tramp support                        ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                         Google cloud Tramp support                        ;
+;; ------------------------------------------------------------------------- ;
 
 (require 'tramp)
 
 (add-to-list 'tramp-methods
   '("gcssh"
-    (tramp-login-program        "gcloud beta compute ssh")
-    (tramp-login-args           (("%h")))
-    (tramp-async-args           (("-q")))
-    (tramp-remote-shell         "/bin/sh")
-    (tramp-remote-shell-args    ("-c"))
-    (tramp-gw-args              (("-o" "GlobalKnownHostsFile=/dev/null")
-                                 ("-o" "UserKnownHostsFile=/dev/null")
-                                 ("-o" "StrictHostKeyChecking=no")))
-    (tramp-default-port         22)))
+     (tramp-login-program        "gcloud beta compute ssh")
+     (tramp-login-args           (("%h")))
+     (tramp-async-args           (("-q")))
+     (tramp-remote-shell         "/bin/sh")
+     (tramp-remote-shell-args    ("-c"))
+     (tramp-gw-args              (("-o" "GlobalKnownHostsFile=/dev/null")
+                                   ("-o" "UserKnownHostsFile=/dev/null")
+                                   ("-o" "StrictHostKeyChecking=no")))
+     (tramp-default-port         22)))
 
 ;; ... after which it's as easy as:
 ;;

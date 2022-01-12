@@ -27,8 +27,8 @@
 ;;
 
 
-;                                            Determine OS                                           ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                            Determine OS                                           ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defmacro with-system (type &rest body)
   "Evaluate BODY if `system-type' equals TYPE."
@@ -43,16 +43,16 @@
   (message "windows laptop!"))
 
 (with-system gnu/linux
-      (if
-	  (string-match "Microsoft"
-			(with-temp-buffer (shell-command "uname -r" t)
-					  (goto-char (point-max))
-					  (delete-char -1)
-					  (buffer-string)))
-	  (message "Running under Linux subsystem for Windows")
-	(message "Not running under Linux subsystem for Windows")
-	)
-      )
+  (if
+    (string-match "Microsoft"
+      (with-temp-buffer (shell-command "uname -r" t)
+        (goto-char (point-max))
+        (delete-char -1)
+        (buffer-string)))
+    (message "Running under Linux subsystem for Windows")
+    (message "Not running under Linux subsystem for Windows")
+    )
+  )
 
 
 (setq tiqsi-aquamacs (featurep 'aquamacs))
@@ -61,64 +61,64 @@
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
 (setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
-; ------------------------------------------------------------------------- ;
-;                           Conditional execution                           ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                           Conditional execution                           ;
+;; ------------------------------------------------------------------------- ;
 
 (with-system darwin
   (defmacro if-command-exists(data &rest commands)
     `(let ((command-to-use   (shell-command-to-string (s-append "which" ,data))  ))
        (if (equal command-to-use "") nil ,@commands ))
     )
-)
+  )
 
 (with-system gnu/linux
   (defmacro if-command-exists(data &rest commands)
     `(let ((command-to-use   (shell-command-to-string (s-append "which" ,data))  ))
        (if (equal command-to-use "") nil ,@commands ))
     )
-)
+  )
 
 
 (defmacro when-executable (executable-name &rest body)
   `(if ,(executable-find executable-name)
-       ,@body
+     ,@body
      (message "executable not found: %s" executable-name)))
 
 
-;                                          Determine Emacs                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-; Emacs type: are we running GNU Emacs?                                                             ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                          Determine Emacs                                          ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;; Emacs type: are we running GNU Emacs?                                                             ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defmacro GNUEmacs (&rest body)
   "Execute any number of forms if running under GNU Emacs."
   (list 'if (string-match "GNU Emacs" (version))
-        (cons 'progn body)))
+    (cons 'progn body)))
 
 (defmacro GNUEmacs23 (&rest body)
   (list 'if (string-match "GNU Emacs 23" (version))
-        (cons 'progn body)))
+    (cons 'progn body)))
 
 (defmacro GNUEmacs22 (&rest body)
   (list 'if (string-match "GNU Emacs 22" (version))
-        (cons 'progn body)))
+    (cons 'progn body)))
 
 (defmacro XEmacs (&rest body)
   "Execute any number of forms if running under XEmacs."
   (list 'if (string-match "XEmacs" (version))
-        (cons 'progn body)))
+    (cons 'progn body)))
 
 ;; Emacs version
 (GNUEmacs
- (list emacs-version emacs-major-version emacs-minor-version
-       system-type system-name system-configuration
-       window-system
-       (when (boundp 'aquamacs-version) aquamacs-version)))
+  (list emacs-version emacs-major-version emacs-minor-version
+    system-type system-name system-configuration
+    window-system
+    (when (boundp 'aquamacs-version) aquamacs-version)))
 
 
-;                                               Win 32                                              ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                               Win 32                                              ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-win32
   (setq tiqsi-makescript "build.bat")
@@ -128,37 +128,37 @@
     (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING))))
 
 (if (boundp 'w32-send-sys-command)
-    (progn
+  (progn
 
-(defun maximize-frame ()
-  "Maximize the current frame"
-  (interactive)
-  (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
-  (when tiqsi-win32 (w32-send-sys-command 61488)))
-
-
-(defun w32-restore-frame ()
-  "Restore a minimized frame"
-  (interactive)
-  (w32-send-sys-command 61728))
-
-(defun w32-maximize-frame ()
-  "Maximize the current frame"
-  (interactive)
-  (w32-send-sys-command 61488))
-)
-(defun maximize-frame ()
-  "Maximize the current frame"
-  (interactive)
-  (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
-  (when tiqsi-win32   (message "w32-send-sys-command not interned"))))
+    (defun maximize-frame ()
+      "Maximize the current frame"
+      (interactive)
+      (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
+      (when tiqsi-win32 (w32-send-sys-command 61488)))
 
 
-;                                               Linux                                               ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+    (defun w32-restore-frame ()
+      "Restore a minimized frame"
+      (interactive)
+      (w32-send-sys-command 61728))
+
+    (defun w32-maximize-frame ()
+      "Maximize the current frame"
+      (interactive)
+      (w32-send-sys-command 61488))
+    )
+  (defun maximize-frame ()
+    "Maximize the current frame"
+    (interactive)
+    (when tiqsi-aquamacs (aquamacs-toggle-full-frame))
+    (when tiqsi-win32   (message "w32-send-sys-command not interned"))))
+
+
+;;                                               Linux                                               ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (if tiqsi-win32
-    (setq os-sep "\\")
+  (setq os-sep "\\")
   (setq os-sep "/"))
 
 (when tiqsi-linux
@@ -166,8 +166,8 @@
   (setq tiqsi-makescript "./build.sh")
   (display-battery-mode 1) )
 
-;                                               Mac OS                                              ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                               Mac OS                                              ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-aquamacs
   (cua-mode 0)
@@ -184,7 +184,7 @@
   (setq mac-pass-command-to-system nil)
   (setq tiqsi-makescript "./build.macosx"))
 
-                                        ; Turn off the bell on Mac OS X
+;; Turn off the bell on Mac OS X
 (defun nil-bell ())
 (setq ring-bell-function 'nil-bell)
 
@@ -193,52 +193,52 @@
   "Display OS information."
   (interactive)
   (if (eq system-type 'gnu/linux)
-      (if (shell-command-to-string "type -p lsb_release > /dev/null")
-          (message (concat (substring (shell-command-to-string "lsb_release -sd") 1 (- (length (shell-command-to-string "lsb_release -sd")) 2)) " (" (substring (shell-command-to-string "lsb_release -sr") 0 (- (length (shell-command-to-string "lsb_release -sr")) 1)) " '" (substring (shell-command-to-string "lsb_release -sc") 0 (- (length (shell-command-to-string "lsb_release -sc")) 1)) "'" " release, using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
-        (if (shell-command-to-string "type -p guix > /dev/null")
-            (message (concat "Guix System " (shell-command-to-string "guix system -V | awk 'NR==1{printf $5}'") " (using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
-          (message "Cannot determine distro.")))   
+    (if (shell-command-to-string "type -p lsb_release > /dev/null")
+      (message (concat (substring (shell-command-to-string "lsb_release -sd") 1 (- (length (shell-command-to-string "lsb_release -sd")) 2)) " (" (substring (shell-command-to-string "lsb_release -sr") 0 (- (length (shell-command-to-string "lsb_release -sr")) 1)) " '" (substring (shell-command-to-string "lsb_release -sc") 0 (- (length (shell-command-to-string "lsb_release -sc")) 1)) "'" " release, using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
+      (if (shell-command-to-string "type -p guix > /dev/null")
+        (message (concat "Guix System " (shell-command-to-string "guix system -V | awk 'NR==1{printf $5}'") " (using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
+        (message "Cannot determine distro.")))
     (message system-type)))
 
 
-;                 https://oremacs.com/2019/03/24/shell-apt/                 ;
-; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
+;;                 https://oremacs.com/2019/03/24/shell-apt/                 ;
+;; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
 
 (advice-add
- 'ansi-color-apply-on-region
- :before 'ora-ansi-color-apply-on-region)
+  'ansi-color-apply-on-region
+  :before 'ora-ansi-color-apply-on-region)
 
 (defun ora-ansi-color-apply-on-region (begin end)
   "Fix progress bars for e.g. apt(8).
 Display progress in the mode line instead."
   (let ((end-marker (copy-marker end))
-        mb)
+         mb)
     (save-excursion
       (goto-char (copy-marker begin))
       (while (re-search-forward "\0337" end-marker t)
         (setq mb (match-beginning 0))
         (when (re-search-forward "\0338" end-marker t)
           (ora-apt-progress-message
-           (substring-no-properties
-            (delete-and-extract-region mb (point))
-            2 -2)))))))
+            (substring-no-properties
+              (delete-and-extract-region mb (point))
+              2 -2)))))))
 
 (defun ora-apt-progress-message (progress)
   (setq mode-line-process
-        (if (string-match
-             "Progress: \\[ *\\([0-9]+\\)%\\]" progress)
-            (list
-             (concat ":%s "
-                     (match-string 1 progress)
-                     "%%%% "))
-          '(":%s")))
+    (if (string-match
+          "Progress: \\[ *\\([0-9]+\\)%\\]" progress)
+      (list
+        (concat ":%s "
+          (match-string 1 progress)
+          "%%%% "))
+      '(":%s")))
   (force-mode-line-update))
 
 (defun ora-apt-progress-message (progress)
   (message
-   (replace-regexp-in-string
-    "%" "%%"
-    (ansi-color-apply progress))))
+    (replace-regexp-in-string
+      "%" "%%"
+      (ansi-color-apply progress))))
 
 
 ;; Auto revert files when they change
@@ -248,8 +248,8 @@ Display progress in the mode line instead."
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
 
-;                                            Keybindings                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                            Keybindings                                            ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)

@@ -27,11 +27,11 @@
 
 ;; Completion core
 
-;                                             Completion                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-; Get all possible dabbrev expansions                                                               ;
-; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/                 ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;;                                             Completion                                            ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+;; Get all possible dabbrev expansions                                                               ;
+;; from https://curiousprogrammer.wordpress.com/2009/04/07/autocomplete-and-dabbrev/                 ;
+;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 ;; (defun ac-source-dabbrev (abbrev)
 ;;   (interactive)
@@ -75,9 +75,9 @@
 
 ;; (add-to-list 'completion-styles 'initials t)
 
-; ------------------------------------------------------------------------------------------------  ;
-;                  TODO mode specific enable since I use AC alot instead of company                 ;
-; ------------------------------------------------------------------------------------------------  ;
+;; ------------------------------------------------------------------------------------------------  ;
+;;                  TODO mode specific enable since I use AC alot instead of company                 ;
+;; ------------------------------------------------------------------------------------------------  ;
 ;; (eval-after-load 'company
 ;;  '(define-key company-active-map (kbd "C-M-h") #'company-quickhelp-manual-begin))
 ;; (company-quickhelp-mode 1)
@@ -98,32 +98,32 @@
 ;; TODO fix this for msys2
 ;; (straight-require 'popup-pos-tip)
 
-;; TODO: DEBUG 
+;; TODO: DEBUG
 (defun core-completion-describe-function (function)
   "Display the full documentation of FUNCTION (a symbol) in tooltip."
   (interactive (list (function-called-at-point)))
   (if (null function)
-      (pos-tip-show
-       "** You didn't specify a function! **" '("red"))
     (pos-tip-show
-     (with-temp-buffer
-       (let ((standard-output (current-buffer))
-             (help-xref-following t))
-         (prin1 function)
-         (princ " is ")
-         (describe-function-1 function)
-         (buffer-string)))
-     nil nil nil 0)))
+      "** You didn't specify a function! **" '("red"))
+    (pos-tip-show
+      (with-temp-buffer
+        (let ((standard-output (current-buffer))
+               (help-xref-following t))
+          (prin1 function)
+          (princ " is ")
+          (describe-function-1 function)
+          (buffer-string)))
+      nil nil nil 0)))
 
 
 (defun describe-thing-in-popup ()
   (interactive)
   (let* ((thing (symbol-at-point))
-         (help-xref-following t)
-         (description (with-temp-buffer
-                        (help-mode)
-                        (help-xref-interned thing)
-                        (buffer-string))))
+          (help-xref-following t)
+          (description (with-temp-buffer
+                         (help-mode)
+                         (help-xref-interned thing)
+                         (buffer-string))))
     (pos-tip-show description)))
 
 (global-set-key (kbd "M-5") 'describe-thing-in-popup)

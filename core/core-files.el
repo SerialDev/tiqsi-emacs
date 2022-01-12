@@ -26,10 +26,10 @@
 ;;; Commentary:
 ;;
 
-                                        ;{set compilation dir};
+;;{set compilation dir};
 (setq compilation-directory-locked nil)
 
-                                        ;---{TODO related}--;
+;;---{TODO related}--;
 
 (setq tiqsi-todo-file "/todo.txt")
 
@@ -37,7 +37,7 @@
   (interactive)
   (find-file tiqsi-todo-file))
 
-                                        ;---{LOG related}---;
+;;---{LOG related}---;
 
 (setq tiqsi-log-file "/log.txt")
 
@@ -60,44 +60,44 @@
 ;; Automatically creating missing parent directories when visiting a new file.
 
 (defun tiqsi--create-non-existent-directory ()
-      (let ((parent-directory (file-name-directory buffer-file-name)))
-        (when (and (not (file-exists-p parent-directory))
-                   (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
-          (make-directory parent-directory t))))
+  (let ((parent-directory (file-name-directory buffer-file-name)))
+    (when (and (not (file-exists-p parent-directory))
+            (y-or-n-p (format "Directory `%s' does not exist! Create it?" parent-directory)))
+      (make-directory parent-directory t))))
 (add-to-list 'find-file-not-found-functions #'tiqsi--create-non-existent-directory)
 
-                                        ;---{MAP to MODE}---;
+;;---{MAP to MODE}---;
 
-; Accepted file extensions and their appropriate modes
+                                        ; Accepted file extensions and their appropriate modes
 (setq auto-mode-alist
-      (append
-       '(("\\.cpp$"    . c++-mode)
-         ("\\.hin$"    . c++-mode)
-         ("\\.cin$"    . c++-mode)
-         ("\\.inl$"    . c++-mode)
-         ("\\.rdc$"    . c++-mode)
-;         ("\\.h$"    . c++-mode)
-         ("\\.c$"   . c-mode)
-         ("\\.cc$"   . c-mode)
-         ("\\.c8$"   . c-mode)
-         ("\\.txt$" . indented-text-mode)
-         ("\\.emacs$" . emacs-lisp-mode)
-         ("\\.gen$" . gen-mode)
-         ("\\.ms$" . fundamental-mode)
-         ("\\.m$" . objc-mode)
-         ("\\.mm$" . objc-mode)
-         ) auto-mode-alist))
+  (append
+    '(("\\.cpp$"    . c++-mode)
+       ("\\.hin$"    . c++-mode)
+       ("\\.cin$"    . c++-mode)
+       ("\\.inl$"    . c++-mode)
+       ("\\.rdc$"    . c++-mode)
+                                        ;         ("\\.h$"    . c++-mode)
+       ("\\.c$"   . c-mode)
+       ("\\.cc$"   . c-mode)
+       ("\\.c8$"   . c-mode)
+       ("\\.txt$" . indented-text-mode)
+       ("\\.emacs$" . emacs-lisp-mode)
+       ("\\.gen$" . gen-mode)
+       ("\\.ms$" . fundamental-mode)
+       ("\\.m$" . objc-mode)
+       ("\\.mm$" . objc-mode)
+       ) auto-mode-alist))
 
 
 
-                                        ;---{Buffer File}---;
+;;---{Buffer File}---;
 
 (defun delete-current-buffer-file ()
   "Removes file connected to current buffer and kills buffer."
   (interactive)
   (let ((filename (buffer-file-name))
-        (buffer (current-buffer))
-        (name (buffer-name)))
+         (buffer (current-buffer))
+         (name (buffer-name)))
     (if (not (and filename (file-exists-p filename)))
       (kill-buffer (buffer-name (current-buffer)))
       (when (yes-or-no-p "Are you sure you want to remove this file? ")
@@ -110,11 +110,11 @@
 (defun rename-current-buffer-file (new-name)
   "Renames both current buffer and file it's visiting to NEW-NAME." (interactive "sNew name: ")
   (let ((name (buffer-name))
-        (filename (buffer-file-name)))
+         (filename (buffer-file-name)))
     (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+      (message "Buffer '%s' is not visiting a file!" name)
       (if (get-buffer new-name)
-          (message "A buffer named '%s' already exists!" new-name)
+        (message "A buffer named '%s' already exists!" new-name)
         (progn   (rename-file filename new-name 1)   (rename-buffer new-name)    (set-visited-file-name new-name)    (set-buffer-modified-p nil)))))) ;;
 
 ;; Never understood why Emacs doesn't have this function, either.
@@ -122,17 +122,17 @@
 (defun move-buffer-file (dir)
   "Moves both current buffer and file it's visiting to DIR." (interactive "DNew directory: ")
   (let* ((name (buffer-name))
-         (filename (buffer-file-name))
-         (dir
-          (if (string-match dir "\\(?:/\\|\\\\)$")
+          (filename (buffer-file-name))
+          (dir
+            (if (string-match dir "\\(?:/\\|\\\\)$")
               (substring dir 0 -1) dir))
-         (newname (concat dir "/" name)))
+          (newname (concat dir "/" name)))
 
     (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
+      (message "Buffer '%s' is not visiting a file!" name)
       (progn     (copy-file filename newname 1)  (delete-file filename)  (set-visited-file-name newname)     (set-buffer-modified-p nil)     t))))
 
-                                        ;--{Scratch Files}--;
+;;--{Scratch Files}--;
 
 (defun start--file (path)
   "Create a file at PATH, creating any containing directories as necessary.
@@ -154,11 +154,11 @@ Visit the file after creation."
   "create a new scratch buffer to work in. (could be *scratch* - *scratchX*)"
   (interactive)
   (let ((n 0)
-        bufname)
+         bufname)
     (while (progn
              (setq bufname (concat "*scratch"
-                                   (if (= n 0) "" (int-to-string n))
-                                   "*"))
+                             (if (= n 0) "" (int-to-string n))
+                             "*"))
              (setq n (1+ n))
              (get-buffer bufname)))
     (switch-to-buffer (get-buffer-create bufname))
@@ -216,9 +216,9 @@ sInsert str to search: ")
   (compile (format "tree -f %s | grep %s" dir str)))
 
 
-; ------------------------------------------------------------------------- ;
-;                        Use Prescient and selectrum                        ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                        Use Prescient and selectrum                        ;
+;; ------------------------------------------------------------------------- ;
 
 ;; (straight-use-package
 ;;  '(selectrum :host github :repo "raxod502/selectrum"))
@@ -228,7 +228,7 @@ sInsert str to search: ")
 
 ;; (selectrum-mode 1)
 
-;---{keybindings}---;
+;;---{keybindings}---;
 
 (define-key global-map [M-t] 'load-todo)
 (define-key global-map [M-T] 'load-log)

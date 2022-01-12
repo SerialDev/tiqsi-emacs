@@ -57,11 +57,11 @@
   No more \"End of file during parsing\" horrors!"
   (interactive)
   (let ((point (point))
-        (region-regex "^(def..")
-        defs beg end)
+         (region-regex "^(def..")
+         defs beg end)
     (goto-char (point-min))
     (setq defs (loop while (search-forward-regexp region-regex nil t)
-                     collect (point-at-bol)))
+                 collect (point-at-bol)))
     ;; so it evals last definition
     (nconc defs (list (point-max)))
     (setq beg (point-min))
@@ -72,9 +72,9 @@
       ;; (message "checking core-debug-pbug from %s to %s..." beg end)
       ;; (sit-for 1)
       (when (eq (condition-case nil
-                    (eval-region beg (1- end))
+                  (eval-region beg (1- end))
                   (error 'core-debug-pbug-error))
-                'core-debug-pbug-error)
+              'core-debug-pbug-error)
         (push-mark end 'nomsg 'activate)
         (goto-char beg)
         (recenter)
@@ -90,8 +90,8 @@
   (interactive)
   (require 'async)
   (async-start
-   (lambda () (shell-command-to-string
-               "emacs --batch --eval \"
+    (lambda () (shell-command-to-string
+                 "emacs --batch --eval \"
 (condition-case e
     (progn
       (load \\\"~/.emacs\\\")
@@ -99,14 +99,14 @@
   (error
    (message \\\"ERROR!\\\")
    (signal (car e) (cdr e))))\""))
-   `(lambda (output)
-      (if (string-match "-OK-" output)
-          (when ,(called-interactively-p 'any)
-            (message "All is well"))
-        (switch-to-buffer-other-window "*startup error*")
-        (delete-region (point-min) (point-max))
-        (insert output)
-        (search-backward "ERROR!")))))
+    `(lambda (output)
+       (if (string-match "-OK-" output)
+         (when ,(called-interactively-p 'any)
+           (message "All is well"))
+         (switch-to-buffer-other-window "*startup error*")
+         (delete-region (point-min) (point-max))
+         (insert output)
+         (search-backward "ERROR!")))))
 
 
                                         ;-------------{Bug hunter}-------------;
@@ -123,9 +123,9 @@
   "Insert version of Emacs and 7 characters of the commit hash."
   (interactive)
   (insert
-   (format "GNU Emacs %s (commit %s)"
-           emacs-version
-           (substring (emacs-repository-get-version) 0 7))))
+    (format "GNU Emacs %s (commit %s)"
+      emacs-version
+      (substring (emacs-repository-get-version) 0 7))))
 
                                         ;-----------------{gdb}----------------;
 

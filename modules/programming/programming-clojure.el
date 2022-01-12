@@ -43,8 +43,8 @@
 (defmacro with-minibuffer-input (form &rest inputs)
   (declare (indent 1))
   `(minibuffer-with-setup-hook
-       (lambda ()
-         (minibuffer-input-provider ',inputs))
+     (lambda ()
+       (minibuffer-input-provider ',inputs))
      ,form))
 
 ;; -*- lexical-binding: t -*-
@@ -64,13 +64,13 @@
 (use-package with-simulated-input
   :straight t
   :ensure t
-)
+  )
 
 
 (use-package clojure-mode
   :straight t
   :ensure t
-)
+  )
 
 
 (use-package monroe
@@ -81,13 +81,13 @@
     (add-hook 'clojure-mode-hook 'clojure-enable-monroe)
     (setf monroe-detail-stacktraces 'true))
 
-)
+  )
 
 
 (use-package cider
   :straight t
   :ensure t
-)
+  )
 
 
 (setq nrepl-hide-special-buffers t)
@@ -97,7 +97,7 @@
 
 
 (setq cider-cljs-lein-repl
-      "(cond
+  "(cond
   (and (resolve 'user/run) (resolve 'user/browser-repl)) ;; Chestnut projects
   (eval '(do (user/run)
              (user/browser-repl)))
@@ -133,18 +133,18 @@
   "Start Leiningen repl."
   (interactive)
   (let* ((output-buffer (generate-new-buffer "temp-clj"))
-	 (proc (progn
-		 (async-shell-command "lein repl :start :port 6666" output-buffer)
-		 (get-buffer-process output-buffer))))))
+          (proc (progn
+                  (async-shell-command "lein repl :start :port 6666" output-buffer)
+                  (get-buffer-process output-buffer))))))
 
-  ;; ;; TODO fix with continuation passing
-  ;; (async-start
-  ;;  (lambda()
-  ;;    (async-shell-command "lein repl :start :port 6666" )
-  ;;    46061)
-  ;;  (lambda(result)
-  ;;    (cider-connect "127.0.0.1" (message "%s" result))))
-  
+;; ;; TODO fix with continuation passing
+;; (async-start
+;;  (lambda()
+;;    (async-shell-command "lein repl :start :port 6666" )
+;;    46061)
+;;  (lambda(result)
+;;    (cider-connect "127.0.0.1" (message "%s" result))))
+
 
 (defun lein-connect-repl()
   "Start Leiningen repl."
@@ -162,8 +162,8 @@
     (comint-send-input)))
 
 (defun lein-connect-cljs-repl()
-  (interactive) 
-    (with-simulated-input "127.0.0.1 RET 6666 RET figwheel RET" (call-interactively 'cider-connect-cljs)))
+  (interactive)
+  (with-simulated-input "127.0.0.1 RET 6666 RET figwheel RET" (call-interactively 'cider-connect-cljs)))
 
 (defun figwheel-repl ()
   (interactive)
@@ -175,14 +175,14 @@
   "Compile lein to jar."
   (interactive)
   (message
-   (async-shell-command(message "lein uberjar"))))
+    (async-shell-command(message "lein uberjar"))))
 
 
 (defun lein-run-uberjar()
   "Compile lein to jar."
   (interactive)
   (message
-   (async-shell-command(message "java -jar target/uberjar/%s" (lein-project-file)))))
+    (async-shell-command(message "java -jar target/uberjar/%s" (lein-project-file)))))
 
 
 (defun lein-project-file()
@@ -190,11 +190,11 @@
   (interactive)
 
   (s-append "standalone.jar"
-            (s-replace "\"" "-"
-                       (s-replace " \"" "-"
-                                  (s-replace "defproject " ""
-                                             (regex-match "defproject .*"
-                                                          (my-file-contents (concat projectile-project-root "project.clj")) 0))))))
+    (s-replace "\"" "-"
+      (s-replace " \"" "-"
+        (s-replace "defproject " ""
+          (regex-match "defproject .*"
+            (my-file-contents (concat projectile-project-root "project.clj")) 0))))))
 
 (defun my-file-contents (filename)
   "Return the contents of FILENAME."
@@ -294,7 +294,7 @@
 
 
 (defhydra hydra-clojure-usage (:color pink
-                                      :hint nil)
+                                :hint nil)
   "
                                                                                            ╭──────┐
  Move              ^ ^        Jump      ^ ^                                                │ Ukhu │

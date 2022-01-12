@@ -33,67 +33,67 @@
 (straight-require 'parsec)
 
 (straight-use-package
- '(evcxr
-   :type git
-   :host github
-   :repo "serialdev/evcxr-mode"
-   :config
-   (add-hook 'rust-mode-hook #'evcxr-minor-mode)
-   ))
+  '(evcxr
+     :type git
+     :host github
+     :repo "serialdev/evcxr-mode"
+     :config
+     (add-hook 'rust-mode-hook #'evcxr-minor-mode)
+     ))
 
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
 
 (add-hook
- 'rust-mode-hook
- '(lambda ()
-    (setq tab-width 2)
-    ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
-    ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
-    (setq company-tooltip-align-annotations t)
-    (add-hook 'rust-mode-hook #'racer-mode)
-    (add-hook 'racer-mode-hook #'eldoc-mode)
-    (add-hook 'racer-mode-hook #'company-mode)
-    (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
-    (add-hook 'rust-mode-hook 'cargo-minor-mode)
-    (setq rust-format-on-save t)
-    (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
-    (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
+  'rust-mode-hook
+  '(lambda ()
+     (setq tab-width 2)
+     ;; (setq racer-cmd (concat (getenv "HOME") "/cargo/bin/racer")) ;; Rustup binaries PATH
+     ;; (setq racer-rust-src-path (concat (getenv "HOME") (shell-command-to-string "echo `rustc --print sysroot`/lib/rustlib/src/rust/src")))
+     (setq company-tooltip-align-annotations t)
+     (add-hook 'rust-mode-hook #'racer-mode)
+     (add-hook 'racer-mode-hook #'eldoc-mode)
+     (add-hook 'racer-mode-hook #'company-mode)
+     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+     (add-hook 'rust-mode-hook 'cargo-minor-mode)
+     (setq rust-format-on-save t)
+     (local-set-key (kbd "TAB") #'company-indent-or-complete-common)
+     (local-set-key (kbd "C-c <tab>") #'rust-format-buffer)))
 
 (with-system gnu/linux
 
   (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "which cargo") ) )))
   (setq racer-rust-src-path
-      (concat (string-trim
-               (shell-command-to-string "rustc --print sysroot"))
-              "/lib/rustlib/src/rust/src"))
+    (concat (string-trim
+              (shell-command-to-string "rustc --print sysroot"))
+      "/lib/rustlib/src/rust/src"))
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "which racer")) "racer")  )
 
-)
+  )
 
 
 
 (with-system darwin
   (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "which cargo") ) )))
   (setq racer-rust-src-path
-      (concat (string-trim
-               (shell-command-to-string "rustc --print sysroot"))
-              "/lib/rustlib/src/rust/src"))
+    (concat (string-trim
+              (shell-command-to-string "rustc --print sysroot"))
+      "/lib/rustlib/src/rust/src"))
 
   (if-command-exists "racer"
-		     (setq racer-cmd
-			   (s-prepend (file-name-directory
-				       (shell-command-to-string "which racer")) "racer")  )
-		     ))
+    (setq racer-cmd
+      (s-prepend (file-name-directory
+                   (shell-command-to-string "which racer")) "racer")  )
+    ))
 
 
 (when tiqsi-win32
   (setq racer-cmd (s-prepend (file-name-directory (shell-command-to-string "where racer")) "racer.exe")  )
   (setq exec-path (append exec-path  '(`,(file-name-directory (shell-command-to-string "where cargo"))) ))
   (setq racer-rust-src-path
-      (concat (string-trim
-               (shell-command-to-string "rustc --print sysroot"))
-              "/lib/rustlib/src/rust/src"))
+    (concat (string-trim
+              (shell-command-to-string "rustc --print sysroot"))
+      "/lib/rustlib/src/rust/src"))
   )
 
 
@@ -107,7 +107,7 @@
   "Get the mccabe complexity for this buffer."
   (interactive)
   (message
-   (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
+    (shell-command-to-string(message "tree -d %starget/doc -L 1 " (projectile-project-root)))))
 
 
 (defun cargo-process-run-optimized()
@@ -158,70 +158,70 @@ _|_: Doc Tree     _k_: Check         _q_: Clippy
 
 
 (defun current-line ()
-     (string-to-number (car (cdr(s-split " " (what-line)))))
-     )
+  (string-to-number (car (cdr(s-split " " (what-line)))))
+  )
 
 (format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name)))
 
 (defun tiqsi--rust-print-src()
-    (interactive)
+  (interactive)
   (let ((match-end  (s-split "END"   (shell-command-to-string (format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name))) ))))
-  (if (s-equals? (car match-end) "")
+    (if (s-equals? (car match-end) "")
       1
-    (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
-(cl-multiple-value-bind
-    (name row col path type extra)
-    (s-split ","  match-match )
+      (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
+        (cl-multiple-value-bind
+          (name row col path type extra)
+          (s-split ","  match-match )
 
-  (with-temp-buffer
-    (insert-file-contents path)
-    (goto-line (string-to-number row))
-    (print (buffer-substring-no-properties (point)
-    (search-forward "}" )))
-    )
-  )
-))))
+          (with-temp-buffer
+            (insert-file-contents path)
+            (goto-line (string-to-number row))
+            (print (buffer-substring-no-properties (point)
+                     (search-forward "}" )))
+            )
+          )
+        ))))
 
 
 
 (defun tiqsi--racer-insert-struct-point()
-    (interactive)
+  (interactive)
   (let (  (b-name (buffer-name)) (match-end  (s-split "END"   (shell-command-to-string (format-mode-line (s-prepend "racer find-definition %l %c " (buffer-file-name))) ))))
-  ;; (let ((match-end  (s-split "END"  ttt )) (b-name (buffer-name)))
-  (if (s-equals? (car match-end) "")
+    ;; (let ((match-end  (s-split "END"  ttt )) (b-name (buffer-name)))
+    (if (s-equals? (car match-end) "")
       1
-    (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
-      (cl-multiple-value-bind
-	  (name row col path type extra)
-	  (s-split ","  match-match )
+      (let ((match-match (s-trim(car(cdr(s-split "MATCH" (car match-end)))))  ))
+        (cl-multiple-value-bind
+          (name row col path type extra)
+          (s-split ","  match-match )
 
-	(with-temp-buffer
-	  (insert-file-contents path)
-	  (goto-line (string-to-number row))
+          (with-temp-buffer
+            (insert-file-contents path)
+            (goto-line (string-to-number row))
 
-	  (let ((mm
-		 (buffer-substring-no-properties (point)
-						 (search-forward "}" )) ))
-	    (with-current-buffer b-name
-	      (backward-kill-word 1)
-		(insert name)
-	    (insert "{")
-	    (newline)
-	    (cl-loop for k in 
-		     (cl-loop for kv in 
-			      (cl-remove-if  (lambda(item) (string= "" item)) (mapcar 's-trim (s-split ","  (cadr(s-split "{" (car(s-split "}" mm)))))))
-			      collect (car (s-split ":" kv))
-			      )
-		     do (progn
-			  (insert k)
-			  (insert ":")
-			  (insert "  ,")
-			  (newline)
-			  )
-		     )
-	    (insert "}")
-	    ))
-	  ))))))
+            (let ((mm
+                    (buffer-substring-no-properties (point)
+                      (search-forward "}" )) ))
+              (with-current-buffer b-name
+                (backward-kill-word 1)
+                (insert name)
+                (insert "{")
+                (newline)
+                (cl-loop for k in
+                  (cl-loop for kv in
+                    (cl-remove-if  (lambda(item) (string= "" item)) (mapcar 's-trim (s-split ","  (cadr(s-split "{" (car(s-split "}" mm)))))))
+                    collect (car (s-split ":" kv))
+                    )
+                  do (progn
+                       (insert k)
+                       (insert ":")
+                       (insert "  ,")
+                       (newline)
+                       )
+                  )
+                (insert "}")
+                ))
+            ))))))
 
 (string-to-number (format-mode-line "%l"))
 
@@ -235,13 +235,13 @@ The tooltip's face is `racer-tooltip'
 See `racer-describe'."
   (interactive)
   (-some-> (symbol-at-point)
-           (symbol-name)
-           (racer--describe)
-           (with-current-buffer (concat "\n" (buffer-string) "\n\n"))
-           (message 'racer-tooltip nil nil 1000)))
+    (symbol-name)
+    (racer--describe)
+    (with-current-buffer (concat "\n" (buffer-string) "\n\n"))
+    (message 'racer-tooltip nil nil 1000)))
 
 
-; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
@@ -255,7 +255,7 @@ See `racer-describe'."
 (define-key rust-mode-map (kbd "C-c n") 'flymake-goto-next-error)
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 (provide 'programming-rust)
 

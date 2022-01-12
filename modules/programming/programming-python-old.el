@@ -26,7 +26,7 @@
 (defun jedi:jump-to-definition ()
   (interactive)
   (add-to-list 'jedi:goto-stack
-               (list (buffer-name) (point)))
+    (list (buffer-name) (point)))
   (jedi:goto-definition))
 
 
@@ -42,13 +42,13 @@
   "Execute FORM when all the files in FILE-OR-FILES are loaded.
 FORM is checked at compile time."
   (declare (debug (form form &rest form))
-           (indent 1))
+    (indent 1))
   (when (stringp file-or-files)
     (setq file-or-files (list file-or-files)))
   (let ((code `(progn ,@form)))
     (mapc (lambda (file)
             (setq code `(eval-after-load ',file ',code)))
-          file-or-files)
+      file-or-files)
     code))
 
 
@@ -70,39 +70,39 @@ FORM is checked at compile time."
   (defun python-shell-completion-native-try ()
     "Return non-nil if can trigger native completion."
     (let ((python-shell-completion-native-enable t)
-          (python-shell-completion-native-output-timeout
-           python-shell-completion-native-try-output-timeout))
+           (python-shell-completion-native-output-timeout
+             python-shell-completion-native-try-output-timeout))
       (python-shell-completion-native-get-completions
-       (get-buffer-process (current-buffer))
-       nil "_"))))
+        (get-buffer-process (current-buffer))
+        nil "_"))))
 
 
 (setq python-shell-prompt-detect-failure-warning nil)
 
 
 (setq
- python-shell-interpreter "ipython"
- python-shell-interpreter-args "--matplotlib=qt5"
- python-shell-prompt-regexp "In \\[[0-9]+\\]: "
- python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
- python-shell-completion-setup-code
- "from IPython.core.completerlib import module_completion"
- python-shell-completion-string-code
- "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
- python-shell-completion-module-string-code
- "';'.join(module_completion('''%s'''))\n"
- )
+  python-shell-interpreter "ipython"
+  python-shell-interpreter-args "--matplotlib=qt5"
+  python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+  python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+  python-shell-completion-setup-code
+  "from IPython.core.completerlib import module_completion"
+  python-shell-completion-string-code
+  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"
+  python-shell-completion-module-string-code
+  "';'.join(module_completion('''%s'''))\n"
+  )
 
 
 ;;; smartrep
 (pyt--eval-after-load (smartrep python)
-                      (smartrep-define-key
-                       python-mode-map
-                       "C-c"
-                       '(("C-p" . beginning-of-defun)
-                         ("C-n" . end-of-defun)
-                         (">"   . python-indent-shift-right)
-                         ("<"   . python-indent-shift-left))))
+  (smartrep-define-key
+    python-mode-map
+    "C-c"
+    '(("C-p" . beginning-of-defun)
+       ("C-n" . end-of-defun)
+       (">"   . python-indent-shift-right)
+       ("<"   . python-indent-shift-left))))
 
 (add-hook 'python-mode-hook 'py-autopep8-enable-on-save)
 (setq py-autopep8-options '("--max-line-length=110"))
@@ -120,38 +120,38 @@ With prefix arg, prompt for the command to use."
   ;; Needed for IPython 5+
   (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
   (cond
-   ;; Emacs 24 until 24.3
-   ((boundp 'python-python-command)
-    (setq python-python-command ipython))
-   ;; Emacs 24.3
-   ((and (version<= "24.3" emacs-version)
-         (not (boundp 'python-shell-interpreter-interactive-arg)))
-    ;; This is from the python.el commentary.
-    ;; Settings for IPython 0.11:
-    (setq python-shell-interpreter ipython
-          python-shell-interpreter-args "--pylab"
-          python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-          python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-          python-shell-completion-setup-code
-          "from IPython.core.completerlib import module_completion"
-          python-shell-completion-module-string-code
-          "';'.join(module_completion('''%s'''))\n"
-          python-shell-completion-string-code
-          "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
-   ;; Emacs 24.4
-   ((boundp 'python-shell-interpreter-interactive-arg)
-    (setq python-shell-interpreter ipython
-          python-shell-interpreter-args "-i")
-    ;; Windows requires some special handling here, see #422
-    (let ((exe "C:\\Python27\\python.exe")
-          (ipython_py "C:\\Python27\\Scripts\\ipython-script.py"))
-      (when (and (eq system-type 'windows-nt)
-                 (file-exists-p exe)
-                 (file-exists-p ipython_py))
-        (setq python-shell-interpreter exe
-              python-shell-interpreter-args "-i " + ipython_py))))
-   (t
-    (error "I don't know how to set ipython settings for this Emacs"))))
+    ;; Emacs 24 until 24.3
+    ((boundp 'python-python-command)
+      (setq python-python-command ipython))
+    ;; Emacs 24.3
+    ((and (version<= "24.3" emacs-version)
+       (not (boundp 'python-shell-interpreter-interactive-arg)))
+      ;; This is from the python.el commentary.
+      ;; Settings for IPython 0.11:
+      (setq python-shell-interpreter ipython
+        python-shell-interpreter-args "--pylab"
+        python-shell-prompt-regexp "In \\[[0-9]+\\]: "
+        python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
+        python-shell-completion-setup-code
+        "from IPython.core.completerlib import module_completion"
+        python-shell-completion-module-string-code
+        "';'.join(module_completion('''%s'''))\n"
+        python-shell-completion-string-code
+        "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
+    ;; Emacs 24.4
+    ((boundp 'python-shell-interpreter-interactive-arg)
+      (setq python-shell-interpreter ipython
+        python-shell-interpreter-args "-i")
+      ;; Windows requires some special handling here, see #422
+      (let ((exe "C:\\Python27\\python.exe")
+             (ipython_py "C:\\Python27\\Scripts\\ipython-script.py"))
+        (when (and (eq system-type 'windows-nt)
+                (file-exists-p exe)
+                (file-exists-p ipython_py))
+          (setq python-shell-interpreter exe
+            python-shell-interpreter-args "-i " + ipython_py))))
+    (t
+      (error "I don't know how to set ipython settings for this Emacs"))))
 
 
 
@@ -166,18 +166,18 @@ With prefix arg, prompt for the command to use."
   (when (not (executable-find cpython))
     (error "Command %S not found" cpython))
   (cond
-   ;; Emacs 24 until 24.3
-   ((boundp 'python-python-command)
-    (setq python-python-command cpython))
-   ;; Emacs 24.3 and onwards.
-   ((and (version<= "24.3" emacs-version)
-         (not (boundp 'python-shell-interpreter-interactive-arg)))
-    (setq python-shell-interpreter cpython
-          python-shell-interpreter-args "-i"
-          python-shell-prompt-regexp ">>> "
-          python-shell-prompt-output-regexp ""
-          python-shell-completion-setup-code
-          "try:
+    ;; Emacs 24 until 24.3
+    ((boundp 'python-python-command)
+      (setq python-python-command cpython))
+    ;; Emacs 24.3 and onwards.
+    ((and (version<= "24.3" emacs-version)
+       (not (boundp 'python-shell-interpreter-interactive-arg)))
+      (setq python-shell-interpreter cpython
+        python-shell-interpreter-args "-i"
+        python-shell-prompt-regexp ">>> "
+        python-shell-prompt-output-regexp ""
+        python-shell-completion-setup-code
+        "try:
     import readline
 except ImportError:
     def __COMPLETER_all_completions(text): []
@@ -197,24 +197,24 @@ else:
         except NameError:
             pass
         return completions"
-          python-shell-completion-module-string-code ""
-          python-shell-completion-string-code
-          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
-   ;; Emacs 24.4
-   ((boundp 'python-shell-interpreter-interactive-arg)
-    (setq python-shell-interpreter cpython
-          python-shell-interpreter-args "-i"))
-   (t
-    (error "I don't know how to set ipython settings for this Emacs"))))
+        python-shell-completion-module-string-code ""
+        python-shell-completion-string-code
+        "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+    ;; Emacs 24.4
+    ((boundp 'python-shell-interpreter-interactive-arg)
+      (setq python-shell-interpreter cpython
+        python-shell-interpreter-args "-i"))
+    (t
+      (error "I don't know how to set ipython settings for this Emacs"))))
 
 (use-package python-pytest
   :straight t
   :after python
   :custom
   (python-pytest-arguments
-   '("--color"          ;; colored output in the buffer
-     "--failed-first"   ;; run the previous failed tests first
-     "--maxfail=5"))    ;; exit in 5 continuous failures in a run
+    '("--color"          ;; colored output in the buffer
+       "--failed-first"   ;; run the previous failed tests first
+       "--maxfail=5"))    ;; exit in 5 continuous failures in a run
   :config
   ;; (which-key-declare-prefixes-for-mode 'python-mode "SPC pt" "Testing")
   ;; (evil-leader/set-key-for-mode 'python-mode
@@ -230,38 +230,38 @@ else:
 (defun sdev-use-remote (&optional ipython)
   (interactive)
   (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
-        python-shell-interpreter-args "-i"
-        python-shell-prompt-regexp ">>> "
-        python-shell-prompt-output-regexp ""))
+    python-shell-interpreter-args "-i"
+    python-shell-prompt-regexp ">>> "
+    python-shell-prompt-output-regexp ""))
 
 (defun run-python-locally (&rest args)
   (interactive (progn (require 'nadvice)
-                      (advice-eval-interactive-spec
-                       (cadr (interactive-form #'run-python)))))
+                 (advice-eval-interactive-spec
+                   (cadr (interactive-form #'run-python)))))
   (let ((default-directory user-emacs-directory))
     (apply #'run-python args)))
 
 
 (eval-when-compile (require 'cl-lib))
 (defun nadvice/python-shell-send-string/fix-local-process
-    (old-fun string &optional process)
+  (old-fun string &optional process)
   (cl-letf ((old-psstf (symbol-function #'python-shell--save-temp-file))
-            ((symbol-function #'python-shell--save-temp-file)
-             (lambda (string)
-               (let ((default-directory
-                       ;; if buffer is a remote file, but the process is not
-                       ;; save the temp file locally, instead of remotely
-                       (if (and buffer-file-name
-                                (file-remote-p buffer-file-name)
-                                (not (plist-get 'remote-tty
-                                                (process-plist process))))
+             ((symbol-function #'python-shell--save-temp-file)
+               (lambda (string)
+                 (let ((default-directory
+                         ;; if buffer is a remote file, but the process is not
+                         ;; save the temp file locally, instead of remotely
+                         (if (and buffer-file-name
+                               (file-remote-p buffer-file-name)
+                               (not (plist-get 'remote-tty
+                                      (process-plist process))))
                            user-emacs-directory
-                         default-directory)))
-                 (funcall old-psstf string)))))
+                           default-directory)))
+                   (funcall old-psstf string)))))
     (funcall old-fun string process)))
 
 (advice-add 'python-shell-send-string :around
-            #'nadvice/python-shell-send-string/fix-local-process)
+  #'nadvice/python-shell-send-string/fix-local-process)
 
 
 (defun get-selection ()
@@ -281,7 +281,7 @@ else:
 (defun send-py-region(begin end)
   (interactive "r")
   (comint-send-string tiqsi-python-buffer
-		      (buffer-substring-no-properties begin end))
+    (buffer-substring-no-properties begin end))
   (comint-send-string tiqsi-python-buffer "\n")
   )
 
@@ -292,14 +292,14 @@ else:
 (defun my-merge-imenu ()
   (interactive)
   (let ((mode-imenu (imenu-default-create-index-function))
-        (custom-imenu (imenu--generic-function imenu-generic-expression)))
+         (custom-imenu (imenu--generic-function imenu-generic-expression)))
     (append mode-imenu custom-imenu)))
 
 (defun my-python-menu-hook()
   (interactive)
   (add-to-list
-   'imenu-generic-expression
-   '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
+    'imenu-generic-expression
+    '("Sections" "^#### \\[ \\(.*\\) \\]$" 1))
   (setq imenu-create-index-function 'my-merge-imenu)
   ;; (eval-after-load "company"
   ;;     '(progn
@@ -318,7 +318,7 @@ else:
   "Get the mccabe complexity for this buffer."
   (interactive)
   (message
-   (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
+    (shell-command-to-string(message "python -m mccabe --min 3 %s" buffer-file-name))))
 
 
 ;;; Indentation for python
@@ -327,7 +327,7 @@ else:
 (defun electric-indent-ignore-python (char)
   "Ignore electric indentation for python-mode"
   (if (equal major-mode 'python-mode)
-      'no-indent
+    'no-indent
     nil))
 (add-hook 'electric-indent-functions 'electric-indent-ignore-python)
 
@@ -429,14 +429,14 @@ else:
                                         ;-------{mypy}------;
 
 (flycheck-define-checker
-    python-mypy ""
-    :command ("mypy"
-              "--ignore-missing-imports" "--fast-parser"
-              "--python-version" "3.6"
-              source-original)
-    :error-patterns
-    ((error line-start (file-name) ":" line ": error:" (message) line-end))
-    :modes python-mode)
+  python-mypy ""
+  :command ("mypy"
+             "--ignore-missing-imports" "--fast-parser"
+             "--python-version" "3.6"
+             source-original)
+  :error-patterns
+  ((error line-start (file-name) ":" line ": error:" (message) line-end))
+  :modes python-mode)
 
 (add-to-list 'flycheck-checkers 'python-mypy t)
 (flycheck-add-next-checker 'python-pylint 'python-mypy t)
@@ -445,7 +445,7 @@ else:
                                         ;--------{disable ac for python}-------;
 
 (defun disable-autocomplete() (interactive)
-       (auto-complete-mode 0))
+  (auto-complete-mode 0))
 
 (defadvice auto-complete-mode (around disable-auto-complete-for-python)
   (unless (eq major-mode 'python-mode) ad-do-it))
@@ -469,7 +469,7 @@ else:
 
 ;; (add-hook 'python-mode-hook (lambda () (add-hook 'before-save-hook #'tiqsi-py-before-save-hook nil 'local)) )
 
-;---------------------------------------------------------------------------------
+                                        ;---------------------------------------------------------------------------------
 
 (setq test-test "birthday = df.birthday[0]
 age = time_since(df.birthday[0]).days // 365
@@ -479,91 +479,91 @@ profile_disabled = disabled_status(df)")
 
 (defun parse-l ()
   (parsec-collect*
-   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
-					 (parsec-or (parsec-letter)
-						    (parsec-str "\"")
-						    (parsec-digit)
-						    (parsec-str "-")
-						    (parsec-str "[")
-						    (parsec-str "]")
-						    (parsec-str ".")
-						    (parsec-str "_"))))
-   (parsec-optional* (parsec-lookahead "="))))
+    (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
+                             (parsec-or (parsec-letter)
+                               (parsec-str "\"")
+                               (parsec-digit)
+                               (parsec-str "-")
+                               (parsec-str "[")
+                               (parsec-str "]")
+                               (parsec-str ".")
+                               (parsec-str "_"))))
+    (parsec-optional* (parsec-lookahead "="))))
 
 (defun parse-r ()
   (parsec-collect*
-   (parsec-optional* (parsec-str "="))
-   (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
-					 (parsec-or (parsec-letter)
-						    (parsec-str "\"")
-						    (parsec-digit)
-						    (parsec-str "-")
-						    (parsec-str "[")
-						    (parsec-str "]")
-						    (parsec-str ".")
-						    (parsec-str "_"))))
-   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))
+    (parsec-optional* (parsec-str "="))
+    (parsec-many-as-string (parsec-option (parsec-optional* (parsec-str " "))
+                             (parsec-or (parsec-letter)
+                               (parsec-str "\"")
+                               (parsec-digit)
+                               (parsec-str "-")
+                               (parsec-str "[")
+                               (parsec-str "]")
+                               (parsec-str ".")
+                               (parsec-str "_"))))
+    (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))
 
 (parsec-with-input test-test
-      (parsec-many
-       (parsec-collect
-	(car(parse-l))
-	(car(parse-r))))
-      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof))))
+  (parsec-many
+    (parsec-collect
+      (car(parse-l))
+      (car(parse-r))))
+  (parsec-optional* (parsec-option (parsec-newline) (parsec-eof))))
 
 (defun evcxr-parse-toml (input)
   (parsec-with-input input
     (parsec-many
-     (parsec-collect*
-      (car (evcxr-parse-title))
-      (parsec-many
-       (parsec-collect
-	(car(evcxr-parse-l))
-	(car(evcxr-parse-r))))
-      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))))
+      (parsec-collect*
+        (car (evcxr-parse-title))
+        (parsec-many
+          (parsec-collect
+            (car(evcxr-parse-l))
+            (car(evcxr-parse-r))))
+        (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))))))
 
 
 (parsec-with-input test-test
   (parsec-many
-   (parsec-collect*
-   (parsec-many-as-string (parsec-letter))
-   (parsec-many-as-string (parsec-optional* (parsec-str "=")))
-   (parsec-many-as-string (parsec-optional*(parsec-any-ch)))
-   (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))
-   ))
+    (parsec-collect*
+      (parsec-many-as-string (parsec-letter))
+      (parsec-many-as-string (parsec-optional* (parsec-str "=")))
+      (parsec-many-as-string (parsec-optional*(parsec-any-ch)))
+      (parsec-optional* (parsec-option (parsec-newline) (parsec-eof)))
+      ))
   )
 
 (defun split-lines (input)
   (interactive)
   (parsec-with-input input
     (parsec-many
-    (car(parsec-collect
-     (parsec-many-as-string (parsec-re "."))
-     (parsec-optional (parsec-eol-or-eof))
-     )))))
+      (car(parsec-collect
+            (parsec-many-as-string (parsec-re "."))
+            (parsec-optional (parsec-eol-or-eof))
+            )))))
 
 (parsec-with-input (car
-		    (split-lines test-test))
+                     (split-lines test-test))
   (parsec-collect
-   (parsec-endby (parsec-str "=") (parsec-many-as-string(parsec-letter))))
-)
+    (parsec-endby (parsec-str "=") (parsec-many-as-string(parsec-letter))))
+  )
 
 (defun parse-l (input)
   (interactive)
   ((let ((left (car input)))
      (setq left ()
-  ))
-  (car (split-lines input))))
+       ))
+    (car (split-lines input))))
 
 
 (defun evcxr-eval-region (begin end)
   "Evaluate region between BEGIN and END."
   (interactive "r")
   (buffer-substring-no-properties begin end)
-)
-;---------------------------------------------------------------------------------
+  )
+;;---------------------------------------------------------------------------------
 
-					;---{Keybindings}---;
+                                        ;---{Keybindings}---;
 
 ;; redefine jedi's C-. (jedi:goto-definition)
 ;; to remember position, and set C-, to jump back

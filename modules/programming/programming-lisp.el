@@ -14,18 +14,18 @@
 
 (with-system gnu/linux
   (try!
-   (progn
-     ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
-     (setq inferior-lisp-program "sbcl")
-     (load (expand-file-name "~/.roswell/helper.el"))
-    ))
-   )
+    (progn
+      ;; (load (expand-file-name "~/quicklisp/slime-helper.el"))
+      (setq inferior-lisp-program "sbcl")
+      (load (expand-file-name "~/.roswell/helper.el"))
+      ))
+  )
 
 (with-system darwin
   (setq inferior-lisp-program "sbcl")
   (load (expand-file-name "~/.roswell/helper.el"))
   (message "ros ready for OSX")
-     )
+  )
 
 
 (with-system windows
@@ -38,24 +38,24 @@
 
 (defmacro ros-commands (&rest commands)
   `(send-to-shell
-   (concat 
-    (concat "ros --eval '" ,@commands)
-    "'")
-   )
+     (concat
+       (concat "ros --eval '" ,@commands)
+       "'")
+     )
   )
 
- 
+
 (defun get-last-sexp (&optional bounds)
   "Return the sexp preceding the point."
   (interactive)
   (let ((points     (save-excursion
-           (list (point)
-                 (progn (backward-sexp 1)
-                        (skip-chars-forward "[:blank:]")
-                        (when (looking-at-p "\n") (forward-char 1))
-                        (point)))) ))
+                      (list (point)
+                        (progn (backward-sexp 1)
+                          (skip-chars-forward "[:blank:]")
+                          (when (looking-at-p "\n") (forward-char 1))
+                          (point)))) ))
     (buffer-substring-no-properties  (car points) (cadr points) )
-  ))
+    ))
 
 
 
@@ -64,8 +64,8 @@
 (slime-setup '(slime-fancy slime-company))
 
 (setf slime-lisp-implementations
-      `((sbcl    ("sbcl" "--dynamic-space-size" "2000"))
-        (roswell ("ros" "-Q" "run"))))
+  `((sbcl    ("sbcl" "--dynamic-space-size" "2000"))
+     (roswell ("ros" "-Q" "run"))))
 (setf slime-default-lisp 'roswell)
 
 (use-package paredit
@@ -77,7 +77,7 @@
     ;; which is annoying when backspacing over a '('
     (defun override-slime-repl-bindings-with-paredit ()
       (define-key slime-repl-mode-map
-	(read-kbd-macro paredit-backward-delete-key) nil))
+        (read-kbd-macro paredit-backward-delete-key) nil))
     (add-hook 'slime-repl-mode-hook 'override-slime-repl-bindings-with-paredit)
     ))
 
@@ -136,20 +136,20 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   (delete-forward-char 1)
   )
 
-; ------------------------------------------------------------------------- ;
-;                                  Overlays                                 ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                                  Overlays                                 ;
+;; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(eros
-   :type git
-   :host github
-   :repo "xiongtx/eros"
-   :config
-   (eros-mode 1) 
-   ))
+  '(eros
+     :type git
+     :host github
+     :repo "xiongtx/eros"
+     :config
+     (eros-mode 1)
+     ))
 
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
 
 
 ;; (straight-use-package
@@ -204,50 +204,50 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
 (define-advice elisp--preceding-sexp (:around (old-fun) multiline-comment)
   "Support sexp in multiline comment."
   (condition-case err
-      (funcall old-fun)
+    (funcall old-fun)
     (scan-error
-     (if (nth 4 (syntax-ppss))
-         (let ((work-buffer (current-buffer))
+      (if (nth 4 (syntax-ppss))
+        (let ((work-buffer (current-buffer))
                (temp-buffer (generate-new-buffer " *temp*"))
                found sexp error)
-           (with-current-buffer temp-buffer
-             (delay-mode-hooks (emacs-lisp-mode)))
-           (save-excursion
-             (comment-normalize-vars)
-             (while (and (comment-beginning)
-                         (not found))
-               (let ((code (buffer-substring-no-properties
+          (with-current-buffer temp-buffer
+            (delay-mode-hooks (emacs-lisp-mode)))
+          (save-excursion
+            (comment-normalize-vars)
+            (while (and (comment-beginning)
+                     (not found))
+              (let ((code (buffer-substring-no-properties
                             (point) (line-end-position))))
-                 (with-current-buffer temp-buffer
-                   (goto-char (point-min))
-                   (insert code ?\n)
-                   (goto-char (point-max))
-                   (condition-case err
-                       (setq sexp (funcall old-fun)
-                             found t)
-                     (scan-error (setq error err)))))
-               (when (= -1 (forward-line -1))
-                 (error "elisp--preceding-sexp@multiline-comment error"))
-               (goto-char (line-end-position))))
-           (cond (found sexp)
-                 (error (signal (car error) (cdr error)))
-                 (t (error "elisp--preceding-sexp@multiline-comment error"))))
-       (signal (car err) (cdr err))))))
+                (with-current-buffer temp-buffer
+                  (goto-char (point-min))
+                  (insert code ?\n)
+                  (goto-char (point-max))
+                  (condition-case err
+                    (setq sexp (funcall old-fun)
+                      found t)
+                    (scan-error (setq error err)))))
+              (when (= -1 (forward-line -1))
+                (error "elisp--preceding-sexp@multiline-comment error"))
+              (goto-char (line-end-position))))
+          (cond (found sexp)
+            (error (signal (car error) (cdr error)))
+            (t (error "elisp--preceding-sexp@multiline-comment error"))))
+        (signal (car err) (cdr err))))))
 
 (when tiqsi-linux
   (add-to-list 'load-path (expand-file-name "~/quicklisp/slime-helper.el")))
 
 
-; ------------------------------------------------------------------------- ;
-;                              Hy repl support                              ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                              Hy repl support                              ;
+;; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(ihy
-   :type git
-   :host github
-   :repo "serialdev/ihy-mode"
-))
+  '(ihy
+     :type git
+     :host github
+     :repo "serialdev/ihy-mode"
+     ))
 
 ;; (require 'sly-quicklisp-autoloads)
 

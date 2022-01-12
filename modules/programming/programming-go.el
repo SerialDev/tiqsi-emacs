@@ -24,7 +24,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 (use-package go-mode
   :straight t
@@ -97,37 +97,37 @@
 (defun go-build()
   (interactive)
   (compile
-   "go build main.go"))
+    "go build main.go"))
 
 (defun go-run()
   (interactive)
   (compile
-   "go run main.go"))
+    "go run main.go"))
 
 
 (defun go-build-win()
   (interactive)
   (compile
-   "env GOOS=windows GOARCH=amd64 go build main.go"))
+    "env GOOS=windows GOARCH=amd64 go build main.go"))
 
 (define-key go-mode-map (kbd "C-c C-b") 'go-build)
 (define-key go-mode-map (kbd "C-c C-c") 'go-run)
 (define-key go-mode-map (kbd "C-c C-w") 'go-build-win)
 
 
-; ------------------------------------------------------------------------- ;
-;                           GORE REPL integration                           ;
-; ------------------------------------------------------------------------- ;
-; TODO: Find alternatives as this repl leaves alot to be desired            ;
-; ------------------------------------------------------------------------- ;
+                                        ; ------------------------------------------------------------------------- ;
+                                        ;                           GORE REPL integration                           ;
+                                        ; ------------------------------------------------------------------------- ;
+                                        ; TODO: Find alternatives as this repl leaves alot to be desired            ;
+                                        ; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(gore-mode
-   :type git
-   :host github
-   :ensure t
-   :repo "sergey-pashaev/gore-mode"
-))
+  '(gore-mode
+     :type git
+     :host github
+     :ensure t
+     :repo "sergey-pashaev/gore-mode"
+     ))
 
 (defun run-gore-other-buffer ()
   (interactive)
@@ -141,23 +141,23 @@
   (interactive "r")
   (let ((buf (current-buffer) ))
     (let ((current-command (replace-regexp-in-string "\n[[:space:]]?" " "(buffer-substring-no-properties begin end))) ))
-      (pop-to-buffer gore-shell-buffer-name)
-      (insert current-command)
-      (gore-send-expr)
-      (pop-to-buffer buf)))
+    (pop-to-buffer gore-shell-buffer-name)
+    (insert current-command)
+    (gore-send-expr)
+    (pop-to-buffer buf)))
 
 
 
-; ------------------------------------------------------------------------- ;
-;                                 Go install                                ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                                 Go install                                ;
+;; ------------------------------------------------------------------------- ;
 
 (defmacro go--get-github(repo)
   `(multiple-async-shell-commands "*Output*"
-				  ,(s-prepend
-				   (s-prepend "go get github.com/" repo)
-				   "/...")
-				  "echo \"Done\"")
+     ,(s-prepend
+        (s-prepend "go get github.com/" repo)
+        "/...")
+     "echo \"Done\"")
   )
 
 

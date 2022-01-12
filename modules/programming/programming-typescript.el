@@ -49,9 +49,9 @@
 (defun ts-parcel-build()
   (interactive)
   (compile
-   (s-prepend
-    (s-append
-     (car(s-split "src" (current-buffer-path))) "npx parcel build " ) "index.html")))
+    (s-prepend
+      (s-append
+        (car(s-split "src" (current-buffer-path))) "npx parcel build " ) "index.html")))
 
 (define-key typescript-mode-map (kbd "C-c C-c") 'ts-parcel-build)
 

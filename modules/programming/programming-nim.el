@@ -29,12 +29,13 @@
 
 (use-package nim-mode
   :straight t
-  :config (progn
-	    (add-hook 'nim-mode-hook 'nimsuggest-mode)
-	    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
-	    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
-	    (add-hook 'nimsuggest-mode-hook 'flycheck-nimsuggest-setup)
-	    ))
+  :config
+  (progn
+    (add-hook 'nim-mode-hook 'nimsuggest-mode)
+    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
+    (add-hook 'nimsuggest-mode-hook 'company-mode)  ; auto complete package
+    (add-hook 'nimsuggest-mode-hook 'flycheck-nimsuggest-setup)
+    ))
 
 
 (provide 'programming-nim)

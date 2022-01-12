@@ -30,35 +30,35 @@
 (use-package zig-mode
   :straight t
   :config (progn
-	    (add-hook 'zig-mode-hook 'zig-file-coding-system)
-	    ))
+            (add-hook 'zig-mode-hook 'zig-file-coding-system)
+            ))
 
 
 (defun zig-file-coding-system ()
   (with-current-buffer (current-buffer)
     (if (string-match "\\.d?zig\\'" buffer-file-name)
-        (setq buffer-file-coding-system 'utf-8-unix)
+      (setq buffer-file-coding-system 'utf-8-unix)
       nil)
     ))
 
 (defun zig-compile ()
   (interactive)
   (async-shell-command
-   (s-prepend "zig build-exe " (buffer-name))
-        "*zig-compilation*" "*Zig-error*"
-		       ))
+    (s-prepend "zig build-exe " (buffer-name))
+    "*zig-compilation*" "*Zig-error*"
+    ))
 
 (defun zig-test()
   (interactive)
   (async-shell-command
-   (s-prepend "zig test " (buffer-name))
-   "*zig-test*" "*Zig-error*"))
+    (s-prepend "zig test " (buffer-name))
+    "*zig-test*" "*Zig-error*"))
 
 (defun zig-run()
   (interactive)
   (async-shell-command
-   (s-prepend "zig run " (buffer-name))
-   "*zig-test*" "*Zig-error*"))
+    (s-prepend "zig run " (buffer-name))
+    "*zig-test*" "*Zig-error*"))
 
 
 (define-key zig-mode-map (kbd "C-c C-c") 'zig-compile)

@@ -28,22 +28,23 @@
 
 
 
-; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Commenting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
+
+;;                                 Commenting                                ;
 
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
   (interactive)
   (let ((start (line-beginning-position))
-        (end (line-end-position)))
+         (end (line-end-position)))
     (when (or (not transient-mark-mode) (region-active-p))
       (setq start (save-excursion
                     (goto-char (region-beginning))
                     (beginning-of-line)
                     (point))
-            end (save-excursion
-                  (goto-char (region-end))
-                  (end-of-line)
-                  (point))))
+        end (save-excursion
+              (goto-char (region-end))
+              (end-of-line)
+              (point))))
     (comment-or-uncomment-region start end)))
 
 
@@ -55,9 +56,9 @@
   (copy-region-as-kill (mark) (point)))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Commenting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Commenting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Replacing ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Replacing ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 (defun tiqsi-replace-in-region (old-word new-word)
   "Perform a replace-string in the current region."
@@ -86,9 +87,9 @@
     new-pattern))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Replacing _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Replacing _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Saving ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Saving ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
 (defun tiqsi-save-buffer ()
@@ -100,12 +101,12 @@
       (untabify (point-min) (point-max))))
   (save-buffer))
 
-; ------------------------------------------------------------------------- ;
-;                         Run linters asyncronously                         ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                         Run linters asyncronously                         ;
+;; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(apheleia :host github :repo "raxod502/apheleia"))
+  '(apheleia :host github :repo "raxod502/apheleia"))
 
 (apheleia-global-mode +1)
 
@@ -113,9 +114,9 @@
 
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Saving _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Saving _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Inserting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Inserting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
 
 
 
@@ -123,10 +124,10 @@
   (interactive "sEnter name:
 sEnter b64 data: ")
   (insert
-   (s-prepend
-    (s-prepend "![" (s-prepend b64-name "]"))
-    (s-prepend "(data:image/png;base64," (s-prepend b64-data ")" )))
-   )
+    (s-prepend
+      (s-prepend "![" (s-prepend b64-name "]"))
+      (s-prepend "(data:image/png;base64," (s-prepend b64-data ")" )))
+    )
   )
 
 
@@ -134,10 +135,10 @@ sEnter b64 data: ")
   (interactive "sEnter name:
 sEnter b64 data: ")
   (insert
-   (s-prepend
-    (s-prepend "[" (s-prepend link-name "]"))
-    (s-prepend "(" (s-prepend link-url ")" )))
-   )
+    (s-prepend
+      (s-prepend "[" (s-prepend link-name "]"))
+      (s-prepend "(" (s-prepend link-url ")" )))
+    )
   )
 
 
@@ -186,9 +187,9 @@ sEnter b64 data: ")
 (defun new-line-dwim ()
   (interactive)
   (let ((break-open-pair (or (and (looking-back "{" 1) (looking-at "}"))
-                             (and (looking-back ">" 1) (looking-at "<"))
-                             (and (looking-back "(" 1) (looking-at ")"))
-                             (and (looking-back "\\[" 1) (looking-at "\\]")))))
+                           (and (looking-back ">" 1) (looking-at "<"))
+                           (and (looking-back "(" 1) (looking-at ")"))
+                           (and (looking-back "\\[" 1) (looking-at "\\]")))))
     (newline)
     (when break-open-pair
       (save-excursion
@@ -200,7 +201,7 @@ sEnter b64 data: ")
   "Duplicate the current line NUM times."
   (interactive "p")
   (if (bound-and-true-p paredit-mode)
-      (paredit-duplicate-current-line)
+    (paredit-duplicate-current-line)
     (save-excursion
       (when (eq (point-at-eol) (point-max))
         (goto-char (point-max))
@@ -215,8 +216,8 @@ region-end is used."
   (interactive "p")
   (save-excursion
     (let* ((start (or start (region-beginning)))
-           (end (or end (region-end)))
-           (region (buffer-substring start end)))
+            (end (or end (region-end)))
+            (region (buffer-substring start end)))
       (goto-char end)
       (dotimes (i num)
         (insert region)))))
@@ -227,17 +228,17 @@ region-end is used."
 If there's no region, the current line will be duplicated."
   (interactive "p")
   (if (region-active-p)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (duplicate-region arg beg end)
-        (one-shot-keybinding "d" (? (duplicate-region 1 beg end))))
+    (let ((beg (region-beginning))
+           (end (region-end)))
+      (duplicate-region arg beg end)
+      (one-shot-keybinding "d" (? (duplicate-region 1 beg end))))
     (duplicate-current-line arg)
     (one-shot-keybinding "d" 'duplicate-current-line)))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Inserting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Inserting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Indentation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Indentation ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 (defun indent-buffer ()
   "Indents an entire buffer using the default intenting scheme."
@@ -249,10 +250,10 @@ If there's no region, the current line will be duplicated."
   (jump-to-register 'o))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Indentation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Indentation _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 
-; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Modification ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _   /¯¯¯ Modification ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
 
 ;; unrelated, but a nice spot for it
@@ -262,9 +263,9 @@ If there's no region, the current line will be duplicated."
   (save-excursion
     (let ((end (copy-marker end)))
       (while
-          (progn
-            (goto-char start)
-            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
+        (progn
+          (goto-char start)
+          (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
         (replace-match "\\1\n\\2")))))
 
 
@@ -287,32 +288,32 @@ If there's no region, the current line will be duplicated."
 (defun tiqsi-goto-closest-number ()
   (interactive)
   (let ((closest-behind (save-excursion (search-backward-regexp "[0-9]" nil t)))
-        (closest-ahead (save-excursion (search-forward-regexp "[0-9]" nil t))))
+         (closest-ahead (save-excursion (search-forward-regexp "[0-9]" nil t))))
     (push-mark)
     (goto-char
-     (cond
-      ((and (not closest-ahead) (not closest-behind)) (error "No numbers in buffer"))
-      ((and closest-ahead (not closest-behind)) closest-ahead)
-      ((and closest-behind (not closest-ahead)) closest-behind)
-      ((> (- closest-ahead (point)) (- (point) closest-behind)) closest-behind)
-      ((> (- (point) closest-behind) (- closest-ahead (point))) closest-ahead)
-      (closest-ahead)))))
+      (cond
+        ((and (not closest-ahead) (not closest-behind)) (error "No numbers in buffer"))
+        ((and closest-ahead (not closest-behind)) closest-ahead)
+        ((and closest-behind (not closest-ahead)) closest-behind)
+        ((> (- closest-ahead (point)) (- (point) closest-behind)) closest-behind)
+        ((> (- (point) closest-behind) (- closest-ahead (point))) closest-ahead)
+        (closest-ahead)))))
 
 ;; Once you go to the closest number, you might want to change it. These functions are useful for that.
 
 (defun tiqsi-incs (s &optional num)
   (interactive "p")
   (let* ((inc (or num 1))
-         (new-number (number-to-string (+ inc (string-to-number s))))
-         (zero-padded? (s-starts-with? "0" s)))
+          (new-number (number-to-string (+ inc (string-to-number s))))
+          (zero-padded? (s-starts-with? "0" s)))
     (if zero-padded?
-        (s-pad-left (length s) "0" new-number)
+      (s-pad-left (length s) "0" new-number)
       new-number)))
 
 (defun tiqsi-change-number-at-point (arg)
   (interactive "p")
   (unless (or (looking-at "[0-9]")
-              (looking-back "[0-9]"))
+            (looking-back "[0-9]"))
     (tiqsi-goto-closest-number))
   (save-excursion
     (while (looking-back "[0-9]")
@@ -328,40 +329,40 @@ If there's no region, the current line will be duplicated."
   "Presumes that params are in the form (p, p, p) or {p, p, p} or [p, p, p]"
   (interactive)
   (let* ((end-of-first (cond
-                        ((looking-at ", ") (point))
-                        ((and (looking-back ",") (looking-at " ")) (- (point) 1))
-                        ((looking-back ", ") (- (point) 2))
-                        (t (error "Place point between params to transpose."))))
-         (start-of-first (save-excursion
-                           (goto-char end-of-first)
-                           (move-backward-out-of-param)
-                           (point)))
-         (start-of-last (+ end-of-first 2))
-         (end-of-last (save-excursion
-                        (goto-char start-of-last)
-                        (move-forward-out-of-param)
-                        (point))))
+                         ((looking-at ", ") (point))
+                         ((and (looking-back ",") (looking-at " ")) (- (point) 1))
+                         ((looking-back ", ") (- (point) 2))
+                         (t (error "Place point between params to transpose."))))
+          (start-of-first (save-excursion
+                            (goto-char end-of-first)
+                            (move-backward-out-of-param)
+                            (point)))
+          (start-of-last (+ end-of-first 2))
+          (end-of-last (save-excursion
+                         (goto-char start-of-last)
+                         (move-forward-out-of-param)
+                         (point))))
     (transpose-regions start-of-first end-of-first start-of-last end-of-last)))
 
 (defun move-forward-out-of-param ()
   (while (not (looking-at ")\\|, \\| ?}\\| ?\\]"))
     (cond
-     ((point-is-in-string-p) (move-point-forward-out-of-string))
-     ((looking-at "(\\|{\\|\\[") (forward-list))
-     (t (forward-char)))))
+      ((point-is-in-string-p) (move-point-forward-out-of-string))
+      ((looking-at "(\\|{\\|\\[") (forward-list))
+      (t (forward-char)))))
 
 
 (defun move-backward-out-of-param ()
   (while (not (looking-back "(\\|, \\|{ ?\\|\\[ ?"))
     (cond
-     ((point-is-in-string-p) (move-point-backward-out-of-string))
-     ((looking-back ")\\|}\\|\\]") (backward-list))
-     (t (backward-char)))))
+      ((point-is-in-string-p) (move-point-backward-out-of-string))
+      ((looking-back ")\\|}\\|\\]") (backward-list))
+      (t (backward-char)))))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Modification _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   \_ _ Modification _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Toggle ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Toggle ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
 (try-require 'origami)
@@ -371,12 +372,12 @@ If there's no region, the current line will be duplicated."
      (defun rb-show-only (buffer point)
        (interactive (list (current-buffer) (point)))
        (progn (origami-show-only-node buffer point)
-              (minimap-new-minimap)))
+         (minimap-new-minimap)))
 
      (defun rb-toggle-rec (buffer point)
        (interactive (list (current-buffer) (point)))
        (progn (origami-recursively-toggle-node buffer point)
-              (minimap-new-minimap)))
+         (minimap-new-minimap)))
      (global-origami-mode 1)
      ))
 
@@ -384,7 +385,7 @@ If there's no region, the current line will be duplicated."
   :straight t
   :ensure t
   :commands (vimish-fold-toggle
-             vimish-fold))
+              vimish-fold))
 
 ;; Fold indentation https://stackoverflow.com/questions/1587972/how-to-display-indentation-guides-in-emacs/4459159#4459159
 ;; Quite nice for python mode TODO: fix for using with ipynb buffers in EIN
@@ -396,50 +397,50 @@ If there's no region, the current line will be duplicated."
       (back-to-indentation)
       (setq col (+ 1 (current-column)))
       (set-selective-display
-       (if selective-display nil (or col 1))))))
+        (if selective-display nil (or col 1))))))
 
 (add-hook 'python-mode-hook
   (lambda () (define-key python-mode-map (kbd "C-c f") 'tiqsi-toggle-indent-fold)))
 
-; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
+;; yas-expand is run first and does what it has to, then it calls malb/indent-or-complete.
 
-; This function then hopefully does what I want:
+;; This function then hopefully does what I want:
 
-; if a region is active, just indent
-; if we’re looking at a space after a non-whitespace character, we try some company-expansion
-; otherwise call whatever would have been called otherwise.
+;; if a region is active, just indent
+;; if we’re looking at a space after a non-whitespace character, we try some company-expansion
+;; otherwise call whatever would have been called otherwise.
 
 (defun malb/indent-or-complete (&optional arg)
   (interactive "P")
   (cond
-   ;; if a region is active, indent
-   ((use-region-p)
-    (indent-region (region-beginning)
-                   (region-end)))
-   ;; if the next char is space or eol, but prev char not whitespace
-   ((and (not (active-minibuffer-window))
-         (or (looking-at " ")
-             (looking-at "$"))
-         (looking-back "[^[:space:]]")
-         (not (looking-back "^")))
+    ;; if a region is active, indent
+    ((use-region-p)
+      (indent-region (region-beginning)
+        (region-end)))
+    ;; if the next char is space or eol, but prev char not whitespace
+    ((and (not (active-minibuffer-window))
+       (or (looking-at " ")
+         (looking-at "$"))
+       (looking-back "[^[:space:]]")
+       (not (looking-back "^")))
 
-    (ac-expand arg))
+      (ac-expand arg))
 
-   ;; no whitespace anywhere
-   ((and (not (active-minibuffer-window))
-         (looking-at "[^[:space:]]")
-         (looking-back "[^[:space:]]")
-         (not (looking-back "^")))
-    (origami-toggle-node (current-buffer) (point)))
+    ;; no whitespace anywhere
+    ((and (not (active-minibuffer-window))
+       (looking-at "[^[:space:]]")
+       (looking-back "[^[:space:]]")
+       (not (looking-back "^")))
+      (origami-toggle-node (current-buffer) (point)))
 
-   ;; by default just call whatever was bound
-   (t
-    (let ((fn (or (lookup-key (current-local-map) (kbd "TAB"))
+    ;; by default just call whatever was bound
+    (t
+      (let ((fn (or (lookup-key (current-local-map) (kbd "TAB"))
                   'indent-for-tab-command)))
-      (if (not (called-interactively-p 'any))
+        (if (not (called-interactively-p 'any))
           (fn arg)
-        (setq this-command fn)
-        (call-interactively fn))))))
+          (setq this-command fn)
+          (call-interactively fn))))))
 
 (defun current-quotes-char ()
   (nth 3 (syntax-ppss)))
@@ -458,38 +459,38 @@ If there's no region, the current line will be duplicated."
 (defun toggle-quotes ()
   (interactive)
   (if (point-is-in-string-p)
-      (let ((old-quotes (char-to-string (current-quotes-char)))
-            (new-quotes (char-to-string (alternate-quotes-char)))
-            (start (make-marker))
-            (end (make-marker)))
-        (save-excursion
-          (move-point-forward-out-of-string)
-          (backward-delete-char 1)
-          (set-marker end (point))
-          (insert new-quotes)
-          (move-point-backward-out-of-string)
-          (delete-char 1)
-          (insert new-quotes)
-          (set-marker start (point))
-          (replace-string new-quotes (concat "\\" new-quotes) nil start end)
-          (replace-string (concat "\\" old-quotes) old-quotes nil start end)))
+    (let ((old-quotes (char-to-string (current-quotes-char)))
+           (new-quotes (char-to-string (alternate-quotes-char)))
+           (start (make-marker))
+           (end (make-marker)))
+      (save-excursion
+        (move-point-forward-out-of-string)
+        (backward-delete-char 1)
+        (set-marker end (point))
+        (insert new-quotes)
+        (move-point-backward-out-of-string)
+        (delete-char 1)
+        (insert new-quotes)
+        (set-marker start (point))
+        (replace-string new-quotes (concat "\\" new-quotes) nil start end)
+        (replace-string (concat "\\" old-quotes) old-quotes nil start end)))
     (error "Point isn't in a string")))
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Toggle _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Toggle _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Deleting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Deleting ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _     ;;
 
 
 (defun sdev/del-beg-line()
   (interactive)
   (let ((beg(point ))) (sk/smarter-move-beginning-of-line())
-       (delete-region beg(point))))
+    (delete-region beg(point))))
 
 (defun sdev/del-end-line()
   (interactive)
   (let ((beg(point ))) (move-end-of-line())
-       (delete-region beg(point))))
+    (delete-region beg(point))))
 
 ;; Kill whitespace
 (defun kill-whitespace ()
@@ -522,9 +523,9 @@ region if active."
         (move-beginning-of-line nil)
         (kill-whole-line)))))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Deleting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Deleting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Kill Ring ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Kill Ring ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;;
 
 (use-package undo-tree
   :straight t
@@ -537,31 +538,31 @@ region if active."
 
 (defun pre-process-kill-ring-element (element)
   (replace-regexp-in-string "^[[:space:]]+" ""
-                            (replace-regexp-in-string "[[:space:]]+$" "" (substring-no-properties element))))
+    (replace-regexp-in-string "[[:space:]]+$" "" (substring-no-properties element))))
 
 (defun preprocess-kill-ring ()
   (let ((result nil)
-        (element nil))
+         (element nil))
     (dolist (element kill-ring)
       (progn
         (setq element (pre-process-kill-ring-element element))
         (when (not (or
-                    (eq 0 (length element))
-                    (string-match-p "[\r\n]+" element)))
+                     (eq 0 (length element))
+                     (string-match-p "[\r\n]+" element)))
           (setq result (cons element result)))))
     (reverse result)))
 
 (defun browse-kill-ring ()
   (interactive)
   (insert (completing-read "Pick an element: "
-                           (preprocess-kill-ring))))
+            (preprocess-kill-ring))))
 
 
 (defun my-kill-thing-at-point (thing)
   "Kill the `thing-at-point' for the specified kind of THING."
   (let ((bounds (bounds-of-thing-at-point thing)))
     (if bounds
-        (kill-region (car bounds) (cdr bounds))
+      (kill-region (car bounds) (cdr bounds))
       (error "No %s at point" thing))))
 
 (defun my-kill-word-at-point ()
@@ -572,24 +573,24 @@ region if active."
 (defun file-name-no-path()
   (interactive)
 
-      (s-prepend(file-name-base (buffer-file-name))
-		(s-prepend "." (file-name-extension (buffer-file-name))))
-)
+  (s-prepend(file-name-base (buffer-file-name))
+    (s-prepend "." (file-name-extension (buffer-file-name))))
+  )
 
 
 (defun print-current()
   (interactive)
   (let ((current-data (thing-at-point 'symbol) ))
     (progn (my-kill-word-at-point)
-	   (insert
-	    (s-prepend "\""
-	    (s-prepend 
-		       (s-prepend
-			(s-prepend (file-name-no-path) "  :: line " )
-			(s-prepend (number-to-string (line-number-at-pos)) " :: var: " ))
-	    (s-prepend(s-prepend current-data "\", ") current-data)))
-	    )
-  )))
+      (insert
+        (s-prepend "\""
+          (s-prepend
+            (s-prepend
+              (s-prepend (file-name-no-path) "  :: line " )
+              (s-prepend (number-to-string (line-number-at-pos)) " :: var: " ))
+            (s-prepend(s-prepend current-data "\", ") current-data)))
+        )
+      )))
 
 
 
@@ -597,13 +598,13 @@ region if active."
 
 (setq current-data "test")
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Kill Ring _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Kill Ring _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;;
 
-; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;;
 
 (define-key global-map [f8] 'tiqsi-replace-string)
 
-                                        ; Editting
+;; Editting
 (define-key global-map (kbd "C-q" )'copy-region-as-kill)
 (define-key global-map (kbd "C-f" )'yank)
 (define-key global-map "" 'nil)
@@ -615,13 +616,13 @@ region if active."
 (define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
 (define-key global-map "\eO" 'tiqsi-replace-string)
-                                        ; \377 is alt-backspace
+;; \377 is alt-backspace
 (define-key global-map "\377" 'backward-kill-word)
 (define-key global-map [M-delete] 'kill-word)
 (define-key global-map "\e[" 'start-kbd-macro)
 (define-key global-map "\e]" 'end-kbd-macro)
 (define-key global-map "\e'" 'call-last-kbd-macro)
-                                        ; Buffers
+;; Buffers
 (define-key global-map "\er" 'revert-buffer)
 (define-key global-map "\ek" 'kill-this-buffer)
 (define-key global-map "\es" 'save-buffer)
@@ -645,11 +646,12 @@ region if active."
 (global-set-key (kbd "C-c <deletechar>") 'kill-whitespace)
 (global-set-key (kbd "C-c <up>") 'drag-stuff-up)
 (global-set-key (kbd "C-c <down>") 'drag-stuff-down)
-;(bind-key "<tab>" #'malb/indent-or-complete)
-; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
-; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
+;;(bind-key "<tab>" #'malb/indent-or-complete)
+;; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
+;; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
+;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;;
+
 (provide 'core-editing)
 
 ;;; core-editing.el ends here
