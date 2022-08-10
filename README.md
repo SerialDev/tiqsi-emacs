@@ -1,4 +1,4 @@
-# Tiqsi Emacs <a href="https://github.com/SerialDev/tiqsi-emacs/"> <img align="right" width="100" height="100" src="gifs/tiqsi.jpeg"></a> 
+# Tiqsi Emacs <a href="https://github.com/SerialDev/tiqsi-emacs/"> <img align="right" src="gifs/tiqsi.jpeg"></a> 
   
   
   
