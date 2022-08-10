@@ -1,16 +1,12 @@
 # Tiqsi Emacs <a href="https://github.com/SerialDev/tiqsi-emacs/"> <img align="right" src="gifs/tiqsi.jpeg"></a> 
   
-  
-  
-  
-  
-```
+
 Fully self contained emacs IDE experience.  
 
 Considers usage on windows(WSL) , linux, OSx, and,
 cloud remote connection[for repl usage] a first class citizen.
-      
-```
+
+
 
 ### BNFC
 ```
