@@ -1,4 +1,4 @@
-# Tiqsi Emacs <a align="right" href="https://github.com/SerialDev/tiqsi-emacs/">![Tiqsi Emacs](gifs/tiqsi.jpeg)</a> 
+# Tiqsi Emacs <a href="https://github.com/SerialDev/tiqsi-emacs/"> <img align="right" width="100" height="100" src="gifs/tiqsi.jpeg"></a> 
 
 
 ```
