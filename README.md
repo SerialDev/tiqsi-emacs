@@ -3,15 +3,10 @@
 
 ```
 
-    __________________     Fully self contained emacs IDE experience.  
-   |__________________|   
-      \\ \ \ / / //        Considers usage on windows(WSL) , linux, OSx, and,
-      \\_|_|_|_//          cloud remote connection[for repl usage] a first class citizen.
- Tiqsi |        |          
-       | o    o | Emacs    
-    __________________
-   |__________________|
-        \______/         
+Fully self contained emacs IDE experience.  
+
+Considers usage on windows(WSL) , linux, OSx, and,
+cloud remote connection[for repl usage] a first class citizen.
       
 ```
 
@@ -91,14 +86,5 @@ C# & F# Supported
 Heavy use of hydras 
 
 
-` ` _ _ _ _ _ _ _ _ _` ` ` ` |    
-`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
-` ` ` \\\\ \\ \\ // ///` ` ` ` ` |
-` ` `  \\\\_|_|_| // ` ` ` ` ` |  
- Tiqsi |        |` ` ` ` ` ` |    
-` ` `  | o    o | Emacs` ` ` |    
-` ` _ _ _ _ _ _ _ _ _  ` ` ` |    
-`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
-` ` ` ` \\_ _ _ /` ` ` ` ` ` `|   
 
-
+<a href="https://github.com/SerialDev/tiqsi-emacs/">![Tiqsi Emacs](gifs/tiqsi.jpeg)</a> Tiqsi Emacs
