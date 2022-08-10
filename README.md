@@ -1,3 +1,6 @@
+# Tiqsi Emacs <a href="https://github.com/SerialDev/tiqsi-emacs/">![Tiqsi Emacs](gifs/tiqsi.jpeg)</a>
+
+
 ```
 
     __________________     Fully self contained emacs IDE experience.  
