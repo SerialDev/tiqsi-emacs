@@ -27,7 +27,6 @@
 ;;
 
 (setq magit-completing-read-function 'ivy-completing-read)
-(global-magit-file-mode t)
 
 
 (use-package git-gutter-fringe
@@ -35,6 +34,12 @@
   :init
   (global-git-gutter-mode)
   (setq git-gutter-fr:side 'right-fringe))
+
+(use-package magit
+  :straight t
+  :init
+  (global-magit-file-mode t))
+
 
 
                                         ;--{Push upstream}--;

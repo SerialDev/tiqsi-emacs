@@ -63,6 +63,39 @@
     ))
 
 
+;; set variable to allow for inline-image resizing within org-mode for large images
+(setq org-image-actual-width t)
+
+;; enables abbreviations such as <s for source code
+;; enables easy templates again
+(require 'org-tempo)
+
+;; disable newline indentation
+(add-hook 'org-mode-hook (lambda ()
+                           (electric-indent-mode -1)))
+
+;; -------------------------------------
+;; ORG-BABEL
+;; -------------------------------------
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (C . t)
+   (calc . t)
+   (latex . t)
+   (java . t)
+   (ruby . t)
+   (lisp . t)
+   (scheme . t)
+   (shell . t)
+   (sqlite . t)
+   (js . t)
+   (octave . t)
+   (emacs-lisp .t)
+    (restclient . t)))
+
+
 
 (add-hook 'before-save-hook #'tiqsi-org-mode-before-save-hook)
 

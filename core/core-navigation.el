@@ -56,6 +56,11 @@ insert `%'."
 
 
 
+(straight-use-package
+  '(imenu-list :host github :repo "bmag/imenu-list"))
+
+
+
                                         ;--{Nav primitives}-;
 
 (defun previous-blank-line ()
@@ -411,6 +416,7 @@ one, an error is signaled."
 (define-key global-map (kbd "M-f") 'find-file)
 (define-key global-map (kbd "M-F") 'find-file-other-window)
 (global-set-key (kbd "C-c g") 'my-toggle-window-split)
+;; (global-set-key (kbd "<f15>") 'imenu-list-smart-toggle)
 
 (global-set-key (kbd "C-x b")  'helm-mini)
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)

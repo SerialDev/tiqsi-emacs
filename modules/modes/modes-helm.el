@@ -26,66 +26,76 @@
 ;;; Commentary:
 ;;
 
+(straight-require 'helm-rg)
 
 (use-package helm
   :straight t
   :ensure t
-  :config (progn
-	    ;; Resize
-	    (helm-autoresize-mode 1)
-	    (setq helm-autoresize-max-height 30)
-	    (setq helm-autoresize-min-height 10)
+  :config
+  (progn
+    ;; Resize
+    (helm-autoresize-mode 1)
+    (setq helm-autoresize-max-height 30)
+    (setq helm-autoresize-min-height 10)
 
-	    ;; Performance
-	    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
-	    	  helm-input-idle-delay 0.01  ; this actually updates things
+    ;; Performance
+    (setq helm-idle-delay 0.0 ; update fast sources immediately (doesn't).
+      helm-input-idle-delay 0.01  ; this actually updates things
                                         ; reeeelatively quickly.
-	    	  helm-quick-update t
-	    	  helm-M-x-requires-pattern nil
-	    	  helm-ff-skip-boring-files t)
+      helm-quick-update t
+      helm-M-x-requires-pattern nil
+      helm-ff-skip-boring-files t)
 
-	    ;; M-x features
-	    (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
-	    (setq helm-buffers-fuzzy-matching t
-		  helm-recentf-fuzzy-match t)
+    ;; M-x features
+    (setq helm-M-x-fuzzy-match t) ;; optional fuzzy matching for helm-M-x
+    (setq helm-buffers-fuzzy-matching t
+      helm-recentf-fuzzy-match t)
 
-	    (setq helm-boring-buffer-regexp-list
-		  '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+    (setq helm-boring-buffer-regexp-list
+      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
 
-	    (setq helm-boring-file-regexp-list
-		  '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
+    (setq helm-boring-file-regexp-list
+      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
-	    ;; Horizontal
+    ;; Horizontal
 
-	    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-		  helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-		  helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-		  helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-		  helm-ff-file-name-history-use-recentf t
-		  helm-echo-input-in-header-line t)
+    (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+      helm-ff-file-name-history-use-recentf t
+      helm-echo-input-in-header-line t)
 
-	    (setq helm-split-window-default-side 'below)
+    (setq helm-split-window-default-side 'below)
 
-	    ;; Semantic Imenu
+    ;; Semantic Imenu
 
-	    (setq helm-semantic-fuzzy-match t
-		  helm-imenu-fuzzy-match    t)
+    (setq helm-semantic-fuzzy-match t
+      helm-imenu-fuzzy-match    t)
 
-	    (setq helm-lisp-fuzzy-completion t)
+    (setq helm-lisp-fuzzy-completion t)
 
-	    ;; Locate any file
+    ;; Locate any file
 
-					;(shell-command "choco install; everything")
-	    (setq helm-locate-fuzzy-match t)
-	    (setq helm-apropos-fuzzy-match t)
+                                        ;(shell-command "choco install; everything")
+    (setq helm-locate-fuzzy-match t)
+    (setq helm-apropos-fuzzy-match t)
 
-	    (when (executable-find "curl")
-	      (setq helm-net-prefer-curl t))))
+    (when (executable-find "curl")
+      (setq helm-net-prefer-curl t))))
 
 ;; Straight install requirements
 
 (straight-require 'helm-smex)
+(straight-require 'hydra)
+(straight-require 'helm-projectile)
+
+(with-system darwin
+  (setq helm-rg-ripgrep-executable "/usr/local/bin/rg")
+  (setq helm-rg-default-directory 'git-root)
+  )
+
 (straight-require 'helm-etags-plus) ;; Helm Etags support
 (straight-require 'ac-helm) ;; Interactive ac with Helm
 (straight-require 'helm-pydoc) ;; Helm Python documentation
@@ -113,15 +123,15 @@
   (defun helm-posframe-display (buffer &optional _resume)
     (setq helm-posframe-buffer buffer)
     (posframe-show
-     buffer
-     :background-color "#161616"
-     :foreground-color "#DAB98F"
-     :poshandler #'posframe-poshandler-frame-bottom-left-corner
-     ;; :width (/ (window-width) 2)
-     :width (+ (window-width) 2)
-     ;; :height helm-display-buffer-height
-     :height (/ helm-display-buffer-height 3)
-     :respect-header-line t))
+      buffer
+      :background-color "#161616"
+      :foreground-color "#DAB98F"
+      :poshandler #'posframe-poshandler-frame-bottom-left-corner
+      ;; :width (/ (window-width) 2)
+      :width (+ (window-width) 2)
+      ;; :height helm-display-buffer-height
+      :height (/ helm-display-buffer-height 3)
+      :respect-header-line t))
 
   (defun helm-posframe-cleanup ()
     (posframe-hide helm-posframe-buffer))
@@ -139,24 +149,26 @@
 (use-package helm-flx
   :straight t
   :ensure t
-  :config (progn
-	    (helm-flx-mode 1)
-	    (setq helm-flx-for-helm-find-files t ;; t by default
-		  helm-flx-for-helm-locate t) ;; nil by default
-	    ))
+  :config
+  (progn
+    (helm-flx-mode 1)
+    (setq helm-flx-for-helm-find-files t ;; t by default
+      helm-flx-for-helm-locate t) ;; nil by default
+    ))
 
 ;; Interactive Silver Searcher with Helm
 
 (use-package helm-ag
   :straight t
   :ensure t
-  :config (progn
-	    (custom-set-variables
-	     '(helm-ag-base-command "ag --nocolor --nogroup --ignore-case")
-	     '(helm-ag-command-option "--all-text")
-	     '(helm-ag-insert-at-point 'symbol)
-	     '(helm-ag-ignore-buffer-patterns '("\\.txt\\'" "\\.mkd\\'")))
-	    (setq ag-highlight-search t)))
+  :config
+  (progn
+    (custom-set-variables
+      '(helm-ag-base-command "ag --nocolor --nogroup --ignore-case")
+      '(helm-ag-command-option "--all-text")
+      '(helm-ag-insert-at-point 'symbol)
+      '(helm-ag-ignore-buffer-patterns '("\\.txt\\'" "\\.mkd\\'")))
+    (setq ag-highlight-search t)))
 
 ;; Dash Documentation Support
 
@@ -164,14 +176,14 @@
   :straight t
   :ensure t
   :config (progn
-	    (eval-after-load "helm-dash"
-	      '(defun helm-dash-actions (actions doc-item) `(("Go to doc" . eww))))
-	    ;; (setq-local helm-dash-docsets-path "../../tools/dash/")
-	    (setq helm-dash-docsets-path (format "%s/.emacs.d/docsets" (getenv "HOME")))
-	    ;; (setq helm-dash-common-docsets '(("NumPy") ("Redis") ("Pandas")))
-	    ;; (setq helm-dash-browser-func 'browse-url-generic)
-	    ;; (setq helm-dash-browser-func 'browse-url)
-	    (setq helm-dash-browser-func 'eww)))
+            (eval-after-load "helm-dash"
+              '(defun helm-dash-actions (actions doc-item) `(("Go to doc" . eww))))
+            ;; (setq-local helm-dash-docsets-path "../../tools/dash/")
+            (setq helm-dash-docsets-path (format "%s/.emacs.d/docsets" (getenv "HOME")))
+            ;; (setq helm-dash-common-docsets '(("NumPy") ("Redis") ("Pandas")))
+            ;; (setq helm-dash-browser-func 'browse-url-generic)
+            ;; (setq helm-dash-browser-func 'browse-url)
+            (setq helm-dash-browser-func 'eww)))
 
                                         ;-{Patch Helpful.el};
 
@@ -208,8 +220,8 @@
                                         ;--{Eshell History}-;
 
 (add-hook 'eshell-mode-hook
-          #'(lambda ()
-              (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
+  #'(lambda ()
+      (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
 
 
                                         ;---{Buffer Funcs}--;
@@ -217,32 +229,32 @@
 (defun amitp/buffer-file-names ()
   "A list of filenames for the current buffers"
   (loop for filename in (mapcar 'buffer-file-name (buffer-list))
-        when filename
-        collect filename))
+    when filename
+    collect filename))
 
 (defun amitp/helm-for-files ()
   "Global filename match, over all files I typically open"
   (interactive)
   (let ((helm-ff-transformer-show-only-basename nil)
-        (recentf-list
-         (mapcar 'abbreviate-file-name
-                 (append (amitp/buffer-file-names)
-                         (helm-skip-boring-files (directory-files default-directory t))
-                         recentf-list
+         (recentf-list
+           (mapcar 'abbreviate-file-name
+             (append (amitp/buffer-file-names)
+               (helm-skip-boring-files (directory-files default-directory t))
+               recentf-list
                                         ;amitp/global-file-list
-                         ))))
+               ))))
     (helm
-     :sources '(helm-source-recentf)
-     :buffer "*helm for files*")))
+      :sources '(helm-source-recentf)
+      :buffer "*helm for files*")))
 
 
 (defun amitp/helm-locate (candidate)
   "Fallback when helm-recentf doesn't find what I want"
   (interactive)
   (helm :sources '(helm-source-locate helm-source-find-files)
-        :buffer "*helm locate*"
-        :input helm-input
-        :resume 'noresume))
+    :buffer "*helm locate*"
+    :input helm-input
+    :resume 'noresume))
 
 (defun amitp/helm-for-files-fallback ()
   (interactive)
@@ -254,16 +266,16 @@
 (defun helm-objc-headlines ()
   (interactive)
   (helm :sources '(((name . "Objective-C Headlines")
-                    (volatile)
-                    (headline  "^[-+@]\\|^#pragma mark")))))
+                     (volatile)
+                     (headline  "^[-+@]\\|^#pragma mark")))))
 
 (defun helm-clojure-headlines ()
   "Display headlines for the current Clojure file."
   (interactive)
   (helm-mode t)
   (helm :sources '(((name . "Clojure Headlines")
-                    (volatile)
-                    (headline "^[;(]")))))
+                     (volatile)
+                     (headline "^[;(]")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; PACKAGE: helm-descbinds                      ;;
@@ -279,30 +291,31 @@
 (use-package helm-swoop
   :straight t
   :ensure t
-  :config (progn
-	    ;; If this value is t, split window inside the current window
-	    (setq helm-swoop-split-with-multiple-windows nil)
+  :config
+  (progn
+    ;; If this value is t, split window inside the current window
+    (setq helm-swoop-split-with-multiple-windows nil)
 
-	    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
-	    (setq helm-swoop-split-direction 'split-window-vertically)
+    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+    (setq helm-swoop-split-direction 'split-window-vertically)
 
-	    ;; If nil, you can slightly boost invoke speed in exchange for text color
-	    (setq helm-swoop-speed-or-color t)
+    ;; If nil, you can slightly boost invoke speed in exchange for text color
+    (setq helm-swoop-speed-or-color t)
 
-	    ;; Optional face for line numbers
-	    ;; Face name is `helm-swoop-line-number-face`
-	    (setq helm-swoop-use-line-number-face t)
+    ;; Optional face for line numbers
+    ;; Face name is `helm-swoop-line-number-face`
+    (setq helm-swoop-use-line-number-face t)
 
-	    ;; If you prefer fuzzy matching
-	    (setq helm-swoop-use-fuzzy-match t)
+    ;; If you prefer fuzzy matching
+    (setq helm-swoop-use-fuzzy-match t)
 
-	    ;; If there is no symbol at the cursor, use the last used words instead.
-	    (setq helm-swoop-pre-input-function
-		  (lambda ()
-		    (let (($pre-input (thing-at-point 'symbol)))
-		      (if (eq (length $pre-input) 0)
-			  helm-swoop-pattern ;; this variable keeps the last used words
-			$pre-input))))))
+    ;; If there is no symbol at the cursor, use the last used words instead.
+    (setq helm-swoop-pre-input-function
+      (lambda ()
+        (let (($pre-input (thing-at-point 'symbol)))
+          (if (eq (length $pre-input) 0)
+            helm-swoop-pattern ;; this variable keeps the last used words
+            $pre-input))))))
 
                                         ;----{Multi term}---;
 
@@ -347,16 +360,16 @@
 
 (defhydra hydra-helm-ag (:color blue :hint nil)
   "
-								  ^Search^                 ^Interactive^
+                                                                  ^Search^                 ^Interactive^
 ` ` _ _ _ _ _ _ _ _ _` ` ` ` | ------------------------------------------------------
 `  |_ _ _ _ _ _ _ _ _ |` ` ` | _A_: Search              _a_: Interactive search
 ` ` ` \\\\ \\ \\ // ///` ` ` ` ` | _F_: Search this file    _f_: Interactive search this file
 ` ` `  \\\\_|_|_| // ` ` ` ` ` |  _S_: Search project      _s_: Interactive search project
  Tiqsi |        |` ` ` ` ` ` |    _B_: Search buffers      _b_: Interactive search buffers
-` ` `  | o    o | Emacs` ` ` |    
-` ` _ _ _ _ _ _ _ _ _  ` ` ` |    
-`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
-` ` ` ` \\_ _ _ /` ` ` ` ` ` `|   
+` ` `  | o    o | Emacs` ` ` |
+` ` _ _ _ _ _ _ _ _ _  ` ` ` |
+`  |_ _ _ _ _ _ _ _ _ |` ` ` |
+` ` ` ` \\_ _ _ /` ` ` ` ` ` `|
 "
   ("A" helm-ag)
   ("F" helm-ag-this-file)
@@ -367,6 +380,8 @@
   ("s" helm-do-ag-project-root)
   ("b" helm-do-ag-buffers)
   ("ESC" nil "Exit"))
+
+
 
 
 (use-package helm-ag
@@ -381,16 +396,16 @@
 
 (defhydra hydra-window-stuff (:hint nil)
   "
-								            Split: _v_ert  _s_:horz
+                                                                            Split: _v_ert  _s_:horz
 ` ` _ _ _ _ _ _ _ _ _` ` ` ` | Delete: _c_lose  _o_nly
 `  |_ _ _ _ _ _ _ _ _ |` ` ` | Switch Window: _h_:left  _j_:down  _k_:up  _l_:right
 ` ` ` \\\\ \\ \\ // ///` ` ` ` ` | Buffers: _p_revious  _n_ext  _b_:select  _f_ind-file  _F_projectile
 ` ` `  \\\\_|_|_| // ` ` ` ` ` | Winner: _u_ndo  _r_edo
  Tiqsi |        |` ` ` ` ` ` | Resize: _H_:splitter left  _J_:splitter down  _K_:splitter up  _L_:splitter right
 ` ` `  | o    o | Emacs` ` ` | Move: _a_:up  _z_:down  _i_menu
-` ` _ _ _ _ _ _ _ _ _  ` ` ` |    
-`  |_ _ _ _ _ _ _ _ _ |` ` ` |    
-` ` ` ` \\_ _ _ /` ` ` ` ` ` `|   
+` ` _ _ _ _ _ _ _ _ _  ` ` ` |
+`  |_ _ _ _ _ _ _ _ _ |` ` ` |
+` ` ` ` \\_ _ _ /` ` ` ` ` ` `|
 "
 
 
@@ -437,7 +452,7 @@
   ("/" (lambda ()
          (interactive)
          (execute-kbd-macro [?\C-s]))
-   "search")
+    "search")
   ("v" helm-execute-persistent-action)
   ("g" helm-beginning-of-buffer "top")
   ("h" helm-previous-source)
@@ -470,7 +485,7 @@
 
 ;; TODO Mode specific hydras send to something else
 (defhydra hydra-helm-menu (:color pink
-                                  :hint nil)
+                            :hint nil)
   "
 ^Code^                ^Movement^           ^Search^               ^Misc
 ^^^^^^^^---------------------------------------------------------------------------------
@@ -532,7 +547,10 @@ _j_: jedi:related-names
                                         ;{Python documentation};
   ("pd" helm-pydoc :color blue)
                                         ;--{Search with Ag}-;
-  ("ss" helm-ag :color blue)
+  ("ss"   (if tiqsi-osx
+            (call-interactively 'helm-rg)
+            helm-ag
+            ) :color blue)
                                         ;-{Ag project root}-;
   ("sp" helm-ag-project-root :color blue)
   ("c" nil "cancel")
@@ -559,7 +577,63 @@ _j_: jedi:related-names
   ("D" (progn (kill-this-buffer) (next-buffer)) "Delete" :color red)
   ("s" save-buffer "save" :color red))
 
+(require 'cl-lib)
+(require 'helm)
 
+(defun get-python-functions (file)
+  "Extract Python function definitions from FILE."
+  (if (file-readable-p file)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (let ((result '())
+              (re "^def\\s-+\\(\\w+\\)\\s-*("))
+          (while (re-search-forward re nil t)
+            (push (cons (match-string-no-properties 1) (cons file (point))) result))
+          (message "File: %s | Functions: %s" file result)
+          result))
+    (progn
+      (message "File not readable: %s" file)
+      '())))
+
+(defun find-duplicate-python-functions (dir)
+  "Recursively find duplicate Python function definitions in a directory."
+  (let* ((files (directory-files-recursively dir "\\.py$"))
+         (functions (cl-remove nil (mapcar 'get-python-functions files)))
+         (grouped (seq-group-by 'car functions)))
+    (message "FILES: %s" files)
+    (message "FUNCTIONS: %s" functions)
+    (message "GROUPED: %s" grouped)
+    (cl-remove-if (lambda (x) (= (length x) 1)) grouped)))
+
+
+
+(defun helm-python-duplicate-functions-source (duplicates)
+  "Create a Helm source for duplicate Python functions from DUPLICATES."
+  (helm-build-sync-source "Duplicate Python Functions"
+    :candidates (cl-mapcan (lambda (group)
+                             (cl-mapcar (lambda (func)
+                                          (let ((func-name (car func))
+                                                (file (car (cdr func)))
+                                                (marker (cdr (cdr func))))
+                                            (cons (format "%s: %s" func-name file) marker)))
+                                        group))
+                           duplicates)
+    :action (lambda (candidate)
+              (let ((marker (cdr candidate)))
+                (switch-to-buffer (marker-buffer marker))
+                (goto-char marker)
+                (hi-lock-mode)
+                (hi-lock-face-buffer (format "^def\\s-+\\(%s\\)\\s-*(" (thing-at-point 'symbol))
+                                     'hi-yellow))))) 
+
+(defun check-duplicate-python-functions (dir)
+  "Check for duplicate Python function definitions in DIR and display them with Helm."
+  (interactive "DSelect directory: ")
+  (let ((duplicates (find-duplicate-python-functions dir)))
+    (message "DUPLICATES: %s" duplicates)
+    (if duplicates
+        (helm :sources (helm-python-duplicate-functions-source duplicates))
+      (message "No duplicate Python function definitions found."))))
 
                                         ;---{Keybindings}---;
 
@@ -571,9 +645,9 @@ _j_: jedi:related-names
 
 (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history) ;; For Minibuffer
 (define-key shell-mode-map (kbd "C-c C-l") 'helm-comint-input-ring) ;; For Shell
-;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-;(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-;(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+                                        ;(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+                                        ;(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+                                        ;(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 ;; (define-key global-map (kbd "C-c b") 'helm-mini) ;; Browse Open Buffers ;; Offloaded to selectrum now
 (global-set-key (kbd "C-<return>") 'ac-complete-with-helm)
 
@@ -584,3 +658,8 @@ _j_: jedi:related-names
 (provide 'modes-helm)
 
 ;;; modes-helm.el ends here
+
+
+
+
+

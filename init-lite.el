@@ -236,6 +236,11 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-comments.el")
 
 
+(load-expand "modules/modes/modes-ido.el")
+(load-expand  "modules/modes/modes-helm.el")
+(load-expand  "modules/programming/programming-lisp.el")
+(load-expand  "modules/programming/programming-python-lite.el")
+
 (load-expand  "modules/modes/modes-company.el")
 (load-expand  "modules/modes/modes-shell.el")
 (load-expand  "modules/modes/modes-avy.el")
@@ -246,11 +251,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/programming/programming-javascript.el")
 (load-expand  "modules/programming/programming-zig.el")
 (load-expand  "modules/programming/programming-clojure.el")
-
-(load-expand "modules/modes/modes-ido.el")
-(load-expand  "modules/modes/modes-helm.el")
-(load-expand  "modules/programming/programming-lisp.el")
-(load-expand  "modules/programming/programming-python-lite.el")
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)

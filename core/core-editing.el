@@ -31,6 +31,7 @@
 
 ;;                                 Commenting                                ;
 
+
 (defun comment-or-uncomment-region-or-line ()
   "Comments or uncomments the region or the current line if there's no active region."
   (interactive)
@@ -46,6 +47,10 @@
               (end-of-line)
               (point))))
     (comment-or-uncomment-region start end)))
+
+
+(with-system darwin
+  (global-set-key (kbd "M-\\") (lambda () (interactive) (comment-or-uncomment-region-or-line))))
 
 
 

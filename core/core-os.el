@@ -37,6 +37,7 @@
      ,@body))
 
 (with-system darwin
+  (setq tiqsi-osx t)
   (message "OSX laptop!"))
 
 (with-system windows
@@ -168,6 +169,12 @@
 
 ;;                                               Mac OS                                              ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+
+(with-system darwin
+  (setq ns-alternate-modifier 'meta)
+  (setq ns-right-alternate-modifier 'none)
+)
 
 (when tiqsi-aquamacs
   (cua-mode 0)

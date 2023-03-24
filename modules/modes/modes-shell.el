@@ -189,7 +189,7 @@
    :repo "DamienCassou/etop-mode"
 ))
 
-
+(try!
 (when-executable
  "nmap"
  (progn
@@ -197,10 +197,6 @@
    ;; #notice that some companies might not like you using nmap
    (create-tooltip-command "ports-listening-tcp" "nmap -sT -O localhost")
 ))
-
-
-(with-system darwin
-  ()
 )
 
 

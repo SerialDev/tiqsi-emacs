@@ -1,4 +1,4 @@
-;;; programming-javascript.el --- Tiqsi Emacs base  -*- lexical-binding: t -*-
+;;; Programming-javascript.el --- Tiqsi Emacs base  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-  Andres Mariscal
 

@@ -22,10 +22,12 @@
   )
 
 (with-system darwin
+  (try!
+    (progn
   (setq inferior-lisp-program "sbcl")
   (load (expand-file-name "~/.roswell/helper.el"))
   (message "ros ready for OSX")
-  )
+  )))
 
 
 (with-system windows

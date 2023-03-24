@@ -8,6 +8,7 @@
 ;; _ _ _ _ _ _ _ _    /¯¯¯ Fixes upstream bug <25.2RC ¯¯¯\_ _ _ _ _ _ _ _    ;
 
 
+
 ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=25753#44
 
 (when (version< emacs-version "25.2")
@@ -889,6 +890,14 @@ sEnter Doctest result: ")
 
 ;; ------------------------------------------------------------------------- ;
 ;; ------------------------------------------------------------------------- ;
+
+(straight-require 'py-isort)
+
+(defun sdev/py-sort-imports ()
+  (interactive)
+  (mark-whole-buffer)
+  (py-isort-region))
+
 
 
 ;; ;;; ein:notebook-save-notebook-command when in ein mode
