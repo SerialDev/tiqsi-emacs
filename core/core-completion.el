@@ -98,22 +98,25 @@
 ;; TODO fix this for msys2
 ;; (straight-require 'popup-pos-tip)
 
-;; TODO: DEBUG
+;; TODO: make a rust and python version too
 (defun core-completion-describe-function (function)
   "Display the full documentation of FUNCTION (a symbol) in tooltip."
   (interactive (list (function-called-at-point)))
   (if (null function)
-    (pos-tip-show
-      "** You didn't specify a function! **" '("red"))
-    (pos-tip-show
-      (with-temp-buffer
-        (let ((standard-output (current-buffer))
-               (help-xref-following t))
-          (prin1 function)
-          (princ " is ")
-          (describe-function-1 function)
-          (buffer-string)))
-      nil nil nil 0)))
+      (pos-tip-show
+       "** You didn't specify a function! **" '("red"))
+    (if (symbolp function)
+        (pos-tip-show
+         (with-temp-buffer
+           (let ((standard-output (current-buffer))
+                  (help-xref-following t))
+             (prin1 function)
+             (princ " is ")
+             (describe-function-1 function)
+             (buffer-string)))
+         nil nil nil 0)
+      (pos-tip-show
+       (format "** %s is not a symbol! **" function) '("red")))))
 
 
 (defun describe-thing-in-popup ()

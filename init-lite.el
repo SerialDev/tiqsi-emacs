@@ -36,7 +36,6 @@
 
 (setq lisp-indent-offset 2)
 
-
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
                           ("melpa" . "http://melpa.org/packages/")))
 (package-initialize)
@@ -237,7 +236,7 @@ of an error, just add the package to a list of missing packages."
 
 
 (load-expand "modules/modes/modes-ido.el")
-(load-expand  "modules/modes/modes-helm.el")
+(load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
 (load-expand  "modules/programming/programming-lisp.el")
 (load-expand  "modules/programming/programming-python-lite.el")
 

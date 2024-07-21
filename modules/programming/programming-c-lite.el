@@ -1,4 +1,4 @@
-﻿;;; programming-c-lite.el --- Tiqsi C & CPP programming support based on clang  -*- lexical-binding: t -*-
+﻿;; programming-c-lite.el --- Tiqsi C & CPP programming support based on clang  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2018-  Andres Mariscal
 
@@ -35,18 +35,74 @@
 
 (require 'compile)
 
-(defun tiqsi-compile(compile-string)
+;; (defun tiqsi-compile(compile-string)
+;;   (interactive "sString to compile: ")
+;;   (if (boundp 'tiqsi-compile--command)
+;;     (progn
+;;       (compile tiqsi-compile--command)
+;;       (setq tiqsi-compile--command compile-string)
+;;       )
+;;     (progn
+;;       (setq tiqsi-compile--command compile-string)
+;;       (compile tiqsi-compile--command)
+;;       )
+;;     ))
+
+
+
+
+(defun tiqsi-compile-extract-executable (compile-string)
+  "Extract the name of the executable from the compile string."
+  (if (string-match "\\(?:-o\\s-+\\)\\([^\\s-]+\\)" compile-string)
+    (match-string 1 compile-string)
+    compile-string))
+
+
+(defun tiqsi-compile--utils--setmode (buffer-name)
+  "Switch the specified buffer to compile-mode after 1 second."
+  (run-at-time "3 sec" nil
+    (lambda ()
+      (let ((buffer (get-buffer buffer-name)))
+        (when buffer
+          (with-current-buffer buffer
+            (compilation-mode)))))))
+
+
+(defun tiqsi-compile (compile-string)
   (interactive "sString to compile: ")
-  (if (boundp 'tiqsi-compile--command)
-    (progn
-      (compile tiqsi-compile--command)
-      (setq tiqsi-compile--command compile-string)
-      )
-    (progn
-      (setq tiqsi-compile--command compile-string)
-      (compile tiqsi-compile--command)
-      )
-    ))
+  (let* ((buffer-dir (or (and (boundp 'default-directory)
+                           default-directory)
+                       (file-name-directory buffer-file-name)))
+          (compile-command (concat "cd " buffer-dir " && " compile-string))
+          (executable (tiqsi-compile-extract-executable compile-string))
+          (current-window (selected-window))
+          (other-window (next-window current-window nil t)))
+    (setq tiqsi-compile--command compile-string)
+    (setq tiqsi-compile--executable executable)
+    (message "Compiling executable: %s" executable)
+    (with-selected-window other-window
+      (let ((compilation-buffer-name-function (lambda (mode) "*tiqsi-compile*"))
+             (display-buffer-alist
+               `(("*tiqsi-compile*" . ((display-buffer-reuse-window
+					 display-buffer-same-window))))))
+        (compile compile-command)
+	(tiqsi-compile--utils--setmode "*shell*")
+	))))
+
+
+(defun tiqsi-compile-run ()
+  (interactive)
+  (let* ((executable (or (and (boundp 'tiqsi-compile--executable)
+                           tiqsi-compile--executable)
+                       (error "No executable found. Compile first!")))
+          (buffer-dir (or (and (boundp 'default-directory)
+                            default-directory)
+                        (file-name-directory buffer-file-name)))
+          (command (format "cd %s && chmod +x %s && ./%s" buffer-dir executable executable)))
+    (message "Running executable: %s" executable)
+    (async-shell-command command "*tiqsi-run*")))
+
+
 
 (defun tiqsi-compile--reset-string(compile-string)
   (interactive "sString to compile: ")
@@ -55,14 +111,10 @@
     (compile tiqsi-compile--command)
     ))
 
-
-(defun tiqsi-compile--no-message()
+(defun tiqsi-compile--no-message ()
   (interactive)
-  (if (boundp 'tiqsi-compile--command)
-    (progn
-      (compile tiqsi-compile--command)
-      )
-    (call-interactively 'tiqsi-compile) ))
+  (tiqsi-compile tiqsi-compile--command)
+  )
 
 
 ;; ------------------------------------------------------------------------- ;
@@ -94,6 +146,18 @@
       )))
 
 
+(defun send-to-compile-other(command-string)
+  (with-current-buffer "*compile-other*"
+    (let ((process (get-buffer-process (current-buffer)))
+           )
+      (unless process
+        (error "No process in %s" buffer-or-name))
+      (goto-char (process-mark process))
+      (insert command-string)
+      (comint-send-input nil t )
+      )))
+
+
 (defun tiqsi--tool-valgrind--run(string)
   (interactive "sString for file_name: ")
   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
@@ -113,6 +177,21 @@
   )
 
 
+(defun tiqsi--util-gen-compilation ()
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+          (default-directory (file-name-directory current-file))
+          (buffer-name (file-name-sans-extension (buffer-name)))
+          (executable (concat buffer-name ""))
+          (source-files (directory-files default-directory t "\\.\\(c\\|cpp\\)$"))
+          (compile-command (format "clang -o %s %s"
+                             executable
+                             (mapconcat 'identity source-files " "))))
+    (message "Generated compile command: %s" compile-command)
+    (kill-new compile-command)))
+
+
+
 (defun tiqsi--tool-cpp-quick-run()
   (interactive)
   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
@@ -127,12 +206,22 @@
   )
 
 
-(defun tiqsi--tool-clang-tidy(string)
-  (interactive "sString for files to compile: ")
-  ;; (let ((input (cfrs-read "Text: " "Initial Input")))
-  (compile (s-concat "clang-tidy "(current-buffer-path)  string ))
-  )
 
+;; (defun tiqsi--tool-clang-tidy(string)
+;;   (interactive "sString for files to compile: ")
+;;   ;; (let ((input (cfrs-read "Text: " "Initial Input")))
+;;   (compile (s-concat "clang-tidy "(current-buffer-path)  string ))
+;;   )
+
+(defun tiqsi--tool-clang-tidy (files)
+  (interactive "sString for files to compile: ")
+  (let* ((buffer-dir (or (and (boundp 'default-directory)
+                           default-directory)
+                       (file-name-directory buffer-file-name)))
+          (file-paths (concat buffer-dir files))
+          (command (concat "clang-tidy " file-paths)))
+    (message "Running clang-tidy on: %s" file-paths)
+    (compile command)))
 
 
 (defun tiqsi--tool-coz--run(string arguments)
@@ -174,9 +263,9 @@ sString arguments for causal profiler: ")
     (send-to-shell (s-prepend "rm " llvm))
     (send-to-shell (s-prepend
                      (s-prepend
-                       "mv "
-                       (s-join "\\."(butlast (s-split "\\." llvm)
-                                      2)))
+		       "mv "
+		       (s-join "\\."(butlast (s-split "\\." llvm)
+				      2)))
                      clang-v))
     (send-to-shell (s-prepend "sudo mv" (s-prepend clang-v " /usr/local")))
     (bashrc_funcs)
@@ -405,7 +494,35 @@ header"
         (sdev/jump-window))
       )
     )
+
+  
   (message "compile defined"))
+
+
+
+(defun compile-other (data)
+  "Compile and run code in a dedicated window, reusing the existing split if necessary.
+USAGE: (compile-other \"my-code-to-compile\")"
+  (let* ((buf (get-buffer-create "*compile-other*"))
+          (current-win (selected-window))
+          (other-win (next-window current-win))
+          (current-directory default-directory))
+    (select-window other-win)
+    (set-window-buffer other-win buf)
+    (with-current-buffer buf
+      (setq default-directory current-directory)
+      (erase-buffer)
+      (if (get-buffer-process buf)
+        (progn
+          (send-to-compile-other data)
+          (send-to-compile-other "exit")
+          (sdev/jump-window))
+        (progn
+          (shell buf)
+          (send-to-compile-other data)
+          (send-to-compile-other "exit")
+          (sdev/jump-window))))
+    (select-window current-win)))
 
 
 
@@ -442,9 +559,35 @@ header"
 "))
 
 
+					; ------------------------------------------------------------------------- ;
+					;                                smartparens                                ;
+					; ------------------------------------------------------------------------- ;
+
+(straight-require 'smartparens)
+;; Enable smartparens only for C and C++ modes
+(add-hook 'c-mode-hook #'smartparens-mode)
+(add-hook 'c++-mode-hook #'smartparens-mode)
+
+(defun my-create-newline-and-enter-sexp (&rest _ignored)
+  "Create a newline and place the cursor in between the braces."
+  (newline)
+  (indent-according-to-mode)
+  (forward-line -1)
+  (indent-according-to-mode))
+
+
+;; Optional: Configure smartparens for C and C++ specifics
+(sp-with-modes '(c-mode c++-mode)
+  (sp-local-pair "{" nil :post-handlers '((my-create-newline-and-enter-sexp "RET")))
+  (sp-local-pair "(" nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
+
+;; (add-hook 'c-mode-hook #'lsp)
+
+
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Snippets _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;
 
 ;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
+
 
 
 ;;                                   c-mode                                  ;
@@ -457,6 +600,7 @@ header"
     (define-key c-mode-map (kbd "C-c n") 'flymake-goto-next-error)
     (define-key c-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
     (define-key c-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+    (define-key c-mode-map (kbd "C-c C-p") 'tiqsi-compile-run)
     ))
 
 ;;                                  c++-mode                                 ;
@@ -470,6 +614,7 @@ header"
     (define-key c++-mode-map (kbd "C-c n") 'flymake-goto-next-error)
     (define-key c++-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
     (define-key c++-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
+    (define-key c++-mode-map (kbd "C-c C-p") 'tiqsi-compile-run)
     ))
 
 

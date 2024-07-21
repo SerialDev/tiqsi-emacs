@@ -174,7 +174,7 @@
 (with-system darwin
   (setq ns-alternate-modifier 'meta)
   (setq ns-right-alternate-modifier 'none)
-)
+  )
 
 (when tiqsi-aquamacs
   (cua-mode 0)
@@ -208,9 +208,21 @@
     (message system-type)))
 
 
+(defmacro check-exec (exec &rest body)
+  "Check if EXEC is an executable in the environment.
+
+If EXEC is found, evaluate the first part of BODY, otherwise evaluate the second part.
+BODY should contain two parts: what to do if EXEC is found, and what to do if not found."
+  (declare (indent defun))
+  `(let ((executable-path (executable-find ,exec)))
+     (if executable-path
+       (progn ,@(car body))  ; Execute the first part of BODY if the executable is found
+       (progn ,@(cadr body))))) ; Execute the second part of BODY if the executable is not found
+
+
 ;;                 https://oremacs.com/2019/03/24/shell-apt/                 ;
 ;; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
-
+;; TODO inspect this
 (advice-add
   'ansi-color-apply-on-region
   :before 'ora-ansi-color-apply-on-region)
@@ -254,6 +266,10 @@ Display progress in the mode line instead."
 ;; Also auto refresh dired, but be quiet about it
 (setq global-auto-revert-non-file-buffers t)
 (setq auto-revert-verbose nil)
+
+
+(add-hook 'shell-mode-hook 'company-mode)
+
 
 ;;                                            Keybindings                                            ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;

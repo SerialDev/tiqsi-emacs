@@ -238,8 +238,8 @@ Single Capitals as you type."
 (global-set-key (kbd "M-g p") 'dumb-jump-quick-look)
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
-(define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
-(define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
+;;(define-key emacs-lisp-mode-map (kbd "C-.") 'elisp-slime-nav-describe-elisp-thing-at-point)
+;;(define-key emacs-lisp-mode-map (kbd "M-.") 'elisp-slime-nav-find-elisp-thing-at-point)
 
 
 

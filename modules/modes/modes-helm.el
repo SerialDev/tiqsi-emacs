@@ -548,9 +548,10 @@ _j_: jedi:related-names
   ("pd" helm-pydoc :color blue)
                                         ;--{Search with Ag}-;
   ("ss"   (if tiqsi-osx
-            (call-interactively 'helm-rg)
-            helm-ag
+            (call-interactively 'helm-ag)
+            ag-highlight-search
             ) :color blue)
+  
                                         ;-{Ag project root}-;
   ("sp" helm-ag-project-root :color blue)
   ("c" nil "cancel")
@@ -736,31 +737,6 @@ _j_: jedi:related-names
     (my-helm-buffer result)))
 
 
-
-(defun python-duplicate-functions-in-dir (directory)
-  (interactive "DDirectory: ")
-  (let ((py-files (directory-files directory t "\\.py$"))
-        (function-names '())
-        (duplicates '())
-        (initial-buffer (current-buffer)))
-    (dolist (file py-files)
-      (when (and (not (file-symlink-p file)) (file-exists-p file))
-        (with-current-buffer (find-file-noselect file)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\s-*def\\s-+\\([_a-zA-Z0-9]+\\)\\s-*(" nil t)
-            (let ((function-name (match-string 1)))
-              (push function-name function-names)))
-          (unless (eq (current-buffer) initial-buffer)
-            (kill-buffer)))))
-    (dolist (fn function-names)
-      (when (> (count fn function-names) 1)
-        (push fn duplicates)))
-    (let ((unique-duplicates (delete-dups duplicates)))
-      (dolist (dup unique-duplicates)
-        (message "Duplicate function: %s" dup)))))
-
-
-
 (defun python-duplicate-functions-in-dir (directory)
   (interactive "DDirectory: ")
   (let ((py-files (directory-files directory t "\\.py$"))
@@ -783,6 +759,34 @@ _j_: jedi:related-names
         (push fn duplicates)))
     (let ((sorted-duplicates (sort (delete-dups duplicates) (lambda (a b) (string< (cadr a) (cadr b))))))
       (my-helm-buffer sorted-duplicates))))
+
+(defun ag-search-and-highlight (query)
+  "Perform ag search and highlight results in another buffer"
+  (interactive "sEnter search query: ")
+  (let* ((results-buffer (get-buffer-create "*Ag Search Results*"))
+         (ag-command "ag")
+         (ag-arguments `("-l" "--nobreak" "--nocolor" "--hidden" ,query))
+         (full-directory (shell-quote-argument (expand-file-name "."))))
+    (with-current-buffer results-buffer
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (insert (format "Ag search results for '%s' in %s:\n\n" query default-directory)))
+    (let ((process (apply 'start-file-process "ag-search" results-buffer ag-command ag-arguments)))
+      (set-process-sentinel process
+        (lambda (p e)
+          (when (eq (process-status p) 'exit)
+            (with-current-buffer (process-buffer p)
+              (goto-char (point-max))
+              (if (= (process-exit-status p) 0)
+                  (progn
+                    (goto-char (point-min))
+                    (if (re-search-forward "^\\([^:]+\\):\\([0-9]+\\):" nil t)
+                        (insert "\nSearch completed. Issues found.\n")
+                      (insert "\nSearch completed. No matches found.\n")))
+                (insert (format "\nSearch failed with error code %d.\n" (process-exit-status p))))
+              (highlight-regexp (format "\\(%s\\)" (regexp-quote query)) 'hi-yellow)
+              (setq buffer-read-only t)
+              (display-buffer (process-buffer p)))))))))
 
 
 

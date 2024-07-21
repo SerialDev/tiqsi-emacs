@@ -44,6 +44,9 @@ insert `%'."
     (t (self-insert-command (or arg 1)))))
 
 
+(global-set-key (kbd "%") 'match-paren)
+
+
 ;; TODO: debug this                                                          ;
 ;; ------------------------------------------------------------------------- ;
 ;;           CTRLF Searching to replace isearch base functionality           ;
@@ -63,20 +66,22 @@ insert `%'."
 
                                         ;--{Nav primitives}-;
 
+
 (defun previous-blank-line ()
-  "Moves to the previous line containing nothing but whitespace."
+  "Moves to the previous line containing nothing but whitespace.
+If there's no previous blank line, goes to point-min."
   (interactive)
-  (search-backward-regexp "^[ \t]*\n")
-  )
+  (condition-case nil
+      (search-backward-regexp "^[ \t]*\n")
+    (error (goto-char (point-min)))))
 
 (defun next-blank-line ()
   "Moves to the next line containing nothing but whitespace."
   (interactive)
   (forward-line)
-  (search-forward-regexp "^[ \t]*\n")
-  (forward-line -1)
-  )
-
+  (if (search-forward-regexp "^[ \t]*\n" nil t)
+      (forward-line -1)
+    (goto-char (point-max))))
 
                                         ;----{Nav Shift}----;
 

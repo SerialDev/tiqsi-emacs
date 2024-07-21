@@ -26,6 +26,11 @@
 ;;; Commentary:
 ;; 
 
+(defun connect-to-tramp-ssh ()
+  (interactive)
+  (setq tramp-default-method "ssh")
+  (find-file "/ssh:serialdev@192.168.1.92:tramp.land"))
+
 
 ; (defun python-tramp-hook()
 ; (setq
@@ -40,6 +45,9 @@
 ;  python-shell-completion-string-code
 ;  "';'.join(get_ipython().Completer.all_completions('''%s'''))\n"))
 ;(add-hook 'python-mode-hook 'python-tramp-hook)
+
+
+
 
 
 (provide 'modes-tramp)

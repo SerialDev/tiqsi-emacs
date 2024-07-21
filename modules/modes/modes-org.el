@@ -26,6 +26,41 @@
 ;;; Commentary:
 ;;
 
+(straight-require 'org-tree-slide)
+
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
+
+
+(org-babel-do-load-languages
+'org-babel-doload-languages
+'(
+
+   ))
+
+
+(org-babel-do-load-languages
+  'org-babel-load-languages '(
+   (python . t)
+			       ))
+
+
+(org-babel-do-load-languages
+  'org-babel-load-languages '(
+   (C . t)
+			       ))
+
+(org-babel-do-load-languages
+  'org-babel-load-languages '(
+   (shell . t)
+			       ))
+
+(setq org-babel-python-command "python3")
+
+;; (setq org-babel-shell-command "sh")
+(setq org-startup-with-inline-images t)
+
+
+
 
 (straight-use-package
  '(ox-reveal

@@ -26,61 +26,61 @@
 ;;; Commentary:
 ;;
 
-;                                         Startup Windowing                                         ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         Startup Windowing                                         ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq next-line-add-newlines nil)
 (setq-default truncate-lines t)
 (setq truncate-partial-width-windows nil)
 (split-window-horizontally)
 
-;                                            No Scrollbar                                           ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                            No Scrollbar                                           ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (scroll-bar-mode -1))
 
-;                                             NO Toolbar                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                             NO Toolbar                                            ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (tool-bar-mode 0))
 
-;                                         NO shift to select                                        ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         NO shift to select                                        ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq shift-select-mode nil)
 
-;                                          Dont ask Yes/No                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          Dont ask Yes/No                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
 
-;                                          NO middle mouse                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-;no screwing with my middle mouse button                                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          NO middle mouse                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;no screwing with my middle mouse button                                                            ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-unset-key [mouse-2])
 
 
-;                                           Smooth Scroll                                           ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                           Smooth Scroll                                           ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 (setq scroll-step 3)
 
 
-;                                          Show Keystrokes                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          Show Keystrokes                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq echo-keystrokes 0.0001)
 
-; _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Face modifiers ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
+					; _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Face modifiers ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
 
-;                                          Brigth red TODO                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          Brigth red TODO                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (setq fixme-modes '(c++-mode c-mode emacs-lisp-mode python-mode))
 
@@ -95,20 +95,20 @@
 
 (mapc (lambda (mode)
         (font-lock-add-keywords
-         mode
-         '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
-           ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
-           ("\\<\\(CHECK\\)" 1 'font-lock-check-face t)
-           ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
-           ("\\<\\(WIP\\)" 1 'font-lock-wip-face t)
-           ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
-           ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
-           ("\\<\\(Experimental!\\)" 1 'font-lock-experimental-face t)
-	   ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
+          mode
+          '(("\\<\\(TODO\\)" 1 'font-lock-fixme-face t)
+             ("\\<\\(NOTE\\)" 1 'font-lock-note-face t)
+             ("\\<\\(CHECK\\)" 1 'font-lock-check-face t)
+             ("\\<\\(DONE\\)" 1 'font-lock-done-face t)
+             ("\\<\\(WIP\\)" 1 'font-lock-wip-face t)
+             ("\\<\\(fn\\(\\)\\)" 1 'font-lock-fn-face t)
+             ("\\<\\(fn\\)" 1 'font-lock-fn-face t)
+             ("\\<\\(Experimental!\\)" 1 'font-lock-experimental-face t)
+	     ("^.*NOT USABLE.*" 0 'font-lock-nus-face t)
 
 
-	   )))
-      fixme-modes)
+	     )))
+  fixme-modes)
 
 (modify-face 'font-lock-fixme-face "Red" nil nil t nil t nil nil)
 (modify-face 'font-lock-note-face "Dark Green" nil nil t nil t nil nil)
@@ -120,11 +120,12 @@
 (modify-face 'font-lock-wip-face "systemYellowColor" nil nil t nil t nil nil)
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+					; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Face modifiers _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-;                                           Line Highlight                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                           Line Highlight                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
+(straight-require 'hl-line+)
 (global-hl-line-mode 0)
 
 (defvar-local was-hl-line-mode-on nil)
@@ -140,9 +141,11 @@
 
 
 (set-face-background 'hl-line "midnight blue")
+(global-hl-line-unhighlight-all)
 
-;                                              Set Font                                             ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+					;                                              Set Font                                             ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defun font-exists-p (font)
   "check if font exists"
@@ -150,7 +153,7 @@
 
 
 (if (font-exists-p "PragmataPro")
-    (setq tiqsi-font "PragmataPro")
+  (setq tiqsi-font "PragmataPro")
   (setq tiqsi-font "Courier New"))
 
 
@@ -167,6 +170,26 @@
 (set-face-attribute 'font-lock-type-face nil :foreground "burlywood3")
 (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
 (set-face-attribute 'region nil :background "#666" :foreground "#ffffff")
+
+(when (eq system-type 'darwin)
+
+  ;; default Latin font (e.g. Consolas)
+  (set-face-attribute 'default nil :family "Consolas")
+
+  ;; default font size (point * 10)
+  ;;
+  ;; WARNING!  Depending on the default font,
+  ;; if the size is not supported very well, the frame will be clipped
+  ;; so that the beginning of the buffer may not be visible correctly. 
+  (set-face-attribute 'default nil :height 110)
+
+  ;; use specific font for Korean charset.
+  ;; if you want to use different font size for specific charset,
+  ;; add :size POINT-SIZE in the font-spec.
+  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+
+  ;; you may want to add different for other charset in this way.
+  )
 
 
 ;; Consistent things
@@ -196,11 +219,11 @@
   )
 (add-hook 'window-setup-hook 'post-load-stuff t)
 
-;                                               Beacon                                              ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                               Beacon                                              ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-;                           TODO: Asyc the beacon                             ;
-; ------------------------------------------------------------------------- ;
+					;                           TODO: Asyc the beacon                             ;
+					; ------------------------------------------------------------------------- ;
 
 (use-package beacon
   :straight t
@@ -210,8 +233,8 @@
 	    (setq beacon-push-mark 35)
 	    ;; (add-hook 'beacon-dont-blink-predicates #'fundamental-mode-p)
 	    (setq beacon-color "#666600")
-	    (setq beacon-blink-when-point-moves-vertically 20)
-	    (setq beacon-blink-when-point-moves-horizontally 20)
+	    (setq beacon-blink-when-point-moves-vertically 10)
+	    (setq beacon-blink-when-point-moves-horizontally 10)
 	    (setq beacon-blink-when-focused t)
 	    (setq beacon-blink-duration 0.2)
 	    (setq beacon-blink-delay 0.2)
@@ -219,8 +242,8 @@
 
 
 
-;                                             spaceline                                             ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                             spaceline                                             ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when tiqsi-not-console
   (use-package spaceline-all-the-icons
@@ -228,8 +251,8 @@
     :after spaceline
     :config (spaceline-all-the-icons-theme)))
 
-;                                          Colour str repr                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          Colour str repr                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (use-package rainbow-mode
   :straight t
@@ -241,19 +264,19 @@
   :straight t
   :ensure t
   :config (progn (setq highlight-indent-guides-method 'column)
-                 (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
+            (add-hook 'python-mode-hook 'highlight-indent-guides-mode)))
 
 
-;                                         Highlight actions                                         ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         Highlight actions                                         ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (straight-use-package
- '(volatile-highlights
-   :type git
-   :host github
-   :repo "k-talo/volatile-highlights.el"
-   :config (progn (volatile-highlights-mode t))
-))
+  '(volatile-highlights
+     :type git
+     :host github
+     :repo "k-talo/volatile-highlights.el"
+     :config (progn (volatile-highlights-mode t))
+     ))
 
 
 (use-package highlight-parentheses
@@ -261,23 +284,23 @@
   :ensure t
   :config (progn
             (global-highlight-parentheses-mode 1)
-))
+	    ))
 
-; _ _ _ _ _ _ _ _ _ _    /¯¯¯ Select from a list ¯¯¯\_ _ _ _ _ _ _ _ _ _    ;
+					; _ _ _ _ _ _ _ _ _ _    /¯¯¯ Select from a list ¯¯¯\_ _ _ _ _ _ _ _ _ _    ;
 
 (defmacro pick-one(info &rest body)
   "Prompt user to pick a choice from a list
 usage (pick-one test (1 2))
 "
   (interactive)
- `(message "%s" (ido-completing-read+ ,info ',@body))
+  `(message "%s" (ido-completing-read+ ,info ',@body))
   )
 
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Select from a list _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
+					; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Select from a list _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
-;                                          Highlight thing                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                          Highlight thing                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 
 (use-package highlight-thing
@@ -287,8 +310,8 @@ usage (pick-one test (1 2))
 	    (setq highlight-thing-delay-seconds 0.15) ;; default at 0.5
 	    ))
 
-;                                         Enforce Line Limit                                        ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         Enforce Line Limit                                        ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 
 (use-package column-enforce-mode
@@ -299,30 +322,31 @@ usage (pick-one test (1 2))
 	    (setq column-enforce-comments nil)))
 
 
-;                                         Marked region info                                        ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         Marked region info                                        ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 ;; (add-hook 'rectangle-mark-mode 'region-state-mode)
 (add-hook 'text-mode 'region-state-mode)
 
 
-;                                               Clock                                               ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                               Clock                                               ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (display-time)
 
-;                                            Line numbers                                           ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                            Line numbers                                           ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(global-linum-mode)
+(global-display-line-numbers-mode t)
 
-;                                            col numbers                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+					;                                            col numbers                                            ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (column-number-mode t)
 
-;                                           show file-size                                          ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                           show file-size                                          ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (size-indication-mode t)
 
@@ -333,10 +357,10 @@ usage (pick-one test (1 2))
 (defun toggle-whitespace ()
   (interactive)
   (if (equal show-trailing-whitespace nil)
-      (setq show-trailing-whitespace t)
+    (setq show-trailing-whitespace t)
     (setq show-trailing-whitespace nil))
 
-      )
+  )
 
 
 ;; "Never, ever split a window.  Why would anyone EVER want you to do that??"
@@ -347,15 +371,15 @@ usage (pick-one test (1 2))
 (defadvice mic-paren-highlight (around cursorOnClosing activate)
   "Dirty hack to highlight sexps with closing delim below cursor"
   (if (eq (char-syntax (following-char)) ?\) )
-      (let ((paren-priority 'close))
-        (save-excursion
-          (forward-char)
-          ad-do-it))
+    (let ((paren-priority 'close))
+      (save-excursion
+        (forward-char)
+        ad-do-it))
     ad-do-it))
 
 
-;                                               Ediff                                               ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                               Ediff                                               ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (defun tiqsi-ediff-setup-windows (buffer-A buffer-B buffer-C control-buffer)
   (ediff-setup-windows-plain buffer-A buffer-B buffer-C control-buffer)
@@ -365,8 +389,8 @@ usage (pick-one test (1 2))
 (setq ediff-split-window-function 'split-window-horizontally)
 
 
-;                                         Avoid Line Clutter                                        ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                         Avoid Line Clutter                                        ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (use-package diminish
   :straight t
@@ -377,18 +401,18 @@ usage (pick-one test (1 2))
 	    (diminish 'volatile-highlights-mode)
 	    (diminish 'highlight-parentheses-mode)
 	    (diminish 'rainbow-mode)
-  )) ;; to use as :diminish in use packages
+	    )) ;; to use as :diminish in use packages
 
 
-;                                               Paren                                               ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                               Paren                                               ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (when (try-require 'paren)
   (GNUEmacs
-   (show-paren-mode t)
-   (setq show-paren-ring-bell-on-mismatch t))
+    (show-paren-mode t)
+    (setq show-paren-ring-bell-on-mismatch t))
   (XEmacs
-   (paren-set-mode 'paren)))
+    (paren-set-mode 'paren)))
 
 ;; if the matching paren is offscreen, show the matching line in the echo area
 ;; + many other useful things
@@ -418,6 +442,7 @@ usage (pick-one test (1 2))
 (add-to-list 'semantic-default-submodes 'global-semantic-stickyfunc-mode)
 (semantic-mode 1)
 
+
 (use-package fill-column-indicator
   :straight t
   :ensure t
@@ -437,8 +462,8 @@ usage (pick-one test (1 2))
 (setq whitespace-style '(face trailing tabs))
 
 (setq whitespace-display-mappings
-      '((space-mark 32 [183])            ; normal space
-        (newline-mark 10 [?↷ 10])))      ; newline
+  '((space-mark 32 [183])            ; normal space
+     (newline-mark 10 [?↷ 10])))      ; newline
 
 (setq whitespace-line-column 79)
 
@@ -454,8 +479,8 @@ usage (pick-one test (1 2))
 (add-hook 'prog-mode-hook 'whitespace-mode)
 
 (setq whitespace-display-mappings
-      '((space-mark 32 [183])            ; normal space
-        (newline-mark 10 [?↷ 10])))      ; newline
+  '((space-mark 32 [183])            ; normal space
+     (newline-mark 10 [?↷ 10])))      ; newline
 
 
 (eval-after-load 'whitespace
@@ -467,9 +492,9 @@ usage (pick-one test (1 2))
 (defun my-visual-line-mode-hook ()
   (when visual-line-mode
     (setq my-visual-line-state
-          `(whitespace-style ,whitespace-style
-            whitespace-mode ,whitespace-mode
-            auto-fill-mode ,auto-fill-function))
+      `(whitespace-style ,whitespace-style
+         whitespace-mode ,whitespace-mode
+         auto-fill-mode ,auto-fill-function))
 
     (when whitespace-mode
       whitespace-mode -1)
@@ -495,8 +520,8 @@ usage (pick-one test (1 2))
   ;; revert the state before activating visual-line-mode
   (when my-visual-line-state
     (let ((ws-style (plist-get my-visual-line-state 'whitespace-style))
-          (ws-mode (plist-get my-visual-line-state 'whitespace-mode))
-          (af-mode (plist-get my-visual-line-state 'auto-fill-mode)))
+           (ws-mode (plist-get my-visual-line-state 'whitespace-mode))
+           (af-mode (plist-get my-visual-line-state 'auto-fill-mode)))
 
       (when whitespace-mode
         (whitespace-mode -1))
@@ -509,7 +534,7 @@ usage (pick-one test (1 2))
 (defun my-visual-line-mode-toggle ()
   (interactive)
   (if visual-line-mode
-      (my-visual-line-mode-off)
+    (my-visual-line-mode-off)
     (visual-line-mode 1)))
 
 
@@ -520,14 +545,14 @@ usage (pick-one test (1 2))
     "Activate visual-line-mode for specific services like GitHub."
     (let ((msg mu4e-compose-parent-message))
       (when (and msg (mu4e-message-contact-field-matches
-                      msg :from '(".*@github.com$" ".*@upwork.com$")))
+                       msg :from '(".*@github.com$" ".*@upwork.com$")))
         (visual-line-mode)))))
 
 
 ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+					; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
 
@@ -539,29 +564,29 @@ usage (pick-one test (1 2))
     (error "Couldn't find URL."))
   (let ((buffer (url-retrieve-synchronously url)))
     (unwind-protect
-          (let ((data (with-current-buffer buffer
-                       (goto-char (point-min))
-                       (search-forward "\n\n")
-                       (buffer-substring (point) (point-max)))))
-           (insert-image (create-image data nil t)))
+      (let ((data (with-current-buffer buffer
+                    (goto-char (point-min))
+                    (search-forward "\n\n")
+                    (buffer-substring (point) (point-max)))))
+        (insert-image (create-image data nil t)))
       (kill-buffer buffer))))
 
 ;; (insert-image-from-url "https://tpc.googlesyndication.com/simgad/1487126809566417335")  
 
 
- (defun my-turn-current-window-into-frame ()
+(defun my-turn-current-window-into-frame ()
   (interactive)
   (let ((buffer (current-buffer)))
     (unless (one-window-p)
       (delete-window))
     (display-buffer-pop-up-frame buffer nil)))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+					; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Images _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
-; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Themes ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+					; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Themes ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
-;                                   Themes                                  ;
-; ------------------------------------------------------------------------- ;
+					;                                   Themes                                  ;
+					; ------------------------------------------------------------------------- ;
 
 (use-package exotica-theme
   :straight t
@@ -572,42 +597,42 @@ usage (pick-one test (1 2))
     (setq exotica-theme-enable-italics t)
     ))
 
-; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Themes _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
+					; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Themes _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
 
 
-;                                    Tray                                   ;
-; ------------------------------------------------------------------------- ;
+					;                                    Tray                                   ;
+					; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(awesome-tray
-   :type git
-   :host github
-   :repo "manateelazycat/awesome-tray"
-))
+  '(awesome-tray
+     :type git
+     :host github
+     :repo "manateelazycat/awesome-tray"
+     ))
 
 (awesome-tray-mode 1)
 
 
-; ------------------------------------------------------------------------- ;
-;             Interesting library, worth inspecting more for UI             ;
-; ------------------------------------------------------------------------- ;
-;                                   TODO:                                   ;
-; ------------------------------------------------------------------------- ;
+					; ------------------------------------------------------------------------- ;
+					;             Interesting library, worth inspecting more for UI             ;
+					; ------------------------------------------------------------------------- ;
+					;                                   TODO:                                   ;
+					; ------------------------------------------------------------------------- ;
 
 (straight-use-package
- '(svg-lib
-   :type git
-   :host github
-   :ensure t
-   :repo "rougier/svg-lib"
-))
+  '(svg-lib
+     :type git
+     :host github
+     :ensure t
+     :repo "rougier/svg-lib"
+     ))
 
-; ------------------------------------------------------------------------- ;
+					; ------------------------------------------------------------------------- ;
 
 
 
-;                                            Keybindings                                            ;
-; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+					;                                            Keybindings                                            ;
+					; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)

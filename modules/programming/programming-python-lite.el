@@ -31,6 +31,11 @@
 
 (straight-require 'popwin)
 
+(straight-require 'blacken)
+(straight-require 'pyimpsort)
+
+
+
 ;; (popwin-mode 1)
 
 (defun tiqsi-py-view-plt(image_name)
@@ -262,6 +267,58 @@ else:
     (t
       (error "I don't know how to set ipython settings for this Emacs"))))
 
+(defun sdev-use-venv (&optional cpython)
+  "Set Emacs to use a Python interpreter from a virtual environment in the current directory.
+
+With prefix arg, prompt for the command to use."
+  (interactive (list (when current-prefix-arg
+                       (read-file-name "Python command: " (concat (expand-file-name default-directory) ".venv/bin/"))))
+    (when (not cpython)
+      (setq cpython (concat (expand-file-name default-directory) ".venv/bin/python")))
+    (when (not (executable-find cpython))
+      (error "Command %S not found" cpython))
+    (cond
+      ;; Emacs 24 until 24.3
+      ((boundp 'python-python-command)
+	(setq python-python-command cpython))
+      ;; Emacs 24.3 and onwards.
+      ((and (version<= "24.3" emacs-version)
+         (not (boundp 'python-shell-interpreter-interactive-arg)))
+	(setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"
+          python-shell-prompt-regexp ">>> "
+          python-shell-prompt-output-regexp ""
+          python-shell-completion-setup-code
+          "try:
+    import readline
+except ImportError:
+    def __COMPLETER_all_completions(text): []
+else:
+    import rlcompleter
+    readline.set_completer(rlcompleter.Completer().complete)
+    def __COMPLETER_all_completions(text):
+        import sys
+        completions = []
+        try:
+            i = 0
+            while True:
+                res = readline.get_completer()(text, i)
+                if not res: break
+                i += 1
+                completions.append(res)
+        except NameError:
+            pass
+        return completions"
+          python-shell-completion-module-string-code ""
+          python-shell-completion-string-code
+          "';'.join(__COMPLETER_all_completions('''%s'''))\n"))
+      ;; Emacs 24.4
+      ((boundp 'python-shell-interpreter-interactive-arg)
+	(setq python-shell-interpreter cpython
+          python-shell-interpreter-args "-i"))
+      (t
+	(error "I don't know how to set ipython settings for this Emacs")))))
+
 
 (defun sdev-use-cpython (&optional cpython)
   "Set defaults to use the standard interpreter instead of IPython.
@@ -314,6 +371,65 @@ else:
         python-shell-interpreter-args "-i"))
     (t
       (error "I don't know how to set ipython settings for this Emacs"))))
+
+
+(defun make-current-file-executable ()
+  "Make the current file executable."
+  (interactive)
+  ;; Check if the buffer is associated with a file
+  (if (buffer-file-name)
+    (progn
+      ;; Set the file mode to 755 (rwxr-xr-x)
+      (set-file-modes (buffer-file-name) #o755)
+      (message "Made %s executable" (buffer-file-name)))
+    (error "Buffer is not associated with a file!")))
+
+
+
+(defun sdev-custom-venv (&optional ipython)
+  "Switch to a Python interpreter in the current directory or specify a custom script."
+  (interactive (list (when current-prefix-arg
+                       (read-file-name "Path to Python shell script: " default-directory "remote-python.sh"))))
+  ;; If IPython is not provided, look for 'remote-python.sh' in the current directory
+  (setq ipython (or ipython (concat default-directory "remote-python.sh")))
+
+  ;; Check if the specified interpreter exists, otherwise throw an error
+  (unless (file-executable-p ipython)
+    (error "Script %S not found or not executable" ipython))
+
+  (setq python-shell-interpreter ipython
+    python-shell-interpreter-args "-i"
+    python-shell-prompt-regexp ">>> "
+    python-shell-prompt-output-regexp ""))
+
+
+(defun sdev-use-venv (&optional ipython)
+  (interactive)
+  (setq python-shell-interpreter  "/tiqsi-emacs/modules/programming/remote-python.sh"
+    python-shell-interpreter-args "-i"
+    python-shell-prompt-regexp ">>> "
+    python-shell-prompt-output-regexp ""))
+
+
+(defun sdev-use-venv (&optional ipython)
+  (interactive)
+  (let ((script-path (concat (file-name-directory (buffer-file-name))
+                       "remote-python.sh")))
+    (unless (file-exists-p script-path) ; Check if the script file exists
+      (with-temp-file script-path ; Create and write to the file
+        (insert "#!/bin/bash\n"
+          "# Activate the virtual environment\n"
+          "source .venv/bin/activate\n"
+          "# Hand off to the Python interpreter\n"
+          "exec python -c 'import IPython; IPython.terminal.ipapp.launch_new_instance()' \"$@\"\n"))
+      (set-file-modes script-path #o755) ; Make the script executable
+      (message "remote-python.sh did not exist and was created."))
+    (setq python-shell-interpreter script-path
+      python-shell-interpreter-args "-i"
+      python-shell-prompt-regexp ">>> "
+      python-shell-prompt-output-regexp "")))
+
+
 
 
 (defun sdev-use-remote (&optional ipython)
@@ -868,6 +984,24 @@ sEnter Doctest result: ")
   )
 
 
+(defun send-py-region (begin end)
+  "Send the selected region from BEGIN to END to the Python process.
+This function sends the region as a single block to ensure that multiline statements
+and definitions are treated correctly."
+  (interactive "r")
+  (let ((code (buffer-substring-no-properties begin end)))
+    ;; Ensure the code ends with a newline to execute it
+    (unless (string-suffix-p "\n" code)
+      (setq code (concat code "\n")))
+    ;; Use python-shell-send-string instead of comint-send-string if available
+    (if (fboundp 'python-shell-send-string)
+      (python-shell-send-string code)
+      (comint-send-string tiqsi-python-buffer code))))
+
+
+(define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
+
+
 (defun toggle-camelcase-underscores ()
   "Toggle between camelcase and underscore notation for the symbol at point."
   (interactive)
@@ -897,6 +1031,110 @@ sEnter Doctest result: ")
   (interactive)
   (mark-whole-buffer)
   (py-isort-region))
+
+(defun paste-to-python-list ()
+  "Convert clipboard contents to Python list format."
+  (interactive)
+  (let* ((raw-text (current-kill 0))
+          (items (split-string raw-text)))
+    (kill-new (format "['%s']" (mapconcat 'identity items "', '"))))
+  (yank))
+
+
+
+(defun custom-compile-go-to-error ()
+  "Automatically navigate to the file and line of the compilation error under the cursor,
+   but keep the focus on the compilation buffer."
+  (interactive)
+  (let* ((line (buffer-substring-no-properties (line-beginning-position) (line-end-position)))
+          (pattern "^\\([^:]+\\):\\([0-9]+\\):.*$")
+          match file line-num orig-buffer)
+    ;; Store the original buffer
+    (setq orig-buffer (current-buffer))
+    (when (string-match pattern line)
+      (setq file (match-string 1 line))
+      (setq line-num (string-to-number (match-string 2 line)))
+      (when (and file (file-exists-p file) line-num)
+        ;; Open the file in another window without switching to it
+        (save-selected-window
+          (find-file-other-window file)
+          (goto-char (point-min))
+          (forward-line (1- line-num))
+          (recenter))))
+    ;; Reselect the original buffer to return the focus there
+    (select-window (get-buffer-window orig-buffer))))
+
+
+
+
+(defun python-find-functions-without-docstrings-ag (directory)
+  "Use ag to search DIRECTORY for Python functions potentially without docstrings and display results in a compilation-mode buffer."
+  (interactive "DDirectory: ")
+  (let* ((output-buffer (get-buffer-create "*Python Functions Without Docstrings*"))
+          (full-directory (shell-quote-argument (expand-file-name directory)))
+          (ag-command "ag")
+          (ag-arguments `("--vimgrep" "--python"
+                           "def\\s+[a-zA-Z_][a-zA-Z0-9_]*\\s*\\([^)]*\\):\\s*\\n\\s*(?![\\s\\t]*(?:'''|\"\"\"))"
+                           ,full-directory)))
+    ;; Initialize the output buffer and temporarily disable read-only mode
+    (with-current-buffer output-buffer
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (insert "Searching for Python functions without docstrings in " directory "...\n"))
+
+    ;; Start the ag process
+    (let ((process (apply 'start-file-process "ag-search" output-buffer ag-command ag-arguments)))
+      (set-process-sentinel process
+        (lambda (p e)
+          (when (eq (process-status p) 'exit)
+            (with-current-buffer (process-buffer p)
+              (goto-char (point-max))
+              (if (= (process-exit-status p) 0)
+                (progn
+                  (goto-char (point-min))
+                  (if (re-search-forward "^\\([a-zA-Z0-9_./-]+\\.py\\):\\([0-9]+\\):\\([0-9]+\\):" nil t)
+                    (insert "\nSearch completed. Issues found.\n")
+                    (insert "\nSearch completed. No functions without docstrings found.\n")))
+                (insert (format "\nSearch failed with error code %d.\n" (process-exit-status p))))
+              ;; Enable compilation-mode after writing is done
+              (compilation-mode)
+              (setq buffer-read-only t)
+              (display-buffer (process-buffer p)))))))))
+
+
+(defun extract-python-functions-to-clipboard (start end)
+  "Extract function names from the selected region and copy them to the clipboard in the desired import format."
+  (interactive "r")
+  (let ((region-content (buffer-substring-no-properties start end))
+         (function-names '())
+         (buffer-file-name (file-name-nondirectory (buffer-file-name))))
+    (with-temp-buffer
+      (insert region-content)
+      (goto-char (point-min))
+      (while (re-search-forward "^def \\([a-zA-Z0-9_]+\\)\\s-*(" nil t)
+        (push (match-string 1) function-names)))
+    (let ((import-string (concat "from " buffer-file-name " import ("
+                           (mapconcat 'identity (reverse function-names) ", ") ")")))
+      (kill-new import-string)
+      (message "Copied to clipboard: %s" import-string))))
+
+
+(define-key compilation-mode-map (kbd "RET") 'custom-compile-go-to-error)
+(define-key compilation-mode-map (kbd "g") 'custom-compile-go-to-error)
+
+(global-set-key (kbd "<f12>")
+  (lambda ()
+    (interactive)
+    (xref-push-marker-stack)
+    (lsp-goto-type-definition)))
+
+(global-set-key (kbd "M-m")
+  (lambda ()
+    (interactive)
+    (xref-push-marker-stack)))
+
+
+(global-set-key (kbd "<f10>") 'xref-go-back)
 
 
 

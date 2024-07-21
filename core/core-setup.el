@@ -135,7 +135,7 @@
 (straight-require 'helm)
                                         ;-{elisp libraries}-;
 
-(straight-require 'elisp-slime-nav)
+;; (straight-require 'elisp-slime-nav)
 ;; (straight-require 'slime-docker)
 
 (straight-require 's)
@@ -351,6 +351,26 @@
      :host github
      :repo "emacs-pe/docker-tramp.el"
      ))
+
+
+
+
+(straight-use-package
+  '(find-orphan
+     :type git
+     :host github
+     :repo "manateelazycat/find-orphan"
+     ))
+
+
+
+
+(defun add-hooks (hooks functions)
+  (let ((hooks (ensure-list hooks))
+		(functions (if (functionp functions) (list functions) functions)))
+    (dolist (hook hooks)
+      (dolist (func functions)
+	(add-hook hook func)))))
 
 
                                         ;---{Requirements}--;

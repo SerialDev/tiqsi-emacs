@@ -117,6 +117,10 @@
 
 ;; Add a few more formatters modifying 'apheleia-mode-alist and  'apheleia-formatters
 
+;; (setq apheleia-mode-alist
+;;       (append apheleia-mode-alist
+;;               '(
+;;                 (python-mode . (isort black)))))
 
 
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  \_ _ Saving _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯  ;
@@ -530,6 +534,163 @@ region if active."
 
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Deleting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯     ;;
 
+
+;;                                 COLOURIZE                                 ;
+;; ------------------------------------------------------------------------- ;
+
+(defun colourize--red ()
+  "Insert ASCII codes for red text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[91m' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+
+(defun colourize--mustard ()
+  "Insert ASCII codes for mustard text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[38;5;172m' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+(defun colourize--yellow ()
+  "Insert ASCII codes for yellow text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[33m*' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+(defun colourize--orange ()
+  "Insert ASCII codes for orange text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[38;5;214m' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+
+(defun colourize--blue ()
+  "Insert ASCII codes for blue text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[38;5;75m?' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+(defun colourize--cyan ()
+  "Insert ASCII codes for cyan text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[36m' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+(defun colourize--purple ()
+  "Insert ASCII codes for purple text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[35m{' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+(defun colourize--magenta ()
+  "Insert ASCII codes for magenta text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[95m^' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert " + '\\033[0m'"))))))
+
+
+
+
+
+
+
+(defun colourize--green ()
+  "Insert ASCII codes for green text around the first quoted string on the current line."
+  (interactive)
+  (save-excursion
+    (let ((start (point))
+           (end (point-max)))
+      ;; Find the first quote
+      (when (re-search-forward "\\(['\"]\\)" end t)
+        (backward-char 1)
+        (insert "'\\033[32m[' +" )
+        (forward-char 6)
+        ;; Find the closing quote
+        (when (re-search-forward "\\(['\"]\\)" end t)
+          (insert "' + \\033[0m'"))))))
+
+					; ------------------------------------------------------------------------- ;
+
+
+
 ;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Kill Ring ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;;
 
 (use-package undo-tree
@@ -598,6 +759,13 @@ region if active."
       )))
 
 
+
+(defun add-hooks (hooks functions)
+  (let ((hooks (ensure-list hooks))
+	 (functions (if (functionp functions) (list functions) functions)))
+    (dolist (hook hooks)
+      (dolist (func functions)
+	(add-hook hook func)))))
 
 
 
