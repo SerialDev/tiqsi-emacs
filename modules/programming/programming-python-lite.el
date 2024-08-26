@@ -34,6 +34,7 @@
 (straight-require 'blacken)
 (straight-require 'pyimpsort)
 
+(straight-require 'company-quickhelp)
 
 
 ;; (popwin-mode 1)
@@ -1135,6 +1136,68 @@ and definitions are treated correctly."
 
 
 (global-set-key (kbd "<f10>") 'xref-go-back)
+
+(define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
+
+
+(defun tiqsi-compile (compile-string)
+  (interactive "sString to compile: ")
+  (let* ((buffer-dir (or (and (boundp 'default-directory)
+                           default-directory)
+                       (file-name-directory buffer-file-name)))
+          (compile-command (concat "cd " buffer-dir " && " compile-string))
+          (executable (tiqsi-compile-extract-executable compile-string))
+          (current-window (selected-window))
+          (other-window (next-window current-window nil t)))
+    (setq tiqsi-compile--command compile-string)
+    (setq tiqsi-compile--executable executable)
+    (message "Compiling executable: %s" executable)
+    (with-selected-window other-window
+      (let ((compilation-buffer-name-function (lambda (mode) "*tiqsi-compile*"))
+             (display-buffer-alist
+               `(("*tiqsi-compile*" . ((display-buffer-reuse-window
+					 display-buffer-same-window))))))
+        (compile compile-command)
+	(tiqsi-compile--utils--setmode "*shell*")
+	))))
+
+
+(defun tiqsi-uv-compile (compile-string)
+  (interactive (list (read-string "String to compile: " "source .venv/bin/activate && ")))
+  (let* ((buffer-dir (or (and (boundp 'default-directory)
+                           default-directory)
+                       (file-name-directory buffer-file-name)))
+          (compile-command (concat "cd " buffer-dir " && " compile-string))
+          (executable (tiqsi-compile-extract-executable compile-string))
+          (current-window (selected-window))
+          (other-window (next-window current-window nil t)))
+    (setq tiqsi-compile--command compile-string)
+    (setq tiqsi-compile--executable executable)
+    (message "Compiling executable: %s" executable)
+    (with-selected-window other-window
+      (let ((compilation-buffer-name-function (lambda (mode) "*tiqsi-uv-compile*"))
+             (display-buffer-alist
+               `(("*tiqsi-uv-compile*" . ((display-buffer-reuse-window
+                                            display-buffer-same-window))))))
+        (compile compile-command)
+        ;;(tiqsi-compile--utils--setmode "*shell*")
+	))))
+
+
+
+(define-key python-mode-map (kbd "C-c C-c") 'tiqsi-uv-compile)
+
+;; ------------------------------------------------------------------------- ;
+;;                               FASTHTML stuff                              ;
+;; ------------------------------------------------------------------------- ;
+
+(fset 'fh-html-to-link
+  (kmacro "L i n k ( C-SPC C-s r e <left> <left> C-w C-s \" C-s <right> <left> , C-S-a <backspace> <backspace> ) C-a <down>"))
+
+
+(fset 'fh-flag-to-FLAG
+  (kmacro "M-x s u b w o r d - u p c a s e <return> M-x <return> SPC = SPC F l a g ( C-a C-SPC M-<right> M-<right> C-q C-S-a \" C-f \" , SPC \" C-f M-<left> M-<left> M-x s u b w o r d - d o w n <return> M-x <return> \" ) C-a <down> M-x C-g"))
+
 
 
 
