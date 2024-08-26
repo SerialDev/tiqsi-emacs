@@ -85,7 +85,7 @@
   :ensure t
   :if (display-graphic-p)
   :config
-  (add-hook 'python-mode-hook 'company-quickhelp)
+  ;;  (add-hook 'python-mode-hook 'company-quickhelp)
   :init
   (setq pos-tip-foreground-color "#c5c8c6")
   (setq company-quickhelp-delay 0.05)
