@@ -133,13 +133,24 @@ Writing English explanations is forbidden. ")
 
 (straight-require 'ansi-color)
 
+(defun cai-flow-set-model ()
+  "Set the appropriate model to use with cai-flow from a list of options."
+  (interactive)
+  (let ((model-options '( " bigllama " " ll "))
+         (model-name))
+    (setq model-name (completing-read "Select model: " model-options))
+    (setq cai-flow-model model-name)
+    (message "cai-flow model set to %s" model-name)))
+
+(setq cai-flow-model "ll")
+
 (defun cai-flow-call-region (begin end)
   "Call cai_flow with the selected text from BEGIN to END, formatted as a single line, and display output in a side buffer."
   (interactive "r")  ; 'r' uses the current region, or prompts to select one if not already set
   (let* ((region-text (buffer-substring-no-properties begin end))
           (arg-string (shell-quote-argument (replace-regexp-in-string "\\s-+" " " region-text)))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string)))
     (with-current-buffer output-buffer
       (erase-buffer)
       ;; Use `shell-command` with properly directed output
@@ -186,7 +197,7 @@ Writing English explanations is forbidden. ")
   (let* ((input (read-string "Enter search query: "))
           (arg-string (shell-quote-argument (replace-regexp-in-string "[ \t\n\r]+" " " input)))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -232,7 +243,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai  " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -281,7 +292,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -317,7 +328,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -357,7 +368,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -402,7 +413,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -453,7 +464,7 @@ Writing English explanations is forbidden. ")
                                                      "* <CODE here>\n"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -489,7 +500,7 @@ Writing English explanations is forbidden. \n "
 						     "YOU are a copilot you MUST adhere to these maxims"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -521,7 +532,7 @@ Writing English explanations is forbidden. \n "
 						       "\nYOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                        region-text "\n")))
             (output-buffer (get-buffer-create "*cai_flow-output*"))
-            (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
+            (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
       (with-current-buffer output-buffer
 	(erase-buffer)
 	(shell-command shell-command-string (current-buffer) (current-buffer))
@@ -558,8 +569,8 @@ Writing English explanations is forbidden. \n "
                                                        "\nYOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                        conversation-context
                                                        region-text "\n")))
-            (shell-command-string (concat "source ~/.zshrc && cai " arg-string " " formatted-comment)))
-      (with-current-buffer output-buffer
+            (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+      (with-current-buqffer output-buffer
         (erase-buffer)
 	(shell-command shell-command-string (current-buffer) (current-buffer))
         ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
