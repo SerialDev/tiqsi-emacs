@@ -64,9 +64,9 @@
 (load-expand  "modules/programming/programming-typescript.el")
 (load-expand  "modules/programming/programming-cfsharp.el")
 (load-expand  "modules/programming/programming-terraform.el")
-(load-expand  "modules/programming/programming-zig.el")
 (load-expand  "modules/programming/programming-jai.el")
 (load-expand  "modules/programming/programming-llm.el")
+(load-expand  "modules/programming/programming-zig.el")
 
 (provide 'programming)
 
