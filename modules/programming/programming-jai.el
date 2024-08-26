@@ -36,6 +36,8 @@
      :repo "krig/jai-mode"
      ))
 
+(require 'jai-mode)
+
 (defun set-shell-to-current-buffer-location ()
   "Set the shell's working directory to the current buffer's location."
   (let ((buffer-file-directory (file-name-directory (or (buffer-file-name) default-directory))))
