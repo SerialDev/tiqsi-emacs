@@ -225,6 +225,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-os.el")
 (load-expand  "core/core-editing.el")
 (load-expand  "core/core-ui.el")
+
 (load-expand  "core/core-files.el")
 (load-expand  "core/core-navigation.el")
 (load-expand  "core/core-functionality.el")
@@ -246,9 +247,10 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/programming/programming-c-lite.el")
 
 (load-expand  "modules/programming/programming-go.el")
+
 (load-expand  "modules/programming/programming-rust.el")
-(load-expand  "modules/programming/programming-javascript.el")
-(load-expand  "modules/programming/programming-zig.el")
+;; (load-expand  "modules/programming/programming-javascript.el") ;; JSX FIX
+(load-expand  "modules/programming/programming-zig.el") ;; FIXME
 (load-expand  "modules/programming/programming-clojure.el")
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
