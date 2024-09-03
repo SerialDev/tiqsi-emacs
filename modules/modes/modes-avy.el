@@ -31,16 +31,52 @@
 selected frame."
   (length (cl-delete-duplicates (mapcar #'window-buffer (window-list frame)))))
 
+
+(defun sdev/other-window (&optional arg)
+  "Wrap `other-window' and skip *vterm* buffer."
+  (interactive "p")
+  (let ((win (other-window arg)))
+    (while (string= (buffer-name (window-buffer win)) "*vterm*")
+      (setq win (other-window 1 win)))
+    (select-window win)))
+
+(defun sdev/other-window (&optional arg)
+  "Wrap `other-window' and skip *vterm* buffer."
+  (interactive "p")
+  (ignore-errors
+    (let
+      ((win (selected-window))
+	(start-win (selected-window)))
+      (catch 'done
+	(while t
+	  (setq win (other-window arg))
+	  (when (eq win start-win)
+	    (throw 'done nil))
+	  (unless (string= (buffer-name (window-buffer win)) "*vterm*")
+	    (throw 'done (select-window win))))))))
+
+
 (defun sdev/jump-window (&optional frame)
   (interactive)
   (if
-      (> (count-unique-visible-buffers) 4)
-      (call-interactively #'ace-window)
-    (call-interactively #'other-window)))
+    (> (count-unique-visible-buffers) 4)
+    (call-interactively #'ace-window)
+    (call-interactively #'sdev/other-window)))
+
+
+(defun sdev/jump-to-vterm ()
+  "Jump to the *vterm* buffer."
+  (interactive)
+  (let ((win (get-buffer-window "*vterm*")))
+    (if win
+      (select-window win)
+      (error "No *vterm* buffer found"))))
+
 
                                         ;---{keybindings}---;
 
 (global-set-key (kbd "M-w") 'sdev/jump-window)
+(global-set-key (kbd "C-t") 'sdev/jump-to-vterm)
 (global-set-key (kbd "C-c jj") 'avy-goto-word-or-subword-1)
 (global-set-key (kbd "C-c jw") 'ace-window)
 (global-set-key (kbd "C-c js") 'ace-swap-window)
