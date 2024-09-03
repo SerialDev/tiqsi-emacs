@@ -777,6 +777,15 @@ region if active."
 
 (define-key global-map [f8] 'tiqsi-replace-string)
 
+
+;; (define-key global-map (kbd "\e0B") 'next-line)
+
+(define-key input-decode-map (kbd "\eOA") [down])
+(define-key input-decode-map "\eOB" [down])
+
+
+
+
 ;; Editting
 (define-key global-map (kbd "C-q" )'copy-region-as-kill)
 (define-key global-map (kbd "C-f" )'yank)
