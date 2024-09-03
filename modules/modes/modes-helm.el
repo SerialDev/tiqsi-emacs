@@ -333,7 +333,7 @@
 ;;                   (imenu--menubar-select imenu--rescan-item)))
 
 
-                                        ;-----{HYDRAS!}-----;
+;;-----{HYDRAS!}-----;
 
 (defhydra hydra-gtags (:color blue :hint nil)
   "
@@ -461,6 +461,8 @@
   ("j" helm-next-line "down")
   ("k" helm-previous-line "up")
   ("i" nil "cancel"))
+
+
 
 ;; (define-key helm-map "jk" 'helm-like-unite/body)
 
