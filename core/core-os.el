@@ -276,6 +276,21 @@ Display progress in the mode line instead."
 (straight-require 'vterm)
 
 
+(defun copy-cd-command-maybe-next-buffer ()
+  "Get the directory path of the next buffer if in *vterm*, or current buffer otherwise, and copy it to the clipboard prepended by 'cd '. Then jump to *vterm* buffer and paste it."
+  (interactive)
+  (let (path)
+    (if (string= (buffer-name) "*vterm*")
+      (progn
+        (other-window 1)
+        (setq path (file-name-directory (buffer-file-name)))
+        (other-window 1))
+      (setq path (file-name-directory (buffer-file-name))))
+    (when path
+      (kill-new (concat "cd " path))
+      (message "Copied 'cd %s' to clipboard" path))
+    (call-interactively #'sdev/jump-to-vterm)
+    ))
 
 (add-hook 'shell-mode-hook 'company-mode)
 (add-hook 'term-mode-hook 'company-mode)
@@ -286,6 +301,11 @@ Display progress in the mode line instead."
 
 (define-key vterm-mode-map (kbd "M-w") 'sdev/jump-window)
 (define-key vterm-mode-map (kbd "M-f") 'ido-find-file)
+(define-key vterm-mode-map (kbd "C-f") 'yank)
+(define-key vterm-mode-map (kbd "M-k") 'kill-this-buffer)
+
+(define-key global-map (kbd "C-p") 'copy-cd-command-maybe-next-buffer)
+(define-key vterm-mode-map (kbd "C-p") 'copy-cd-command-maybe-next-buffer)
 
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
