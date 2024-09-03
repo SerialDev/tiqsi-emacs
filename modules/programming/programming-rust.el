@@ -482,26 +482,6 @@ Display a success message in the `*Messages*' buffer if the installation is succ
       "install" formula)))
 
 
-(with-system darwin
-
-
-  (check-exec "pyright"
-    ((message "pyright is installed at %s" (executable-find "pyright")))
-    ((progn
-       (message "pyright is not installed")
-       (sdev/brew-install "pyright")
-       )))
-  
-
-  )
-
-
-(use-package lsp-pyright
-  :ensure t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))  ; or lsp-deferred
-
 
 (setq lsp-eldoc-enable-hover nil)
 (setq lsp-ui-sideline-show-hover nil)
