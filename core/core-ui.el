@@ -32,7 +32,21 @@
 (setq next-line-add-newlines nil)
 (setq-default truncate-lines t)
 (setq truncate-partial-width-windows nil)
-(split-window-horizontally)
+
+(defun sdev/set-windows ()
+  (interactive)
+  (progn
+    (split-window-horizontally)
+    (other-window 1)
+    (split-window-below)
+    (other-window 1)
+    (split-window-below)
+    (delete-window)
+    (other-window 1)
+    (vterm)
+    )
+  )
+(sdev/set-windows)
 
 ;;                                            No Scrollbar                                           ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
@@ -557,14 +571,14 @@ usage (pick-one test (1 2))
     "Activate visual-line-mode for specific services like GitHub."
     (let ((msg mu4e-compose-parent-message))
       (when (and msg (mu4e-message-contact-field-matches
-                       msg :from '(".*@github.com$" ".*@upwork.com$")))
+		       msg :from '(".*@github.com$" ".*@upwork.com$")))
         (visual-line-mode)))))
 
 
 ;; (setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
 
 
-					; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
+;; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Images ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 
 
