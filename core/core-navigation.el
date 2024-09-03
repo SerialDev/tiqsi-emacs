@@ -72,7 +72,7 @@ insert `%'."
 If there's no previous blank line, goes to point-min."
   (interactive)
   (condition-case nil
-      (search-backward-regexp "^[ \t]*\n")
+    (search-backward-regexp "^[ \t]*\n")
     (error (goto-char (point-min)))))
 
 (defun next-blank-line ()
@@ -80,7 +80,7 @@ If there's no previous blank line, goes to point-min."
   (interactive)
   (forward-line)
   (if (search-forward-regexp "^[ \t]*\n" nil t)
-      (forward-line -1)
+    (forward-line -1)
     (goto-char (point-max))))
 
                                         ;----{Nav Shift}----;
@@ -485,7 +485,7 @@ one, an error is signaled."
 (global-set-key (kbd "C-M-<down>") 'windmove-down)
 
 
-(define-key global-map (kbd "M-/") 'close-side-come-back)
+;; (define-key global-map (kbd "M-/") 'close-side-come-back)
 
 
 (provide 'core-navigation)
