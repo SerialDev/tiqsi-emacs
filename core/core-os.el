@@ -220,6 +220,8 @@ BODY should contain two parts: what to do if EXEC is found, and what to do if no
        (progn ,@(cadr body))))) ; Execute the second part of BODY if the executable is not found
 
 
+
+
 ;;                 https://oremacs.com/2019/03/24/shell-apt/                 ;
 ;; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
 ;; TODO inspect this
@@ -269,6 +271,7 @@ Display progress in the mode line instead."
 
 
 (add-hook 'shell-mode-hook 'company-mode)
+(add-hook 'term-mode-hook 'company-mode)
 
 
 ;;                                            Keybindings                                            ;
