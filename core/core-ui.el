@@ -59,7 +59,7 @@
 
 ;;                                          NO middle mouse                                          ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
-;;no screwing with my middle mouse button                                                            ;
+;;                  no screwing with my middle mouse button                  ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (global-unset-key [mouse-2])
@@ -68,6 +68,18 @@
 ;;                                           Smooth Scroll                                           ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 (setq scroll-step 3)
+
+
+
+;;                                 Pop window                                ;
+;; ------------------------------------------------------------------------- ;
+
+(straight-require 'popwin)
+
+(popwin-mode 1)
+
+(setq popwin:popup-window-height 35)
+(setq popwin:popup-window-width 15)
 
 
 ;;                                          Show Keystrokes                                          ;
