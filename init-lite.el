@@ -253,6 +253,7 @@ of an error, just add the package to a list of missing packages."
 ;; (load-expand  "modules/programming/programming-javascript.el") ;; JSX FIX
 (load-expand  "modules/programming/programming-zig.el") ;; FIXME
 (load-expand  "modules/programming/programming-clojure.el")
+(load-expand  "modules/programming/programming-llm.el")
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)
@@ -260,5 +261,5 @@ of an error, just add the package to a list of missing packages."
 
 ;; (load-expand  "core/core-setup.el")
 
-
+<
 ;;; init.el ends here
