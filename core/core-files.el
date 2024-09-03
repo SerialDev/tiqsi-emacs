@@ -216,6 +216,19 @@ sInsert str to search: ")
   (compile (format "tree -f %s | grep %s" dir str)))
 
 
+
+(defun make-current-file-executable ()
+  "Make the current file executable."
+  (interactive)
+  ;; Check if the buffer is associated with a file
+  (if (buffer-file-name)
+    (progn
+      ;; Set the file mode to 755 (rwxr-xr-x)
+      (set-file-modes (buffer-file-name) #o755)
+      (message "Made %s executable" (buffer-file-name)))
+    (error "Buffer is not associated with a file!")))
+
+
 ;; ------------------------------------------------------------------------- ;
 ;;                        Use Prescient and selectrum                        ;
 ;; ------------------------------------------------------------------------- ;
