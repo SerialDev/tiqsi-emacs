@@ -100,8 +100,13 @@
 (when (require-soft 'jit-lock)    ; enable JIT to make font-lock faster
   (setq jit-lock-stealth-time 1)) ; new with emacs21
 
+					; ------------------------------------------------------------------------- ;
 
-; ------------------------------------------------------------------------- ;
+(straight-use-package
+  '(explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode"))
+(explain-pause-mode)
+
+					; ------------------------------------------------------------------------- ;
 
 
 (defun clear-buffer-long-printouts-line()
