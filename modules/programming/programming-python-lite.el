@@ -526,11 +526,6 @@ else:
 ;; ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Python Repl _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
 
-;; (straight-require 'popwin)
-
-;; (setq popwin:popup-window-height 35)
-;; (setq popwin:popup-window-width 15)
-
 
 ;; (straight-require 'blacken)
 ;; (straight-require 'pyimpsort)
