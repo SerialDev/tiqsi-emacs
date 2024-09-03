@@ -828,6 +828,8 @@ region if active."
 (global-set-key (kbd "C-c <deletechar>") 'kill-whitespace)
 (global-set-key (kbd "C-c <up>") 'drag-stuff-up)
 (global-set-key (kbd "C-c <down>") 'drag-stuff-down)
+(global-set-key (kbd "M-/") 'comment-or-uncomment-region-or-line)
+
 ;;(bind-key "<tab>" #'malb/indent-or-complete)
 ;; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
 ;; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
