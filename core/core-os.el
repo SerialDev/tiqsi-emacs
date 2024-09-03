@@ -285,6 +285,7 @@ Display progress in the mode line instead."
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
 (define-key vterm-mode-map (kbd "M-w") 'sdev/jump-window)
+(define-key vterm-mode-map (kbd "M-f") 'ido-find-file)
 
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
