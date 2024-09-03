@@ -255,6 +255,22 @@ point reaches the beginning or end of the buffer, stop there."
 ;;(key-chord-define-global "jj"  #'avy-goto-word-1)
 
 
+(global-set-key (kbd "<f12>")
+  (lambda ()
+    (interactive)
+    (xref-push-marker-stack)
+    (lsp-goto-type-definition)))
+
+(global-set-key (kbd "M-m")
+  (lambda ()
+    (interactive)
+    (xref-push-marker-stack)))
+
+
+(global-set-key (kbd "<f10>") 'xref-go-back)
+
+
+
                                         ;-----{Buffers}-----;
 
 (defun malb/switch-to-previous-buffer ()
