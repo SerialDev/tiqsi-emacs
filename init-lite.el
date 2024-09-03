@@ -220,9 +220,9 @@ of an error, just add the package to a list of missing packages."
 ;; (prescient-persist-mode +1)
 
 
-(load-expand  "core/core-performance.el")
+(load-expand  "core/core-performance.el") ;; DONE
 
-(load-expand  "core/core-os.el")
+(load-expand  "core/core-os.el") ;; DONE
 (load-expand  "core/core-editing.el")
 (load-expand  "core/core-ui.el")
 
@@ -239,6 +239,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand "modules/modes/modes-ido.el")
 (load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
 (load-expand  "modules/programming/programming-lisp.el")
+
 (load-expand  "modules/programming/programming-python-lite.el")
 
 (load-expand  "modules/modes/modes-company.el")
@@ -246,7 +247,7 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/modes/modes-avy.el")
 (load-expand  "modules/programming/programming-c-lite.el")
 
-(load-expand  "modules/programming/programming-go.el")
+;;(load-expand  "modules/programming/programming-go.el")
 
 (load-expand  "modules/programming/programming-rust.el")
 ;; (load-expand  "modules/programming/programming-javascript.el") ;; JSX FIX
