@@ -270,12 +270,21 @@ Display progress in the mode line instead."
 (setq auto-revert-verbose nil)
 
 
+;;                               Terminal setup                              ;
+;; ------------------------------------------------------------------------- ;
+
+(straight-require 'vterm)
+
+
+
 (add-hook 'shell-mode-hook 'company-mode)
 (add-hook 'term-mode-hook 'company-mode)
 
 
 ;;                                            Keybindings                                            ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
+
+(define-key vterm-mode-map (kbd "M-w") 'sdev/jump-window)
 
 (define-key global-map "\ep" 'maximize-frame)
 (define-key global-map "\ew" 'other-window)
