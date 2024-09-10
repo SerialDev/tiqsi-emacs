@@ -325,17 +325,16 @@ _C-s_: eval last sexp           ^ ^
 
 (add-hook 'cider-repl-mode-hook #'company-mode)
 (add-hook 'cider-mode-hook #'company-mode)
-
 (define-key clojure-mode-map (kbd "TAB") 'company-indent-or-complete-common)
+(define-key clojure-mode-map (kbd "C-c s") 'cider-eval-last-sexp)
+(define-key clojure-mode-map (kbd "M-c") 'hydra-clojure-usage/body)
 
 ;; (define-key clojure-mode-map (kbd "C-c <up>") 'move-forward-paren)
 ;; (define-key clojure-mode-map (kbd "C-c <down>") 'move-backward-paren)
 ;; (define-key clojure-mode-map (kbd "C-c <right>") 'paredit-forward-slurp-sexp)
 ;; (define-key clojure-mode-map (kbd "C-c <left>") 'paredit-forward-barf-sexp)
-(define-key clojure-mode-map (kbd "C-c s") 'cider-eval-last-sexp)
 ;; (define-key clojure-mode-map (kbd "C-c (") 'paredit-wrap-round)
 ;; (define-key clojure-mode-map (kbd "C-c )") 'paredit-splice-sexp)
-(define-key clojure-mode-map (kbd "M-c") 'hydra-clojure-usage/body)
 
 
 (provide 'programming-clojure)
