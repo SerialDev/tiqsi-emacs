@@ -570,7 +570,7 @@ Writing English explanations is forbidden. \n "
                                                        conversation-context
                                                        region-text "\n")))
             (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
-      (with-current-buqffer output-buffer
+      (with-current-buffer output-buffer
         (erase-buffer)
 	(shell-command shell-command-string (current-buffer) (current-buffer))
         ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
