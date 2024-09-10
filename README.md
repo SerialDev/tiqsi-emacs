@@ -180,7 +180,30 @@ AWS support and automatic remote repl execution
 ```
 CLJS Support  
 Lein Hydras
+### Hydra: hydra-clojure-usage
+
+Activate the hydra menu by pressing `M-c`
+
+**Hydra Shortcuts**:
+
+* `C-<up>`: Move forward a parenthesis
+* `M-<up>`: Wrap around a parenthesis
+* `C-<down>`: Move backward a parenthesis
+* `M-<down>`: Splice a sexp
+* `M-<right>`: Forward slurp a parenthesis
+* `C-<right>`: Backward barf a parenthesis
+* `M-<left>`: Forward barf a parenthesis
+* `C-<left>`: Backward slurp a parenthesis
+* `C-s`: Evaluate the last sexp
+* `<escape>`: Cancel
+* `<f1>`: Start a new REPL
+* `<f2>`: Connect to an existing REPL
+* `<f3>`: Compile an uberjar
+* `<f3>`: Run an uberjar
+
+
 ```
+
 
 ### Lisp 
 ```
