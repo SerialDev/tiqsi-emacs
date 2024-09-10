@@ -74,15 +74,98 @@ With continuosly incremental support for:
 
 ### Rust
 ```
-Rust Repl support through  
+Rust Repl support through evxcr-mode
 Extra racer tools
+
+**Hydra Commands**
+
+* `r`: Run
+* `i`: Init
+* `u`: Update
+* `+r`: Release
+* `x`: Run example
+* `n`: New
+* `c`: Repeat
+* `b`: Build
+* `f`: Current test
+* `e`: Bench
+* `l`: Clean
+* `s`: Search
+* `o`: Current file tests
+* `d`: Doc
+* `t`: Test
+* `m`: Fmt
+* `|`: Doc Tree
+* `k`: Check
+* `q`: Clippy
+
+**LSP Configuration**
+
+* `lsp-mode` is enabled for Rust files
+* `lsp-rust-analyzer` is used as the LSP server
+* `lsp-ui` is used for LSP UI
+* `dap-mode` is used for debugging
+
+**Keybindings**
+
+* `C-c C-c` : Hydra Rust menu
+* `C-t` : Racer UI tooltip
+* `M-p` : Print Rust source code
+* `M-i` : Insert struct point
+* `C-c c` : Compile with no message
+* `C-c C-r` : Compile and reset string
+* `C-c n` : Go to next error
+
+**Debugging**
+
+* `M-x hover-debug-toggle` to toggle hover debug mode
+* `M-x display-active-modes-and-functions` to display active modes and functions on hover
+
+
 ```
 ![Rust racer tweaks](gifs/racer-insert.gif)
 
 ### Python
 ```
 AWS support and automatic remote repl execution
+
+**Send Python Code to REPL**
+
+* `send-py-line` (bound to `C-c C-a`): sends the current line of Python code to the REPL.
+* `send-py-line-p` (bound to `C-c C-s`): sends the current line of Python code to the REPL, wrapped in a `print` statement.
+* `send-py-region` (bound to `C-c C-r`): sends the selected region of Python code to the REPL.
+
+**Compile and Run Python Code**
+
+* `tiqsi-uv-compile` (bound to `C-c C-c`): compiles and runs the Python code in the current buffer.
+* `custom-compile-go-to-error` (bound to `RET` and `g` in compilation mode): navigates to the file and line of the compilation error under the cursor, but keeps the focus on the compilation buffer.
+
+**Extract Function Names**
+
+* `extract-python-functions-to-clipboard` (interactive): extracts function names from the selected region and copies them to the clipboard in the desired import format.
+
+**Find Functions Without Docstrings**
+
+* `python-find-functions-without-docstrings-ag` (interactive): uses ag to search for Python functions without docstrings in the specified directory and displays the results in a compilation-mode buffer.
+
+**Remote REPL**
+
+* `sdev-use-venv` (interactive): sets up a remote REPL using a virtual environment.
+* `sdev-use-remote` (interactive): sets up a remote REPL using a remote Python interpreter.
+
+**Keybindings**
+
+* `C-c C-s`: sends the current line of Python code to the REPL, wrapped in a `print` statement.
+* `C-c C-a`: sends the current line of Python code to the REPL.
+* `C-c C-0`: evaluates the last sexp.
+* `C-c C-r`: sends the selected region of Python code to the REPL.
+* `C-c C-_`: toggles camelcase underscores.
+* `RET` and `g` in compilation mode: navigates to the file and line of the compilation error under the cursor, but keeps the focus on the compilation buffer.
+* `C-c C-c`: compiles and runs the Python code in the current buffer.
+
 ```
+
+
 ### Java
 ```
 [WIP]
