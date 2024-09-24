@@ -780,6 +780,12 @@ region if active."
 	(add-hook hook func)))))
 
 
+(defun add-to-end-of-line (string)
+  "Add STRING to the end of the line if not already at end of line."
+  (interactive "sAdd to end of line: ")
+  (unless (eolp)
+    (end-of-line)
+    (insert string)))
 
 (setq current-data "test")
 
