@@ -787,6 +787,24 @@ region if active."
     (end-of-line)
     (insert string)))
 
+
+(defun opposite-buffer-check (arbitrary-string)
+  "Check if ARBITRARY-STRING exists in the opposite buffer.
+Insert 1 if it does, 0 if it doesn't."
+  (interactive "sEnter a string: ")
+  (let ((opposite-buffer (window-buffer (other-window 1))))
+    (with-current-buffer opposite-buffer
+      (if (search-forward arbitrary-string nil t)
+        (progn
+          (call-interactively #'sdev/other-window )
+          (end-of-line)
+          (insert "1"))
+        (progn
+          (call-interactively #'sdev/other-window )
+          (end-of-line)
+          (insert "0"))))))
+
+
 (setq current-data "test")
 
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ \_ _ Kill Ring _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;;
