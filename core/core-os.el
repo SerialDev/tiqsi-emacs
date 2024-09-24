@@ -303,6 +303,11 @@ Display progress in the mode line instead."
 (define-key vterm-mode-map (kbd "M-f") 'ido-find-file)
 (define-key vterm-mode-map (kbd "C-f") 'yank)
 (define-key vterm-mode-map (kbd "M-k") 'kill-this-buffer)
+(define-key vterm-mode-map (kbd "M-k") 'kill-this-buffer)
+(define-key vterm-mode-map (kbd "S-<up>") 'previous-line)
+(define-key vterm-mode-map (kbd "M-<up>") 'previous-blank-line)
+(define-key vterm-mode-map (kbd "S-<down>") 'next-line)
+(define-key vterm-mode-map (kbd "M-<down>") 'next-blank-line)
 
 (define-key global-map (kbd "C-p") 'copy-cd-command-maybe-next-buffer)
 (define-key vterm-mode-map (kbd "C-p") 'copy-cd-command-maybe-next-buffer)
