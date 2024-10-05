@@ -114,7 +114,7 @@ Symbols matching the text at point are put first in the completion list."
 ;;     (pop-to-buffer buffer nil t)))
 ;; Replaced by selectrum
 
-(define-key vterm-mode-map (kbd "C-x f") 'ido-find-file)
+(define-key global-map (kbd "C-x f") 'ido-find-file)
 
 
 
