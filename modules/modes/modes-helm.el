@@ -860,8 +860,11 @@ _j_: jedi:related-names
                                         ;---{Keybindings}---;
 
 (global-set-key (kbd "M-x") 'helm-smex) ;; Offloaded to selectrum now
+(global-set-key (kbd "C-x C-x") 'helm-smex) 
+
 (global-set-key (kbd "M-X") 'helm-smex-major-mode-commands) ;; Offloaded to selectrum now
-                                        ;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
+
+;;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))
 
 
