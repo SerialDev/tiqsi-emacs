@@ -230,6 +230,7 @@ BODY should contain two parts: what to do if EXEC is found, and what to do if no
 ;; 		:before 'ora-ansi-color-apply-on-region)
 ;;   )
 
+(straight-use-package-mode +1)
 
 (defun ora-ansi-color-apply-on-region (begin end)
   "Fix progress bars for e.g. apt(8).
