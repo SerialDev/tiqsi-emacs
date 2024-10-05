@@ -707,14 +707,16 @@ region if active."
 
 ;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Kill Ring ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;;
 
-(use-package undo-tree
-  :straight t
-  :diminish undo-tree-mode
-  :config
-  (progn
-    (global-undo-tree-mode)
-    (setq undo-tree-visualizer-timestamps t)
-    (setq undo-tree-visualizer-diff t)))
+(safe-load-package
+  (use-package undo-tree
+    :straight t
+    :diminish undo-tree-mode
+    :config
+    (progn
+      (global-undo-tree-mode)
+      (setq undo-tree-visualizer-timestamps t)
+      (setq undo-tree-visualizer-diff t)))
+  )
 
 (defun pre-process-kill-ring-element (element)
   (replace-regexp-in-string "^[[:space:]]+" ""
@@ -818,7 +820,7 @@ Insert 1 if it does, 0 if it doesn't."
 
 ;; (define-key global-map (kbd "\e0B") 'next-line)
 
-(define-key input-decode-map (kbd "\eOA") [down])
+(define-key input-decode-map (kbd "\eOA") [up])
 (define-key input-decode-map "\eOB" [down])
 
 
