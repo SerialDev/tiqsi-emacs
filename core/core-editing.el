@@ -402,13 +402,13 @@ If there's no region, the current line will be duplicated."
      (global-origami-mode 1)
      ))
 
-(safe-load-package
-  (use-package vimish-fold
-    :straight t
-    :ensure t
-    :commands (vimish-fold-toggle
-		vimish-fold))
-  )
+;; (safe-load-package
+;;   (use-package vimish-fold
+;;     :straight t
+;;     :ensure t
+;;     :commands (vimish-fold-toggle
+;; 		vimish-fold))
+;;   )
 
 ;; Fold indentation https://stackoverflow.com/questions/1587972/how-to-display-indentation-guides-in-emacs/4459159#4459159
 ;; Quite nice for python mode TODO: fix for using with ipynb buffers in EIN
