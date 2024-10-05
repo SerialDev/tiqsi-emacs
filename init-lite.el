@@ -236,6 +236,8 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-editing.el")
 (load-expand  "core/core-ui.el")
 
+(load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
+
 (load-expand  "core/core-files.el")
 (load-expand  "core/core-navigation.el")
 (load-expand  "core/core-functionality.el")
@@ -246,7 +248,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-comments.el")
 
 
-(load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
 (load-expand  "modules/programming/programming-lisp.el")
 
 (load-expand  "modules/programming/programming-python-lite.el")
