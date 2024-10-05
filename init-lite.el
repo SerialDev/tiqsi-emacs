@@ -228,8 +228,10 @@ of an error, just add the package to a list of missing packages."
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 
 (load-expand  "core/core-performance.el") ;; DONE
-
 (load-expand  "core/core-os.el") ;; DONE
+
+(load-expand "modules/modes/modes-ido.el")
+
 (load-expand  "core/core-editing.el")
 (load-expand  "core/core-ui.el")
 
@@ -243,7 +245,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-comments.el")
 
 
-(load-expand "modules/modes/modes-ido.el")
 (load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
 (load-expand  "modules/programming/programming-lisp.el")
 
