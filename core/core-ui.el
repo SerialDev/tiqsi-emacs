@@ -43,7 +43,7 @@
     (split-window-below)
     (delete-window)
     (other-window 1)
-    (vterm)
+    (safe-execute(vterm))
     )
   )
 (sdev/set-windows)
