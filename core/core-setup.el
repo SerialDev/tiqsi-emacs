@@ -238,7 +238,8 @@
 (straight-require 'drag-stuff)
 (straight-require 'undo-tree)
 (straight-require 'indent-tools)
-(straight-require-lazy 'vimish-fold)
+
+(safe-execute (straight-require-lazy 'vimish-fold))
 (straight-require 'corral)
 (straight-require 'expand-region) ;; Select a code region by semantic units
 
@@ -367,7 +368,7 @@
 
 (defun add-hooks (hooks functions)
   (let ((hooks (ensure-list hooks))
-		(functions (if (functionp functions) (list functions) functions)))
+	 (functions (if (functionp functions) (list functions) functions)))
     (dolist (hook hooks)
       (dolist (func functions)
 	(add-hook hook func)))))
