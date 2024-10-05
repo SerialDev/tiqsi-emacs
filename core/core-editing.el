@@ -820,8 +820,8 @@ Insert 1 if it does, 0 if it doesn't."
 
 ;; (define-key global-map (kbd "\e0B") 'next-line)
 
-(define-key input-decode-map (kbd "\eOA") [up])
-(define-key input-decode-map "\eOB" [down])
+;; (define-key input-decode-map (kbd "\eOA") [up])
+;; (define-key input-decode-map "\eOB" [down])
 
 
 
@@ -837,7 +837,9 @@ Insert 1 if it does, 0 if it doesn't."
 (define-key global-map "\e." 'fill-paragraph)
 (define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
-(define-key global-map "\eO" 'tiqsi-replace-string)
+
+;; (define-key global-map "\eO" 'tiqsi-replace-string)
+
 ;; \377 is alt-backspace
 (define-key global-map "\377" 'backward-kill-word)
 (define-key global-map [M-delete] 'kill-word)
