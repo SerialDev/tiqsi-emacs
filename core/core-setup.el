@@ -239,7 +239,7 @@
 (straight-require 'undo-tree)
 (straight-require 'indent-tools)
 
-(safe-execute (straight-require-lazy 'vimish-fold))
+;; (safe-execute (straight-require-lazy 'vimish-fold))
 (straight-require 'corral)
 (straight-require 'expand-region) ;; Select a code region by semantic units
 
