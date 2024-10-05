@@ -101,6 +101,12 @@
   (list 'if (string-match "GNU Emacs 23" (version))
     (cons 'progn body)))
 
+
+(defmacro GNUEmacs25 (&rest body)
+  (list 'if (string-match "GNU Emacs 25" (version))
+    (cons 'progn body)))
+
+
 (defmacro GNUEmacs22 (&rest body)
   (list 'if (string-match "GNU Emacs 22" (version))
     (cons 'progn body)))
@@ -116,6 +122,7 @@
     system-type system-name system-configuration
     window-system
     (when (boundp 'aquamacs-version) aquamacs-version)))
+
 
 
 ;;                                               Win 32                                              ;
@@ -218,6 +225,138 @@ BODY should contain two parts: what to do if EXEC is found, and what to do if no
      (if executable-path
        (progn ,@(car body))  ; Execute the first part of BODY if the executable is found
        (progn ,@(cadr body))))) ; Execute the second part of BODY if the executable is not found
+
+
+
+;;          Patch the missing provided-mode-derived-p for < emacs 26         ;
+
+(GNUEmacs25
+  (progn
+    (defun merge-ordered-lists (lists &optional error-function)
+      "Merge LISTS in a consistent order.
+LISTS is a list of lists of elements.
+Merge them into a single list containing the same elements (removing
+duplicates), obeying their relative positions in each list.
+The order of the (sub)lists determines the final order in those cases where
+the order within the sublists does not impose a unique choice.
+Equality of elements is tested with `eql'.
+
+If a consistent order does not exist, call ERROR-FUNCTION with
+a remaining list of lists that we do not know how to merge.
+It should return the candidate to use to continue the merge, which
+has to be the head of one of the lists.
+By default we choose the head of the first list."
+      ;; Algorithm inspired from
+      ;; [C3](https://en.wikipedia.org/wiki/C3_linearization)
+      (let ((result '()))
+	(setq lists (remq nil lists)) ;Don't mutate the original `lists' argument.
+	(while (cdr (setq lists (delq nil lists)))
+	  ;; Try to find the next element of the result. This
+	  ;; is achieved by considering the first element of each
+	  ;; (non-empty) input list and accepting a candidate if it is
+	  ;; consistent with the rests of the input lists.
+	  (let* ((next nil)
+		  (tail lists))
+	    (while tail
+	      (let ((candidate (caar tail))
+	             (other-lists lists))
+		;; Ensure CANDIDATE is not in any position but the first
+		;; in any of the element lists of LISTS.
+		(while other-lists
+		  (if (not (memql candidate (cdr (car other-lists))))
+	            (setq other-lists (cdr other-lists))
+	            (setq candidate nil)
+	            (setq other-lists nil)))
+		(if (not candidate)
+		  (setq tail (cdr tail))
+		  (setq next candidate)
+		  (setq tail nil))))
+	    (unless next ;; The graph is inconsistent.
+	      (setq next (funcall (or error-function #'caar) lists))
+	      (unless (assoc next lists #'eql)
+		(error "Invalid candidate returned by error-function: %S" next)))
+	    ;; The graph is consistent so far, add NEXT to result and
+	    ;; merge input lists, dropping NEXT from their heads where
+	    ;; applicable.
+	    (push next result)
+	    (setq lists
+	      (mapcar (lambda (l) (if (eql (car l) next) (cdr l) l))
+		lists))))
+	(if (null result) (car lists) ;; Common case.
+	  (append (nreverse result) (car lists)))))
+
+
+
+    (defun derived-mode-all-parents (mode &optional known-children)
+      "Return all the parents of MODE, starting with MODE.
+This includes the parents set by `define-derived-mode' and additional
+ones set by `derived-mode-add-parents'.
+The returned list is not fresh, don't modify it.
+\n(fn MODE)"               ;`known-children' is for internal use only.
+      ;; Can't use `with-memoization' :-(
+      (let ((ps (get mode 'derived-mode--all-parents)))
+	(cond
+	  (ps ps)
+	  ((memq mode known-children)
+	    ;; These things happen, better not get all worked up about it.
+	    ;;(error "Cycle in the major mode hierarchy: %S" mode)
+	    ;; But do try to return something meaningful.
+	    (memq mode (reverse known-children)))
+	  (t
+	    ;; The mode hierarchy (or DAG, actually), is very static, but we
+	    ;; need to react to changes because `parent' may not be defined
+	    ;; yet (e.g. it's still just an autoload), so the recursive call
+	    ;; to `derived-mode-all-parents' may return an
+	    ;; invalid/incomplete result which we'll need to update when the
+	    ;; mode actually gets loaded.
+	    (let* ((new-children (cons mode known-children))
+		    (get-all-parents
+		      (lambda (parent)
+			;; Can't use `cl-lib' here (nor `gv') :-(
+			;;(cl-assert (not (equal parent mode)))
+			;;(cl-pushnew mode (get parent 'derived-mode--followers))
+			(let ((followers (get parent 'derived-mode--followers)))
+			  (unless (memq mode followers)
+			    (put parent 'derived-mode--followers
+                              (cons mode followers))))
+			(derived-mode-all-parents parent new-children)))
+		    (parent (or (get mode 'derived-mode-parent)
+                              ;; If MODE is an alias, then follow the alias.
+                              (let ((alias (symbol-function mode)))
+				(and (symbolp alias) alias))))
+		    (extras (get mode 'derived-mode-extra-parents))
+		    (all-parents
+		      (merge-ordered-lists
+			(cons (if (and parent (not (memq parent extras)))
+				(funcall get-all-parents parent))
+			  (mapcar get-all-parents extras)))))
+              ;; Cache the result unless it was affected by `known-children'
+              ;; because of a cycle.
+              (if (and (memq mode all-parents) known-children)
+		(cons mode (remq mode all-parents))
+		(put mode 'derived-mode--all-parents (cons mode all-parents))))))))
+
+    (defun provided-mode-derived-p (mode &optional modes &rest old-modes)
+      "Non-nil if MODE is derived from a mode that is a member of the list MODES.
+MODES can also be a single mode instead of a list.
+This examines the parent modes set by `define-derived-mode' and also
+additional ones set by `derived-mode-add-parents'.
+If you just want to check the current `major-mode', use `derived-mode-p'.
+We also still support the deprecated calling convention:
+\(provided-mode-derived-p MODE &rest MODES)."
+      (declare (side-effect-free t)
+	(advertised-calling-convention (mode modes) "30.1"))
+      (cond
+	(old-modes (setq modes (cons modes old-modes)))
+	((not (listp modes)) (setq modes (list modes))))
+      (let ((ps (derived-mode-all-parents mode)))
+	(while (and modes (not (memq (car modes) ps)))
+	  (setq modes (cdr modes)))
+	(car modes)))
+
+    ))
+
+;;                                                                           ;
 
 
 
