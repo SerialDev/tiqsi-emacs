@@ -225,10 +225,11 @@ BODY should contain two parts: what to do if EXEC is found, and what to do if no
 ;;                 https://oremacs.com/2019/03/24/shell-apt/                 ;
 ;; -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   - ;
 ;; TODO inspect this
-(safe-execute (advice-add
-		'ansi-color-apply-on-region
-		:before 'ora-ansi-color-apply-on-region)
-  )
+;; (safe-execute (advice-add
+;; 		'ansi-color-apply-on-region
+;; 		:before 'ora-ansi-color-apply-on-region)
+;;   )
+
 
 (defun ora-ansi-color-apply-on-region (begin end)
   "Fix progress bars for e.g. apt(8).
