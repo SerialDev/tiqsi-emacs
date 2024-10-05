@@ -125,10 +125,6 @@
 (safe-execute (explain-pause-mode))
 
 
-(straight-use-package
-  '(explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode"))
-(explain-pause-mode)
-
 ;; ------------------------------------------------------------------------- ;
 
 
