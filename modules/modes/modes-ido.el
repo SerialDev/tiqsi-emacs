@@ -114,6 +114,22 @@ Symbols matching the text at point are put first in the completion list."
 ;;     (pop-to-buffer buffer nil t)))
 ;; Replaced by selectrum
 
+
+
+(GNUEmacs25
+  (progn
+    (use-package ido  :config
+      (setq ido-auto-merge-delay-time 99999999)
+      (setq ido-virtual-buffers t)
+      (ido-mode))
+
+    (use-package flx-ido   :requires ido :config (flx-ido-mode))
+    (use-package ido-vertical-mode   :requires ido :config (ido-vertical-mode))
+    (use-package ido-hacks   :requires ido :config (ido-hacks-mode))
+    (use-package ido-ubiquitous   :requires ido :config (ido-ubiquitous-mode))
+    (ido-everywhere)
+    ))
+
 (define-key global-map (kbd "C-x f") 'ido-find-file)
 
 
