@@ -79,6 +79,7 @@ selected frame."
                                         ;---{keybindings}---;
 
 (global-set-key (kbd "M-w") 'sdev/jump-window)
+(global-set-key (kbd "C-x C-w") 'sdev/jump-window)
 (global-set-key (kbd "C-t") 'sdev/jump-to-vterm)
 
 
