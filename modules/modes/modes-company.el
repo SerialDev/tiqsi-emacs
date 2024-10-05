@@ -136,6 +136,8 @@ point."
 ;; (define-key global-map (kbd "<tab>") 'indent-or-expand)
 (define-key global-map (kbd "<tab>") 'company-indent-or-complete-common)
 
+
+
 (rectangle-mark-mode 0)
 
 (provide 'modes-company)
