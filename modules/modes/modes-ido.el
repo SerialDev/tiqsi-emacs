@@ -123,9 +123,9 @@ Symbols matching the text at point are put first in the completion list."
       (setq ido-virtual-buffers t)
       (ido-mode))
 
-    (use-package flx-ido   :requires ido :config (flx-ido-mode))
+    ;; (use-package flx-ido   :requires ido :config (flx-ido-mode))
     (use-package ido-vertical-mode   :requires ido :config (ido-vertical-mode))
-    (use-package ido-hacks   :requires ido :config (ido-hacks-mode))
+    ;; (use-package ido-hacks   :requires ido :config (ido-hacks-mode))
     ;; (use-package ido-ubiquitous   :requires ido :config (ido-ubiquitous-mode))
     (ido-everywhere)
     ))
