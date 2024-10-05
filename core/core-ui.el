@@ -361,7 +361,7 @@ usage (pick-one test (1 2))
 ;;                                            Line numbers                                           ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-(global-display-line-numbers-mode t)
+(safe-execute (global-display-line-numbers-mode t))
 
 
 ;;                                            col numbers                                            ;
