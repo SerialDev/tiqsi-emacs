@@ -100,13 +100,36 @@
 (when (require-soft 'jit-lock)    ; enable JIT to make font-lock faster
   (setq jit-lock-stealth-time 1)) ; new with emacs21
 
-					; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+
+(defmacro safe-load-package (package-code)
+  `(let ((debug-on-error nil)
+          (inhibit-debugger t)) ;; Ensure the debugger is inhibited
+     (condition-case err
+       (progn
+         ,package-code
+         (message "Successfully loaded or executed: %s" ',package-code))
+       (error (message "Error loading package or executing code: %s" err)))))
+
+(defmacro safe-execute (code)
+  `(condition-case nil
+     ,code
+     (error (message "Failed to execute: %s, but continuing..." ',code))))
+
+
+(safe-load-package
+  (straight-use-package
+    '(explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode")))
+
+
+(safe-execute (explain-pause-mode))
+
 
 (straight-use-package
   '(explain-pause-mode :type git :host github :repo "lastquestion/explain-pause-mode"))
 (explain-pause-mode)
 
-					; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
 
 
 (defun clear-buffer-long-printouts-line()
