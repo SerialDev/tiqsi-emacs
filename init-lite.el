@@ -226,7 +226,6 @@ of an error, just add the package to a list of missing packages."
 ;; (prescient-persist-mode +1)
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
-
 (load-expand  "core/core-performance.el") ;; DONE
 
 (load-expand  "core/core-os.el") ;; DONE
@@ -268,5 +267,5 @@ of an error, just add the package to a list of missing packages."
 
 ;; (load-expand  "core/core-setup.el")
 
-<
+
 ;;; init.el ends here
