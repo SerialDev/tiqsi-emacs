@@ -125,9 +125,20 @@ Symbols matching the text at point are put first in the completion list."
 
     (use-package flx-ido   :requires ido :config (flx-ido-mode))
     (use-package ido-vertical-mode   :requires ido :config (ido-vertical-mode))
-    ;; (use-package ido-hacks   :requires ido :config (ido-hacks-mode))
     ;; (use-package ido-ubiquitous   :requires ido :config (ido-ubiquitous-mode))
     (ido-everywhere)
+    (defun ido-execute-extended-command ()
+      "Use `ido' to select and execute a command."
+      (interactive)
+      (call-interactively
+	(intern
+	  (ido-completing-read
+	    "M-x "
+	    (all-completions "" obarray 'commandp)))))
+
+    (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
+
+    
     ))
 
 (define-key global-map (kbd "C-x f") 'ido-find-file)
