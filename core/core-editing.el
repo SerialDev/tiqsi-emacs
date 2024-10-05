@@ -815,7 +815,7 @@ Insert 1 if it does, 0 if it doesn't."
 
 ;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;;
 
-(define-key global-map [f8] 'tiqsi-replace-string)
+;; (define-key global-map [f8] 'tiqsi-replace-string)
 
 
 ;; (define-key global-map (kbd "\e0B") 'next-line)
