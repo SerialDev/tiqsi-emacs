@@ -122,9 +122,9 @@ of an error, just add the package to a list of missing packages."
 
                                         ;{Bootstrap Straight};
 (defmacro GNUEmacsGT25 (&rest body)
-  `(if (and (string-match "GNU Emacs" (version))
-         (> emacs-major-version 25))
+  `(if (> emacs-major-version 25)
      (progn ,@body)))
+
 
 
 (when (file-directory-p (concat "~/volume/.emacs/" "straight"))
