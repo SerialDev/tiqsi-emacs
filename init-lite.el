@@ -225,6 +225,12 @@ of an error, just add the package to a list of missing packages."
 
 ;; (prescient-persist-mode +1)
 
+(defmacro GNUEmacsGT25 (&rest body)
+  `(if (and (string-match "GNU Emacs" (version))
+         (> emacs-major-version 25))
+     (progn ,@body)))
+
+
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
 (define-key global-map (kbd "C-c >") 'end-of-buffer)
 (define-key global-map (kbd "C-c <") 'beginning-of-buffer)
@@ -248,25 +254,30 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-completion.el")
 (load-expand  "core/core-comments.el")
 
-(load-expand  "core/core-ui.el")
-
-
-(load-expand  "modules/programming/programming-lisp.el")
-
 (load-expand  "modules/programming/programming-python-lite.el")
 
-(load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
-(load-expand  "modules/modes/modes-company.el")
-(load-expand  "modules/modes/modes-shell.el")
-(load-expand  "modules/programming/programming-c-lite.el")
+(GNUEmacsGT25
+  
+  (load-expand  "core/core-ui.el")
+  (load-expand  "modules/programming/programming-lisp.el")
 
-;;(load-expand  "modules/programming/programming-go.el")
+  (load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
+  (load-expand  "modules/modes/modes-company.el")
+  (load-expand  "modules/modes/modes-shell.el")
+  (load-expand  "modules/programming/programming-c-lite.el")
 
-(load-expand  "modules/programming/programming-rust.el")
-;; (load-expand  "modules/programming/programming-javascript.el") ;; JSX FIX
-(load-expand  "modules/programming/programming-zig.el") ;; FIXME
-(load-expand  "modules/programming/programming-clojure.el")
-(load-expand  "modules/programming/programming-llm.el")
+  ;;(load-expand  "modules/programming/programming-go.el")
+
+  (load-expand  "modules/programming/programming-rust.el")
+  ;; (load-expand  "modules/programming/programming-javascript.el") ;; JSX FIX
+  (load-expand  "modules/programming/programming-zig.el") ;; FIXME
+  (load-expand  "modules/programming/programming-clojure.el")
+  (load-expand  "modules/programming/programming-llm.el")
+
+
+  )
+
+
 
 ;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
 (global-set-key (kbd "C-x b") 'ido-switch-buffer)
