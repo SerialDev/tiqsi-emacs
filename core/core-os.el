@@ -97,19 +97,19 @@
   (list 'if (string-match "GNU Emacs" (version))
     (cons 'progn body)))
 
-(defmacro GNUEmacs23 (&rest body)
-  (list 'if (string-match "GNU Emacs 23" (version))
-    (cons 'progn body)))
-
-
 (defmacro GNUEmacs25 (&rest body)
-  (list 'if (string-match "GNU Emacs 25" (version))
-    (cons 'progn body)))
+  `(if (= emacs-major-version 25)
+     (progn ,@body)))
 
 
 (defmacro GNUEmacs22 (&rest body)
-  (list 'if (string-match "GNU Emacs 22" (version))
-    (cons 'progn body)))
+  `(if (= emacs-major-version 22)
+     (progn ,@body)))
+
+(defmacro GNUEmacs23 (&rest body)
+  `(if (= emacs-major-version 22)
+     (progn ,@body)))
+
 
 (defmacro XEmacs (&rest body)
   "Execute any number of forms if running under XEmacs."
