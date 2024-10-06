@@ -227,8 +227,15 @@ BODY should contain two parts: what to do if EXEC is found, and what to do if no
        (progn ,@(cadr body))))) ; Execute the second part of BODY if the executable is not found
 
 
+(GNUEmacs25
+  (define-key global-map (kbd "C-@") 'set-mark-command)
+  (straight-require 'python)
+
+  )
 
 ;;          Patch the missing provided-mode-derived-p for < emacs 26         ;
+
+
 
 (GNUEmacs25
   (progn
