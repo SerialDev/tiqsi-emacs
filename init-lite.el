@@ -226,6 +226,9 @@ of an error, just add the package to a list of missing packages."
 ;; (prescient-persist-mode +1)
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
+(define-key global-map (kbd "C-c >") 'end-of-buffer)
+(define-key global-map (kbd "C-c <") 'beginning-of-buffer)
+
 
 (load-expand  "core/core-performance.el") ;; DONE
 (load-expand  "core/core-os.el") ;; DONE
@@ -234,7 +237,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "modules/modes/modes-avy.el")
 
 (load-expand  "core/core-editing.el")
-(load-expand  "core/core-ui.el")
 
 
 (load-expand  "core/core-files.el")
@@ -245,6 +247,8 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-secrets.el")
 (load-expand  "core/core-completion.el")
 (load-expand  "core/core-comments.el")
+
+(load-expand  "core/core-ui.el")
 
 
 (load-expand  "modules/programming/programming-lisp.el")
