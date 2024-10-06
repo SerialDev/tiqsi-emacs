@@ -873,6 +873,16 @@ Insert 1 if it does, 0 if it doesn't."
 (global-set-key (kbd "C-c <down>") 'drag-stuff-down)
 (global-set-key (kbd "M-/") 'comment-or-uncomment-region-or-line)
 
+
+
+(GNUEmacs25
+  (define-key global-map (kbd "C-@") 'set-mark-command)
+  (straight-require 'python)
+  (global-set-key (kbd "˚") 'kill-this-buffer)
+
+  )
+
+
 ;;(bind-key "<tab>" #'malb/indent-or-complete)
 ;; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
 ;; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
