@@ -121,12 +121,20 @@ of an error, just add the package to a list of missing packages."
 
 
                                         ;{Bootstrap Straight};
+(defmacro GNUEmacsGT25 (&rest body)
+  `(if (and (string-match "GNU Emacs" (version))
+         (> emacs-major-version 25))
+     (progn ,@body)))
+
 
 (when (file-directory-p (concat "~/volume/.emacs/" "straight"))
   (progn (setq user-emacs-directory "~/volume/.emacs/")
     (message "No radox bootstrapping needed")
 
     (load (concat user-emacs-directory "straight/repos/straight.el/bootstrap.el")))
+  )
+
+(GNUEmacsGT25 
   (let ((bootstrap-file (concat user-emacs-directory "straight/repos/straight.el/bootstrap.el"))
          (bootstrap-version 3))
     (unless (file-exists-p bootstrap-file)
@@ -136,8 +144,8 @@ of an error, just add the package to a list of missing packages."
           'silent 'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))
-    (load bootstrap-file nil 'nomessage)))
-
+    (load bootstrap-file nil 'nomessage))
+  )
 
 
 ;; Bootstrap use-package
@@ -225,10 +233,6 @@ of an error, just add the package to a list of missing packages."
 
 ;; (prescient-persist-mode +1)
 
-(defmacro GNUEmacsGT25 (&rest body)
-  `(if (and (string-match "GNU Emacs" (version))
-         (> emacs-major-version 25))
-     (progn ,@body)))
 
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
@@ -254,7 +258,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-completion.el")
 (load-expand  "core/core-comments.el")
 
-(load-expand  "modules/programming/programming-python-lite.el")
 
 (GNUEmacsGT25
   
@@ -276,6 +279,8 @@ of an error, just add the package to a list of missing packages."
 
 
   )
+
+(load-expand  "modules/programming/programming-python-lite.el")
 
 
 
