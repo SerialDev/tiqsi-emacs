@@ -824,6 +824,7 @@ Insert 1 if it does, 0 if it doesn't."
 ;; (define-key input-decode-map "\eOB" [down])
 
 
+;; (define-key input-decode-map "6~" [<next>])
 
 
 ;; Editting
