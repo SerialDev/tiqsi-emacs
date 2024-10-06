@@ -140,7 +140,10 @@
 (global-set-key (kbd "C-;") 'tiqsi-comment--line-to-msg)
 (global-set-key (kbd "C-:") 'tiqsi-comment--line-to-msg-centered)
 (global-set-key (kbd "C-'") 'tiqsi-comment--insert-end)
-(global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
+(GNUEmacsGT25
+  (global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
+  )
+
 (global-set-key (kbd "C-c >") 'tiqsi-comment--line-to-msg-centered-end)
 (global-set-key (kbd "C-c <") 'tiqsi-comment--line-to-msg-centered-begin)
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
