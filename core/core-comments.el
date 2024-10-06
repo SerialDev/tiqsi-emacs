@@ -142,7 +142,11 @@
 (global-set-key (kbd "C-'") 'tiqsi-comment--insert-end)
 (GNUEmacsGT25
   (global-set-key (kbd "C-@") 'tiqsi-comment--insert-sep)
+  (global-set-key (kbd "≈") 'ido-execute-extended-command)
+  (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
+  
   )
+
 
 (global-set-key (kbd "C-c >") 'tiqsi-comment--line-to-msg-centered-end)
 (global-set-key (kbd "C-c <") 'tiqsi-comment--line-to-msg-centered-begin)
