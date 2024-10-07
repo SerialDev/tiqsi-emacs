@@ -51,6 +51,20 @@
   (sdev/set-windows)
   )
 
+(GNUEmacs25
+  (progn
+    (split-window-horizontally)
+    (other-window 1)
+    (split-window-below)
+    (other-window 1)
+    (split-window-below)
+    (delete-window)
+    (other-window 1)
+    (eshell )
+    )
+  )
+
+
 ;;                                            No Scrollbar                                           ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
