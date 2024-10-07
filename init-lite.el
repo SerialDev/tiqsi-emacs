@@ -258,10 +258,10 @@ of an error, just add the package to a list of missing packages."
 (load-expand  "core/core-completion.el")
 (load-expand  "core/core-comments.el")
 
+(load-expand  "core/core-ui.el")
 
 (GNUEmacsGT25
   
-  (load-expand  "core/core-ui.el")
   (load-expand  "modules/programming/programming-lisp.el")
 
   (load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
