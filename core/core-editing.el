@@ -886,6 +886,9 @@ Insert 1 if it does, 0 if it doesn't."
   (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
   (define-key global-map (kbd "C-h") 'kill-whole-line)
   (define-key input-decode-map "\eH" 'kill-whole-line)
+
+  (global-unset-key (kbd "M-["))
+
   
   
   (straight-require 'gruber-darker-theme)
