@@ -880,7 +880,7 @@ Insert 1 if it does, 0 if it doesn't."
   (straight-require 'python)
   (global-set-key (kbd "˚") 'kill-this-buffer)
   (global-set-key (kbd "ƒ") 'ido-find-file)
-  (global-set-key (kbd "≈") 'ido-execute-extended-command)
+
   (global-set-key (kbd "˘") 'end-of-buffer)
   (global-set-key (kbd "¯") 'beginning-of-buffer)
   (define-key global-map (kbd "C-h") 'kill-whole-line)
@@ -895,7 +895,7 @@ Insert 1 if it does, 0 if it doesn't."
   (straight-require 'amx)
   (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
   (define-key global-map (kbd "M-x") 'amx)
-
+  (global-set-key (kbd "≈") 'amx)
 
   
   )
