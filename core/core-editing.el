@@ -876,6 +876,7 @@ Insert 1 if it does, 0 if it doesn't."
 
 
 (GNUEmacs25
+  ;; A lot of these are to work well with remote jupyterhub terminals
   (define-key global-map (kbd "C-@") 'set-mark-command)
   (straight-require 'python)
   (global-set-key (kbd "˚") 'kill-this-buffer)
@@ -896,8 +897,9 @@ Insert 1 if it does, 0 if it doesn't."
   (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
   (define-key global-map (kbd "M-x") 'amx)
   (global-set-key (kbd "≈") 'amx)
+  (global-set-key (kbd "ß") 'save-buffer)
 
-  
+
   )
 
 ;; (straight-require 'gruber-darker-theme)
