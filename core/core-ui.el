@@ -344,15 +344,15 @@ usage (pick-one test (1 2))
 ;;                                         Enforce Line Limit                                        ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
-
-(use-package column-enforce-mode
-  :straight
-  :ensure
-  :config
-  (progn
-    (setq column-enforce-column 100)
-    (setq column-enforce-comments nil)))
-
+(GNUEmacsGT25
+  (use-package column-enforce-mode
+    :straight
+    :ensure
+    :config
+    (progn
+      (setq column-enforce-column 100)
+      (setq column-enforce-comments nil)))
+  )
 
 ;;                                         Marked region info                                        ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
