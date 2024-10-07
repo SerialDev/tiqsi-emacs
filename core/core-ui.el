@@ -46,7 +46,10 @@
     (safe-execute(vterm))
     )
   )
-(sdev/set-windows)
+
+(GNUEmacsGT25
+  (sdev/set-windows)
+  )
 
 ;;                                            No Scrollbar                                           ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
@@ -200,6 +203,7 @@
 (set-face-attribute 'font-lock-variable-name-face nil :foreground "burlywood3")
 (set-face-attribute 'region nil :background "#666" :foreground "#ffffff")
 
+
 (when (eq system-type 'darwin)
 
   ;; default Latin font (e.g. Consolas)
@@ -246,6 +250,10 @@
 
 ;;                           TODO: Asyc the beacon                             ;
 ;; ------------------------------------------------------------------------- ;
+
+(GNUEmacs25
+  (defvar after-focus-change-function #'ignore
+    ))
 
 (use-package beacon
   :straight t
