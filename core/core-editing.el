@@ -879,6 +879,10 @@ Insert 1 if it does, 0 if it doesn't."
   (define-key global-map (kbd "C-@") 'set-mark-command)
   (straight-require 'python)
   (global-set-key (kbd "˚") 'kill-this-buffer)
+  (global-set-key (kbd "ƒ") 'ido-find-file)
+  (global-set-key (kbd "≈") 'ido-execute-extended-command)
+  (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
+  (define-key input-decode-map "\eH" 'kill-whole-line)
 
   )
 
