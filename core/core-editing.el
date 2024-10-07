@@ -885,6 +885,8 @@ Insert 1 if it does, 0 if it doesn't."
   (define-key global-map (kbd "C-h") 'kill-whole-line)
   (define-key input-decode-map "\eH" 'kill-whole-line)
 
+  (straight-require 'gruber-darker-theme)
+  (load-theme 'gruber-darker t)
   )
 
 
