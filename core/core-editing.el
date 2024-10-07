@@ -890,6 +890,7 @@ Insert 1 if it does, 0 if it doesn't."
   (global-unset-key (kbd "M-["))
 
   (global-set-key (kbd "C-c <right>") 'sdev/jump-window)
+  (global-set-key (kbd "C-c <left>") 'windmove-left)
 
 
   (straight-require 'gruber-darker-theme)
