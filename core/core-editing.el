@@ -881,10 +881,13 @@ Insert 1 if it does, 0 if it doesn't."
   (global-set-key (kbd "˚") 'kill-this-buffer)
   (global-set-key (kbd "ƒ") 'ido-find-file)
   (global-set-key (kbd "≈") 'ido-execute-extended-command)
+  (global-set-key (kbd "˘") 'end-of-buffer)
+  (global-set-key (kbd "¯") 'beginning-of-buffer)
   (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
   (define-key global-map (kbd "C-h") 'kill-whole-line)
   (define-key input-decode-map "\eH" 'kill-whole-line)
-
+  
+  
   (straight-require 'gruber-darker-theme)
   (load-theme 'gruber-darker t)
   )
