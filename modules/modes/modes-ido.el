@@ -136,9 +136,6 @@ Symbols matching the text at point are put first in the completion list."
 	    "M-x "
 	    (all-completions "" obarray 'commandp)))))
 
-    (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
-
-    
     ))
 
 (define-key global-map (kbd "C-x f") 'ido-find-file)
