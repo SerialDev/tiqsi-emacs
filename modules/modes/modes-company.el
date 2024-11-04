@@ -136,6 +136,119 @@ point."
 ;; (define-key global-map (kbd "<tab>") 'indent-or-expand)
 (define-key global-map (kbd "<tab>") 'company-indent-or-complete-common)
 
+(use-package posframe
+  :straight t
+  :after dashboard
+  )
+
+(use-package markdown-mode
+  :straight t
+  :after dashboard
+  )
+
+(use-package yasnippet
+  :straight t
+  )
+
+;; ;; lsp-bridge: faster lsp server
+;; (use-package lsp-bridge
+;;   :straight (lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+;; 	      :files ("*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources"))
+;;   :hook(prog-mode . lsp-bridge-mode)
+;;   )
+
+
+(use-package lsp-bridge
+  :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+               :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+               :build (:not compile))
+  :init
+
+  ;; (global-lsp-bridge-mode)
+
+  )
+
+
+(defun activate-lsp-bridge-with-uv ()
+  "Set up lsp-bridge with uv virtual environment for Python files."
+  (interactive)
+  (when (derived-mode-p 'python-mode)
+    (let ((default-directory (file-name-directory buffer-file-name)))
+      (setq-local lsp-bridge-python-command
+        (string-trim (shell-command-to-string "cd $PWD && uv_source && which python")))
+      (setq-local lsp-bridge-python-default-server 'pyright)
+      (lsp-bridge-mode 1))))
+
+
+
+
+
+(defun conditional-xref-lsp-find-definition ()
+  "Attempt to jump to definition, pushing to xref stack only if unsuccessful."
+  (interactive)
+  (condition-case nil
+    (lsp-find-definition)   ;; This pushes to xref stack on success
+    (error
+      (xref-push-marker-stack) ;; Push to stack only if definition fails
+      (message "Definition not found."))))
+
+
+(defun conditional-xref-lsp-find-definition-side-buffer ()
+  "Open definition in a side buffer and switch focus to it."
+  (interactive)
+  (condition-case nil
+    (let ((buf (save-window-excursion
+                 (lsp-find-definition)
+                 (current-buffer))))
+      (display-buffer-in-side-window buf '((side . right) (slot . 1) (window-width . 0.5)))
+      (select-window (get-buffer-window buf)))
+    (error
+      (xref-push-marker-stack)
+      (message "Definition not found."))))
+
+
+
+(defun conditional-xref-lsp-find-definition-side-buffer ()
+  "Open definition in a right side buffer, reusing an existing side window if available."
+  (interactive)
+  (condition-case nil
+    (let ((buf (save-window-excursion
+                 (lsp-find-definition)
+                 (current-buffer)))
+           (right-window (or (window-in-direction 'right)
+                           (display-buffer-in-side-window buf '((side . right) (slot . 1) (window-width . 0.5))))))
+      (set-window-buffer right-window buf)
+      (select-window right-window))
+    (error
+      (xref-push-marker-stack)
+      (message "Definition not found."))))
+
+
+(add-hook 'python-mode-hook 'lsp)
+(add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+
+
+(define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
+(define-key python-mode-map (kbd "C->") 'conditional-xref-lsp-find-definition-side-buffer) ;; Jump to definition in side buffer
+
+
+(define-key python-mode-map (kbd "C-`") 'lsp-ui-peek-find-definitions)
+(define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
+(define-key python-mode-map (kbd "C-,") 'xref-go-back)      ;; Jump back
+(define-key python-mode-map (kbd "C-~") 'lsp-ui-peek-find-references)        ;; Find references
+
+
+;; Enable xref navigation for Emacs Lisp buffers
+(define-key emacs-lisp-mode-map (kbd "C-.") 'xref-find-definitions) ;; Jump to definition
+(define-key emacs-lisp-mode-map (kbd "C-,") 'xref-pop-marker-stack) ;; Jump back
+
+
+
+
+(defun install-pyright-in-uv ()
+  (interactive)
+  (shell-command "uv_source && pip install pyright"))
 
 
 (rectangle-mark-mode 0)
