@@ -913,6 +913,9 @@ Insert 1 if it does, 0 if it doesn't."
 ;; (global-set-key (kbd "C-S-<left>") 'corral-parentheses-backward)
 ;; (global-set-key (kbd "C-S-<right>") 'corral-parentheses-forward)
 
+(global-set-key (kbd "M-z") 'undo-tree-undo)
+(global-set-key (kbd "M-Z") 'undo-tree-redo)
+
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;;
 
 (provide 'core-editing)
