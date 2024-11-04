@@ -227,6 +227,11 @@ point."
 (add-hook 'python-mode-hook 'lsp)
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
 
+(defun insert-colored-print (text)
+  "Insert a colored print statement with customizable message."
+  (interactive "sEnter message: ")
+  (insert (format "print(\"\\033[32m*%s\\033[0m\")" text)))
+
 
 
 (define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
