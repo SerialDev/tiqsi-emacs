@@ -67,6 +67,7 @@
 (load-expand  "modules/programming/programming-jai.el")
 (load-expand  "modules/programming/programming-llm.el")
 (load-expand  "modules/programming/programming-zig.el")
+(load-expand  "modules/programming/programming-other.el")
 
 (provide 'programming)
 
