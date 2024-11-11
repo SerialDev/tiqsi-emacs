@@ -37,7 +37,6 @@
 (load-expand  "modules/modes/modes-magit.el")
 (load-expand  "modules/modes/modes-minimap.el")
 (load-expand  "modules/modes/modes-tramp.el")
-(load-expand  "modules/modes/modes-waka.el")
 (load-expand  "modules/modes/modes-avy.el")
 (load-expand  "modules/modes/modes-erc.el")
 (load-expand  "modules/modes/modes-org.el")
@@ -50,18 +49,18 @@
 (load-expand  "modules/modes/modes-shell.el")
 
 
-; ------------------------------------------------------------------------- ;
-;                        TODO Refactor in the future                        ;
-; ------------------------------------------------------------------------- ;
+;; ------------------------------------------------------------------------- ;
+;;                        TODO Refactor in the future                        ;
+;; ------------------------------------------------------------------------- ;
 
 
 (straight-use-package
- '(emacs-refactor
-   :type git
-   :host github
-   :ensure t
-   :repo "Wilfred/emacs-refactor"
-))
+  '(emacs-refactor
+     :type git
+     :host github
+     :ensure t
+     :repo "Wilfred/emacs-refactor"
+     ))
 
 
 (provide 'modes)
