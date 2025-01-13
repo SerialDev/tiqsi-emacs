@@ -29,6 +29,33 @@
 
 (add-to-list 'auto-mode-alist '("Makefile\\'" . makefile-mode))
 
+
+;; JAI mode
+
+(straight-use-package
+  '(jai-mode
+     :type git
+     :host github
+     :ensure t
+     :repo "krig/jai-mode"  
+     )
+  )
+
+
+(straight-use-package
+  '(odin-mode
+     :type git
+     :host github
+     :ensure t
+     :repo "mattt-b/odin-mode"  
+     )
+  )
+
+
+(add-to-list 'auto-mode-alist '("\\.jai\\'" . jai-mode))
+(add-to-list 'auto-mode-alist '("\\.odin\\'" . odin-mode))
+
+
 (provide 'programming-other)
 
 ;;; programming-other.el ends here
