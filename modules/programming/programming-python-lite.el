@@ -1205,9 +1205,24 @@ else:
 ;; ;;                          (lsp))))  ; or lsp-deferred
 
 
+
+(defun pandas-print-all ()
+  "Insert code to configure Pandas to display all rows and columns."
+  (interactive)
+  (insert "import pandas as pd\n\n# Display all rows and columns\npd.set_option('display.max_rows', None)\npd.set_option('display.max_columns', None)\n"))
+
+(defun pandas-print-shortened ()
+  "Insert code to reset Pandas display options to default shortened mode."
+  (interactive)
+  (insert "import pandas as pd\n\n# Reset display options to defaults\npd.reset_option('display.max_rows')\npd.reset_option('display.max_columns')\n"))
+
 ;;                                Keybindings                                ;
 ;; ------------------------------------------------------------------------- ;
 
+
+(straight-require 'ruff-format)
+
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
 
 
 (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
