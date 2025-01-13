@@ -597,6 +597,8 @@ USAGE: (compile-other \"my-code-to-compile\")"
   (progn
     (define-key c-mode-map [f12] 'tiqsi-find-corresponding-file)
     (define-key c-mode-map [M-f12] 'tiqsi-find-corresponding-file-other-window)
+    (define-key c-mode-map (kbd "C-#") 'tiqsi-find-corresponding-file)
+    (define-key c-mode-map (kbd "C-~") 'tiqsi-find-corresponding-file-other-window)
     (define-key c-mode-map (kbd "C-c n") 'flymake-goto-next-error)
     (define-key c-mode-map (kbd "C-c C-c") 'tiqsi-compile--no-message)
     (define-key c-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
