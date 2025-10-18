@@ -27,7 +27,6 @@
 ;;
 
 
-
 (straight-require 'terraform-mode)
 (straight-require 'terraform-doc)
 

@@ -24,9 +24,20 @@
 
 
 ;;; Commentary:
-;; 
+;; Java development support with JDEE and neotree integration
 
+;;; Code:
 
+;; JDEE server configuration
+(setq jdee-server-dir "/jdee-server/target/")
+
+(defun tiqsi-java-hook()
+  "Java mode hook with flycheck and neotree integration."
+  (jdee-flycheck-enable-p)
+  (neotree-show))
+
+;; Hook for Java development (moved from modes-neotree.el)
+(add-hook 'jdee-mode-hook 'tiqsi-java-hook)
 
 (provide 'programming-java)
 

@@ -226,8 +226,6 @@ Writing English explanations is forbidden. ")
                                                      "You are an editor function, a copilot, \n"
 						     " you will convert the following code into a docstring \n"
 						     " in the following format using this as a scaffold -> "
-						     "* ---------------Typedef----------------\n "
-						     "* type-def ::(<types>) -> <output_type>"
                                                      "* ---------------Function---------------\n"
                                                      "* <FUNCTION DESCRIPTION HERE>\n"
                                                      "* ----------------Returns---------------\n"
@@ -236,8 +234,6 @@ Writing English explanations is forbidden. ")
                                                      "* <PARAMS DESCRIPTION HERE>\n"
                                                      "* ----------------Usage-----------------\n"
                                                      "* ----------------Notes-----------------\n"
-						     "* <Notes Here>\n"
-						     "* <WHy? here>\n"
                                                      "The code you will edit is this, provide a docstring \n"
 						     " be STRICT about the scaffold \n"
 						     " Make --Function-- etc spaced into the middle and use * as a line starter \n"
@@ -488,6 +484,43 @@ Writing English explanations is forbidden. ")
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
+(defun cai-flow-ascii (begin end)
+  "Call cai_flow with the selected text from BEGIN to END, formatted as a single line, and append a formatted comment."
+  (interactive "r")
+  (let* ((region-text (buffer-substring-no-properties begin end))
+          (arg-string (shell-quote-argument (replace-regexp-in-string "[ \t\n\r]+" " " region-text)))
+          (formatted-comment (shell-quote-argument (concat
+                                                     "You are an editor function, a copilot, \n"
+						     "you will inspect the following code \n"
+						     "try to identify and scaffold the following \n "
+                                                     "*Use raw print() statements with ANSI escape codes to color messages by semantic category—"
+						     "yellow (33) for commentary, green (32) for successes, red (31) for errors, magenta (35) "
+						     "for informative data, cyan (36) for section headings, and blue (34) for rare one-offs—always "
+						     " ending with \033[0m, with no logging abstraction and minimal, high-signal content "
+						     "for precise human and script readability."
+						     "YOU are a copilot you MUST adhere to these maxims"
+                                                     region-text "\n")))
+          (output-buffer (get-buffer-create "*cai_flow-output*"))
+          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
+    (with-current-buffer output-buffer
+      (erase-buffer)
+      (shell-command shell-command-string (current-buffer) (current-buffer))
+      ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
+      (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
+      ;; Optionally delete unwanted output, e.g., the first 10 lines
+      (goto-char (point-min))
+      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      ;; Find an existing side window or open a new side window if none is available
+      (let ((side-window (or (get-window-with-predicate
+                               (lambda (window)
+                                 (equal (window-parameter window 'window-side) 'right)))
+                           (car (window-at-side-list nil 'right)))))
+        (if side-window
+          (set-window-buffer side-window output-buffer)  ; Use existing side window
+          (display-buffer-in-side-window output-buffer '((side . right)))))
+      ;; Provide visual feedback that the command has executed
+      (message "cai_flow executed with escaped and formatted region."))))
+
 (defun cai-flow-complete (begin end)
   "Call cai_flow with the selected text from BEGIN to END, formatted as a single line, and append a formatted comment."
   (interactive "r")
@@ -601,7 +634,7 @@ Writing English explanations is forbidden. \n "
 ` ` `  \\\\_|_|_| // ` ` ` ` ` | _df_: Debug Functionality  _e_: Explain
  Tiqsi |        |` ` ` ` ` ` | _t_: Transform into Function _o_: Continue from last
 ` ` `  | o    o | Emacs` ` ` | _m_: Comment  _dp_: Debug Performance
-` ` _ _ _ _ _ _ _ _ _  ` ` ` | _r_: Call Region
+` ` _ _ _ _ _ _ _ _ _  ` ` ` | _r_: Call Region  _a_: Ascii Colourize
 `  |_ _ _ _ _ _ _ _ _ |` ` ` | _p_: Call Prompt
 ` ` ` ` \\_ _ _ /` ` ` ` ` ` `|"
   ("c" cai-flow-custom)
@@ -614,6 +647,7 @@ Writing English explanations is forbidden. \n "
   ("r" cai-flow-call-region)
   ("p" cai-flow-call-prompt)
   ("o" cai-flow-continue)
+  ("a" cai-flow-ascii)
   ("ESC" nil "Exit"))
 
 ;; define `ctrl-c ctrl-k` keybinding for llm code completion
@@ -644,6 +678,35 @@ Writing English explanations is forbidden. \n "
      :ensure t
      :repo "emacs-openai/chatgpt"
      ))
+
+
+(straight-use-package
+  '(chatgpt
+     :type git
+     :host github
+     :ensure t
+     :repo "emacs-openai/chatgpt"
+     ))
+
+(straight-use-package
+  '(aidermacs
+     :type git
+     :host github
+     :repo "MatthewZMD/aidermacs"))
+
+(use-package exec-path-from-shell)
+
+(use-package aidermacs
+  :straight t
+  :bind (("C-c C-a" . aidermacs-transient-menu))
+  :config
+  (setenv "OPENAI_API_KEY" (exec-path-from-shell-copy-env "OPENAI_API_KEY"))
+  :custom
+  (aidermacs-use-architect-mode t)
+  (setq aidermacs-watch-files t)
+  (setq aidermacs-show-diff-after-change t)
+
+  (aidermacs-default-model "o3-mini"))
 
 
 (provide 'programming-llm)

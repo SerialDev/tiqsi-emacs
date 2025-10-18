@@ -43,6 +43,10 @@
 ;; Debug?
 ;; (setq debug-on-error t)
 
+;; Checkpoint logging removed - issue was fixed
+;; Problem was: ultra-beacon color parsing failed on named color "White"
+;; Solution: Added color normalization function
+
                                         ;----{About User}---;
 
 (setq user-full-name "C Andres Mariscal"
@@ -251,6 +255,7 @@ of an error, just add the package to a list of missing packages."
 
 (load-expand  "core/core-files.el")
 (load-expand  "core/core-navigation.el")
+(load-expand  "core/core-windows.el")
 (load-expand  "core/core-functionality.el")
 (load-expand  "core/core-functions.el")
 (load-expand  "core/core-debug.el")
@@ -260,6 +265,11 @@ of an error, just add the package to a list of missing packages."
 
 (load-expand  "core/core-ui.el")
 
+(use-package elisp-slime-nav
+  :straight t
+  :hook (emacs-lisp-mode . elisp-slime-nav-mode))
+
+
 (GNUEmacsGT25
   
   (load-expand  "modules/programming/programming-lisp.el")
@@ -267,6 +277,7 @@ of an error, just add the package to a list of missing packages."
   (load-expand  "modules/modes/modes-helm.el") ;; TODO explore abo abo's packages and swiper ivy as a replacement for slow stuff
   (load-expand  "modules/modes/modes-company.el")
   (load-expand  "modules/modes/modes-shell.el")
+  (load-expand  "modules/modes/modes-claude.el")
   (load-expand  "modules/programming/programming-c-lite.el")
 
   ;;(load-expand  "modules/programming/programming-go.el")
@@ -277,16 +288,17 @@ of an error, just add the package to a list of missing packages."
   (load-expand  "modules/programming/programming-clojure.el")
   (load-expand  "modules/programming/programming-llm.el")
 
-
   )
 
 (load-expand  "modules/programming/programming-python-lite.el")
 
 
 
-;; (global-set-key (kbd "M-x") 'smex) ;; Offloaded to selectrum now
-(global-set-key (kbd "C-x b") 'ido-switch-buffer)
+;; M-x and C-x b will be set by helm in modes-helm.el
+;; (global-set-key (kbd "M-x") 'smex)
+;; (global-set-key (kbd "C-x b") 'ido-switch-buffer)
 (global-set-key (kbd "C-c v") 'evil-mode)
+
 
 ;; (load-expand  "core/core-setup.el")
 

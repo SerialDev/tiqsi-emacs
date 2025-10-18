@@ -269,20 +269,32 @@
   (defvar after-focus-change-function #'ignore
     ))
 
-(use-package beacon
-  :straight t
-  :ensure t
-  :config (progn
-	    (beacon-mode 1)
-	    (setq beacon-push-mark 35)
-	    ;; (add-hook 'beacon-dont-blink-predicates #'fundamental-mode-p)
-	    (setq beacon-color "#666600")
-	    (setq beacon-blink-when-point-moves-vertically 10)
-	    (setq beacon-blink-when-point-moves-horizontally 10)
-	    (setq beacon-blink-when-focused t)
-	    (setq beacon-blink-duration 0.2)
-	    (setq beacon-blink-delay 0.2)
-	    (setq beacon-size 20)))
+;; Comment out original beacon and use our ultra-fast version
+;; (use-package beacon
+;;   :straight t
+;;   :ensure t
+;;   :config (progn
+;; 	    (beacon-mode 1)
+;; 	    (setq beacon-push-mark 35)
+;; 	    ;; (add-hook 'beacon-dont-blink-predicates #'fundamental-mode-p)
+;; 	    (setq beacon-color "#666600")
+;; 	    (setq beacon-blink-when-point-moves-vertically 10)
+;; 	    (setq beacon-blink-when-point-moves-horizontally 10)
+;; 	    (setq beacon-blink-when-focused t)
+;; 	    (setq beacon-blink-duration 0.2)
+;; 	    (setq beacon-blink-delay 0.2)
+;; 	    (setq beacon-size 20)))
+
+;; Use ultra-fast beacon implementation
+(load-expand "modules/modes/modes-beacon-ultra.el")
+(require 'modes-beacon-ultra)
+(setq ultra-beacon-color "#d4af37") ; Comfortable golden yellow
+(setq ultra-beacon-size 30) ; Larger size
+(setq ultra-beacon-push-mark t)
+(setq ultra-beacon-minimum-movement 10)
+(setq ultra-beacon-blink-duration 0.4) ; Slightly longer for gentler fade
+(setq ultra-beacon-fade-steps 8) ; More steps for smoother fade
+(ultra-beacon-mode 1)
 
 
 

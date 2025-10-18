@@ -280,155 +280,13 @@ Repeated invocations toggle between the two most recently open buffers."
   (switch-to-buffer (other-buffer (current-buffer) 1)))
 
 
-(defun close-side-come-back ()
+(defun sdev/go-to-dir ()
+  "Prompt for a directory path (paste allowed) and jump there in dired."
   (interactive)
-  (sdev/jump-window)
-  (kill-current-buffer)
-  (sdev/jump-window))
-
-
-                                        ;------{Window}-----;
-
-;; swap 2 windows
-(defun my-swap-windows ()
-  "If you have 2 windows, it swaps them."
-  (interactive)
-  (cond ((not (= (count-windows) 2))
-          (message "You need exactly 2 windows to do this."))
-    (t
-      (let* ((w1 (first (window-list)))
-              (w2 (second (window-list)))
-              (b1 (window-buffer w1))
-              (b2 (window-buffer w2))
-              (s1 (window-start w1))
-              (s2 (window-start w2)))
-        (set-window-buffer w1 b2)
-        (set-window-buffer w2 b1)
-        (set-window-start w1 s2)
-        (set-window-start w2 s1)))))
-
-
-(defun rotate-windows ()
-  "Rotate your windows"
-  (interactive)
-  (cond ((not (> (count-windows)1))
-          (message "You can't rotate a single window!"))
-    (t
-      (setq i 1)
-      (setq numWindows (count-windows))
-      (while  (< i numWindows)
-        (let* (
-                (w1 (elt (window-list) i))
-                (w2 (elt (window-list) (+ (% i numWindows) 1)))
-
-                (b1 (window-buffer w1))
-                (b2 (window-buffer w2))
-
-                (s1 (window-start w1))
-                (s2 (window-start w2))
-                )
-          (set-window-buffer w1  b2)
-          (set-window-buffer w2 b1)
-          (set-window-start w1 s2)
-          (set-window-start w2 s1)
-          (setq i (1+ i)))))))
-
-(defun my-toggle-window-split ()
-  "Vertical split shows more of each line, horizontal split shows
-more lines. This code toggles between them. It only works for
-frames with exactly two windows."
-  (interactive)
-  (if (= (count-windows) 2)
-    (let* ((this-win-buffer (window-buffer))
-            (next-win-buffer (window-buffer (next-window)))
-            (this-win-edges (window-edges (selected-window)))
-            (next-win-edges (window-edges (next-window)))
-            (this-win-2nd (not (and (<= (car this-win-edges)
-                                      (car next-win-edges))
-                                 (<= (cadr this-win-edges)
-                                   (cadr next-win-edges)))))
-            (splitter
-              (if (= (car this-win-edges)
-                    (car (window-edges (next-window))))
-                'split-window-horizontally
-                'split-window-vertically)))
-      (delete-other-windows)
-      (let ((first-win (selected-window)))
-        (funcall splitter)
-        (if this-win-2nd (other-window 1))
-        (set-window-buffer (selected-window) this-win-buffer)
-        (set-window-buffer (next-window) next-win-buffer)
-        (select-window first-win)
-        (if this-win-2nd (other-window 1))))))
-
-
-;;;###autoload
-(defun buf-move-left ()
-  "Swap the current buffer and the buffer on the left of the split.
-If there is no split, ie now window on the left of the current
-one, an error is signaled."
-  (interactive)
-  (let* ((other-win (windmove-find-other-window 'left))
-          (buf-this-buf (window-buffer (selected-window))))
-    (if (null other-win)
-      (error "No left split")
-      ;; swap top with this one
-      (set-window-buffer (selected-window) (window-buffer other-win))
-      ;; move this one to top
-      (set-window-buffer other-win buf-this-buf)
-      (select-window other-win))))
-
-
-;;;###autoload
-(defun buf-move-up ()
-  "Swap the current buffer and the buffer above the split.
-If there is no split, ie now window above the current one, an
-error is signaled."
-  ;;  "Switches between the current buffer, and the buffer above the
-  ;;  split, if possible."
-  (interactive)
-  (let* ((other-win (windmove-find-other-window 'up))
-          (buf-this-buf (window-buffer (selected-window))))
-    (if (null other-win)
-      (error "No window above this one")
-      ;; swap top with this one
-      (set-window-buffer (selected-window) (window-buffer other-win))
-      ;; move this one to top
-      (set-window-buffer other-win buf-this-buf)
-      (select-window other-win))))
-
-;;;###autoload
-(defun buf-move-down ()
-  "Swap the current buffer and the buffer under the split.
-If there is no split, ie now window under the current one, an
-error is signaled."
-  (interactive)
-  (let* ((other-win (windmove-find-other-window 'down))
-          (buf-this-buf (window-buffer (selected-window))))
-    (if (or (null other-win)
-          (string-match "^ \\*Minibuf" (buffer-name (window-buffer other-win))))
-      (error "No window under this one")
-      ;; swap top with this one
-      (set-window-buffer (selected-window) (window-buffer other-win))
-      ;; move this one to top
-      (set-window-buffer other-win buf-this-buf)
-      (select-window other-win))))
-
-;;;###autoload
-(defun buf-move-right ()
-  "Swap the current buffer and the buffer on the right of the split.
-If there is no split, ie now window on the right of the current
-one, an error is signaled."
-  (interactive)
-  (let* ((other-win (windmove-find-other-window 'right))
-          (buf-this-buf (window-buffer (selected-window))))
-    (if (null other-win)
-      (error "No right split")
-      ;; swap top with this one
-      (set-window-buffer (selected-window) (window-buffer other-win))
-      ;; move this one to top
-      (set-window-buffer other-win buf-this-buf)
-      (select-window other-win))))
+  (let ((dir (read-directory-name "Paste directory path: ")))
+    (if (file-directory-p dir)
+      (dired dir)
+      (message "\033[31mInvalid directory:\033[0m %s" dir))))
 
 
 
@@ -436,17 +294,11 @@ one, an error is signaled."
 
 (define-key global-map (kbd "M-f") 'find-file)
 (define-key global-map (kbd "M-F") 'find-file-other-window)
-(global-set-key (kbd "C-c g") 'my-toggle-window-split)
 ;; (global-set-key (kbd "<f15>") 'imenu-list-smart-toggle)
 
-(global-set-key (kbd "C-x b")  'helm-mini)
 (global-set-key (kbd "<backtab>") 'un-indent-by-removing-4-spaces)
 
 
-(global-set-key (kbd "C-c l") 'buf-move-left)
-(global-set-key (kbd "C-c r") 'buf-move-right)
-(global-set-key (kbd "C-c u") 'buf-move-up)
-(global-set-key (kbd "C-c d") 'buf-move-down)
 (define-key global-map [C-right] 'forward-word)
 (define-key global-map [C-left] 'backward-word)
 (define-key global-map [C-up] 'previous-blank-line)
@@ -487,7 +339,6 @@ one, an error is signaled."
   'sk/smarter-move-beginning-of-line)
 
 (global-set-key (kbd "C-=") 'er/expand-region)
-(global-set-key (kbd "C-c w") 'rotate-windows)
 
 (global-set-key (kbd "C-c 3") 'switch-to-buffer)
 (global-set-key (kbd "C-c 2") 'next-buffer)

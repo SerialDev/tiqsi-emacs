@@ -1,0 +1,1687 @@
+;;; tiqsi-claude-repl.el --- Claude REPL integration -*- lexical-binding: t -*-
+
+;;; Commentary:
+;; Claude REPL integration for Tiqsi Emacs
+
+;;; Code:
+
+(require 'cl-lib)
+(require 'project)
+(require 'json)
+(require 'font-lock)
+(require 'ansi-color)
+
+;;; Custom Variables
+
+(defgroup tiqsi-claude-repl nil
+  "Claude REPL integration for Tiqsi Emacs."
+  :group 'tiqsi
+  :prefix "tiqsi-claude-repl-")
+
+(defcustom tiqsi-claude-repl-program "claude"
+  "Path to the Claude CLI executable."
+  :type 'string
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-clean-output t
+  "Whether to clean Unicode/ANSI from Claude output."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-show-thinking t
+  "Whether to show Claude's thinking process."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-highlight-code t
+  "Whether to syntax highlight code blocks in responses."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-highlight-inline-code t
+  "Whether to syntax highlight inline code in responses."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-show-line-numbers t
+  "Whether to show line numbers in code blocks."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-history-directory
+  (expand-file-name "~/.tiqsi-claude-history/")
+  "Directory to store Claude conversation history."
+  :type 'directory
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-save-history t
+  "Whether to save conversation history."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-history-max-size 1000
+  "Maximum number of conversations to keep in history."
+  :type 'integer
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-use-smart-context t
+  "Whether to automatically include project context."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-animate-thinking t
+  "Whether to animate the thinking indicator."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-auto-recover-prompt t
+  "Whether to automatically recover missing prompts after responses."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-wrap-column 100
+  "Column at which to wrap long lines in Claude responses."
+  :type 'integer
+  :group 'tiqsi-claude-repl)
+
+(defcustom tiqsi-claude-repl-auto-wrap t
+  "Whether to automatically wrap long lines in Claude responses."
+  :type 'boolean
+  :group 'tiqsi-claude-repl)
+
+;;; Faces
+
+(defface tiqsi-claude-repl-code-block
+  '((t :background "#2e3440" :extend t))
+  "Face for code block backgrounds."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-line-number
+  '((t :foreground "#4c566a" :background "#2e3440" :weight normal))
+  "Face for line numbers in code blocks."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-code-lang
+  '((t :foreground "#88c0d0" :weight bold))
+  "Face for code language indicators."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-code-border
+  '((t :foreground "#5e81ac" :weight normal))
+  "Face for code block borders."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-markdown-header
+  '((t :foreground "#81a1c1" :weight bold :height 1.2))
+  "Face for markdown headers."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-markdown-bold
+  '((t :weight bold))
+  "Face for markdown bold text."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-markdown-italic
+  '((t :slant italic))
+  "Face for markdown italic text."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-success
+  '((t :foreground "#a3be8c" :weight bold))
+  "Face for success messages."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-error
+  '((t :foreground "#bf616a" :weight bold))
+  "Face for error messages."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-warning
+  '((t :foreground "#ebcb8b" :weight bold))
+  "Face for warning messages."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-info
+  '((t :foreground "#88c0d0" :weight bold))
+  "Face for info messages."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-prompt
+  '((t :foreground "#d08770" :weight bold))
+  "Face for the REPL prompt."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-input
+  '((t :foreground "#eceff4"))
+  "Face for user input."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-timestamp
+  '((t :foreground "#4c566a" :slant italic))
+  "Face for timestamps."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-status
+  '((t :foreground "#b48ead" :weight bold))
+  "Face for status messages."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-separator
+  '((t :foreground "#434c5e" :weight bold :height 0.9))
+  "Face for separators."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-thinking
+  '((t :foreground "#ebcb8b" :weight bold :slant italic))
+  "Face for thinking indicators."
+  :group 'tiqsi-claude-repl)
+
+(defface tiqsi-claude-repl-progress
+  '((t :foreground "#5e81ac" :weight bold))
+  "Face for progress indicators."
+  :group 'tiqsi-claude-repl)
+
+;;; Colorized Output Functions
+
+(defun tiqsi-claude-repl--colorize (text face)
+  "Colorize TEXT with FACE."
+  (propertize text 'face face))
+
+(defun tiqsi-claude-repl--make-separator (&optional width char)
+  "Create a separator line of WIDTH using CHAR."
+  (let ((w (or width 80))
+         (c (or char "━")))
+    (tiqsi-claude-repl--colorize (make-string w (string-to-char c)) 'tiqsi-claude-repl-separator)))
+
+(defun tiqsi-claude-repl--format-timestamp (&optional time)
+  "Format TIME (or current time) as a timestamp."
+  (tiqsi-claude-repl--colorize 
+    (format-time-string "[%Y-%m-%d %H:%M:%S]" (or time (current-time)))
+    'tiqsi-claude-repl-timestamp))
+
+(defun tiqsi-claude-repl--format-status (status &optional details)
+  "Format a STATUS message with optional DETAILS."
+  (let* ((icon (cond ((string-match-p "success\\|complete\\|done" (downcase status)) "✅")
+                 ((string-match-p "error\\|fail" (downcase status)) "❌")
+                 ((string-match-p "warn" (downcase status)) "⚠️")
+                 ((string-match-p "info" (downcase status)) "ℹ️")
+                 ((string-match-p "thinking\\|process" (downcase status)) "🤔")
+                 ((string-match-p "wait" (downcase status)) "⏳")
+                 ((string-match-p "start" (downcase status)) "🚀")
+                 ((string-match-p "stop\\|cancel" (downcase status)) "🛑")
+                 ((string-match-p "save" (downcase status)) "💾")
+                 ((string-match-p "load\\|history" (downcase status)) "📜")
+                 ((string-match-p "search" (downcase status)) "🔍")
+                 ((string-match-p "connect" (downcase status)) "🔌")
+                 ((string-match-p "disconnect" (downcase status)) "🔌")
+                 (t "•")))
+          (face (cond ((string-match-p "success\\|complete\\|done" (downcase status)) 'tiqsi-claude-repl-success)
+                  ((string-match-p "error\\|fail" (downcase status)) 'tiqsi-claude-repl-error)
+                  ((string-match-p "warn" (downcase status)) 'tiqsi-claude-repl-warning)
+                  ((string-match-p "thinking\\|process\\|wait" (downcase status)) 'tiqsi-claude-repl-thinking)
+                  (t 'tiqsi-claude-repl-info))))
+    (concat icon " " (tiqsi-claude-repl--colorize status face)
+      (when details (concat " - " details)))))
+
+(defun tiqsi-claude-repl--format-prompt (&optional prefix)
+  "Format the REPL prompt with optional PREFIX."
+  (concat (when prefix (concat prefix " "))
+    (tiqsi-claude-repl--colorize "λ" 'tiqsi-claude-repl-prompt)
+    " "))
+
+(defun tiqsi-claude-repl--insert-header ()
+  "Insert the REPL header with colors."
+  (let ((header-lines
+          (list
+            (tiqsi-claude-repl--colorize "Claude REPL - AI Programming Assistant" 'tiqsi-claude-repl-info)
+            (tiqsi-claude-repl--make-separator)
+            (concat (tiqsi-claude-repl--colorize "Commands: " 'tiqsi-claude-repl-status)
+              (tiqsi-claude-repl--colorize "RET/C-c C-c" 'tiqsi-claude-repl-prompt) " Send | "
+              (tiqsi-claude-repl--colorize "C-g" 'tiqsi-claude-repl-prompt) " Cancel | "
+              (tiqsi-claude-repl--colorize "C-c C-k" 'tiqsi-claude-repl-prompt) " Clear | "
+              (tiqsi-claude-repl--colorize "C-c C-r" 'tiqsi-claude-repl-prompt) " Recover | "
+              (tiqsi-claude-repl--colorize "C-c C-q" 'tiqsi-claude-repl-prompt) " Quit")
+            (concat (tiqsi-claude-repl--colorize "Features: " 'tiqsi-claude-repl-status)
+              "Smart context • Syntax highlighting • History tracking • Project awareness")
+            (tiqsi-claude-repl--make-separator))))
+    (dolist (line header-lines)
+      (insert line "\n"))
+    (insert "\n")))
+
+(defun tiqsi-claude-repl--log-operation (operation &optional details)
+  "Log an OPERATION with optional DETAILS."
+  (when (get-buffer (tiqsi-claude-repl--get-or-create-buffer))
+    (with-current-buffer (tiqsi-claude-repl--get-or-create-buffer)
+      (save-excursion
+        (goto-char (point-max))
+        (beginning-of-line)
+        (when (looking-at "^λ ")
+          (forward-line -1))
+        (end-of-line)
+        (insert "\n" (tiqsi-claude-repl--format-timestamp) " "
+          (tiqsi-claude-repl--format-status operation details) "\n")))))
+
+;;; Utility Functions
+
+(defun tiqsi-claude-repl--executable-available-p ()
+  "Check if Claude CLI is available."
+  (executable-find tiqsi-claude-repl-program))
+
+(defun tiqsi-claude-repl--animate-thinking ()
+  "Animate the thinking indicator."
+  (when (and tiqsi-claude-repl--current-process
+          (process-live-p tiqsi-claude-repl--current-process))
+    (let* ((frames '("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏"))
+            (frame (nth (mod tiqsi-claude-repl--thinking-animation-state (length frames)) frames)))
+      (save-excursion
+        (goto-char (point-max))
+        (when (re-search-backward "⏳ Thinking\\.\\.\\..*$" nil t)
+          (let ((elapsed (if tiqsi-claude-repl--request-start-time
+                           (format " [%.1fs]" (float-time (time-since tiqsi-claude-repl--request-start-time)))
+                           "")))
+            (replace-match (tiqsi-claude-repl--colorize
+                             (format "%s Thinking...%s" frame elapsed)
+                             'tiqsi-claude-repl-thinking)))))
+      (setq tiqsi-claude-repl--thinking-animation-state 
+        (1+ tiqsi-claude-repl--thinking-animation-state)))))
+
+(defun tiqsi-claude-repl--get-project-root ()
+  "Get the project root directory."
+  (or (when (fboundp 'project-root)
+        (when-let* ((project (project-current)))
+          (project-root project)))
+    default-directory))
+
+(defun tiqsi-claude-repl--clean-output (output)
+  "Clean OUTPUT by removing ANSI escape sequences and fixing Unicode."
+  (let ((cleaned output))
+    ;; Remove ANSI escape sequences
+    (setq cleaned (replace-regexp-in-string "\033\\[[0-9;]*[a-zA-Z]" "" cleaned))
+    ;; Remove Unicode box drawing characters
+    (setq cleaned (replace-regexp-in-string "[╭╮╯╰─│├┤┬┴┼║═╔╗╚╝╠╣╦╩╬]+" "" cleaned))
+    ;; Clean up extra whitespace
+    (setq cleaned (string-trim cleaned))
+    cleaned))
+
+;;; History Functions
+
+(defun tiqsi-claude-repl--ensure-history-dir ()
+  "Ensure the history directory exists."
+  (unless (file-exists-p tiqsi-claude-repl-history-directory)
+    (make-directory tiqsi-claude-repl-history-directory t)))
+
+(defun tiqsi-claude-repl--generate-session-id ()
+  "Generate a unique session ID."
+  (format "%s-%s" 
+          (format-time-string "%Y%m%d%H%M%S")
+          (random 10000)))
+
+(defun tiqsi-claude-repl--generate-history-filename ()
+  "Generate a unique filename for saving conversation history."
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (project-name (file-name-nondirectory (directory-file-name project-root)))
+          (timestamp (format-time-string "%Y%m%d-%H%M%S")))
+    (format "%s-%s.claude" project-name timestamp)))
+
+(defun tiqsi-claude-repl--save-conversation ()
+  "Save the current conversation to history."
+  (when tiqsi-claude-repl-save-history
+    (tiqsi-claude-repl--ensure-history-dir)
+    (let* ((filename (tiqsi-claude-repl--generate-history-filename))
+            (filepath (expand-file-name filename tiqsi-claude-repl-history-directory))
+            (content (buffer-string)))
+      (with-temp-file filepath
+        (insert ";; Claude REPL History\n")
+        (insert (format ";; Session ID: %s\n" (or tiqsi-claude-repl--session-id "unknown")))
+        (insert (format ";; Project: %s\n" (tiqsi-claude-repl--get-project-root)))
+        (insert (format ";; Date: %s\n" (format-time-string "%Y-%m-%d %H:%M:%S")))
+        (insert (format ";; Messages: %d\n" tiqsi-claude-repl--message-count))
+        (insert (format ";; Duration: %s\n" 
+                  (if tiqsi-claude-repl--session-start-time
+                      (format-seconds "%h hours, %m minutes, %s seconds"
+                                      (float-time (time-subtract (current-time) 
+                                                               tiqsi-claude-repl--session-start-time)))
+                    "unknown")))
+        (insert ";; ==========================================\n\n")
+        (insert content))
+      (tiqsi-claude-repl--log-operation "Saved" (format "History saved to %s" filename))
+      (message "%s" (tiqsi-claude-repl--format-status "Success" 
+                      (format "Conversation saved to %s" filename))))))
+
+(defun tiqsi-claude-repl--list-history-files ()
+  "List all history files, sorted by date."
+  (when (file-exists-p tiqsi-claude-repl-history-directory)
+    (sort (directory-files tiqsi-claude-repl-history-directory t "\\.claude$")
+      'file-newer-than-file-p)))
+
+;;; Smart Context Functions
+
+(defvar tiqsi-claude-repl-context-files nil
+  "List of files to include as context for Claude.")
+
+(defun tiqsi-claude-repl--get-project-info ()
+  "Get project information to include as context."
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (readme (expand-file-name "README.md" project-root))
+          (package-json (expand-file-name "package.json" project-root))
+          (cargo-toml (expand-file-name "Cargo.toml" project-root))
+          (pyproject (expand-file-name "pyproject.toml" project-root))
+          (info '()))
+    ;; Include README if exists
+    (when (file-exists-p readme)
+      (push (format "=== README.md ===\n%s\n" 
+              (with-temp-buffer
+                (insert-file-contents readme)
+                (buffer-string)))
+        info))
+    ;; Include package files
+    (cond
+      ((file-exists-p package-json)
+	(push (format "=== Project Type: Node.js ===\n") info))
+      ((file-exists-p cargo-toml)
+	(push (format "=== Project Type: Rust ===\n") info))
+      ((file-exists-p pyproject)
+	(push (format "=== Project Type: Python ===\n") info)))
+    (string-join (nreverse info) "\n")))
+
+(defun tiqsi-claude-repl--get-current-file-context ()
+  "Get context from the current file."
+  (when (and (buffer-file-name)
+          (not (eq major-mode 'tiqsi-claude-repl-mode)))
+    (format "=== Current File: %s ===\nMode: %s\n\n%s\n"
+      (file-relative-name (buffer-file-name) (tiqsi-claude-repl--get-project-root))
+      major-mode
+      (buffer-substring-no-properties 
+        (max (point-min) (- (point) 500))
+        (min (point-max) (+ (point) 500))))))
+
+(defun tiqsi-claude-repl-add-context-file (file)
+  "Add FILE to the context for Claude."
+  (interactive "fAdd file to context: ")
+  (add-to-list 'tiqsi-claude-repl-context-files file)
+  (tiqsi-claude-repl--log-operation "Context Added" 
+    (format "File: %s" (file-name-nondirectory file)))
+  (message "%s" (tiqsi-claude-repl--format-status "Success" 
+                  (format "Added %s to context" file))))
+
+(defun tiqsi-claude-repl-clear-context-files ()
+  "Clear all context files."
+  (interactive)
+  (let ((count (length tiqsi-claude-repl-context-files)))
+    (setq tiqsi-claude-repl-context-files nil)
+    (tiqsi-claude-repl--log-operation "Context Cleared" 
+      (format "%d files removed" count))
+    (message "%s" (tiqsi-claude-repl--format-status "Success" "Context files cleared"))))
+
+(defun tiqsi-claude-repl--build-context-prefix ()
+  "Build a context prefix to send with questions."
+  (let ((context-parts '())
+         (context-count 0))
+    ;; Add project info
+    (push (tiqsi-claude-repl--get-project-info) context-parts)
+    (cl-incf context-count)
+    ;; Add current file context
+    (when-let ((file-context (tiqsi-claude-repl--get-current-file-context)))
+      (push file-context context-parts)
+      (cl-incf context-count))
+    ;; Add any manually added files
+    (dolist (file tiqsi-claude-repl-context-files)
+      (when (file-exists-p file)
+        (push (format "=== File: %s ===\n%s\n"
+                (file-relative-name file (tiqsi-claude-repl--get-project-root))
+                (with-temp-buffer
+                  (insert-file-contents file)
+                  (buffer-string)))
+          context-parts)
+        (cl-incf context-count)))
+    (when context-parts
+      (tiqsi-claude-repl--log-operation "Context Built" 
+        (format "%d items included" context-count))
+      (concat "Context:\n" (string-join (nreverse context-parts) "\n") "\n\nQuestion: "))))
+
+(defun tiqsi-claude-repl--get-language-mode (lang)
+  "Get the major mode for language LANG."
+  (let ((lang-lower (downcase (string-trim (or lang "")))))
+    (cond
+      ;; Lisp family - check first for better elisp detection
+      ((member lang-lower '("elisp" "emacs-lisp" "el")) 'emacs-lisp-mode)
+      ((member lang-lower '("lisp" "common-lisp" "cl")) 'lisp-mode)
+      ((member lang-lower '("clojure" "clj" "cljs")) 'clojure-mode)
+      ((member lang-lower '("scheme" "scm")) 'scheme-mode)
+      ((member lang-lower '("racket" "rkt")) 'racket-mode)
+      ;; Common programming languages
+      ((member lang-lower '("python" "py" "python3")) 'python-mode)
+      ((member lang-lower '("javascript" "js" "node")) 'js-mode)
+      ((member lang-lower '("typescript" "ts" "tsx")) 'typescript-mode)
+      ((member lang-lower '("jsx")) 'js-jsx-mode)
+      ((member lang-lower '("java")) 'java-mode)
+      ((member lang-lower '("c")) 'c-mode)
+      ((member lang-lower '("c++" "cpp" "cc" "cxx")) 'c++-mode)
+      ((member lang-lower '("csharp" "cs" "c#")) 'csharp-mode)
+      ((member lang-lower '("rust" "rs")) 'rust-mode)
+      ((member lang-lower '("go" "golang")) 'go-mode)
+      ((member lang-lower '("ruby" "rb")) 'ruby-mode)
+      ((member lang-lower '("perl" "pl")) 'perl-mode)
+      ((member lang-lower '("php")) 'php-mode)
+      ((member lang-lower '("swift")) 'swift-mode)
+      ((member lang-lower '("kotlin" "kt")) 'kotlin-mode)
+      ((member lang-lower '("scala")) 'scala-mode)
+      ((member lang-lower '("haskell" "hs")) 'haskell-mode)
+      ((member lang-lower '("ocaml" "ml")) 'tuareg-mode)
+      ((member lang-lower '("fsharp" "fs" "f#")) 'fsharp-mode)
+      ((member lang-lower '("r")) 'ess-mode)
+      ((member lang-lower '("julia" "jl")) 'julia-mode)
+      ((member lang-lower '("nim")) 'nim-mode)
+      ((member lang-lower '("zig")) 'zig-mode)
+      ((member lang-lower '("dart")) 'dart-mode)
+      ((member lang-lower '("lua")) 'lua-mode)
+      ((member lang-lower '("erlang" "erl")) 'erlang-mode)
+      ((member lang-lower '("elixir" "ex" "exs")) 'elixir-mode)
+      ;; Shell and system
+      ((member lang-lower '("shell" "bash" "sh" "zsh")) 'sh-mode)
+      ((member lang-lower '("fish")) 'fish-mode)
+      ((member lang-lower '("powershell" "ps1")) 'powershell-mode)
+      ((member lang-lower '("batch" "bat" "cmd")) 'bat-mode)
+      ;; Config and build files
+      ((member lang-lower '("dockerfile" "docker")) 'dockerfile-mode)
+      ((member lang-lower '("makefile" "make" "mk")) 'makefile-mode)
+      ((member lang-lower '("cmake")) 'cmake-mode)
+      ((member lang-lower '("gradle")) 'groovy-mode)
+      ((member lang-lower '("maven" "pom")) 'nxml-mode)
+      ;; Data formats
+      ((member lang-lower '("sql" "mysql" "postgresql" "sqlite")) 'sql-mode)
+      ((member lang-lower '("json" "jsonc")) 'json-mode)
+      ((member lang-lower '("yaml" "yml")) 'yaml-mode)
+      ((member lang-lower '("toml")) 'conf-toml-mode)
+      ((member lang-lower '("xml")) 'nxml-mode)
+      ((member lang-lower '("csv")) 'csv-mode)
+      ((member lang-lower '("ini" "conf" "config")) 'conf-mode)
+      ;; Web technologies
+      ((member lang-lower '("html" "htm")) 'html-mode)
+      ((member lang-lower '("css" "scss" "sass" "less")) 'css-mode)
+      ((member lang-lower '("vue")) 'vue-mode)
+      ((member lang-lower '("svelte")) 'svelte-mode)
+      ;; Documentation
+      ((member lang-lower '("markdown" "md")) 'markdown-mode)
+      ((member lang-lower '("org" "org-mode")) 'org-mode)
+      ((member lang-lower '("latex" "tex")) 'latex-mode)
+      ((member lang-lower '("rst" "restructuredtext")) 'rst-mode)
+      ((member lang-lower '("asciidoc" "adoc")) 'adoc-mode)
+      ;; Assembly
+      ((member lang-lower '("asm" "assembly" "nasm")) 'asm-mode)
+      ((member lang-lower '("mips")) 'mips-mode)
+      ;; Other
+      ((member lang-lower '("diff" "patch")) 'diff-mode)
+      ((member lang-lower '("nginx")) 'nginx-mode)
+      ((member lang-lower '("apache" "htaccess")) 'apache-mode)
+      ((member lang-lower '("terraform" "tf")) 'terraform-mode)
+      ((member lang-lower '("graphql" "gql")) 'graphql-mode)
+      ((member lang-lower '("protobuf" "proto")) 'protobuf-mode)
+      ;; Default fallback - try to be smart
+      (t (cond
+           ((string-match-p "\\." lang-lower) 'fundamental-mode)
+           ((string-match-p "[a-z]+" lang-lower) 'prog-mode)
+           (t 'fundamental-mode)))))) ; ultimate fallback
+
+(defun tiqsi-claude-repl--safe-mode-available-p (mode)
+  "Check if MODE is available and can be safely called."
+  (and mode
+    (fboundp mode)
+    ;; Try to load the mode if it's autoloaded
+    (or (functionp mode)
+      (ignore-errors (autoload-do-load (symbol-function mode) mode)))))
+
+(defun tiqsi-claude-repl--highlight-code-block (start end lang)
+  "Apply syntax highlighting to code block from START to END with language LANG."
+  (when tiqsi-claude-repl-highlight-code
+    (let* ((mode (tiqsi-claude-repl--get-language-mode lang))
+            (code (buffer-substring-no-properties start end))
+            (orig-buffer (current-buffer))
+            (highlighted-code nil))
+      ;; Use a temp buffer to apply proper syntax highlighting
+      (setq highlighted-code
+        (with-temp-buffer
+          ;; Set up the buffer with the appropriate mode
+          (insert code)
+          (when (tiqsi-claude-repl--safe-mode-available-p mode)
+            ;; Enable the major mode
+            (condition-case err
+              (progn
+                (delay-mode-hooks (funcall mode))
+                ;; Set up font-lock
+                (font-lock-mode 1)
+                (setq font-lock-verbose nil)
+                ;; Force complete fontification
+                (if (fboundp 'font-lock-ensure)
+                  (font-lock-ensure)
+                  (with-no-warnings (font-lock-fontify-buffer))))
+              (error
+                ;; Fall back to prog-mode if specific mode fails
+                (when (fboundp 'prog-mode)
+                  (prog-mode)
+                  (font-lock-mode 1)
+                  (if (fboundp 'font-lock-ensure)
+                    (font-lock-ensure)
+                    (with-no-warnings (font-lock-fontify-buffer)))))))
+          ;; Extract the fontified text with all properties
+          (let ((result "")
+                 (lines (split-string (buffer-string) "\n"))
+                 (line-count (count-lines (point-min) (point-max)))
+                 (line-num 1))
+            (when (> line-count 0)
+              (let ((max-line-width (length (number-to-string line-count))))
+                (goto-char (point-min))
+                (while (not (eobp))
+                  (let ((line-start (point))
+                         (line-end (line-end-position)))
+                    ;; Add line numbers if enabled
+                    (when tiqsi-claude-repl-show-line-numbers
+                      (setq result 
+                        (concat result
+                          (propertize (format (concat "%" (number-to-string max-line-width) "d │ ") line-num)
+                            'face 'tiqsi-claude-repl-line-number))))
+                    ;; Get the line with all its text properties
+                    (setq result 
+                      (concat result
+                        (buffer-substring line-start line-end)))
+                    ;; Add newline if not at end
+                    (forward-line 1)
+                    (when (not (eobp))
+                      (setq result (concat result "\n")))
+                    (setq line-num (1+ line-num))))))
+            result)))
+      ;; Insert the highlighted code back
+      (save-excursion
+        (goto-char start)
+        (delete-region start end)
+        (insert highlighted-code)
+        ;; Apply code block background
+        (add-face-text-property start (point) 'tiqsi-claude-repl-code-block t)
+        ;; Return the new end position
+        (point)))))
+
+(defun tiqsi-claude-repl--highlight-inline-code (start end code-text)
+  "Apply basic syntax highlighting to inline code from START to END."
+  (save-excursion
+    (goto-char start)
+    ;; Highlight common programming constructs
+    (let ((case-fold-search nil))
+      ;; Keywords (common across languages)
+      (when (string-match "\\b\\(def\\|function\\|class\\|if\\|else\\|for\\|while\\|return\\|import\\|from\\|const\\|let\\|var\\|async\\|await\\)\\b" code-text)
+        (let ((keyword-start (+ start (match-beginning 1)))
+               (keyword-end (+ start (match-end 1))))
+          (when (and (>= keyword-start start) (<= keyword-end end))
+            (add-face-text-property keyword-start keyword-end 
+              '(:foreground "#81a1c1" :weight bold) t))))
+      ;; Numbers
+      (when (string-match "\\b[0-9]+\\(?:\\.[0-9]+\\)?\\b" code-text)
+        (let ((num-start (+ start (match-beginning 0)))
+               (num-end (+ start (match-end 0))))
+          (when (and (>= num-start start) (<= num-end end))
+            (add-face-text-property num-start num-end 
+              '(:foreground "#b48ead") t))))
+      ;; Strings (simple detection)
+      (when (or (string-match "\"[^\"]*\"" code-text)
+              (string-match "'[^']*'" code-text))
+        (let ((str-start (+ start (match-beginning 0)))
+               (str-end (+ start (match-end 0))))
+          (when (and (>= str-start start) (<= str-end end))
+            (add-face-text-property str-start str-end 
+              '(:foreground "#a3be8c") t))))
+      ;; Function calls
+      (when (string-match "\\([a-zA-Z_][a-zA-Z0-9_]*\\)\\s-*(" code-text)
+        (let ((func-start (+ start (match-beginning 1)))
+               (func-end (+ start (match-end 1))))
+          (when (and (>= func-start start) (<= func-end end))
+            (add-face-text-property func-start func-end 
+              '(:foreground "#88c0d0") t))))
+      ;; Comments (Python/JS style)
+      (when (string-match "\\(#\\|//\\).*$" code-text)
+        (let ((comment-start (+ start (match-beginning 0)))
+               (comment-end (+ start (match-end 0))))
+          (when (and (>= comment-start start) (<= comment-end end))
+            (add-face-text-property comment-start comment-end 
+              '(:foreground "#4c566a" :slant italic) t))))))
+)
+(defun tiqsi-claude-repl--apply-markdown-formatting (start end)
+  "Apply markdown formatting to region from START to END."
+  (save-excursion
+    (goto-char start)
+    ;; Headers - but check if we're inside a code block
+    (while (re-search-forward "^\\(#+\\) \\(.+\\)$" end t)
+      ;; Skip if this is inside a code block
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((level (length (match-string 1)))
+               (header-start (match-beginning 0))
+               (header-end (match-end 0)))
+          (put-text-property header-start header-end 'face
+            (list :foreground (face-attribute 'tiqsi-claude-repl-markdown-header :foreground)
+              :weight 'bold
+              :height (- 1.5 (* 0.1 level))))
+          ;; Add header indicator
+          (put-text-property (match-beginning 1) (match-end 1) 'display 
+            (tiqsi-claude-repl--colorize (make-string level ?▸) 'tiqsi-claude-repl-info)))))
+    ;; Bold text
+    (goto-char start)
+    (while (re-search-forward "\\*\\*\\([^*]+\\)\\*\\*" end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((content-start (match-beginning 1))
+              (content-end (match-end 1))
+              (marker-start (match-beginning 0))
+              (marker-end (match-end 0)))
+          (when (and (>= content-start start) (<= content-end end))
+            (put-text-property content-start content-end 'face 'tiqsi-claude-repl-markdown-bold))
+          (when (and (>= marker-start start) (< marker-start end))
+            (put-text-property marker-start (min (1+ marker-start) end) 'invisible t))
+          (when (and (> marker-end start) (<= marker-end end) (> marker-end marker-start))
+            (put-text-property (max (1- marker-end) start) marker-end 'invisible t)))))
+    ;; Italic text  
+    (goto-char start)
+    (while (re-search-forward "\\*\\([^*]+\\)\\*" end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((content-start (match-beginning 1))
+              (content-end (match-end 1))
+              (marker-start (match-beginning 0))
+              (marker-end (match-end 0)))
+          (when (and (>= content-start start) (<= content-end end))
+            (put-text-property content-start content-end 'face 'tiqsi-claude-repl-markdown-italic))
+          (when (and (>= marker-start start) (< marker-start end))
+            (put-text-property marker-start (min (1+ marker-start) end) 'invisible t))
+          (when (and (> marker-end start) (<= marker-end end) (> marker-end marker-start))
+            (put-text-property (max (1- marker-end) start) marker-end 'invisible t)))))
+    ;; Inline code with syntax highlighting
+    (goto-char start)
+    (while (re-search-forward "`\\([^`]+\\)`" end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((code-start (match-beginning 1))
+               (code-end (match-end 1))
+               (code-text (match-string 1))
+               (backtick-start (match-beginning 0))
+               (backtick-end (match-end 0)))
+          ;; Apply base inline code face
+          (put-text-property code-start code-end 'face 
+            '(:background "#3b4252" :foreground "#eceff4" :family "monospace"))
+          ;; Apply syntax highlighting if enabled
+          (when tiqsi-claude-repl-highlight-inline-code
+            (tiqsi-claude-repl--highlight-inline-code code-start code-end code-text))
+          ;; Hide backticks only if they exist
+          (when (and (>= backtick-start start) (< backtick-start end))
+            (put-text-property backtick-start (min (1+ backtick-start) end) 'invisible t))
+          (when (and (> backtick-end start) (<= backtick-end end))
+            (put-text-property (max (1- backtick-end) start) backtick-end 'invisible t)))))
+    ;; Bullet lists
+    (goto-char start)
+    (while (re-search-forward "^\\( *\\)\\([*+-]\\) " end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((indent-level (length (match-string 1))))
+          (put-text-property (match-beginning 2) (match-end 2) 'display
+            (cond ((= indent-level 0) "•")
+              ((= indent-level 2) "◦")
+              ((= indent-level 4) "▪")
+              (t "▸")))
+          (put-text-property (match-beginning 2) (match-end 2) 'face 
+            '(:foreground "#88c0d0" :weight bold)))))
+    ;; Numbered lists
+    (goto-char start)
+    (while (re-search-forward "^\\( *\\)\\([0-9]+\\.\\) " end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (put-text-property (match-beginning 2) (match-end 2) 'face 
+          '(:foreground "#88c0d0" :weight bold))))
+    ;; Blockquotes
+    (goto-char start)
+    (while (re-search-forward "^\\(>+\\) " end t)
+      (unless (get-text-property (match-beginning 0) 'tiqsi-code-block)
+        (let ((quote-start (match-beginning 0))
+               (quote-end (line-end-position))
+               (quote-level (length (match-string 1))))
+          (put-text-property quote-start quote-end 'face 
+            '(:foreground "#7c818c" :slant italic :extend t))
+          ;; Add quote indicator
+          (put-text-property (match-beginning 1) (match-end 1) 'display
+            (tiqsi-claude-repl--colorize "▎" 'tiqsi-claude-repl-info)))))))
+
+;;; REPL Mode
+
+(defvar-local tiqsi-claude-repl--session-started nil
+  "Whether a Claude session has been started in this buffer.")
+
+(defvar-local tiqsi-claude-repl--session-start-time nil
+  "Time when the session was started.")
+
+(defvar-local tiqsi-claude-repl--current-process nil
+  "Current Claude process if any.")
+
+(defvar-local tiqsi-claude-repl--thinking-timer nil
+  "Timer for animating thinking indicator.")
+
+(defvar-local tiqsi-claude-repl--thinking-animation-state 0
+  "Current state of thinking animation.")
+
+(defvar-local tiqsi-claude-repl--session-id nil
+  "Unique identifier for the current session.")
+
+(defvar-local tiqsi-claude-repl--message-count 0
+  "Number of messages exchanged in current session.")
+
+(defvar-local tiqsi-claude-repl--last-interaction-time nil
+  "Time of last interaction in the session.")
+
+(defvar-local tiqsi-claude-repl--claude-session-id nil
+  "The actual Claude session ID returned by the CLI.")
+
+(defvar tiqsi-claude-repl-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "RET") 'tiqsi-claude-repl-send-input)
+    (define-key map (kbd "C-c C-c") 'tiqsi-claude-repl-send-input)
+    (define-key map (kbd "C-c C-k") 'tiqsi-claude-repl-clear-buffer)
+    (define-key map (kbd "C-c C-q") 'tiqsi-claude-repl-quit)
+    (define-key map (kbd "C-g") 'tiqsi-claude-repl-cancel)
+    (define-key map (kbd "C-c C-p") 'tiqsi-claude-repl-recover-prompt)
+    (define-key map (kbd "C-c C-r") 'tiqsi-claude-repl-recover-session)
+    (define-key map (kbd "C-c C-w") 'tiqsi-claude-repl-toggle-line-wrapping)
+    (define-key map (kbd "C-c C-W") 'tiqsi-claude-repl-set-wrap-column)
+    map)
+  "Keymap for Claude REPL mode.")
+
+(define-derived-mode tiqsi-claude-repl-mode fundamental-mode "Claude-REPL"
+  "Major mode for Claude REPL interaction."
+  (setq-local comment-start "# ")
+  (setq-local comment-end "")
+  (setq-local tiqsi-claude-repl--session-started nil))
+
+;;; Core Functions
+
+(defun tiqsi-claude-repl--wrap-long-lines (text)
+  "Wrap lines in TEXT that exceed `tiqsi-claude-repl-wrap-column'."
+  ;; TEMPORARILY DISABLED - just return text as-is
+  text)
+
+(defun tiqsi-claude-repl--get-or-create-buffer ()
+  "Get or create the Claude REPL buffer."
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (buffer-name (format "*Claude REPL (%s)*" 
+                         (file-name-nondirectory (directory-file-name project-root)))))
+    (or (get-buffer buffer-name)
+      (with-current-buffer (get-buffer-create buffer-name)
+        (tiqsi-claude-repl-mode)
+        (current-buffer)))))
+
+(defvar-local tiqsi-claude-repl--json-buffer ""
+  "Buffer for accumulating incomplete JSON lines.")
+
+(defvar-local tiqsi-claude-repl--output-start nil
+  "Marker for where Claude's output starts.")
+
+(defvar-local tiqsi-claude-repl--request-start-time nil
+  "Time when request was started.")
+
+;; ------------------------------------------------------------------------- ;
+
+(defvar-local tiqsi-claude-repl--json-processing-enabled nil
+  "Whether JSON processing is enabled for current process.")
+
+(defvar-local tiqsi-claude-repl--current-response ""
+  "Buffer to accumulate Claude's current response.")
+
+(defun tiqsi-claude-repl--process-filter (process output)
+  "Process filter for Claude output."
+  (when (buffer-live-p (process-buffer process))
+    (with-current-buffer (process-buffer process)
+      (let ((inhibit-read-only t))
+        ;; Update thinking indicator if needed
+        ;; Set output start marker if not already set
+        (when (not tiqsi-claude-repl--output-start)
+          (save-excursion
+            (goto-char (point-max))
+            (when (re-search-backward "⏳ Thinking\\.\\.\\." nil t)
+              (let ((elapsed (if tiqsi-claude-repl--request-start-time
+                               (format " [%.1fs]" (float-time (time-since tiqsi-claude-repl--request-start-time)))
+                               "")))
+                (replace-match (format "🧠 Claude is processing%s" elapsed))))
+            ;; Set marker AFTER updating thinking message
+            (goto-char (point-max))
+            (unless (bolp) (insert "\n"))
+            (setq-local tiqsi-claude-repl--output-start (point-marker))))
+        
+        ;; Check if we're in JSON mode or this looks like JSON output
+        (if (or tiqsi-claude-repl--json-processing-enabled
+                (string-match-p "{.*\"type\":" output))
+            (progn
+              (setq-local tiqsi-claude-repl--json-processing-enabled t)
+              (setq tiqsi-claude-repl--json-buffer (concat tiqsi-claude-repl--json-buffer output))
+              ;; Process complete JSON objects line by line
+              (let ((lines (split-string tiqsi-claude-repl--json-buffer "\n"))
+                    (remaining ""))
+                (dolist (line lines)
+                  (let ((trimmed-line (string-trim line)))
+                    (if (and (> (length trimmed-line) 0)
+                             (string-prefix-p "{" trimmed-line)
+                             (string-suffix-p "}" trimmed-line))
+                        ;; Process complete JSON line
+                        (condition-case err
+                            (let* ((json-obj (json-parse-string trimmed-line))
+                                   (type (gethash "type" json-obj)))
+                              ;; Debug: log all JSON types received
+                              (when tiqsi-claude-repl-show-thinking
+                                (message "DEBUG: Received JSON type: %s, line: %s" type (substring trimmed-line 0 (min 100 (length trimmed-line)))))
+                              (cond
+                               ;; Handle system initialization
+                               ((and (equal type "system") (equal (gethash "subtype" json-obj) "init"))
+                                ;; Capture the Claude session ID
+                                (let ((claude-session-id (gethash "session_id" json-obj)))
+                                  (when claude-session-id
+                                    (setq-local tiqsi-claude-repl--claude-session-id claude-session-id))
+                                  ;; Show system info only if in verbose mode
+                                  (when tiqsi-claude-repl-show-thinking
+                                    (save-excursion
+                                      (goto-char (point-max))
+                                      (insert "\n" 
+                                              (tiqsi-claude-repl--colorize "System: " 'tiqsi-claude-repl-info)
+                                              (format "Session initialized (ID: %s)" 
+                                                      (or claude-session-id "unknown"))
+                                              "\n")))))
+                               
+                               ;; Handle assistant messages (the actual response)
+                               ((equal type "assistant")
+                                (let* ((message (gethash "message" json-obj))
+                                       (content (gethash "content" message)))
+                                  ;; Debug logging
+                                  (when tiqsi-claude-repl-show-thinking
+                                    (message "DEBUG: Assistant message received, content type: %s" (type-of content)))
+                                  (when (vectorp content)
+                                    (dotimes (i (length content))
+                                      (let ((part (aref content i)))
+                                        (when (equal (gethash "type" part) "text")
+                                          (let ((text (gethash "text" part)))
+                                            (when (and text (> (length text) 0))
+                                              ;; Debug the text we're about to insert
+                                              (when tiqsi-claude-repl-show-thinking
+                                                (message "DEBUG: Inserting text: %s" (substring text 0 (min 50 (length text)))))
+                                              (save-excursion
+                                                (goto-char (point-max))
+                                                (let ((insert-pos (point)))
+                                                  (insert (tiqsi-claude-repl--wrap-long-lines text))
+                                                  (insert "\n")
+                                                  (when tiqsi-claude-repl-show-thinking
+                                                    (message "DEBUG: Inserted text at position %d, buffer now has %d chars" 
+                                                             insert-pos (buffer-size))))))))))))
+                               
+                               ;; Handle content block deltas (streaming text)
+                               ((equal type "content_block_delta")
+                                (let ((delta (gethash "delta" json-obj)))
+                                  (when delta
+                                    (let ((text (gethash "text" delta "")))
+                                      (when (> (length text) 0)
+                                        ;; Debug streaming text
+                                        (when tiqsi-claude-repl-show-thinking
+                                          (message "DEBUG: Streaming delta text: %s" (substring text 0 (min 30 (length text)))))
+                                        (save-excursion
+                                          (goto-char (point-max))
+                                          (insert (tiqsi-claude-repl--wrap-long-lines text)))))))
+                               
+                               ;; Handle result (completion info) - suppress output
+                               ((equal type "result")
+                                nil)
+                               
+                               ;; Handle thinking messages
+                               ((equal type "thinking")
+                                (when tiqsi-claude-repl-show-thinking
+                                  (let ((content (or (gethash "content" json-obj)
+                                                    (gethash "text" json-obj))))
+                                    (when content
+                                      (save-excursion
+                                        (goto-char (point-max))
+                                        (insert "\n"
+                                                (tiqsi-claude-repl--colorize "🤔 Thinking: " 'tiqsi-claude-repl-thinking)
+                                                (tiqsi-claude-repl--colorize content 'tiqsi-claude-repl-info)
+                                                "\n"))))))
+                               
+                               ;; Ignore other types
+                               (t nil)))
+                          (json-parse-error 
+                           ;; If JSON parsing fails, add to remaining
+                           (setq remaining (concat remaining line "\n"))))
+                      ;; Not a complete JSON line, keep it
+                      (setq remaining (concat remaining line "\n")))))
+                ;; Update buffer with remaining incomplete JSON
+                (setq tiqsi-claude-repl--json-buffer remaining)
+                ;; Debug remaining buffer
+                (when (and tiqsi-claude-repl-show-thinking (> (length remaining) 0))
+                  (message "DEBUG: Remaining JSON buffer: %s" (substring remaining 0 (min 100 (length remaining)))))))
+          
+          ;; Regular output (non-JSON)
+          (let ((cleaned-output output))
+            (when tiqsi-claude-repl-clean-output
+              (setq cleaned-output (tiqsi-claude-repl--clean-output cleaned-output)))
+            ;; Insert non-JSON output
+            (when (> (length (string-trim cleaned-output)) 0)
+              (save-excursion
+                (goto-char (point-max))
+                (insert (tiqsi-claude-repl--wrap-long-lines cleaned-output))))))))
+
+
+)
+(defun tiqsi-claude-repl--post-process-response (start end)
+  "Post-process Claude's response from START to END to apply formatting."
+  (save-excursion
+    (goto-char start)
+    (let ((code-block-count 0))
+      (while (re-search-forward "```\\([a-zA-Z0-9+-]*\\)\n\\(\\(?:.\\|\n\\)*?\\)```" end t)
+        (put-text-property (match-beginning 0) (match-end 0) 'tiqsi-code-block t)
+        (setq code-block-count (1+ code-block-count)))
+      (message "Found %d code blocks to process" code-block-count))
+    (tiqsi-claude-repl--apply-markdown-formatting start end)
+    (let ((continue t) (processed-count 0))
+      (while continue
+        (goto-char start)
+        (if (re-search-forward "```\\([a-zA-Z0-9+-]*\\)\n\\(\\(?:.\\|\n\\)*?\\)```" nil t)
+          (if (get-text-property (match-beginning 0) 'tiqsi-code-block)
+            (let* ((lang (match-string 1))
+                    (code-content (match-string 2))
+                    (block-start (match-beginning 0))
+                    (block-end (match-end 0))
+                    (lang-display (if (> (length lang) 0) (upcase lang) "CODE"))
+                    (badge-width (+ 6 (length lang-display)))
+                    (total-width 80))
+              (delete-region block-start block-end)
+              (goto-char block-start)
+              (insert (tiqsi-claude-repl--colorize "╭" 'tiqsi-claude-repl-code-border))
+              (insert (tiqsi-claude-repl--colorize (concat "─[ " lang-display " ]") 'tiqsi-claude-repl-code-lang))
+              (insert (tiqsi-claude-repl--colorize (make-string (max 1 (- total-width badge-width 2)) ?─) 'tiqsi-claude-repl-code-border))
+              (insert (tiqsi-claude-repl--colorize "╮\n" 'tiqsi-claude-repl-code-border))
+              (let ((code-start (point)))
+                (insert code-content)
+                (let ((code-end (point)))
+                  (unless (bolp) (insert "\n"))
+                  (let ((new-code-end (tiqsi-claude-repl--highlight-code-block code-start code-end lang)))
+                    (goto-char new-code-end)
+                    (unless (bolp) (insert "\n"))
+                    (insert "\n")
+                    (insert (tiqsi-claude-repl--colorize "╰" 'tiqsi-claude-repl-code-border))
+                    (insert (tiqsi-claude-repl--colorize (make-string (- total-width 2) ?─) 'tiqsi-claude-repl-code-border))
+                    (insert (tiqsi-claude-repl--colorize "╯\n" 'tiqsi-claude-repl-code-border))
+                    (insert "\n"))))
+              (setq processed-count (1+ processed-count)))
+            (progn
+              (message "Code block at %s has no tiqsi-code-block property" (match-beginning 0))
+              (setq continue nil)))
+          (progn
+            (message "Processed %d code blocks" processed-count)
+            (setq continue nil))))))
+
+
+
+
+(defun tiqsi-claude-repl--process-sentinel (process event)
+  "Process sentinel for Claude completion."
+  (when (buffer-live-p (process-buffer process))
+    (with-current-buffer (process-buffer process)
+      ;; Show stderr content if any for debugging
+      (when-let* ((stderr-buf (get-buffer "*claude-repl-stderr*")))
+        (with-current-buffer stderr-buf
+          (when (> (buffer-size) 0)
+	    (message "Claude stderr: %s" (buffer-string))
+	    (erase-buffer))))
+      (when (string-match-p "finished\\|exited" event)
+        ;; Post-process the response for formatting
+        (if tiqsi-claude-repl--output-start
+          (progn
+	    (message "Post-processing response from %s to %s" 
+              tiqsi-claude-repl--output-start (point-max))
+	    (tiqsi-claude-repl--post-process-response 
+	      tiqsi-claude-repl--output-start (point-max)))
+          (message "WARNING: No output start marker found, skipping post-processing"))
+        ;; Show completion time
+        (when tiqsi-claude-repl--request-start-time
+          (let ((elapsed (float-time (time-since tiqsi-claude-repl--request-start-time))))
+	    (goto-char (point-max))
+	    (insert "\n" (tiqsi-claude-repl--colorize
+                           (format "✅ Completed in %.1fs" elapsed)
+                           'tiqsi-claude-repl-success) "\n")))
+        ;; Clear state
+        (setq-local tiqsi-claude-repl--current-process nil)
+        (setq-local tiqsi-claude-repl--output-start nil)
+        (setq-local tiqsi-claude-repl--request-start-time nil)
+        (setq-local tiqsi-claude-repl--json-buffer "")
+        (setq-local tiqsi-claude-repl--json-processing-enabled nil)
+        ;; Stop animation timer
+        (when tiqsi-claude-repl--thinking-timer
+          (cancel-timer tiqsi-claude-repl--thinking-timer)
+          (setq-local tiqsi-claude-repl--thinking-timer nil))
+        ;; Add new prompt - use ensure-prompt to be safe
+        (tiqsi-claude-repl--ensure-prompt)
+        (goto-char (point-max))))))
+
+(defun tiqsi-claude-repl--ensure-prompt ()
+  "Ensure there's a prompt at the end of the buffer."
+  (save-excursion
+    (goto-char (point-max))
+    (beginning-of-line)
+    (unless (looking-at "λ ")
+      ;; No prompt found, add one
+      (goto-char (point-max))
+      (unless (bolp) (insert "\n"))
+      (insert "\n" (tiqsi-claude-repl--format-prompt))
+      (tiqsi-claude-repl--log-operation "Prompt Added" "Recovered from missing prompt"))))
+
+(defun tiqsi-claude-repl-send-input ()
+  "Send current input to Claude."
+  (interactive)
+  (if (and tiqsi-claude-repl--current-process
+        (process-live-p tiqsi-claude-repl--current-process))
+    (message "%s" (tiqsi-claude-repl--format-status "Warning" 
+                    "Claude is still processing... Press C-g to cancel"))
+    ;; Ensure we have a prompt before trying to send
+    (tiqsi-claude-repl--ensure-prompt)
+    (let* ((prompt-pos (save-excursion
+                         (goto-char (point-max))
+                         (beginning-of-line)
+                         (when (looking-at "λ ")
+                           (+ (point) 2))))
+	    (input (when prompt-pos
+		     (buffer-substring-no-properties prompt-pos (point-max)))))
+      (when (and input (> (length (string-trim input)) 0))
+        (goto-char (point-max))
+        (insert "\n")
+        ;; Show thinking indicator
+        (let ((thinking-start (point)))
+          (insert (tiqsi-claude-repl--colorize
+		    (format "⏳ Thinking... %s" (tiqsi-claude-repl--format-timestamp))
+		    'tiqsi-claude-repl-thinking))
+          (put-text-property thinking-start (point) 'tiqsi-claude-thinking t))
+        (insert "\n\n")
+        (let* ((cmd-args (list "-p"))  ; Use short form of --print
+		;; Add resume flag if we have a session ID
+		(cmd-args (if tiqsi-claude-repl--claude-session-id
+			    (append cmd-args (list "--resume" tiqsi-claude-repl--claude-session-id))
+			    cmd-args))
+		;; Add output format for streaming
+		(cmd-args (if tiqsi-claude-repl-show-thinking
+			    (append cmd-args '("--output-format" "stream-json" "--verbose"))
+			    cmd-args))
+		;; Don't add input to command, will send via stdin
+		(full-command (append (list tiqsi-claude-repl-program)
+                                cmd-args))
+		;; Create stderr buffer
+		(stderr-buffer (get-buffer-create "*claude-repl-stderr*")))
+          ;; Clear stderr buffer before each request
+          (with-current-buffer stderr-buffer
+	    (erase-buffer))
+          ;; Log the command for debugging
+          (message "%s" (tiqsi-claude-repl--format-status "Command" 
+                          (format "%s (input length: %d chars)" 
+                            (mapconcat 'identity full-command " ")
+                            (length input))))
+          ;; Debug session info
+          (when tiqsi-claude-repl--claude-session-id
+            (message "%s" (tiqsi-claude-repl--format-status "Session" 
+                            (format "Resuming session: %s" tiqsi-claude-repl--claude-session-id))))
+          (let ((process-environment (append `("CLAUDE_CODE_ENTRYPOINT=cli"
+                                                "CLAUDECODE=1"
+                                                ,(concat "PATH=" (getenv "PATH")))
+                                       process-environment))
+                 (process (make-process
+			    :name "claude-repl"
+			    :buffer (current-buffer)
+			    :command full-command
+			    :connection-type 'pipe
+			    :filter 'tiqsi-claude-repl--process-filter
+			    :sentinel 'tiqsi-claude-repl--process-sentinel
+			    :stderr stderr-buffer)))
+	    (setq-local tiqsi-claude-repl--session-started t)
+	    (setq-local tiqsi-claude-repl--current-process process)
+	    (setq-local tiqsi-claude-repl--request-start-time (current-time))
+	    (setq-local tiqsi-claude-repl--last-interaction-time (current-time))
+	    (cl-incf tiqsi-claude-repl--message-count)
+	    ;; Start thinking animation if enabled
+	    (when tiqsi-claude-repl-animate-thinking
+	      (setq-local tiqsi-claude-repl--thinking-animation-state 0)
+	      (when tiqsi-claude-repl--thinking-timer
+                (cancel-timer tiqsi-claude-repl--thinking-timer))
+	      (setq-local tiqsi-claude-repl--thinking-timer
+                (run-with-timer 0.1 0.1 
+                  (lambda ()
+                    (when-let ((buf (get-buffer (buffer-name))))
+                      (with-current-buffer buf
+                        (tiqsi-claude-repl--animate-thinking)))))))
+	    ;; Send input with conversation history via stdin
+	    (let ((full-input (if tiqsi-claude-repl-use-smart-context
+                              (concat (tiqsi-claude-repl--build-context-prefix) input)
+                            input)))
+	      (process-send-string process full-input)
+	      (process-send-string process "\n")
+	      (process-send-eof process))))))))
+
+(defun tiqsi-claude-repl-cancel ()
+  "Cancel current Claude request."
+  (interactive)
+  (if (and tiqsi-claude-repl--current-process
+        (process-live-p tiqsi-claude-repl--current-process))
+    (progn
+      (delete-process tiqsi-claude-repl--current-process)
+      (setq-local tiqsi-claude-repl--current-process nil)
+      ;; Stop animation timer
+      (when tiqsi-claude-repl--thinking-timer
+        (cancel-timer tiqsi-claude-repl--thinking-timer)
+        (setq-local tiqsi-claude-repl--thinking-timer nil))
+      (goto-char (point-max))
+      (insert "\n" (tiqsi-claude-repl--colorize "[Request cancelled]" 'tiqsi-claude-repl-error) "\n\n"
+        (tiqsi-claude-repl--format-prompt))
+      (goto-char (point-max))
+      (message "%s" (tiqsi-claude-repl--format-status "Cancelled" "Request terminated by user")))
+    (message "%s" (tiqsi-claude-repl--format-status "Info" "No active request to cancel"))))
+
+;;; Interactive Commands
+
+;;;###autoload
+(defun tiqsi-claude-repl-start ()
+  "Start Claude REPL session."
+  (interactive)
+  (unless (tiqsi-claude-repl--executable-available-p)
+    (error "%s" (tiqsi-claude-repl--format-status "Error" 
+                  "Claude CLI not found. Install with: npm install -g @anthropic-ai/claude-code")))
+  (let ((repl-buffer (tiqsi-claude-repl--get-or-create-buffer)))
+    (with-current-buffer repl-buffer
+      (goto-char (point-max))
+      (unless (> (buffer-size) 0)
+        (setq-local tiqsi-claude-repl--session-start-time (current-time))
+        (setq-local tiqsi-claude-repl--session-id (tiqsi-claude-repl--generate-session-id))
+        (setq-local tiqsi-claude-repl--message-count 0)
+        (setq-local tiqsi-claude-repl--last-interaction-time (current-time))
+        (tiqsi-claude-repl--insert-header)
+        (insert (tiqsi-claude-repl--format-prompt))
+        (tiqsi-claude-repl--log-operation "Started" 
+          (format "Session %s for %s" 
+            tiqsi-claude-repl--session-id
+            (file-name-nondirectory 
+              (directory-file-name 
+                (tiqsi-claude-repl--get-project-root)))))))
+    (display-buffer repl-buffer)
+    (select-window (get-buffer-window repl-buffer))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-ask-question (question)
+  "Ask QUESTION to Claude."
+  (interactive "sAsk Claude: ")
+  (let ((repl-buffer (tiqsi-claude-repl--get-or-create-buffer)))
+    (with-current-buffer repl-buffer
+      (goto-char (point-max))
+      (insert (tiqsi-claude-repl--colorize question 'tiqsi-claude-repl-input))
+      (tiqsi-claude-repl-send-input))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-recover-prompt ()
+  "Recover the REPL prompt if it's missing."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (tiqsi-claude-repl--ensure-prompt)
+    (goto-char (point-max))
+    (message "%s" (tiqsi-claude-repl--format-status "Success" "Prompt recovered"))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-recover-session ()
+  "Recover session state after a disconnection."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (unless tiqsi-claude-repl--session-id
+      (setq-local tiqsi-claude-repl--session-id (tiqsi-claude-repl--generate-session-id)))
+    (unless tiqsi-claude-repl--session-start-time
+      (setq-local tiqsi-claude-repl--session-start-time (current-time)))
+    (setq-local tiqsi-claude-repl--last-interaction-time (current-time))
+    (tiqsi-claude-repl--ensure-prompt)
+    (goto-char (point-max))
+    (tiqsi-claude-repl--log-operation "Session Recovered" 
+      (format "Session %s restored" tiqsi-claude-repl--session-id))
+    (message "%s" (tiqsi-claude-repl--format-status "Success" "Session recovered"))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-clear-buffer ()
+  "Clear the Claude REPL buffer."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (erase-buffer)
+    (insert (tiqsi-claude-repl--format-prompt))
+    (setq-local tiqsi-claude-repl--session-started nil)
+    (setq-local tiqsi-claude-repl--current-process nil)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-quit ()
+  "Quit Claude REPL."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    ;; Save conversation history before quitting
+    (tiqsi-claude-repl--save-conversation)
+    (when (and tiqsi-claude-repl--current-process
+	    (process-live-p tiqsi-claude-repl--current-process))
+      (delete-process tiqsi-claude-repl--current-process))
+    (kill-buffer)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-send-region (start end)
+  "Send region to Claude."
+  (interactive "r")
+  (let ((text (buffer-substring-no-properties start end))
+         (length (- end start)))
+    (tiqsi-claude-repl--log-operation "Region Sent" 
+      (format "%d characters from %s" length (buffer-name)))
+    (tiqsi-claude-repl-ask-question text)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-send-function ()
+  "Send current function to Claude."
+  (interactive)
+  (save-excursion
+    (beginning-of-defun)
+    (let ((start (point))
+           (func-name (save-excursion
+			(beginning-of-defun)
+			(when (re-search-forward "defun\\s-+\\([^ (]+\\)" (line-end-position) t)
+                          (match-string 1)))))
+      (end-of-defun)
+      (tiqsi-claude-repl--log-operation "Function Sent" 
+        (format "Function: %s" (or func-name "<unnamed>")))
+      (tiqsi-claude-repl-send-region start (point)))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-send-buffer ()
+  "Send entire buffer to Claude."
+  (interactive)
+  (tiqsi-claude-repl--log-operation "Buffer Sent" 
+    (format "File: %s (%d lines)" 
+      (or (buffer-file-name) (buffer-name))
+      (count-lines (point-min) (point-max))))
+  (tiqsi-claude-repl-send-region (point-min) (point-max)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-send-paragraph ()
+  "Send current paragraph to Claude."
+  (interactive)
+  (save-excursion
+    (let ((start (progn (backward-paragraph) (point)))
+           (end (progn (forward-paragraph) (point))))
+      (tiqsi-claude-repl--log-operation "Paragraph Sent" 
+        (format "%d characters" (- end start)))
+      (tiqsi-claude-repl-send-region start end))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-explain-code ()
+  "Ask Claude to explain code."
+  (interactive)
+  (tiqsi-claude-repl--log-operation "Explain Code" "Requesting code explanation")
+  (if (region-active-p)
+    (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+      (tiqsi-claude-repl-ask-question 
+        (format "Please explain what this code does:\n\n%s" text)))
+    (tiqsi-claude-repl-send-function)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-optimize-code ()
+  "Ask Claude to optimize code."
+  (interactive)
+  (tiqsi-claude-repl--log-operation "Optimize Code" "Requesting code optimization")
+  (if (region-active-p)
+    (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+      (tiqsi-claude-repl-ask-question 
+        (format "Please optimize this code:\n\n%s" text)))
+    (tiqsi-claude-repl-send-function)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-fix-error-at-point ()
+  "Ask Claude to fix error."
+  (interactive)
+  (tiqsi-claude-repl--log-operation "Fix Error" "Analyzing code for errors")
+  (let ((text (if (region-active-p)
+                (buffer-substring-no-properties (region-beginning) (region-end))
+                (save-excursion
+                  (beginning-of-defun)
+                  (let ((start (point)))
+		    (end-of-defun)
+		    (buffer-substring-no-properties start (point)))))))
+    (tiqsi-claude-repl-ask-question 
+      (format "Please fix any errors in this code:\n\n%s" text))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-generate-tests ()
+  "Ask Claude to generate tests."
+  (interactive)
+  (tiqsi-claude-repl--log-operation "Generate Tests" "Requesting test generation")
+  (if (region-active-p)
+    (let ((text (buffer-substring-no-properties (region-beginning) (region-end))))
+      (tiqsi-claude-repl-ask-question 
+        (format "Please generate tests for this code:\n\n%s" text)))
+    (tiqsi-claude-repl-send-function)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-kill ()
+  "Kill Claude REPL for current project."
+  (interactive)
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (buffer-name (format "*Claude REPL (%s)*" 
+                         (file-name-nondirectory (directory-file-name project-root)))))
+    (when-let* ((buffer (get-buffer buffer-name)))
+      (with-current-buffer buffer
+        ;; Save conversation history before killing
+        (tiqsi-claude-repl--save-conversation)
+        (when (and tiqsi-claude-repl--current-process
+                (process-live-p tiqsi-claude-repl--current-process))
+          (delete-process tiqsi-claude-repl--current-process)))
+      (kill-buffer buffer)
+      (message "Killed %s" buffer-name))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle ()
+  "Toggle Claude REPL window."
+  (interactive)
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (buffer-name (format "*Claude REPL (%s)*" 
+                         (file-name-nondirectory (directory-file-name project-root)))))
+    (if-let* ((window (get-buffer-window buffer-name)))
+      (delete-window window)
+      (tiqsi-claude-repl-start))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-new-session ()
+  "Start a new Claude REPL session (kills existing one if any)."
+  (interactive)
+  ;; Kill existing session if any
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+          (buffer-name (format "*Claude REPL (%s)*" 
+                         (file-name-nondirectory (directory-file-name project-root)))))
+    (when-let* ((buffer (get-buffer buffer-name)))
+      (with-current-buffer buffer
+        (when (and tiqsi-claude-repl--current-process
+                (process-live-p tiqsi-claude-repl--current-process))
+          (delete-process tiqsi-claude-repl--current-process)))
+      (kill-buffer buffer)))
+  ;; Start fresh session
+  (tiqsi-claude-repl-start)
+  (message "Started new Claude REPL session"))
+
+;;;###autoload
+(defun tiqsi-claude-repl-list-sessions ()
+  "List all active Claude REPL sessions."
+  (interactive)
+  (let ((claude-buffers (cl-remove-if-not
+                          (lambda (buf)
+			    (with-current-buffer buf
+			      (eq major-mode 'tiqsi-claude-repl-mode)))
+                          (buffer-list))))
+    (if claude-buffers
+      (let ((session-info
+	      (mapconcat
+                (lambda (buf)
+                  (format "  • %s" (buffer-name buf)))
+                claude-buffers
+                "\n")))
+        (message "Active Claude REPL sessions:\n%s" session-info))
+      (message "No active Claude REPL sessions"))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-thinking ()
+  "Toggle showing Claude's thinking process."
+  (interactive)
+  (setq tiqsi-claude-repl-show-thinking (not tiqsi-claude-repl-show-thinking))
+  (message "Claude thinking process: %s" 
+    (if tiqsi-claude-repl-show-thinking "enabled" "disabled")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-syntax-highlighting ()
+  "Toggle syntax highlighting in Claude responses."
+  (interactive)
+  (setq tiqsi-claude-repl-highlight-code (not tiqsi-claude-repl-highlight-code))
+  (message "Claude syntax highlighting: %s" 
+    (if tiqsi-claude-repl-highlight-code "enabled" "disabled")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-line-wrapping ()
+  "Toggle automatic line wrapping in Claude responses."
+  (interactive)
+  (setq tiqsi-claude-repl-auto-wrap (not tiqsi-claude-repl-auto-wrap))
+  (message "Claude line wrapping: %s (at column %d)" 
+    (if tiqsi-claude-repl-auto-wrap "enabled" "disabled")
+    tiqsi-claude-repl-wrap-column))
+
+;;;###autoload
+(defun tiqsi-claude-repl-set-wrap-column (column)
+  "Set the column at which to wrap long lines."
+  (interactive "nWrap at column: ")
+  (setq tiqsi-claude-repl-wrap-column column)
+  (message "Claude line wrapping set to column %d" column))
+
+;;;###autoload
+(defun tiqsi-claude-repl-reformat-buffer ()
+  "Re-apply formatting to the entire Claude REPL buffer."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (save-excursion
+      (let ((inhibit-read-only t))
+        ;; Remove all text properties first
+        (remove-text-properties (point-min) (point-max) '(face nil invisible nil))
+        ;; Find all responses and reformat them
+        (goto-char (point-min))
+        (while (re-search-forward "^> .+\n\n" nil t)
+          (let ((response-start (point))
+                 (response-end (if (re-search-forward "^> " nil t)
+                                 (progn (beginning-of-line) (point))
+                                 (point-max))))
+	    (when (< response-start response-end)
+	      (tiqsi-claude-repl--post-process-response response-start response-end))
+	    (goto-char response-end)))))
+    (message "Claude REPL buffer reformatted")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-test-highlighting ()
+  "Test syntax highlighting with a sample response."
+  (interactive)
+  (tiqsi-claude-repl-start)
+  (tiqsi-claude-repl--log-operation "Test Mode" "Running syntax highlighting test")
+  (let ((test-input "Show me a Python function with markdown formatting"))
+    (with-current-buffer (tiqsi-claude-repl--get-or-create-buffer)
+      (goto-char (point-max))
+      (insert test-input)
+      (tiqsi-claude-repl-send-input))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-browse-history ()
+  "Browse Claude conversation history."
+  (interactive)
+  (let ((history-files (tiqsi-claude-repl--list-history-files)))
+    (if history-files
+      (let* ((files-info (mapcar (lambda (f)
+                                   (cons (format "%s - %s"
+                                           (file-name-nondirectory f)
+                                           (format-time-string "%Y-%m-%d %H:%M"
+                                             (nth 5 (file-attributes f))))
+                                     f))
+                           history-files))
+	      (selected (completing-read "Select conversation: " files-info nil t))
+	      (file (cdr (assoc selected files-info))))
+        (when file
+          (find-file-read-only file)
+          (tiqsi-claude-repl-history-mode)))
+      (message "No conversation history found"))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-search-history (query)
+  "Search through Claude conversation history for QUERY."
+  (interactive "sSearch history for: ")
+  (let ((history-files (tiqsi-claude-repl--list-history-files))
+         (results '()))
+    (dolist (file history-files)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (goto-char (point-min))
+        (when (search-forward query nil t)
+          (push (cons file (count-matches query (point-min) (point-max))) results))))
+    (if results
+      (let* ((sorted-results (sort results (lambda (a b) (> (cdr a) (cdr b)))))
+	      (choices (mapcar (lambda (r)
+                                 (format "%s (%d matches)"
+                                   (file-name-nondirectory (car r))
+                                   (cdr r)))
+                         sorted-results))
+	      (selected (completing-read "Select result: " choices nil t))
+	      (index (cl-position selected choices :test 'string=))
+	      (file (car (nth index sorted-results))))
+        (find-file-read-only file)
+        (goto-char (point-min))
+        (search-forward query nil t)
+        (tiqsi-claude-repl-history-mode))
+      (message "No results found for: %s" query))))
+
+;; History viewing mode
+(define-derived-mode tiqsi-claude-repl-history-mode special-mode "Claude-History"
+  "Major mode for viewing Claude conversation history."
+  (setq-local buffer-read-only t)
+  (local-set-key (kbd "q") 'quit-window)
+  (local-set-key (kbd "n") 'tiqsi-claude-repl-history-next)
+  (local-set-key (kbd "p") 'tiqsi-claude-repl-history-previous))
+
+(defun tiqsi-claude-repl-history-next ()
+  "Go to next conversation in history."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+          (history-files (tiqsi-claude-repl--list-history-files))
+          (current-index (cl-position current-file history-files :test 'string=)))
+    (when (and current-index (< (1+ current-index) (length history-files)))
+      (find-file-read-only (nth (1+ current-index) history-files))
+      (tiqsi-claude-repl-history-mode))))
+
+(defun tiqsi-claude-repl-history-previous ()
+  "Go to previous conversation in history."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+          (history-files (tiqsi-claude-repl--list-history-files))
+          (current-index (cl-position current-file history-files :test 'string=)))
+    (when (and current-index (> current-index 0))
+      (find-file-read-only (nth (1- current-index) history-files))
+      (tiqsi-claude-repl-history-mode))))
+
+;;; Summary Functions
+
+(defun tiqsi-claude-repl-show-session-summary ()
+  "Show a summary of the current Claude session."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (let* ((total-chars (buffer-size))
+	    (prompts (count-matches "^λ " (point-min) (point-max)))
+	    (responses (/ prompts 2)) ; Rough estimate
+	    (runtime (if tiqsi-claude-repl--session-start-time
+		       (format-seconds "%h hours, %m minutes, %s seconds"
+                         (float-time (time-subtract (current-time) 
+                           tiqsi-claude-repl--session-start-time)))
+		       "N/A"))
+            (idle-time (if tiqsi-claude-repl--last-interaction-time
+                          (format-seconds "%m minutes, %s seconds"
+                            (float-time (time-subtract (current-time)
+                              tiqsi-claude-repl--last-interaction-time)))
+                        "N/A")))
+      (message "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+        (tiqsi-claude-repl--format-status "Session Summary" "")
+        (format "  Internal Session ID: %s" (or tiqsi-claude-repl--session-id "unknown"))
+        (format "  Claude Session ID: %s" (or tiqsi-claude-repl--claude-session-id "not yet initialized"))
+        (format "  Total characters: %d" total-chars)
+        (format "  Total prompts: %d" prompts)
+        (format "  Messages exchanged: %d" tiqsi-claude-repl--message-count)
+        (format "  Estimated responses: %d" responses)
+        (format "  Session runtime: %s" runtime)
+        (format "  Idle for: %s" idle-time)))))
+
+(defun tiqsi-claude-repl-show-status ()
+  "Show the current status of Claude REPL."
+  (interactive)
+  (let ((status-items
+          (list
+	    (cons "Claude CLI" (if (tiqsi-claude-repl--executable-available-p)
+                                 (tiqsi-claude-repl--colorize "Available" 'tiqsi-claude-repl-success)
+				 (tiqsi-claude-repl--colorize "Not found" 'tiqsi-claude-repl-error)))
+	    (cons "Active sessions" (format "%d" (length (cl-remove-if-not
+                                                           (lambda (buf)
+							     (with-current-buffer buf
+							       (eq major-mode 'tiqsi-claude-repl-mode)))
+                                                           (buffer-list)))))
+	    (cons "Thinking mode" (if tiqsi-claude-repl-show-thinking
+				    (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+				    (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+	    (cons "Syntax highlighting" (if tiqsi-claude-repl-highlight-code
+                                          (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+					  (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+	    (cons "History saving" (if tiqsi-claude-repl-save-history
+				     (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+				     (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+	    (cons "Context files" (format "%d" (length tiqsi-claude-repl-context-files))))))
+    (message "%s\n%s"
+      (tiqsi-claude-repl--format-status "Claude REPL Status" "")
+      (mapconcat (lambda (item)
+                   (format "  %s: %s" (car item) (cdr item)))
+        status-items "\n"))))
+
+
+
+(when (featurep 'hydra)
+  (defhydra tiqsi-claude-repl-hydra (:color pink :hint nil :exit nil)
+    "
+╭──────────────────────────────────────────────────────────╮
+│                 Tiqsi Claude REPL Assistant              │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  Session      │  Send Content     │  AI Analysis        │
+│  ──────────   │  ─────────────    │  ─────────────      │
+│  _s_: Start   │  _r_: Region      │  _e_: Fix Error     │
+│  _k_: Kill    │  _f_: Function    │  _o_: Optimize      │
+│  _c_: Toggle  │  _b_: Buffer      │  _x_: Explain       │
+│  _C_: Clear   │  _a_: Ask         │  _t_: Tests         │
+│  _S_: Simple  │                   │                     │
+│                                                          │
+│  _q_: Quit    │  _h_: Help                              │
+╰──────────────────────────────────────────────────────────╯
+"
+    ("s" tiqsi-claude-repl-start "Start Claude")
+    ("k" tiqsi-claude-repl-kill "Kill Session")  
+    ("c" tiqsi-claude-repl-toggle "Toggle Window")
+    ("C" tiqsi-claude-repl-clear "Clear Buffer")
+    ("S" tiqsi-claude-repl-toggle-simple-mode "Toggle Simple Mode")
+    
+    ("r" tiqsi-claude-repl-send-region "Send Region")
+    ("f" tiqsi-claude-repl-send-function "Send Function")
+    ("b" tiqsi-claude-repl-send-buffer "Send Buffer")
+    ("a" tiqsi-claude-repl-ask-question "Ask Question")
+    
+    ("e" tiqsi-claude-repl-fix-error-at-point "Fix Error")
+    ("o" tiqsi-claude-repl-optimize-code "Optimize Code")
+    ("x" tiqsi-claude-repl-explain-code "Explain Code")
+    ("t" tiqsi-claude-repl-generate-tests "Generate Tests")
+    
+    ("h" (lambda () (interactive) (describe-function 'tiqsi-claude-repl-minor-mode)) "Help" :exit t)
+    ("q" nil "Quit" :exit t)))
+) ;; End of (when (featurep 'hydra)
+
+(defvar tiqsi-claude-repl-minor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c c s") 'tiqsi-claude-repl-start)
+    (define-key map (kbd "C-c c r") 'tiqsi-claude-repl-send-region)
+    (define-key map (kbd "C-c c f") 'tiqsi-claude-repl-send-function)
+    (define-key map (kbd "C-c c b") 'tiqsi-claude-repl-send-buffer)
+    (define-key map (kbd "C-c c a") 'tiqsi-claude-repl-ask-question)
+    (define-key map (kbd "C-c c e") 'tiqsi-claude-repl-fix-error-at-point)
+    (define-key map (kbd "C-c c o") 'tiqsi-claude-repl-optimize-code)
+    (define-key map (kbd "C-c c x") 'tiqsi-claude-repl-explain-code)
+    (define-key map (kbd "C-c c t") 'tiqsi-claude-repl-generate-tests)
+    (define-key map (kbd "C-c c k") 'tiqsi-claude-repl-kill)
+    (define-key map (kbd "C-c c c") 'tiqsi-claude-repl-toggle)
+    (define-key map (kbd "C-c c S") 'tiqsi-claude-repl-toggle-simple-mode)
+    map)
+  "Keymap for Tiqsi Claude REPL minor mode.")
+
+
+
+(defun tiqsi-claude-repl-toggle-simple-mode ()
+  "Toggle simple mode for Claude REPL."
+  (interactive)
+  (message "Simple mode toggling not yet implemented"))
+
+;; Close unclosed forms
+)))) ;; Close remaining unclosed forms
+
+(provide 'tiqsi-claude-repl)
+;;; tiqsi-claude-repl.el ends here

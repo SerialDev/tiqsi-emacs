@@ -1,0 +1,679 @@
+;;; modes-ido.el --- Tiksi IDO configuration  -*- lexical-binding: t -*-
+
+;; Copyright (C) 2018-  Andres Mariscal
+
+;; Author: Andres Mariscal <carlos.mariscal.melgar@gmail.com>
+
+;; URL: https://github.com/serialdev/tiqsi-emacs
+;; Keywords: lisp
+;; Version: 0
+;; Package-Requires: ((cl-lib "0.5") (emacs "24"))
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+;;; Commentary:
+;;
+
+;; Ido find file requirements
+
+(use-package ido
+  :straight t
+  :ensure t
+  :config )
+
+
+(straight-use-package
+  '(ido-completing-read+
+     :type git
+     :host github
+     :repo "DarwinAwardWinner/ido-completing-read-plus"
+     ))
+
+(ido-mode 1)
+
+(use-package smex
+  :ensure t
+  :straight t
+  :init
+  )
+
+;; Make IDO work vertically
+(use-package ido-vertical-mode
+  :ensure t
+  :straight t
+  :init               ; I like up and down arrow keys:
+  (setq ido-vertical-define-keys 'C-n-C-p-up-and-down)
+  :config
+  (ido-vertical-mode 1))
+
+
+(defun ido-imenu ()
+  "Update the imenu index and then use ido to select a symbol to navigate to.
+Symbols matching the text at point are put first in the completion list."
+  (interactive)
+  (imenu--make-index-alist)
+  (let ((name-and-pos '())
+         (symbol-names '()))
+    (flet ((addsymbols (symbol-list)
+             (when (listp symbol-list)
+               (dolist (symbol symbol-list)
+                 (let ((name nil) (position nil))
+                   (cond
+                     ((and (listp symbol) (imenu--subalist-p symbol))
+                       (addsymbols symbol))
+
+                     ((listp symbol)
+                       (setq name (car symbol))
+                       (setq position (cdr symbol)))
+
+                     ((stringp symbol)
+                       (setq name symbol)
+                       (setq position (get-text-property 1 'org-imenu-marker symbol))))
+
+                   (unless (or (null position) (null name))
+                     (add-to-list 'symbol-names name)
+                     (add-to-list 'name-and-pos (cons name position))))))))
+      (addsymbols imenu--index-alist))
+    ;; If there are matching symbols at point, put them at the beginning of symbol-names'.
+    (let ((symbol-at-point (thing-at-point 'symbol)))
+      (when symbol-at-point
+        (let* ((regexp (concat (regexp-quote symbol-at-point) "$"))
+		(matching-symbols (delq nil (mapcar (lambda (symbol)
+                                                      (if (string-match regexp symbol) symbol))
+                                              symbol-names))))
+          (when matching-symbols
+            (sort matching-symbols (lambda (a b) (> (length a) (length b))))
+            (mapc (lambda (symbol) (setq symbol-names (cons symbol (delete symbol symbol-names))))
+              matching-symbols)))))
+    (let* ((selected-symbol (ido-completing-read "Symbol? " symbol-names))
+            (position (cdr (assoc selected-symbol name-and-pos))))
+      (push-mark (point))
+      (goto-char position))))
+
+
+;; (defun my-switch-to-buffer (buffer)
+;;   (interactive
+;;    (list (ido-read-buffer "Switch to buffer: ")))
+;;   ;; get-buffer-window (with second argument t) will return
+;;   ;; nil if the buffer is not open in any window across any
+;;   ;; frame
+;;   (unless (get-buffer-window buffer 0)
+;;     (pop-to-buffer buffer nil t)))
+;; Replaced by selectrum
+
+
+
+(GNUEmacs25
+  (progn
+    (use-package ido  :config
+      (setq ido-auto-merge-delay-time 99999999)
+      (setq ido-virtual-buffers t)
+      )
+
+    (use-package flx-ido   :requires ido :config (flx-ido-mode))
+    (use-package ido-vertical-mode   :requires ido :config (ido-vertical-mode))
+    ;; (use-package ido-ubiquitous   :requires ido :config (ido-ubiquitous-mode))
+    (ido-everywhere)
+    (defun ido-execute-extended-command ()
+      "Use ido' to select and execute a command."
+      (interactive)
+      (call-interactively
+	(intern
+	  (ido-completing-read
+	    "M-x "
+	    (all-completions "" obarray 'commandp)))))
+
+    ))
+
+
+
+(defun ido-sort-folders-then-ext-alpha (files)
+  (let ((files-copy (copy-sequence files)))
+    (sort files-copy
+      (lambda (a b)
+        (let ((dir-a (string-suffix-p "/" a))
+               (dir-b (string-suffix-p "/" b)))
+          (cond
+            ((and dir-a dir-b) (string< a b))
+            (dir-a t)
+            (dir-b nil)
+            (t (let* ((ext-a (or (file-name-extension a) ""))
+                       (ext-b (or (file-name-extension b) "")))
+                 (if (string= ext-a ext-b)
+                   (string< a b)
+                   (string< ext-a ext-b))))))))))
+
+(ignore-errors
+  (advice-remove 'ido-file-internal #'ido-sort-by-ext-and-alpha))
+(ignore-errors
+  (advice-remove 'ido-file-internal #'ido-sort-folders-then-ext-alpha))
+
+(advice-add 'ido-file-internal :filter-return #'ido-sort-folders-then-ext-alpha)
+
+(define-key global-map (kbd "C-x f") 'ido-find-file)
+
+
+(defun search-current-line-in-other-window ()
+  "Search for the current line's exact text in the other window's buffer.
+
+Gets the text of the line containing the point (trimmed), switches to the
+other window, and searches for that exact text. Reports whether the
+line text was found or not found in the other buffer."
+  (interactive)
+  (let* (;; --- Store current state ---
+          (current-win (selected-window))
+          (current-buf (current-buffer))
+          (current-point (point))
+          ;; --- Get line text ---
+          (current-line-text
+            (buffer-substring-no-properties (line-beginning-position)
+              (line-end-position)))
+          ;; Trim leading/trailing whitespace for robustness
+          (search-text (string-trim current-line-text))
+          ;; --- Find the 'other' window ---
+          (other-win (next-window current-win nil 'visible)) ; Avoid minibuffer
+          (other-buf nil)
+          (found-in-other nil))
+
+    ;; --- 1. Basic Validation ---
+    (when (string-empty-p search-text)
+      (user-error "Current line appears empty or contains only whitespace."))
+
+    (unless other-win
+      (user-error "Could not find an 'other' visible window."))
+
+    ;; --- 2. Perform Search in Other Window ---
+    (setq other-buf (window-buffer other-win))
+    (with-current-buffer other-buf
+      (save-excursion       ; Don't permanently move point in other buffer
+        (save-restriction ; Search entire buffer even if narrowed
+          (widen)
+          (goto-char (point-min)) ; Start search from beginning
+          ;; Use search-forward for literal string search
+          ;; 'nil' means don't signal error if not found
+          ;; 't' means search only once
+          (if (search-forward search-text nil t)
+            (setq found-in-other t)
+            (setq found-in-other nil)))))
+
+    ;; --- 3. Report Result (back in original window) ---
+    (select-window current-win) ; Restore original window focus
+
+    (if found-in-other
+      (message "✅ Found matching line in '%s': \"%s\""
+        (buffer-name other-buf)
+        search-text)
+      (message "❓ Line NOT FOUND in '%s': \"%s\" (Searched from '%s')"
+        (buffer-name other-buf)
+        search-text
+        (buffer-name current-buf)))
+    ))
+
+
+
+(defun compare-entity-across-windows ()
+  (interactive)
+  (let* ((defun-size-limit 300000)
+          (analysis-search-chars 10000)
+          (current-win (selected-window))
+          (current-buf (current-buffer))
+          (current-point (point))
+          (original-start nil)
+          (original-end nil)
+          (entity-name nil)
+          (first-meaningful-line nil)
+          (current-line-search-text nil)
+          (other-win nil)
+          (other-buf nil)
+          (found-in-other nil)
+          (comparison-mode :line)
+          (comparison-result :unknown)
+          (message-text nil))
+
+    ;; Identify current defun boundaries & entity name
+    (condition-case nil
+      (save-excursion
+        (goto-char current-point)
+        (beginning-of-defun)
+        (setq original-start (point))
+        (end-of-defun)
+        (setq original-end (point))
+        (when (and original-start original-end
+                (< original-start current-point)
+                (<= (- original-end original-start) defun-size-limit))
+          (goto-char original-start)
+          (when (re-search-forward "^\\s-*\\(?:async\\s-+\\)?\\(?:def\\|class\\)\\s-+\\(\\w+\\)" original-end t)
+            (setq entity-name (match-string 1)))
+          (goto-char original-start)
+          (while (and (< (point) original-end) (not first-meaningful-line))
+            (let ((line-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
+              (unless (or (string-empty-p line-text) (string-prefix-p "#" line-text))
+                (setq first-meaningful-line line-text)))
+            (forward-line 1))
+          (when (and entity-name first-meaningful-line)
+            (setq comparison-mode :defun))))
+      (error (setq comparison-mode :error comparison-result :boundary_func_error)))
+
+    ;; Line fallback extraction
+    (when (eq comparison-mode :line)
+      (setq current-line-search-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (when (string-empty-p current-line-search-text)
+        (setq comparison-mode :error comparison-result :empty_line)))
+
+    ;; Find other window/buffer
+    (unless (eq comparison-mode :error)
+      (setq other-win (next-window current-win nil 'visible))
+      (unless (and other-win (setq other-buf (window-buffer other-win)))
+        (setq comparison-mode :error comparison-result :no_other_window)))
+
+    ;; Locate entity or line in other buffer explicitly
+    (when (and (not (eq comparison-mode :error)) other-buf)
+      (with-current-buffer other-buf
+        (save-excursion
+          (goto-char (point-min))
+          (setq found-in-other
+            (cond ((eq comparison-mode :defun) (search-forward first-meaningful-line nil t))
+              ((eq comparison-mode :line) (search-forward current-line-search-text nil t))))
+          (unless found-in-other (setq comparison-result :not_found)))))
+
+    ;; Precise defun comparison with correct cursor handling
+    (when (and (eq comparison-mode :defun) found-in-other)
+      (let (other-start other-end orig-lines other-lines line-num diff-found)
+        (with-current-buffer other-buf
+          (goto-char found-in-other)
+          (beginning-of-line)
+          (forward-char 1) ;; critical fix to avoid off-by-one
+          (condition-case nil
+            (progn
+              (beginning-of-defun) (setq other-start (point))
+              (end-of-defun) (setq other-end (point)))
+            (error (setq comparison-result :boundary_error_other))))
+        (when (and other-start other-end)
+          (setq orig-lines (split-string (buffer-substring-no-properties original-start original-end) "\n")
+            other-lines (split-string (with-current-buffer other-buf
+                                        (buffer-substring-no-properties other-start other-end)) "\n")
+            line-num 1 diff-found nil)
+          (let ((max-lines (max (length orig-lines) (length other-lines))))
+            (while (and (<= line-num max-lines) (not diff-found))
+              (let ((o-line (nth (1- line-num) orig-lines))
+                     (t-line (nth (1- line-num) other-lines)))
+                (unless (string= o-line t-line)
+                  (setq diff-found t comparison-result :differ
+                    message-text (format "❌ Defun differs at line %d.\nOriginal: \"%s\"\nOther: \"%s\""
+                                   line-num (or o-line "<NO LINE>") (or t-line "<NO LINE>"))))
+                (setq line-num (1+ line-num))))
+            (unless diff-found
+              (setq comparison-result :match
+                message-text (format "✅ Defun matches exactly (%d lines)." (length orig-lines))))))))
+
+    ;; Explicit fallback message handling
+    (unless message-text
+      (setq message-text
+        (cond ((eq comparison-result :no_other_window) "❌ No other visible window.")
+          ((eq comparison-result :empty_line) "❌ Current line empty.")
+          ((eq comparison-result :boundary_func_error) "❌ Boundary function error.")
+          ((eq comparison-result :boundary_error_other) "❌ Boundary error in other buffer.")
+          ((eq comparison-result :not_found) (format "❌ Not found (%s) in %s." comparison-mode (buffer-name other-buf)))
+          ((and (eq comparison-mode :line) found-in-other) (format "✅ Line matches exactly in %s." (buffer-name other-buf)))
+          (t "❓ Comparison inconclusive."))))
+
+    ;; Display final explicitly correct message
+    (select-window current-win)
+    (message "%s" message-text)))
+
+
+
+(defun py-copy-defun-to-clipboard ()
+  "Copy the current Python function or method definition to the kill ring.
+
+Identifies the boundaries of the Python function (`def` or `async def`)
+or method containing the point, regardless of the point's exact
+location within it, and copies the entire block to the kill ring
+(clipboard).
+
+The cursor position remains unchanged after execution."
+  (interactive)
+
+  ;; --- 1. Check if in a Python buffer ---
+  (unless (derived-mode-p 'python-base-mode 'python-mode 'python-ts-mode)
+    (user-error "This command requires a Python buffer (python-mode or similar)."))
+
+  ;; --- 2. Find Boundaries and Copy ---
+  (save-excursion
+    ;; condition-case: Bind 'err' IF an error occurs in the body (progn)
+    (condition-case err
+      ;; Body: Code to try executing
+      (progn
+        (beginning-of-defun)
+        (let ((start (point)))
+          (end-of-defun)
+          (let ((end (point)))
+            (kill-ring-save start end)
+            (message "Python definition copied to kill ring (%d chars)" (- end start))
+            ))) ; End progn
+
+      ;; Handler: Executed ONLY if an 'error' happens in the body (progn)
+      (error
+	;; 'err' is guaranteed to be bound HERE by condition-case
+	(user-error "Could not find Python function/method boundaries at point. %s" err)))
+    ) ; End save-excursion
+  )
+
+
+(defun py-kill-defun ()
+  "Kill (cut) the current Python function or method definition.
+Handles errors finding boundaries more quietly."
+  (interactive)
+
+  ;; --- 1. Check if in a Python buffer ---
+  (unless (derived-mode-p 'python-base-mode 'python-mode 'python-ts-mode)
+    (user-error "This command requires a Python buffer (python-mode or similar)."))
+
+  ;; --- 2. Find Boundaries and Kill (Cut) ---
+  ;; condition-case structure: (condition-case VAR BODY HANDLER)
+  (condition-case err ; VAR: 'err' - will hold error data IF handler is run
+
+    ;; --- BODY: Code to attempt ---
+    (progn
+      (beginning-of-defun)
+      (let ((start (point)))
+        (end-of-defun)
+        (let ((end (point)))
+          (kill-region start end) ; Cut the region
+          ;; Success message
+          (message "Python definition killed (cut) to kill ring (%d chars)" (- end start))
+          ))) ; End of BODY (progn block)
+
+    ;; --- HANDLER: Code to run ONLY if an 'error' occurs in BODY ---
+    (error
+      ;; Display a simpler error message without the detailed 'err' data.
+      (user-error "Could not find Python function/method boundaries at point."))
+
+    ) ; End of condition-case
+  ) ; End of defun
+
+
+
+(defun compare-entity-across-windows ()
+  (interactive)
+  (let* ((defun-size-limit 300000)
+          (analysis-search-chars 10000)
+          (current-win (selected-window))
+          (current-buf (current-buffer))
+          (current-point (point))
+          (original-start nil)
+          (original-end nil)
+          (entity-name nil)
+          (first-meaningful-line nil)
+          (current-line-search-text nil)
+          (other-win nil)
+          (other-buf nil)
+          (found-in-other nil)
+          (comparison-mode :line)
+          (comparison-result :unknown)
+          (message-text nil)
+          (target-line-in-other nil))
+
+    ;; Identify current defun boundaries & entity name
+    (condition-case nil
+      (save-excursion
+        (goto-char current-point)
+        (beginning-of-defun)
+        (setq original-start (point))
+        (end-of-defun)
+        (setq original-end (point))
+        (when (and original-start original-end
+                (< original-start current-point)
+                (<= (- original-end original-start) defun-size-limit))
+          (goto-char original-start)
+          (when (re-search-forward "^\\s-*\\(?:async\\s-+\\)?\\(?:def\\|class\\)\\s-+\\(\\w+\\)" original-end t)
+            (setq entity-name (match-string 1)))
+          (goto-char original-start)
+          (while (and (< (point) original-end) (not first-meaningful-line))
+            (let ((line-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
+              (unless (or (string-empty-p line-text) (string-prefix-p "#" line-text))
+                (setq first-meaningful-line line-text)))
+            (forward-line 1))
+          (when (and entity-name first-meaningful-line)
+            (setq comparison-mode :defun))))
+      (error (setq comparison-mode :error comparison-result :boundary_func_error)))
+
+    ;; Line fallback extraction
+    (when (eq comparison-mode :line)
+      (setq current-line-search-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (when (string-empty-p current-line-search-text)
+        (setq comparison-mode :error comparison-result :empty_line)))
+
+    ;; Find other window/buffer
+    (unless (eq comparison-mode :error)
+      (setq other-win (next-window current-win nil 'visible))
+      (unless (and other-win (setq other-buf (window-buffer other-win)))
+        (setq comparison-mode :error comparison-result :no_other_window)))
+
+    ;; Locate entity or line in other buffer explicitly
+    (when (and (not (eq comparison-mode :error)) other-buf)
+      (with-current-buffer other-buf
+        (goto-char (point-min))
+        (setq found-in-other
+          (cond ((eq comparison-mode :defun) (search-forward first-meaningful-line nil t))
+            ((eq comparison-mode :line) (search-forward current-line-search-text nil t))))
+        (unless found-in-other (setq comparison-result :not_found))
+        (when found-in-other
+          (beginning-of-line)
+          (setq target-line-in-other (point)))))
+
+    ;; Precise defun comparison with correct cursor handling
+    (when (and (eq comparison-mode :defun) found-in-other)
+      (let (other-start other-end orig-lines other-lines line-num diff-found)
+        (with-current-buffer other-buf
+          (goto-char target-line-in-other)
+          (forward-char 1)
+          (condition-case nil
+            (progn
+              (beginning-of-defun) (setq other-start (point))
+              (end-of-defun) (setq other-end (point)))
+            (error (setq comparison-result :boundary_error_other))))
+        (when (and other-start other-end)
+          (setq orig-lines (split-string (buffer-substring-no-properties original-start original-end) "\n")
+            other-lines (split-string (with-current-buffer other-buf
+                                        (buffer-substring-no-properties other-start other-end)) "\n")
+            line-num 1 diff-found nil)
+          (let ((max-lines (max (length orig-lines) (length other-lines))))
+            (while (and (<= line-num max-lines) (not diff-found))
+              (let ((o-line (nth (1- line-num) orig-lines))
+                     (t-line (nth (1- line-num) other-lines)))
+                (unless (string= o-line t-line)
+                  (setq diff-found t comparison-result :differ
+                    message-text (format "❌ Defun differs at line %d.\nOriginal: \"%s\"\nOther: \"%s\""
+                                   line-num (or o-line "<NO LINE>") (or t-line "<NO LINE>")))
+                  (with-current-buffer other-buf
+                    (goto-char other-start)
+                    (forward-line (1- line-num))
+                    (setq target-line-in-other (point))))
+                (setq line-num (1+ line-num))))
+            (unless diff-found
+              (setq comparison-result :match
+                message-text (format "✅ Defun matches exactly (%d lines)." (length orig-lines)))
+              (with-current-buffer other-buf (goto-char other-start)))))))
+
+    ;; Explicit fallback message handling
+    (unless message-text
+      (setq message-text
+        (cond ((eq comparison-result :no_other_window) "❌ No other visible window.")
+          ((eq comparison-result :empty_line) "❌ Current line empty.")
+          ((eq comparison-result :boundary_func_error) "❌ Boundary function error.")
+          ((eq comparison-result :boundary_error_other) "❌ Boundary error in other buffer.")
+          ((eq comparison-result :not_found) (format "❌ Not found (%s) in %s." comparison-mode (buffer-name other-buf)))
+          ((and (eq comparison-mode :line) found-in-other) (format "✅ Line matches exactly in %s." (buffer-name other-buf)))
+          (t "❓ Comparison inconclusive."))))
+
+    ;; Display final message & explicitly center the other window
+    (when (and other-win target-line-in-other)
+      (select-window other-win)
+      (goto-char target-line-in-other)
+      (recenter))
+    (select-window current-win)
+    (message "%s" message-text)))
+
+
+(defun compare-entity-across-windows ()
+  (interactive)
+  (let* ((defun-size-limit 300000)
+          (analysis-search-chars 10000)
+          (current-win (selected-window))
+          (current-buf (current-buffer))
+          (current-point (point))
+          (original-start nil)
+          (original-end nil)
+          (entity-name nil)
+          (first-meaningful-line nil)
+          (current-line-search-text nil)
+          (other-win nil)
+          (other-buf nil)
+          (found-in-other nil)
+          (comparison-mode :line)
+          (comparison-result :unknown)
+          (message-text nil)
+          (target-line-in-other nil))
+
+    ;; Identify current defun boundaries & entity name
+    (condition-case nil
+      (save-excursion
+        (goto-char current-point)
+        (beginning-of-defun)
+        (setq original-start (point))
+        (end-of-defun)
+        (setq original-end (point))
+        (when (and original-start original-end
+                (< original-start current-point)
+                (<= (- original-end original-start) defun-size-limit))
+          (goto-char original-start)
+          (when (re-search-forward "^\\s-*\\(?:async\\s-+\\)?\\(?:def\\|class\\)\\s-+\\(\\w+\\)" original-end t)
+            (setq entity-name (match-string 1)))
+          (goto-char original-start)
+          (while (and (< (point) original-end) (not first-meaningful-line))
+            (let ((line-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position)))))
+              (unless (or (string-empty-p line-text) (string-prefix-p "#" line-text))
+                (setq first-meaningful-line line-text)))
+            (forward-line 1))
+          (when (and entity-name first-meaningful-line)
+            (setq comparison-mode :defun))))
+      (error (setq comparison-mode :error comparison-result :boundary_func_error)))
+
+    ;; Line fallback extraction
+    (when (eq comparison-mode :line)
+      (setq current-line-search-text (string-trim (buffer-substring-no-properties (line-beginning-position) (line-end-position))))
+      (when (string-empty-p current-line-search-text)
+        (setq comparison-mode :error comparison-result :empty_line)))
+
+    ;; Find other window/buffer
+    (unless (eq comparison-mode :error)
+      (setq other-win (next-window current-win nil 'visible))
+      (unless (and other-win (setq other-buf (window-buffer other-win)))
+        (setq comparison-mode :error comparison-result :no_other_window)))
+
+    ;; Locate entity or line in other buffer explicitly
+    (when (and (not (eq comparison-mode :error)) other-buf)
+      (with-current-buffer other-buf
+        (goto-char (point-min))
+        (setq found-in-other
+          (cond ((eq comparison-mode :defun) (search-forward first-meaningful-line nil t))
+            ((eq comparison-mode :line) (search-forward current-line-search-text nil t))))
+        (unless found-in-other (setq comparison-result :not_found))
+        (when found-in-other
+          (beginning-of-line)
+          (setq target-line-in-other (point)))))
+
+    ;; Precise defun comparison with correct cursor handling
+    (when (and (eq comparison-mode :defun) found-in-other)
+      (let (other-start other-end orig-lines other-lines line-num diff-found)
+        (with-current-buffer other-buf
+          (goto-char target-line-in-other)
+          (forward-char 1)
+          (condition-case nil
+            (progn
+              (beginning-of-defun) (setq other-start (point))
+              (end-of-defun) (setq other-end (point)))
+            (error (setq comparison-result :boundary_error_other))))
+        (when (and other-start other-end)
+          (setq orig-lines (split-string (buffer-substring-no-properties original-start original-end) "\n")
+            other-lines (split-string (with-current-buffer other-buf
+                                        (buffer-substring-no-properties other-start other-end)) "\n")
+            line-num 1 diff-found nil)
+          (let ((max-lines (max (length orig-lines) (length other-lines))))
+            (while (and (<= line-num max-lines) (not diff-found))
+              (let ((o-line (nth (1- line-num) orig-lines))
+                     (t-line (nth (1- line-num) other-lines)))
+                (unless (string= o-line t-line)
+                  (setq diff-found t comparison-result :differ
+                    message-text (format "❌ Defun differs at line %d.\nOriginal: \"%s\"\nOther: \"%s\""
+                                   line-num (or o-line "<NO LINE>") (or t-line "<NO LINE>")))
+                  (with-current-buffer other-buf
+                    (goto-char other-start)
+                    (forward-line (1- line-num))
+                    (setq target-line-in-other (point))))
+                (setq line-num (1+ line-num))))
+            (unless diff-found
+              (setq comparison-result :match
+                message-text (format "✅ Defun matches exactly (%d lines)." (length orig-lines)))
+              (with-current-buffer other-buf (goto-char other-start)))))))
+
+    ;; Explicit fallback message handling
+    (unless message-text
+      (setq message-text
+        (cond ((eq comparison-result :no_other_window) "❌ No other visible window.")
+          ((eq comparison-result :empty_line) "❌ Current line empty.")
+          ((eq comparison-result :boundary_func_error) "❌ Boundary function error.")
+          ((eq comparison-result :boundary_error_other) "❌ Boundary error in other buffer.")
+          ((eq comparison-result :not_found) (format "❌ Not found (%s) in %s." comparison-mode (buffer-name other-buf)))
+          ((and (eq comparison-mode :line) found-in-other) (format "✅ Line matches exactly in %s." (buffer-name other-buf)))
+          (t "❓ Comparison inconclusive."))))
+
+    ;; Display final message & explicitly center the other window
+    (when (and other-win target-line-in-other)
+      (select-window other-win)
+      (goto-char target-line-in-other)
+      (recenter))
+    (select-window current-win)
+    (message "%s" message-text)))
+
+
+(setq vc-handled-backends nil)
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+(setq ido-use-virtual-buffers nil)
+(setq ido-auto-merge-delay-time 99999999)
+;; (setq ido-max-work-directory-list 10)
+(setq ido-max-file-prompt-width 0.6)
+(setq ido-ignore-buffers '("\\` " "^\*"))
+(setq ido-ignore-directories '("\\`node_modules\\'" "\\`\\.venv\\'" "\\`__pycache__\\'"))
+(setq ido-ignore-files '("\\`\\." "\\.pyc\\'" "\\.o\\'" "\\.elc\\'"))
+
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c p") 'py-copy-defun-to-clipboard))
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c .") 'compare-entity-across-windows))
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c d") 'py-kill-defun))
+
+
+
+(provide 'modes-ido)
+
+;;; modes-ido.el ends here

@@ -372,6 +372,19 @@ Adapted from `describe-function-or-variable'."
 
 ; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;
 
+;; ------------------------------------------------------------------------- ;
+;;                      General Utility Functions                            ;
+;;                     (moved from modes-md.el)                              ;
+;; ------------------------------------------------------------------------- ;
+
+(defun count-occurences (regex string)
+  (recursive-count regex string 0))
+
+(defun recursive-count (regex string start)
+  (if (string-match regex string start)
+      (+ 1 (recursive-count regex string (match-end 0)))
+    0))
+
 (provide 'core-functions)
 
 ;;; core-functions.el ends here

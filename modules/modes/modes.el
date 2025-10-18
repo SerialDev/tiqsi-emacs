@@ -47,6 +47,7 @@
 (load-expand  "modules/modes/modes-company.el")
 (load-expand  "modules/modes/modes-flyspell.el")
 (load-expand  "modules/modes/modes-shell.el")
+(load-expand  "modules/modes/modes-claude.el")
 
 
 ;; ------------------------------------------------------------------------- ;

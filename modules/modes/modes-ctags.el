@@ -65,7 +65,8 @@
 ;; ;; (setq tags-table-list '("/path/of/TAGS1"    "/path/of/TAG2"))
 
                                         ;---{Keybindings}---;
-(global-set-key (kbd "M-.") 'my-find-tag)
+;; Use helm-etags-plus-select as the primary M-. binding
+(global-set-key (kbd "M-.") 'helm-etags-plus-select)
 
 ;;list all visited tags
 (global-set-key "\M-*" 'helm-etags-plus-history)
@@ -74,7 +75,8 @@
 ;;go forward directly
 (global-set-key "\M-/" 'helm-etags-plus-history-go-forward)
 
-(global-set-key "\M-." 'helm-etags-plus-select)
+;; Alternative binding for sdev/find-tag
+(global-set-key (kbd "C-c .") 'sdev/find-tag)
 
 
 (provide 'modes-ctags)
