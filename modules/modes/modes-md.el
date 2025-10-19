@@ -64,13 +64,7 @@
 
 (add-hook 'before-save-hook #'tiqsi-markdown-mode-before-save-hook)
 
-(defun count-occurences (regex string)
-  (recursive-count regex string 0))
-
-(defun recursive-count (regex string start)
-  (if (string-match regex string start)
-      (+ 1 (recursive-count regex string (match-end 0)))
-    0))
+;; Utility functions count-occurences and recursive-count have been moved to core-functions.el
 
 (defun tiqsi-pd-to-md-table()
   (interactive)
@@ -139,7 +133,50 @@
 
 (setq jiralib-url tiqsi-jira-url)
 
+;; ------------------------------------------------------------------------- ;
+;;                Markdown Image Display Override                            ;
+;;               (moved from modes-org.el)                                   ;
+;; ------------------------------------------------------------------------- ;
 
+;; Override Markdown Mode's image overlays so the image markdown code and the image are both visible!
+(eval-after-load "markdown-mode"
+  '(defun markdown-display-inline-images ()
+  "Add inline image overlays to image links in the buffer.
+This can be toggled with `markdown-toggle-inline-images'
+or \\[markdown-toggle-inline-images]."
+  (interactive)
+  (unless (display-images-p)
+    (error "Cannot show images"))
+  (save-excursion
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (while (re-search-forward markdown-regex-link-inline nil t)
+        (let ((start (match-beginning 0))
+              (end (match-end 0))
+              (file (match-string-no-properties 6)))
+          (when (file-exists-p file)
+            (let* ((abspath (if (file-name-absolute-p file)
+                                file
+                              (concat default-directory file)))
+                   (image
+                    (if (and markdown-max-image-size
+                             (image-type-available-p 'imagemagick))
+                        (create-image
+                         abspath 'imagemagick nil
+                         :max-width (car markdown-max-image-size)
+                         :max-height (cdr markdown-max-image-size))
+                      (create-image abspath))))
+              (when image
+                (setq newStart (+ end ))
+                (setq newEnd (+ end 1))
+                (let ((ov (make-overlay newStart newEnd)))
+                  (message "%s" newEnd)
+                  (overlay-put ov 'display image)
+                  (overlay-put ov 'face 'default)
+                  (overlay-put ov 'before-string "\n\n")
+                  (push ov markdown-inline-image-overlays))))))))))
+)
 
 (provide 'modes-md)
 

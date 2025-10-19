@@ -79,6 +79,7 @@
 (load-expand  "core/core-editing.el")
 
 (load-expand  "core/core-navigation.el")
+(load-expand  "core/core-windows.el")
 (load-expand  "core/core-files.el")
 (load-expand  "core/core-functionality.el")
 (load-expand  "core/core-functions.el")

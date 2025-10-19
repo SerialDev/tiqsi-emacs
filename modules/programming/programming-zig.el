@@ -135,25 +135,6 @@ USAGE: (delete-zig-scratch-folder)"
 
 
 
-
-(use-package yaml-mode
-  :straight t
-  :ensure t
-  :config (progn
-            ))
-
-
-(use-package graphviz-dot-mode
-  :ensure t
-  :straight t
-  :config
-  (progn
-    (setq graphviz-dot-indent-width 4)
-    (define-key graphviz-dot-mode-map (kbd "C-c C-c") 'graphviz-dot-preview)
-
-    )
-  )
-
 (define-key zig-mode-map (kbd "C-c C-c") 'zig-compile)
 (define-key zig-mode-map (kbd "C-c C-t") 'zig-test)
 (define-key zig-mode-map (kbd "C-c C-r") 'zig-run)

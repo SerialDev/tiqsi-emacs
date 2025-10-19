@@ -29,12 +29,7 @@
 ;;; Code:
 
 
-(defun tiqsi-java-hook()
-
-  (jdee-flycheck-enable-p)
-  (neotree-show)
-  )
-(setq jdee-server-dir "/jdee-server/target/")
+;; Java-specific functions have been moved to programming-java.el
 
 (use-package neotree
   :straight t
@@ -44,7 +39,6 @@
     (setq neotree-smart-optn t
           neo-window-fixed-size nil)
   ;; Disable linum for neotree
-    (add-hook 'jdee-mode-hook 'tiqsi-java-hook )
     ))
 
 

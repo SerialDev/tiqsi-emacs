@@ -43,12 +43,34 @@
      ))
 
 (ido-mode 1)
+;; Enhanced IDO configuration for performance and usability
+(setq ido-use-virtual-buffers t) ; Show recent files in buffer switching
+(setq ido-enable-flex-matching t) ; Flexible matching
+(setq ido-everywhere t) ; Use IDO everywhere
+(setq ido-max-prospects 12) ; Show more prospects
+(setq ido-max-work-file-list 50) ; Keep more work files in memory
+(setq ido-work-directory-list-ignore-regexps '("^/tmp/" "^/var/tmp/")) ; Ignore temp dirs
+(setq ido-ignore-buffers '("\\` " "^\*")) ; Ignore internal buffers
+(setq ido-use-filename-at-point 'guess) ; Guess filename at point
+(setq ido-create-new-buffer 'always) ; Always allow creating new buffers
+(setq ido-file-extensions-order '(".py" ".el" ".txt" ".org" ".md" ".js" ".html" ".css")) ; Prioritize file types
+
+;; Configure recentf for better buffer switching
+(use-package recentf
+  :ensure nil
+  :config
+  (recentf-mode 1)
+  (setq recentf-max-menu-items 100)
+  (setq recentf-max-saved-items 300)
+  (setq recentf-auto-cleanup 600)) ; Cleanup every 10 minutes
 
 (use-package smex
   :ensure t
   :straight t
   :init
-  )
+  (smex-initialize)
+  :config
+  (setq smex-save-file (concat user-emacs-directory ".smex-items")))
 
 ;; Make IDO work vertically
 (use-package ido-vertical-mode
@@ -87,7 +109,7 @@ Symbols matching the text at point are put first in the completion list."
                      (add-to-list 'symbol-names name)
                      (add-to-list 'name-and-pos (cons name position))))))))
       (addsymbols imenu--index-alist))
-    ;; If there are matching symbols at point, put them at the beginning of `symbol-names'.
+    ;; If there are matching symbols at point, put them at the beginning of symbol-names'.
     (let ((symbol-at-point (thing-at-point 'symbol)))
       (when symbol-at-point
         (let* ((regexp (concat (regexp-quote symbol-at-point) "$"))
@@ -116,6 +138,7 @@ Symbols matching the text at point are put first in the completion list."
 
 
 
+
 (GNUEmacs25
   (progn
     (use-package ido  :config
@@ -128,7 +151,7 @@ Symbols matching the text at point are put first in the completion list."
     ;; (use-package ido-ubiquitous   :requires ido :config (ido-ubiquitous-mode))
     (ido-everywhere)
     (defun ido-execute-extended-command ()
-      "Use `ido' to select and execute a command."
+      "Use ido' to select and execute a command."
       (interactive)
       (call-interactively
 	(intern
@@ -138,8 +161,48 @@ Symbols matching the text at point are put first in the completion list."
 
     ))
 
-(define-key global-map (kbd "C-x f") 'ido-find-file)
 
+
+(defun ido-sort-folders-then-ext-alpha (files)
+  (let ((files-copy (copy-sequence files)))
+    (sort files-copy
+      (lambda (a b)
+        (let ((dir-a (string-suffix-p "/" a))
+               (dir-b (string-suffix-p "/" b)))
+          (cond
+            ((and dir-a dir-b) (string< a b))
+            (dir-a t)
+            (dir-b nil)
+            (t (let* ((ext-a (or (file-name-extension a) ""))
+                       (ext-b (or (file-name-extension b) "")))
+                 (if (string= ext-a ext-b)
+                   (string< a b)
+                   (string< ext-a ext-b))))))))))
+
+(ignore-errors
+  (advice-remove 'ido-file-internal #'ido-sort-by-ext-and-alpha))
+(ignore-errors
+  (advice-remove 'ido-file-internal #'ido-sort-folders-then-ext-alpha))
+
+(advice-add 'ido-file-internal :filter-return #'ido-sort-folders-then-ext-alpha)
+
+(define-key global-map (kbd "C-x f") 'ido-find-file)
+;; Note: This conflicts with helm-smex in modes-helm.el
+;; Only one of helm or ido should be active at a time
+;; Don't override M-x - use smex as primary, this as alternative
+(define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
+
+
+(setq vc-handled-backends nil)
+;; These settings are now configured above in the enhanced section
+;; (setq ido-enable-flex-matching t) ; Already set above
+;; (setq ido-use-faces nil) ; Keep faces for better visual distinction
+(setq ido-use-virtual-buffers t) ; OVERRIDE: Enable virtual buffers for recent files
+(setq ido-auto-merge-delay-time 99999999)
+(setq ido-max-file-prompt-width 0.6)
+;; ido-ignore-buffers already set above in enhanced section
+(setq ido-ignore-directories '("\\`node_modules\\'" "\\`\\.venv\\'" "\\`__pycache__\\'"))
+(setq ido-ignore-files '("\\`\\." "\\.pyc\\'" "\\.o\\'" "\\.elc\\'"))
 
 
 (provide 'modes-ido)

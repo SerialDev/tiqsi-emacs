@@ -56,7 +56,7 @@
 ;; (load-expand  "modules/programming/programming-scala.el")
 (load-expand  "modules/programming/programming-clojure.el")
 (load-expand  "modules/programming/programming-text.el")
-(load-expand  "modules/programming/programming-lisp.el")
+;; (load-expand  "modules/programming/programming-lisp.el")
 (load-expand  "modules/programming/programming-java.el")
 (load-expand  "modules/programming/programming-go.el")
 (load-expand  "modules/programming/programming-elm.el")

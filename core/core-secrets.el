@@ -32,6 +32,21 @@
 (defconst secrets-eac_path "/plink:eac@cerberus-back.easyanticheat.net:")
 (defconst secrets-ispell "c:\\Program Files (x86)\\Aspell\\bin\\aspell.exe")
 
+;; Server configurations (extracted from hardcoded values)
+(defconst tiqsi-hetzner-server "135.181.198.90"
+  "Hetzner server IP address")
+(defconst tiqsi-hetzner-user "root"
+  "Hetzner server username")
+(defconst tiqsi-hetzner-deploy-path "deploy/main.py"
+  "Path to deployment file on Hetzner server")
+
+(defconst tiqsi-tramp-server "192.168.1.92"
+  "Tramp SSH server IP address")
+(defconst tiqsi-tramp-user "serialdev"
+  "Tramp SSH username")
+(defconst tiqsi-tramp-path "tramp.land"
+  "Default path on Tramp server")
+
 (provide 'core-secrets)
 
 ;;; core-secrets.el ends here

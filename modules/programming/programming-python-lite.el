@@ -1,4 +1,4 @@
-;;; programming-python-lite.el --- Tiqsi python programming support
+;;; programming-python-lite.el --- Tiqsi python programming support  -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;;
@@ -1205,33 +1205,622 @@ else:
 ;; ;;                          (lsp))))  ; or lsp-deferred
 
 
-
-(defun pandas-print-all ()
-  "Insert code to configure Pandas to display all rows and columns."
+(defun break-line-at-80 ()
+  "Move to the first space before column 80 on the current line and insert a newline."
   (interactive)
-  (insert "import pandas as pd\n\n# Display all rows and columns\npd.set_option('display.max_rows', None)\npd.set_option('display.max_columns', None)\n"))
+  (let ((limit 80))
+    (save-excursion
+      (beginning-of-line)
+      (if (<= (line-end-position) (+ (line-beginning-position) limit))
+        (message "Line is shorter than 80 columns, no break needed.")
+        (move-to-column limit)
+        (search-backward " " (line-beginning-position) t)
+        (newline)))))
 
-(defun pandas-print-shortened ()
-  "Insert code to reset Pandas display options to default shortened mode."
+(global-set-key (kbd "C-c b") 'break-line-at-80)
+
+
+(defun go-to-first-line-over-80 ()
+  "Move to the first line after the current line where the content exceeds 80 characters."
   (interactive)
-  (insert "import pandas as pd\n\n# Reset display options to defaults\npd.reset_option('display.max_rows')\npd.reset_option('display.max_columns')\n"))
+  (let ((limit 80)
+         (found nil))
+    (while (and (not found) (not (eobp)))
+      (forward-line 1)
+      (when (> (line-end-position) (+ (line-beginning-position) limit))
+        (setq found t)))
+    (if found
+      (move-to-column (1+ limit) t)
+      (message "No line over 80 characters found after the current line."))))
+
+
+(global-set-key (kbd "C-c o") 'go-to-first-line-over-80)
+
+
+
+;; (use-package lsp-pyright
+;;   :ensure t
+;;   :custom (lsp-pyright-langserver-command "pyright") ;; or basedpyright
+;;   :hook (python-mode . (lambda ()
+;;                          (require 'lsp-pyright)
+;; 			 (lsp-diagnostics-flycheck-enable)
+
+;;                          (lsp))))
+
+
+
+
+
+
+(defun split-long-string (s &optional min-length max-length)
+  (let* ((min-length (or min-length 60))
+          (max-length (or max-length 80))
+          (match (string-match "\\`\\([fFrRbB]*\\)\\(['\"]\\{1,3\\}\\)\\(.*\\)\\2\\(.*\\)\\'" s))
+          (prefix (if match (match-string 1 s) ""))
+          (quote-char (if match (substring (match-string 2 s) 0 1) "\""))
+          (content (if match (match-string 3 s) s))
+          (trailing (if match (match-string 4 s) ""))
+          (triple-quote (make-string 3 (string-to-char quote-char)))
+          split-lines)
+    (while (> (length content) max-length)
+      (let ((split-pos nil)
+             (pos-forward (string-match "[ \t]" content min-length)))
+        (if (and pos-forward (<= pos-forward max-length))
+          (setq split-pos pos-forward)
+          (let ((rev-sub (substring content 0 min-length))
+                 (last-space-pos nil)
+                 (search-pos 0))
+            (while (string-match "[ \t]" rev-sub search-pos)
+              (setq last-space-pos (match-beginning 0))
+              (setq search-pos (1+ last-space-pos)))
+            (setq split-pos (or last-space-pos max-length))))
+        (push (string-trim (substring content 0 split-pos)) split-lines)
+        (setq content (string-trim-left (substring content split-pos)))))
+    (push content split-lines)
+    (concat prefix triple-quote "\n"
+      (mapconcat #'identity (reverse split-lines) "\n")
+      "\n" triple-quote trailing)))
+
+
+(defun split-long-string-at-point (&optional min-length max-length)
+  (interactive)
+  (let* ((bounds (bounds-of-thing-at-point 'line))
+          (start (car bounds))
+          (end (cdr bounds))
+          (original (string-trim (buffer-substring-no-properties start end)))
+          (processed (split-long-string original min-length max-length)))
+    (unless (string= original processed)
+      (delete-region start end)
+      (insert processed))))
+
+
+
+
+
+
+
+(setq eldoc-idle-delay 0.75)  ;; or even 1.0
+(setq eldoc-echo-area-use-multiline-p nil)
+(add-hook 'python-mode-hook (lambda () (eldoc-mode -1)))
+(remove-hook 'python-mode-hook #'eldoc-mode)
+(global-eldoc-mode -1)
+
+(setq comint-buffer-maximum-size 1000)
+
+
+(setq lsp-idle-delay 0.05)
+(setq lsp-log-io nil)
+(setq lsp-enable-symbol-highlighting nil)
+(setq lsp-enable-snippet nil)
+(setq lsp-enable-folding nil)
+
+
+
+;; ------------------------------------------------------------------------- ;;
+
+
+(use-package flymake-ruff
+  :straight (flymake-ruff
+              :type git
+              :host github
+              :repo "erickgnavar/flymake-ruff"))
+
+
+
+;; Prevent Flymake from running automatically on changes
+(setq flymake-no-changes-timeout nil)  ;; Disable auto-triggering on edits
+(setq flymake-start-on-save-buffer t)  ;; Allow Flymake on save
+(setq flymake-start-on-flymake-mode nil)  ;; Prevent immediate checks when opening a file
+
+;; Run Flymake Ruff only once per save
+(defun my-flymake-run-on-save ()
+  "Run Flymake Ruff only when the buffer is saved, not on edits."
+  (remove-hook 'flymake-diagnostic-functions 'flymake-ruff--run-checker t)
+  (add-hook 'after-save-hook
+    (lambda ()
+      (add-hook 'flymake-diagnostic-functions 'flymake-ruff--run-checker nil t)
+      (flymake-start)
+      (remove-hook 'flymake-diagnostic-functions 'flymake-ruff--run-checker t))
+    nil t))
+
+(add-hook 'python-mode-hook #'my-flymake-run-on-save)
+
+
+
+(setq semantic-idle-scheduler-work-idle-time 5)
+(setq semantic-idle-scheduler-max-buffer-size 500000)
+(setq semantic-lex-python-mode nil)
+(remove-hook 'semantic-idle-scheduler-functions 'semantic-idle-scheduler-refresh-tags)
+
+
+;; Disable Semantic Mode for Python
+(add-hook 'python-mode-hook (lambda () (semantic-mode -1)))
+(global-semantic-idle-scheduler-mode -1)
+
+
+(add-hook 'python-mode-hook
+  (lambda ()
+    (flymake-mode)
+    (flymake-ruff-load)
+    (flymake-start)
+    )
+  )
+
+
+
+(use-package lsp-pyright
+  :straight t
+  :ensure t
+  :custom (lsp-pyright-langserver-command "pyright") ;; or basedpyright
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp)))) 
+
+
+(defun insert-local-global-modes ()
+  "Insert a line showing the current major mode and enabled minor modes."
+  (interactive)
+  (let* ((enabled (seq-filter (lambda (sym) (and (boundp sym) (symbol-value sym)))
+                    minor-mode-list))
+          (result  (format "Major: %s | Enabled minors: %S" major-mode enabled)))
+    (insert result)
+    (message "%s" result)))
+
+;; Ensure lsp, lsp-pyright and uv are installed first.
+(with-eval-after-load 'lsp-pyright
+  ;; Always start Pyright through the project’s uv-managed venv
+  (setq lsp-pyright-langserver-command
+    '("uv" "run" "--" "pyright-langserver" "--stdio"))
+  ;; Tell Pyright where the venv lives so import resolution is correct
+  (setq lsp-pyright-venv-path ".")      ; path (project root)
+  (setq lsp-pyright-venv-directory ".venv"))
+
+
+
+(defun quick-pyright-check ()
+  (interactive)
+  (let* ((pyright-exe (executable-find "pyright"))
+          (source-file (buffer-file-name))
+          (output-buffer "*Pyright Errors*")
+          (current-window (selected-window))
+          (other-window (next-window current-window nil t)))
+    (unless pyright-exe
+      (error "Pyright executable not found."))
+    (with-temp-buffer
+      (call-process pyright-exe nil (current-buffer) nil "--outputjson" source-file)
+      (goto-char (point-min))
+      (let* ((json-object-type 'hash-table)
+              (json-array-type 'vector)
+              (json (json-parse-buffer))
+              (diags (append (gethash "generalDiagnostics" json) nil)))
+        (with-current-buffer (get-buffer-create output-buffer)
+          (erase-buffer)
+          (if (null diags)
+            (insert "No diagnostics found by Pyright.\n")
+            (insert (format "Pyright found %d issues:\n\n" (length diags)))
+            (dolist (diag diags)
+              (let* ((severity (capitalize (gethash "severity" diag)))
+                      (message (gethash "message" diag))
+                      (range (gethash "range" diag))
+                      (start (gethash "start" range))
+                      (line (1+ (gethash "line" start)))
+                      (col (1+ (gethash "character" start)))
+                      (header (format "[%s] Line %-4d Col %-3d \n%s:%d:%d\n"
+                                severity line col source-file line col))
+                      (wrapped-message (with-temp-buffer
+                                         (insert message)
+                                         (fill-region (point-min) (point-max) nil nil 100)
+                                         (indent-rigidly (point-min) (point-max) 4)
+                                         (buffer-string))))
+                (insert header wrapped-message "\n\n"))))
+          (compilation-mode))
+        (with-selected-window other-window
+          (let ((display-buffer-alist
+                  `(("*Pyright Errors*" . ((display-buffer-reuse-window
+                                             display-buffer-same-window))))))
+            (pop-to-buffer output-buffer)))))))
+
+
+(use-package python
+  :preface
+  (defvar-local my/venv-name nil)
+  (defun my/find-project-root ()
+    (or (locate-dominating-file default-directory "pyrightconfig.json")
+      (cl-loop for d = default-directory then (file-name-directory (directory-file-name d))
+        while d thereis
+        (let ((toml-file (expand-file-name "pyproject.toml" d)))
+          (and (file-exists-p toml-file)
+            (with-temp-buffer
+              (insert-file-contents toml-file)
+              (goto-char (point-min))
+              (search-forward "[tool.pyright]" nil t) d))))))
+  (defun my/bootstrap-python ()
+    (let* ((root (my/find-project-root))
+            (cfg  (and root (expand-file-name "pyrightconfig.json" root)))
+            (venv-root (or (and root
+                             (cl-loop for n in '(".venv" "venv")
+                               thereis (let ((p (expand-file-name n root)))
+                                         (when (file-directory-p p) p))))
+                         (getenv "VIRTUAL_ENV")))
+            (venv-bin (and venv-root (concat (file-name-as-directory (tramp-file-local-name venv-root)) "bin/")))
+            (py      (and venv-bin (concat venv-bin "python"))))
+      (setq-local compile-command (if cfg
+                                    (format "pyright --project %s" (shell-quote-argument cfg))
+                                    "pyright"))
+      (when (and cfg (bound-and-true-p lsp-mode))
+        (setq-local lsp-pyright-project-root root))
+      (when venv-bin
+        (setq-local python-shell-interpreter py
+          python-shell-virtualenv-root venv-root
+          my/venv-name (file-name-nondirectory (directory-file-name venv-root)))
+        (make-local-variable 'exec-path)
+        (add-to-list 'exec-path venv-bin)
+        (make-local-variable 'process-environment)
+        (setenv "PATH" (mapconcat #'identity exec-path ":"))
+        (setenv "VIRTUAL_ENV" venv-root))))
+  (define-minor-mode my/python-autoenv-mode
+    "" nil "" nil
+    (if my/python-autoenv-mode
+      (progn
+        (my/bootstrap-python)
+        (unless (assoc 'my/python-autoenv-mode mode-line-misc-info)
+          (push '(my/python-autoenv-mode
+                   (:eval (when my/python-autoenv-mode
+                            (format " V:%s" (or my/venv-name "")))))
+            mode-line-misc-info)))
+      (kill-local-variable 'python-shell-interpreter)
+      (kill-local-variable 'python-shell-virtualenv-root)
+      (kill-local-variable 'exec-path)
+      (kill-local-variable 'process-environment)
+      (setq-local my/venv-name nil)))
+  :hook ((python-mode . my/python-autoenv-mode)
+          (python-mode . (lambda () (my/python-autoenv-mode 1)))
+          (compilation-mode . (lambda ()
+				(unless (assoc 'pyright compilation-error-regexp-alist-alist)
+                                  (add-to-list 'compilation-error-regexp-alist 'pyright)
+                                  (add-to-list 'compilation-error-regexp-alist-alist
+                                    '(pyright "^\\s-+\\(.+?\\):\\([0-9]+\\):\\([0-9]+\\).+$" 1 2 3))))))
+  :config
+  (setq python-shell-completion-native-enable nil))
+
+
+
+(defun sdev/copy-diagnostic-at-point ()
+  (interactive)
+  (let ((msg
+          (or
+            ;; Flymake
+            (when (and (bound-and-true-p flymake-mode)
+                    (fboundp 'flymake-diagnostics))
+              (let ((diag (car (flymake-diagnostics (point)))))
+		(when diag (flymake-diagnostic-text diag))))
+            ;; Flycheck
+            (when (and (bound-and-true-p flycheck-mode)
+                    (fboundp 'flycheck-overlay-errors-at))
+              (let ((err (car (flycheck-overlay-errors-at (point)))))
+		(when err (flycheck-error-message err))))
+            ;; LSP overlays as last resort
+            (when (fboundp 'lsp--point-diagnostics)
+              (let ((diag (car (lsp--point-diagnostics))))
+		(when diag (lsp-diagnostic-message diag)))))))
+    (if msg
+      (progn (kill-new msg)
+        (message "Copied diagnostic: %s" msg))
+      (user-error "No diagnostic at point"))))
+
+(define-key python-mode-map (kbd "C-c C-d") 'sdev/copy-diagnostic-at-point)
+
+
+
+
+(defun my/--lines-around (line up down)
+  (save-excursion
+    (goto-char (point-min))
+    (forward-line (max 0 (- line up 1)))
+    (let ((start (point)))
+      (goto-char (point-min))
+      (forward-line (min (line-number-at-pos (point-max)) (+ line down)))
+      (end-of-line)
+      (buffer-substring-no-properties start (point)))))
+
+
+
+
+(defun sdev/copy-diagnostic-context ()
+  "Copy diagnostic message, ±2 lines of context around the line of the diagnostic (not just point).
+If possible, also grabs ±5 lines around the symbol declaration via LSP."
+  (interactive)
+  (let* (
+          ;; Try Flymake at point
+          (diag
+            (or
+              (when (and (bound-and-true-p flymake-mode)
+                      (fboundp 'flymake-diagnostics))
+		(car (flymake-diagnostics (point))))
+              (when (and (bound-and-true-p flycheck-mode)
+                      (fboundp 'flycheck-overlay-errors-at))
+		(car (flycheck-overlay-errors-at (point))))
+              (when (fboundp 'lsp--point-diagnostics)
+		(car (lsp--point-diagnostics)))))
+          (diag-msg
+            (cond
+              ((and diag (fboundp 'flymake-diagnostic-p) (flymake-diagnostic-p diag))
+		(flymake-diagnostic-text diag))
+              ((and diag (fboundp 'flycheck-error-p) (flycheck-error-p diag))
+		(flycheck-error-message diag))
+              ((and diag (hash-table-p diag))
+		(lsp-diagnostic-message diag))))
+          ;; Determine the actual source line of the squiggly, 1-based
+          (diag-line
+            (cond
+              ((and diag (fboundp 'flymake-diagnostic-p) (flymake-diagnostic-p diag))
+		(save-excursion
+		  (goto-char (flymake-diagnostic-beg diag))
+		  (line-number-at-pos)))
+              ((and diag (fboundp 'flycheck-error-p) (flycheck-error-p diag))
+		(flycheck-error-line diag))
+              ((and diag (hash-table-p diag))
+		(let ((range (gethash "range" diag)))
+		  (when range
+                    (let ((start (gethash "start" range)))
+                      (when start
+			(1+ (gethash "line" start)))))))
+              (t nil)))
+          ;; Now always show ±2 of the real squiggly line
+          (snippet (when (and diag-msg diag-line) (my/--lines-around diag-line 2 2)))
+          (decl-snippet nil))
+    (unless diag-msg
+      (user-error "No diagnostic at point"))
+    (when (and (fboundp 'lsp--capability)
+            (lsp--capability "declarationProvider"))
+      (let* ((params (lsp--text-document-position-params))
+              (locs   (lsp-request "textDocument/declaration" params))
+              (loc    (if (and locs (sequencep locs)) (car locs) locs)))
+        (when (and loc (hash-table-p loc))
+          (let* ((file      (lsp--uri-to-path (gethash "uri" loc)))
+                  (start     (gethash "start" (gethash "range" loc)))
+                  (decl-line (1+ (gethash "line" start))))
+            (with-current-buffer (find-file-noselect file)
+              (setq decl-snippet
+                (format "─ Declaration @ %s:%d (±5)\n%s"
+                  (file-name-nondirectory file)
+                  decl-line
+                  (my/--lines-around decl-line 5 5))))))))
+    (let ((full (concat
+                  "─ Diagnostic\n" diag-msg "\n\n"
+                  (if (and diag-line)
+                    (format "─ Context (±2, around line %d)\n" diag-line)
+                    "─ Context (±2)\n")
+                  (or snippet "")
+                  (when decl-snippet (concat "\n\n" decl-snippet)))))
+      (kill-new full)
+      (message "Copied diagnostic context to clipboard"))))
+
+
+
+(defun sdev/copy-hover-context (&optional buf-lines)
+  "Copy LSP hover info at point, with ±N lines (default 2) of context."
+  (interactive)
+  (let* ((buf-lines (or buf-lines 2))
+          (hover (lsp-request "textDocument/hover" (lsp--text-document-position-params)))
+          (hover-str
+            (let ((contents (and hover (gethash "contents" hover))))
+              (cond
+		((stringp contents) contents)
+		((and (hash-table-p contents)
+                   (gethash "kind" contents)
+                   (gethash "value" contents)) ; MarkupContent
+		  (gethash "value" contents))
+		((and (sequencep contents) (= (length contents) 0)) "")
+		((and (sequencep contents))
+		  (mapconcat
+                    (lambda (x)
+                      (cond
+			((stringp x) x)
+			((and (hash-table-p x)
+                           (gethash "value" x)) ; MarkedString as hash
+			  (gethash "value" x))
+			((and (hash-table-p x)
+                           (gethash "language" x)
+                           (gethash "value" x))
+			  (format "```%s\n%s\n```"
+                            (gethash "language" x)
+                            (gethash "value" x)))
+			(t (prin1-to-string x))))
+                    contents "\n"))
+		(t (prin1-to-string contents)))))
+          (cur-line (line-number-at-pos))
+          (context (my--lines-around cur-line buf-lines buf-lines))
+          (out (concat
+                 "─ Hover\n" (or hover-str "[no hover info]") "\n\n"
+                 (format "─ Context (±%d, around line %d)\n" buf-lines cur-line)
+                 context)))
+    (when (string-empty-p (string-trim hover-str))
+      (user-error "No hover info at point"))
+    (kill-new out)
+    (message "Copied hover context to clipboard")))
+
+
+(define-key python-mode-map (kbd "C-c C-s") 'sdev/copy-diagnostic-context)
+
+
+
+
+;; Ensure lsp, lsp-pyright, and flymake-ruff are installed and loaded
+
+;; Enable both flymake-mode and lsp-mode for Python
+(add-hook 'python-mode-hook
+  (lambda ()
+    (flymake-mode 1)
+    (lsp-deferred)))
+
+;; Manually add flymake-ruff as a backend, but trigger only on save
+(defun my/flymake-ruff-on-save ()
+  "Run Flymake Ruff after saving, in addition to any existing diagnostics."
+  (when (derived-mode-p 'python-mode)
+    ;; Prevent stacking redundant hooks
+    (unless (member 'flymake-ruff--run-checker flymake-diagnostic-functions)
+      (add-hook 'flymake-diagnostic-functions 'flymake-ruff--run-checker nil t))
+    (flymake-start)))
+
+(add-hook 'python-mode-hook
+  (lambda ()
+    (add-hook 'after-save-hook #'my/flymake-ruff-on-save nil t)))
+
+;; Optional: ensure flymake-ruff is loaded when python-mode loads
+(add-hook 'python-mode-hook #'flymake-ruff-load)
+
+;; Optionally customize Flymake UI
+(setq flymake-no-changes-timeout nil)    ; don't run on idle
+(setq flymake-start-on-save-buffer t)    ; allow on save
+(setq flymake-start-on-flymake-mode t)   ; start on mode activation
+
+(add-hook 'python-mode-hook (lambda ()
+                              (flymake-mode 1)
+                              (lsp-deferred)))
+
+;; ------------------------------------------------------------------------- ;
+
+(defun sdev--next-diagnostic-pos-flymake ()
+  (when (and (bound-and-true-p flymake-mode) (fboundp 'flymake-diagnostics))
+    (let* ((cur (point))
+            (nearest-pos nil))
+      (dolist (diag (flymake-diagnostics (point-min) (point-max)))
+        (let ((beg (flymake-diagnostic-beg diag)))
+          (when (and (> beg cur)
+                  (or (not nearest-pos) (< beg nearest-pos)))
+            (setq nearest-pos beg))))
+      (when nearest-pos (cons nearest-pos 'flymake)))))
+
+(defun sdev--next-diagnostic-pos-flycheck ()
+  (when (and (bound-and-true-p flycheck-mode) (fboundp 'flycheck-overlay-errors-in))
+    (let* ((cur (point))
+            (nearest-pos nil))
+      (dolist (err (flycheck-overlay-errors-in (point-min) (point-max)))
+        (let ((beg (flycheck-error-pos err)))
+          (when (and beg (> beg cur)
+                  (or (not nearest-pos) (< beg nearest-pos)))
+            (setq nearest-pos beg))))
+      (when nearest-pos (cons nearest-pos 'flycheck)))))
+
+(defun sdev--next-diagnostic-pos-lsp ()
+  (when (and (boundp 'lsp-diagnostics) lsp-diagnostics)
+    (let* ((cur (point))
+            (nearest-pos nil))
+      (maphash
+	(lambda (_file diags)
+          (dolist (diag diags)
+            (let* ((range (gethash "range" diag))
+                    (start (gethash "start" range))
+                    (line (1+ (gethash "line" start)))
+                    (char (gethash "character" start))
+                    (pos (save-excursion
+                           (goto-char (point-min))
+                           (forward-line (1- line))
+                           (forward-char char)
+                           (point))))
+              (when (and (> pos cur)
+                      (or (not nearest-pos) (< pos nearest-pos)))
+		(setq nearest-pos pos)))))
+	lsp-diagnostics)
+      (when nearest-pos (cons nearest-pos 'lsp)))))
+
+(defun sdev/goto-next-diagnostic ()
+  "Go to the next diagnostic in buffer, considering Flymake, Flycheck, or LSP overlays (whichever is closest).
+Echoes which backend the jump is from."
+  (interactive)
+  (let ((orig-pos (point)))
+    (let* ((fm (sdev--next-diagnostic-pos-flymake))
+            (fc (sdev--next-diagnostic-pos-flycheck))
+            (ls (save-excursion (goto-char orig-pos) (sdev--next-diagnostic-pos-lsp)))
+            (all (delq nil (list fm fc ls)))
+            (nearest (car (sort all (lambda (a b) (< (car a) (car b)))))))
+      (if nearest
+        (let ((pos (car nearest))
+               (sys (cdr nearest)))
+          (goto-char pos)
+          (push-mark)
+          (recenter)
+          (message "Jumped to %s diagnostic at char %d (line %d)"
+            sys pos (line-number-at-pos pos)))
+        (user-error "No next diagnostic found from Flymake, Flycheck, or LSP")))))
+
+
+;; --- End: Unified Flymake setup ---
+
+(setq lsp-use-plists nil) ;; hash-table is faster
+
+;; ── 1. Stop eldoc from spamming LSP ──────────────────────────────────────────
+(setq eldoc-idle-delay 1.0          ; wait before querying
+  lsp-eldoc-enable-hover nil)   ; or disable for LSP buffers
+(remove-hook 'python-mode-hook #'eldoc-mode) ; ← if you don’t need it
+
+;; ── 2. Trim LSP payload & frequency ─────────────────────────────────────────
+(setq lsp-idle-delay 0.8                    ; debounce change notifications
+  lsp-enable-symbol-highlighting nil    ; big doc responses
+  lsp-enable-folding nil
+  lsp-signature-auto-activate nil
+  lsp-log-io nil                        ; no heavy logging
+  lsp-use-plists nil)                   ; hash-table parsing is faster
+
+;; Diagnostics only on save, not on every keystroke
+(setq lsp-diagnostic-package :none)
+(add-hook 'after-save-hook #'lsp-diagnostics--enable)
+
+;; ── 3. Make save-buffer cheap ───────────────────────────────────────────────
+(setq lsp-before-save-edits nil)           ; stop auto-format
+(remove-hook 'before-save-hook #'blacken-buffer) ; if you use blacken/py-isort
+(setq vc-handled-backends nil)             ; skip Git status on save
+(global-semantic-idle-scheduler-mode -1)
+
+;; ── 5. Helm/Smex latency fixes ──────────────────────────────────────────────
+(setq helm-input-idle-delay 0.05
+  helm-idle-delay        0.7
+  smex-save-file         "/tmp/.smex-items") ; small tmp file
+
+
+(setq lsp-pyright-disable-language-services nil)
+(setq lsp-pyright-diagnostic-mode "workspace")   ; <- incremental
+
+(add-hook 'python-mode-hook (lambda () (font-lock-mode 1)))
+
 
 ;;                                Keybindings                                ;
 ;; ------------------------------------------------------------------------- ;
 
 
-(straight-require 'ruff-format)
-
-(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
-
-
 (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
+
+(define-key python-mode-map (kbd "C-c >") 'sdev/goto-next-diagnostic)
 
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
 (define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 
 (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 (define-key python-mode-map (kbd "C-c C-_") 'toggle-camelcase-underscores)
+;; (define-key python-mode-map (kbd "C--") 'send-py-line)
+
+(define-key python-mode-map (kbd "C--") 'send-current-line-to-second-line)
 
 
 (define-key compilation-mode-map (kbd "RET") 'custom-compile-go-to-error)
@@ -1239,6 +1828,12 @@ else:
 
 
 (define-key python-mode-map (kbd "C-c C-c") 'tiqsi-uv-compile)
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c p") 'py-copy-defun-to-clipboard))
+
+(with-eval-after-load 'python
+  (define-key python-mode-map (kbd "C-c d") 'py-kill-defun))
 
 
 ;; (defun send-js-line ()
@@ -1250,6 +1845,150 @@ else:
 
 ;; (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
 ;; (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
+
+;; ------------------------------------------------------------------------- ;
+;;                        Python-specific functions                          ;
+;; ------------------------------------------------------------------------- ;
+
+(defun insert-df-checker (start end)
+  "Insert a `df_checker` call with the selected region as the argument."
+  (interactive "r")
+  (let ((region-text (buffer-substring-no-properties start end)))
+    (goto-char end)
+    (insert "\n\n")
+    (insert "#                                  DF CHECK                                 #\n")
+    (insert "# ------------------------------------------------------------------------- #\n")
+    (insert (format "df_checker = browse_df(\n    %s,\n    True,\n    4,\n)\n" region-text))
+    (insert "pprint_df(next(df_checker))\n")
+    (insert "# ------------------------------------------------------------------------- #\n")
+    (insert "\n")))
+
+(defun python-wrap-try-except (beg end)
+  "Wrap the region in a Python try-except block, preserving indentation."
+  (interactive "r")
+  (let* ((region (buffer-substring-no-properties beg end))
+          (indented-region (with-temp-buffer
+                             (insert region)
+                             (python-indent-region (point-min) (point-max))
+                             (buffer-string)))
+          (indentation (save-excursion
+                         (goto-char beg)
+                         (back-to-indentation)
+                         (buffer-substring-no-properties (line-beginning-position) (point)))))
+    (delete-region beg end)
+    (insert (format "%stry:\n%s%s\n%sexcept Exception as e:\n%s"
+              indentation
+              indentation
+              (replace-regexp-in-string "^" (concat indentation "    ") indented-region)
+              indentation
+              (concat indentation "    "))))
+  (forward-line)
+  (back-to-indentation))
+
+(defun py-copy-defun-to-clipboard ()
+  "Copy the current Python function or method definition to the kill ring.
+
+Identifies the boundaries of the Python function (`def` or `async def`)
+or method containing the point, regardless of the point's exact
+location within it, and copies the entire block to the kill ring
+(clipboard).
+
+The cursor position remains unchanged after execution."
+  (interactive)
+
+  ;; --- 1. Check if in a Python buffer ---
+  (unless (derived-mode-p 'python-base-mode 'python-mode 'python-ts-mode)
+    (user-error "This command requires a Python buffer (python-mode or similar)."))
+
+  ;; --- 2. Find Boundaries and Copy ---
+  (save-excursion
+    ;; condition-case: Bind 'err' IF an error occurs in the body (progn)
+    (condition-case err
+      ;; Body: Code to try executing
+      (progn
+        (beginning-of-defun)
+        (let ((start (point)))
+          (end-of-defun)
+          (let ((end (point)))
+            (kill-ring-save start end)
+            (message "Python definition copied to kill ring (%d chars)" (- end start))
+            ))) ; End progn
+
+      ;; Handler: Executed ONLY if an 'error' happens in the body (progn)
+      (error
+	;; 'err' is guaranteed to be bound HERE by condition-case
+	(user-error "Could not find Python function/method boundaries at point. %s" err)))
+    ) ; End save-excursion
+  )
+
+(defun py-kill-defun ()
+  "Kill (cut) the current Python function or method definition.
+Handles errors finding boundaries more quietly."
+  (interactive)
+
+  ;; --- 1. Check if in a Python buffer ---
+  (unless (derived-mode-p 'python-base-mode 'python-mode 'python-ts-mode)
+    (user-error "This command requires a Python buffer (python-mode or similar)."))
+
+  ;; --- 2. Find Boundaries and Kill (Cut) ---
+  ;; condition-case structure: (condition-case VAR BODY HANDLER)
+  (condition-case err ; VAR: 'err' - will hold error data IF handler is run
+
+    ;; --- BODY: Code to attempt ---
+    (progn
+      (beginning-of-defun)
+      (let ((start (point)))
+        (end-of-defun)
+        (let ((end (point)))
+          (kill-region start end) ; Cut the region
+          ;; Success message
+          (message "Python definition killed (cut) to kill ring (%d chars)" (- end start))
+          ))) ; End of BODY (progn block)
+
+    ;; --- HANDLER: Code to run ONLY if an 'error' occurs in BODY ---
+    (error
+      ;; Display a simpler error message without the detailed 'err' data.
+      (user-error "Could not find Python function/method boundaries at point."))
+
+    ) ; End of condition-case
+  ) ; End of defun
+
+;; ------------------------------------------------------------------------- ;
+;;                    LSP and Development Environment                        ;
+;; ------------------------------------------------------------------------- ;
+
+(defun activate-lsp-bridge-with-uv ()
+  "Set up lsp-bridge with uv virtual environment for Python files."
+  (interactive)
+  (when (derived-mode-p 'python-mode)
+    (let ((default-directory (file-name-directory buffer-file-name)))
+      (setq-local lsp-bridge-python-command
+        (string-trim (shell-command-to-string "cd $PWD && uv_source && which python")))
+      (setq-local lsp-bridge-python-default-server 'pyright)
+      (lsp-bridge-mode 1))))
+
+(defun install-pyright-in-uv ()
+  (interactive)
+  (shell-command "uv_source && pip install pyright"))
+
+(defun insert-colored-print (text)
+  "Insert a colored print statement with customizable message."
+  (interactive "sEnter message: ")
+  (insert (format "print(\"\\033[32m*%s\\033[0m\")" text)))
+
+;; ------------------------------------------------------------------------- ;
+;;                            Python Keybindings                             ;
+;; ------------------------------------------------------------------------- ;
+
+;; LSP keybindings for Python mode
+(define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
+(define-key python-mode-map (kbd "C->") 'conditional-xref-lsp-find-definition-side-buffer) ;; Jump to definition in side buffer
+(define-key python-mode-map (kbd "C-`") 'lsp-ui-peek-find-definitions)
+(define-key python-mode-map (kbd "C-,") 'xref-go-back)      ;; Jump back
+(define-key python-mode-map (kbd "C-~") 'lsp-ui-peek-find-references)        ;; Find references
+
+;; Hook for LSP
+(add-hook 'python-mode-hook 'lsp)
 
 (provide 'programming-python-lite)
 

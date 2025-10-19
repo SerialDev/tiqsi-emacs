@@ -277,17 +277,32 @@
 ;; ))
 
 ;; language server protocol support
-;; (straight-use-package
-;;  '(lsp-mode
-;;    :type git
-;;    :host github
-;;    :repo "emacs-lsp/lsp-mode"
-;;    :ensure t
-;;   :preface (setq lsp-enable-flycheck nil
-;;                  lsp-enable-indentation nil
-;;                  lsp-highlight-symbol-at-point nil)
-;;   )
-;; )
+(straight-use-package
+ '(lsp-mode
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-mode"
+   :ensure t
+  :preface (setq lsp-enable-flycheck nil
+                 lsp-enable-indentation nil
+                 lsp-highlight-symbol-at-point nil)
+  ))
+
+;; LSP UI for better interface
+(straight-use-package
+ '(lsp-ui
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-ui"
+   :ensure t))
+
+;; LSP Python support
+(straight-use-package
+ '(lsp-pyright
+   :type git
+   :host github
+   :repo "emacs-lsp/lsp-pyright"
+   :ensure t))
 
                                         ;(straight-require 'blacken)
 

@@ -100,28 +100,6 @@
   (company-statistics-mode)
   (company-quickhelp-mode))
 
-(defun indent-or-expand (arg)
-  "Either indent according to mode, or expand the word preceding
-point."
-  (interactive "*P")
-  (if (and
-	(or (bobp) (= ?w (char-syntax (char-before))))
-	(or (eobp) (not (= ?w (char-syntax (char-after))))))
-    (dabbrev-expand arg)
-    (indent-according-to-mode)))
-
-
-(defun indent-and-complete ()
-  (indent-according-to-mode)
-  (company-complete-common))
-
-;; TODO Bugged fix it
-(defun tiqsi/indent-or-complete (arg)
-  (interactive "*P")
-  (if (company-manual-begin)
-    (indent-and-complete)
-    (indent-or-expand arg)))
-
 ;; Currently using Corfu
 ;; (enable-company)
 
@@ -169,19 +147,6 @@ point."
   )
 
 
-(defun activate-lsp-bridge-with-uv ()
-  "Set up lsp-bridge with uv virtual environment for Python files."
-  (interactive)
-  (when (derived-mode-p 'python-mode)
-    (let ((default-directory (file-name-directory buffer-file-name)))
-      (setq-local lsp-bridge-python-command
-        (string-trim (shell-command-to-string "cd $PWD && uv_source && which python")))
-      (setq-local lsp-bridge-python-default-server 'pyright)
-      (lsp-bridge-mode 1))))
-
-
-
-
 
 (defun conditional-xref-lsp-find-definition ()
   "Attempt to jump to definition, pushing to xref stack only if unsuccessful."
@@ -193,19 +158,7 @@ point."
       (message "Definition not found."))))
 
 
-(defun conditional-xref-lsp-find-definition-side-buffer ()
-  "Open definition in a side buffer and switch focus to it."
-  (interactive)
-  (condition-case nil
-    (let ((buf (save-window-excursion
-                 (lsp-find-definition)
-                 (current-buffer))))
-      (display-buffer-in-side-window buf '((side . right) (slot . 1) (window-width . 0.5)))
-      (select-window (get-buffer-window buf)))
-    (error
-      (xref-push-marker-stack)
-      (message "Definition not found."))))
-
+;; Duplicate function removed - using the more complete version below
 
 
 (defun conditional-xref-lsp-find-definition-side-buffer ()
@@ -224,36 +177,11 @@ point."
       (message "Definition not found."))))
 
 
-(add-hook 'python-mode-hook 'lsp)
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
-
-(defun insert-colored-print (text)
-  "Insert a colored print statement with customizable message."
-  (interactive "sEnter message: ")
-  (insert (format "print(\"\\033[32m*%s\\033[0m\")" text)))
-
-
-
-(define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
-(define-key python-mode-map (kbd "C->") 'conditional-xref-lsp-find-definition-side-buffer) ;; Jump to definition in side buffer
-
-
-(define-key python-mode-map (kbd "C-`") 'lsp-ui-peek-find-definitions)
-(define-key python-mode-map (kbd "C-.") 'conditional-xref-lsp-find-definition)       ;; Direct jump to definition
-(define-key python-mode-map (kbd "C-,") 'xref-go-back)      ;; Jump back
-(define-key python-mode-map (kbd "C-~") 'lsp-ui-peek-find-references)        ;; Find references
-
 
 ;; Enable xref navigation for Emacs Lisp buffers
 (define-key emacs-lisp-mode-map (kbd "C-.") 'xref-find-definitions) ;; Jump to definition
 (define-key emacs-lisp-mode-map (kbd "C-,") 'xref-pop-marker-stack) ;; Jump back
-
-
-
-
-(defun install-pyright-in-uv ()
-  (interactive)
-  (shell-command "uv_source && pip install pyright"))
 
 
 (rectangle-mark-mode 0)

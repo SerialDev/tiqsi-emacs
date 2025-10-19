@@ -26,7 +26,7 @@
 ;;; Commentary:
 ;;
 
-(straight-require 'helm-rg)
+;; (straight-require 'helm-rg)
 
 (use-package helm
   :straight t
@@ -88,6 +88,17 @@
 ;; Straight install requirements
 
 (straight-require 'helm-smex)
+(require 'smex)
+(require 'recentf)
+
+;; Configure recentf for better buffer switching
+(recentf-mode 1)
+(setq recentf-max-menu-items 100)
+(setq recentf-max-saved-items 500)
+(setq recentf-auto-cleanup 600) ; Cleanup every 10 minutes
+
+;; Initialize smex
+(smex-initialize)
 (straight-require 'hydra)
 (straight-require 'helm-projectile)
 
@@ -138,9 +149,7 @@
 
   (add-hook 'helm-cleanup-hook #'helm-posframe-cleanup))
 
-(defun helm-posframe-cleanup()
-  (interactive)
-  (setq helm-display-function 'helm-default-display-buffer))
+;; Duplicate helm-posframe-cleanup removed - using the more complete version above
 
 ;; (helm-posframe)
 
@@ -583,215 +592,6 @@ _j_: jedi:related-names
 (require 'cl-lib)
 (require 'helm)
 
-(defun get-python-functions (file)
-  "Extract Python function definitions from FILE."
-  (if (file-readable-p file)
-    (with-temp-buffer
-      (insert-file-contents file)
-      (let ((result '())
-             (re "^def\\s-+\\(\\w+\\)\\s-*("))
-        (while (re-search-forward re nil t)
-          (push (cons (match-string-no-properties 1) (cons file (point))) result))
-        (message "File: %s | Functions: %s" file result)
-        result))
-    (progn
-      (message "File not readable: %s" file)
-      '())))
-
-
-(defun find-duplicate-python-functions (dir)
-  "Recursively find duplicate Python function definitions in a directory."
-  (let* ((files (directory-files-recursively dir "\\.py$"))
-          (functions (cl-remove nil (mapcar 'get-python-functions files)))
-          (grouped (seq-group-by 'car functions)))
-    (message "FILES: %s" files)
-    (message "FUNCTIONS: %s" functions)
-    (message "GROUPED: %s" grouped)
-    (cl-remove-if (lambda (x) (= (length x) 1)) grouped)))
-
-
-
-(defun helm-python-duplicate-functions-source (duplicates)
-  "Create a Helm source for duplicate Python functions from DUPLICATES."
-  (helm-build-sync-source "Duplicate Python Functions"
-    :candidates (mapcan (lambda (group)
-                          (let* ((funcs (cl-remove-if-not #'cdr group))
-                                  (func-name (caar funcs))
-                                  (file-info (cdar funcs))
-                                  (file (car file-info))
-                                  (line (cdr file-info))
-                                  (dir (when (stringp file) (file-name-nondirectory (directory-file-name file))))
-                                  (loc (when dir (format "%s:%s" dir line))))
-                            (when loc
-                              (append (list (cons (format "%s (%s)" func-name loc)
-                                              (cl-loop for (name . info) in (cdr funcs)
-                                                for (file . line) = info
-                                                for dir = (when (stringp file) (file-name-nondirectory (directory-file-name file)))
-                                                when dir
-                                                collect (format "%s (%s:%s)" name dir line))))
-                                (cl-loop for (name . info) in (cdr funcs)
-                                  for (file . line) = info
-                                  for dir = (when (stringp file) (file-name-nondirectory (directory-file-name file)))
-                                  when dir
-                                  collect (cons (format "%s (%s:%s)" name dir line) info))))))
-                  (seq-group-by #'car duplicates))))
-
-
-(defun check-duplicate-python-functions (dir)
-  "Check for duplicate Python function definitions in DIR and display them with Helm."
-  (interactive "DSelect directory: ")
-  (let ((duplicates (find-duplicate-python-functions dir)))
-    (message "DUPLICATES: %s" duplicates)
-    (if duplicates
-      (helm :sources (helm-python-duplicate-functions-source duplicates))
-      (message "No duplicate Python function definitions found."))))
-
-
-
-
-
-(defun my-helm-highlight-matches (candidates _source)
-  (mapcar (lambda (candidate)
-            (let ((display (car candidate))
-                   (match (cadr candidate)))
-              (cons (replace-regexp-in-string
-                      (concat "\\(\\s-\\|^\\)\\(" (regexp-quote match) "\\)\\(\\s-\\|$\\)")
-                      "\\1**--\\2--**\\3"
-                      display)
-                candidate)))
-    candidates))
-
-(defun my-helm-highlight-matches (candidates _source)
-  (mapcar (lambda (candidate)
-            (let ((display (car candidate))
-                   (match (cadr candidate)))
-              (cons (replace-regexp-in-string
-                      (regexp-quote match)
-                      (concat "**--" match "--**")
-                      display)
-                candidate)))
-    candidates))
-
-
-
-(defun my-helm-source (tuples)
-  `((name . "Custom Helm Buffer")
-     (candidates . ,(lambda () tuples))
-     (filtered-candidate-transformer my-helm-highlight-matches)
-     (action . (lambda (candidate)
-                 (message "Selected: %s" candidate)))))
-
-
-
-(defun python-functions-in-dir (directory)
-  (interactive "DDirectory: ")
-  (let ((py-files (directory-files-recursively directory "\\.py$"))
-         (result '())
-         (initial-buffer (current-buffer)))
-    (dolist (file py-files)
-      (when (and (not (file-symlink-p file)) (file-exists-p file))
-        (with-current-buffer (find-file-noselect file)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\s-*def\\s-+\\(\\w+\\)\\s-*(" nil t)
-            (let* ((function-name (match-string 1))
-                    (line-number (line-number-at-pos))
-                    (short-file-path (mapconcat 'identity (last (split-string file "/" t) 3) "/")))
-              (push (list (format "%s :: %d :: %s" short-file-path line-number function-name) function-name file) result)))
-          (unless (eq (current-buffer) initial-buffer)
-            (kill-buffer)))))
-    (my-helm-buffer result)))
-
-
-(defun my-helm-buffer (tuples)
-  (helm :sources
-    (helm-build-sync-source "Custom Helm Buffer"
-      :candidates (lambda () tuples)
-      :filtered-candidate-transformer 'my-helm-highlight-matches
-      :action (lambda (candidate)
-                (let* ((info (car candidate))
-                        (file (nth 2 candidate))
-                        (file-line (progn (string-match "\\(.*\\) :: \\([0-9]+\\) :: .*" info)
-                                     (list (match-string 1 info) (match-string 2 info)))))
-                  (find-file file)
-                  (goto-line (string-to-number (cadr file-line)))
-                  (recenter)))
-      :multiline t)
-    :buffer "*helm custom buffer*"))
-
-
-
-(defun python-functions-in-dir (directory)
-  (interactive "DDirectory: ")
-  (let ((py-files (directory-files-recursively directory "\\.py$"))
-         (result '())
-         (initial-buffer (current-buffer)))
-    (dolist (file py-files)
-      (when (and (not (file-symlink-p file)) (file-exists-p file))
-        (with-current-buffer (find-file-noselect file)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\s-*def\\s-+\\([_a-zA-Z0-9]+\\)\\s-*(" nil t)
-            (let* ((function-name (match-string 1))
-                    (line-number (line-number-at-pos))
-                    (short-file-path (mapconcat 'identity (last (split-string file "/" t) 3) "/")))
-              (push (list (format "%s :: %d :: %s" short-file-path line-number function-name) function-name file) result)))
-          (unless (eq (current-buffer) initial-buffer)
-            (kill-buffer)))))
-    (my-helm-buffer result)))
-
-
-(defun python-duplicate-functions-in-dir (directory)
-  (interactive "DDirectory: ")
-  (let ((py-files (directory-files directory t "\\.py$"))
-         (function-names '())
-         (duplicates '())
-         (initial-buffer (current-buffer)))
-    (dolist (file py-files)
-      (when (and (not (file-symlink-p file)) (file-exists-p file))
-        (with-current-buffer (find-file-noselect file)
-          (goto-char (point-min))
-          (while (re-search-forward "^\\s-*def\\s-+\\([_a-zA-Z0-9]+\\)\\s-*(" nil t)
-            (let* ((function-name (match-string 1))
-                    (line-number (line-number-at-pos))
-                    (short-file-path (mapconcat 'identity (last (split-string file "/" t) 3) "/")))
-              (push (list (format "%s :: %d :: %s" short-file-path line-number function-name) function-name file) function-names)))
-          (unless (eq (current-buffer) initial-buffer)
-            (kill-buffer)))))
-    (dolist (fn function-names)
-      (when (> (cl-count (cadr fn) function-names :test (lambda (a b) (equal a (cadr b)))) 1)
-        (push fn duplicates)))
-    (let ((sorted-duplicates (sort (delete-dups duplicates) (lambda (a b) (string< (cadr a) (cadr b))))))
-      (my-helm-buffer sorted-duplicates))))
-
-(defun ag-search-and-highlight (query)
-  "Perform ag search and highlight results in another buffer"
-  (interactive "sEnter search query: ")
-  (let* ((results-buffer (get-buffer-create "*Ag Search Results*"))
-          (ag-command "ag")
-          (ag-arguments `("-l" "--nobreak" "--nocolor" "--hidden" ,query))
-          (full-directory (shell-quote-argument (expand-file-name "."))))
-    (with-current-buffer results-buffer
-      (setq buffer-read-only nil)
-      (erase-buffer)
-      (insert (format "Ag search results for '%s' in %s:\n\n" query default-directory)))
-    (let ((process (apply 'start-file-process "ag-search" results-buffer ag-command ag-arguments)))
-      (set-process-sentinel process
-        (lambda (p e)
-          (when (eq (process-status p) 'exit)
-            (with-current-buffer (process-buffer p)
-              (goto-char (point-max))
-              (if (= (process-exit-status p) 0)
-                (progn
-                  (goto-char (point-min))
-                  (if (re-search-forward "^\\([^:]+\\):\\([0-9]+\\):" nil t)
-                    (insert "\nSearch completed. Issues found.\n")
-                    (insert "\nSearch completed. No matches found.\n")))
-                (insert (format "\nSearch failed with error code %d.\n" (process-exit-status p))))
-              (highlight-regexp (format "\\(%s\\)" (regexp-quote query)) 'hi-yellow)
-              (setq buffer-read-only t)
-              (display-buffer (process-buffer p)))))))))
-
-
-
 (require 'async)
 
 (defun helm-git-repos-with-remote-pred (word)
@@ -857,12 +657,21 @@ _j_: jedi:related-names
   (define-key helm-ag-map (kbd "<f5>") 'helm-peek))
 
 
-                                        ;---{Keybindings}---;
 
-(global-set-key (kbd "M-x") 'helm-smex) ;; Offloaded to selectrum now
+(setq eldoc-idle-delay 0.75)  ;; or even 1.0
+(setq eldoc-echo-area-use-multiline-p nil)
+
+;;---{Keybindings}---;
+
+;; Don't load enhanced version for now - it breaks things
+;; (load-expand "modules/modes/modes-helm-enhanced.el")
+;; (require 'modes-helm-enhanced)
+
+;; Enable helm keybindings - helm-smex is preferred
+(global-set-key (kbd "M-x") 'helm-smex) 
 (global-set-key (kbd "C-x C-x") 'helm-smex) 
-
-(global-set-key (kbd "M-X") 'helm-smex-major-mode-commands) ;; Offloaded to selectrum now
+(global-set-key (kbd "M-X") 'helm-smex-major-mode-commands)
+(global-set-key (kbd "C-x b") 'helm-mini)
 
 ;;(global-set-key ( kbd "C-c h") 'helm-command-prefix)
 (global-unset-key (kbd "C-x c"))

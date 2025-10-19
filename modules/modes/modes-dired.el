@@ -39,35 +39,61 @@
 (setq dired-details-hidden-string "* ")
 
 
-                                        ; The ability to create a dired buffer based on searching for files in a directory tree with find-name-dired is fantastic
+;; The ability to create a dired buffer based on searching for files in a directory tree with find-name-dired is fantastic
 (use-package find-dired
   :straight t
   :ensure t
   :init (setq find-ls-option '("-print0 | xargs -0 ls -od" . "-od")))
 
 
-                                        ;The peep project allows you to preview files before loading them into a dedicated buffer:
-                                        ; (use-package peep-dired
-                                        ;   :defer t ; don't access `dired-mode-map' until `peep-dired' is loaded
-                                        ;   :bind (:map dired-mode-map
-                                        ;               ("P" . peep-dired)))
-                                        ;(use-package dired-x)
+;;The peep project allows you to preview files before loading them into a dedicated buffer:
+;; (use-package peep-dired
+;;   :defer t ;; don't access `dired-mode-map' until `peep-dired' is loaded
+;;   :bind (:map dired-mode-map
+;;               ("P" . peep-dired)))
+;;(use-package dired-x)
 
 
-                                        ; (use-package dired-x
-                                        ;   :config
-                                        ;   (progn
-                                        ; (setq dired-omit-verbose nil)
-                                        ; ;; toggle `dired-omit-mode' with C-x M-o
-                                        ; (add-hook 'dired-mode-hook #'dired-omit-mode)
-                                        ; (setq dired-omit-files
-                                        ;       (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$"))))
+;; (use-package dired-x
+;;   :config
+;;   (progn
+;; (setq dired-omit-verbose nil)
+;; ;;;; toggle `dired-omit-mode' with C-x M-o
+;; (add-hook 'dired-mode-hook #'dired-omit-mode)
+;; (setq dired-omit-files
+;;       (concat dired-omit-files "\\|^.DS_STORE$\\|^.projectile$"))))
+
+
+(use-package dired-sidebar
+  :straight t
+  :ensure t
+  :commands (dired-sidebar-toggle-sidebar))
+
+(use-package vscode-icon
+  :ensure t
+  :straight t
+  :commands (vscode-icon-for-file))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :straight t
+  :init (progn (load "all-the-icons-dired.el")
+	  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode)))
+
+
+
+
+
 
 
 (defun jump-to-hetzner ()
   (interactive)
-  (find-file-literally "/ssh:root@135.181.198.90:deploy/main.py")
-  )
+  (find-file-literally (format "/ssh:%s@%s:%s" 
+                               tiqsi-hetzner-user 
+                               tiqsi-hetzner-server 
+                               tiqsi-hetzner-deploy-path)))
+
+
 
 (provide 'modes-dired)
 

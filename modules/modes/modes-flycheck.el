@@ -31,8 +31,8 @@
 
 
 (custom-set-faces
- '(flycheck-error ((((class color)) (:underline "Red"))))
- '(flycheck-warning ((((class color)) (:underline "Orange")))))
+  '(flycheck-error ((((class color)) (:underline "Red"))))
+  '(flycheck-warning ((((class color)) (:underline "Orange")))))
 
                                         ;    Push mark when going to the next error to go back to previous position    ;
 (defadvice flycheck-next-error (before wh/flycheck-next-error-push-mark activate)
@@ -53,10 +53,10 @@ If set to an error level, only navigate errors whose error level
 is at least as severe as this one.  If nil, navigate all errors."
   :group 'flycheck
   :type '(radio (const :tag "All locations" nil)
-                (const :tag "Informational messages" info)
-                (const :tag "Warnings" warning)
-                (const :tag "Errors" error)
-                (symbol :tag "Custom error level"))
+           (const :tag "Informational messages" info)
+           (const :tag "Warnings" warning)
+           (const :tag "Errors" error)
+           (symbol :tag "Custom error level"))
   :safe #'flycheck-error-level-p
   :package-version '(flycheck . "0.21"))
 
@@ -75,8 +75,21 @@ is at least as severe as this one.  If nil, navigate all errors."
 (add-hook 'post-command-hook 'flymake-error-at-point)
 
 (custom-set-faces
- '(flymake-errline ((((class color)) (:underline "Red"))))
- '(flymake-warnline ((((class color)) (:underline "Orange")))))
+  '(flymake-errline ((((class color)) (:underline "Red"))))
+  '(flymake-warnline ((((class color)) (:underline "Orange")))))
+
+
+(defun flymake-diagnostics-at-point-to-minibuffer ()
+  "Show same Flymake diagnostics in minibuffer that mouse hover shows."
+  (let ((diags (flymake-diagnostics (point))))
+    (when diags
+      (message "%s"
+        (mapconcat #'flymake-diagnostic-text diags "\n")))))
+
+(add-hook 'post-command-hook #'flymake-diagnostics-at-point-to-minibuffer)
+
+
+
 
 
 
@@ -86,9 +99,9 @@ is at least as severe as this one.  If nil, navigate all errors."
 
 (defhydra hydra-flycheck
   (:pre (progn (setq hydra-lv t) (flycheck-list-errors))
-        :post (progn (setq hydra-lv nil) (quit-windows-on "*Flycheck errors*"))
-        :color red
-        :hint nil)
+    :post (progn (setq hydra-lv nil) (quit-windows-on "*Flycheck errors*"))
+    :color red
+    :hint nil)
   "Flycheck"
   ("f"  flycheck-error-list-set-filter                            "Filter")
   ("j"  flycheck-next-error                                       "Next")

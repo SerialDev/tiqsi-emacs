@@ -1,4 +1,4 @@
-;;; programming-lisp.el --- Tiqsi Lisp with SLIME support
+;;; programming-lisp.el --- Tiqsi Lisp with SLIME support   -*- lexical-binding: t -*-
 
 ;;; Commentary:
 ;; Standard using SBCL

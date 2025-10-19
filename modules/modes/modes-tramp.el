@@ -29,7 +29,10 @@
 (defun connect-to-tramp-ssh ()
   (interactive)
   (setq tramp-default-method "ssh")
-  (find-file "/ssh:serialdev@192.168.1.92:tramp.land"))
+  (find-file (format "/ssh:%s@%s:%s" 
+                     tiqsi-tramp-user
+                     tiqsi-tramp-server
+                     tiqsi-tramp-path)))
 
 
 ; (defun python-tramp-hook()

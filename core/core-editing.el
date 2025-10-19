@@ -61,6 +61,11 @@
   (copy-region-as-kill (mark) (point)))
 
 
+(defun reload-this-buffer ()
+  "Revert buffer without confirmation."
+  (interactive)
+  (revert-buffer :ignore-auto :noconfirm))
+
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Commenting _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    ;
 
 ;; _ _ _ _ _ _ _ _ _ _ _ _ _ _ /¯¯¯ Replacing ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _    ;
@@ -105,6 +110,78 @@
       (widen)
       (untabify (point-min) (point-max))))
   (save-buffer))
+
+;; ------------------------------------------------------------------------- ;
+
+(defun wrap-region-with-input (start end)
+  "Indent the selected region, then wrap it with a user-provided string, adding newlines inside the wrapper."
+  (interactive "r")
+  (let ((wrapper (read-string "Enter wrapper: ")))
+    (save-excursion
+      (indent-region start end)  ;; First, indent the region
+      (goto-char end)
+      (insert "\n" wrapper)  ;; Add newline before closing wrapper
+      (goto-char start)
+      (insert wrapper "\n"))))  ;; Add newline after opening wrapper
+
+(defun wrap-region-with-input (start end)
+  "Indent each line in the selected region sequentially, then wrap it with a user-provided string.
+Adds newlines inside the wrapper and re-indents the contents correctly."
+  (interactive "r")
+  (let ((wrapper (read-string "Enter wrapper: ")))
+    (save-excursion
+      ;; Indent each line in the region before modifying it
+      (goto-char start)
+      (while (< (point) end)
+        (indent-according-to-mode)
+        (forward-line 1))
+
+      ;; Capture the new end position after indentation
+      (setq end (save-excursion (goto-char end) (line-end-position)))
+
+      ;; Insert closing wrapper on a new line AFTER the indented region
+      (goto-char end)
+      (newline)
+      (insert wrapper)
+
+      ;; Insert opening wrapper BEFORE the region, followed by a newline
+      (goto-char start)
+      (insert wrapper "\n")
+
+      ;; Re-indent everything, including the newly added wrapper lines
+      (goto-char start)
+      (while (not (eobp))
+        (indent-according-to-mode)
+        (forward-line 1)))))
+
+
+(defun send-region-to-top (start end)
+  "Send the region from START to END to the second line of the buffer (first line is assumed to be a comment) without moving the cursor.
+If the region does not end with a newline, one is added."
+  (interactive "r")
+  (let ((text (buffer-substring start end)))
+    (unless (string-suffix-p "\n" text)
+      (setq text (concat text "\n")))
+    (delete-region start end)
+    (save-excursion
+      (goto-char (point-min))
+      (forward-line 1)
+      (insert text))))
+
+(defun send-current-line-to-second-line ()
+  "Send the current line to the second line of the buffer (first line is assumed to be a comment) without moving point."
+  (interactive)
+  (save-excursion
+    (let ((start (line-beginning-position))
+           (end (if (eobp)
+                  (point-max)
+                  (line-beginning-position 2))))
+      (let ((line-text (delete-and-extract-region start end)))
+        (goto-char (point-min))
+        (forward-line 1)
+        (insert line-text)))))
+
+
 
 ;; ------------------------------------------------------------------------- ;
 ;;                         Run linters asyncronously                         ;
@@ -849,7 +926,9 @@ Insert 1 if it does, 0 if it doesn't."
 (define-key global-map "\e'" 'call-last-kbd-macro)
 ;; Buffers
 (define-key global-map "\er" 'revert-buffer)
-(define-key global-map "\ek" 'kill-this-buffer)
+
+(define-key global-map "\ek" (lambda () (interactive) (kill-this-buffer)))
+
 (define-key global-map "\es" 'save-buffer)
 
 (define-key global-map (kbd "S-<down>") 'open-line-below)
@@ -875,12 +954,13 @@ Insert 1 if it does, 0 if it doesn't."
 
 
 
+
+
 (GNUEmacs25
   ;; A lot of these are to work well with remote jupyterhub terminals
   (define-key global-map (kbd "C-@") 'set-mark-command)
   (straight-require 'python)
   (global-set-key (kbd "˚") 'kill-this-buffer)
-  (global-set-key (kbd "ƒ") 'ido-find-file)
 
   (global-set-key (kbd "˘") 'end-of-buffer)
   (global-set-key (kbd "¯") 'beginning-of-buffer)
@@ -896,7 +976,6 @@ Insert 1 if it does, 0 if it doesn't."
   (straight-require 'gruber-darker-theme)
   (load-theme 'gruber-darker t)
   (straight-require 'amx)
-  (define-key global-map (kbd "C-x C-x") 'ido-execute-extended-command)
   (define-key global-map (kbd "M-x") 'amx)
   (global-set-key (kbd "≈") 'amx)
   (global-set-key (kbd "ß") 'save-buffer)
@@ -915,8 +994,49 @@ Insert 1 if it does, 0 if it doesn't."
 
 (global-set-key (kbd "M-z") 'undo-tree-undo)
 (global-set-key (kbd "M-Z") 'undo-tree-redo)
+(global-set-key (kbd "C-c i") 'send-region-to-top)
+(global-set-key (kbd "C--") 'send-current-line-to-second-line)
 
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;;
+
+;; ------------------------------------------------------------------------- ;
+;;                      General Editing Functions                            ;
+;;                    (moved from modes-company.el)                          ;
+;; ------------------------------------------------------------------------- ;
+
+(defun indent-or-expand (arg)
+  "Either indent according to mode, or expand the word preceding
+point."
+  (interactive "*P")
+  (if (and
+	(or (bobp) (= ?w (char-syntax (char-before))))
+	(or (eobp) (not (= ?w (char-syntax (char-after))))))
+    (dabbrev-expand arg)
+    (indent-according-to-mode)))
+
+(defun indent-and-complete ()
+  (indent-according-to-mode)
+  (company-complete-common))
+
+(defun tiqsi/indent-or-complete (arg)
+  (interactive "*P")
+  (if (company-manual-begin)
+    (indent-and-complete)
+    (indent-or-expand arg)))
+
+(defun open-line-below ()
+  "Open a new line below the current line and indent."
+  (interactive)
+  (end-of-line)
+  (newline-and-indent))
+
+(defun open-line-above ()
+  "Open a new line above the current line and indent."
+  (interactive)
+  (beginning-of-line)
+  (newline-and-indent)
+  (forward-line -1)
+  (indent-according-to-mode))
 
 (provide 'core-editing)
 
