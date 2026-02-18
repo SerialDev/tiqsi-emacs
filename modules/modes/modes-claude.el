@@ -441,7 +441,7 @@ Otherwise display a message that the key requires the OpenCode backend."
 ;; ---------------------------------------------------------------------------
 ;; Every command goes through the smart-dispatch wrappers above, so the
 ;; active backend (`tiqsi-repl-backend') determines where they route.
-;; OpenCode-only keys (F/D/A/V/L/I/P/W/R/X/G/N) are guarded and will
+;; OpenCode-only keys (F/D/A/V/L/I/P/p/W/R/X/G/N) are guarded and will
 ;; show a helpful message when the Claude backend is active.
 
 (defhydra hydra-claude (:color pink :hint nil)
@@ -461,6 +461,7 @@ Otherwise display a message that the key requires the OpenCode backend."
 │  _d_: Delete    │                   │  _B_: Switch backend          │
 │                 │                   │  _m_: Modes menu              │
 │                 │                   │  _M_: Cycle perms             │
+│                 │                   │  _p_: View perms              │
 │                                                                    │
 │  OpenCode                          perms: %(symbol-name tiqsi-opencode-permission-prompt)
 │  _F_: Attach file  │  _S_: Stats      │  _D_: Set model            │
@@ -500,6 +501,9 @@ Otherwise display a message that the key requires the OpenCode backend."
     ;; Settings
     ("m" hydra-claude-modes/body "Modes" :exit t)
     ("M" tiqsi-claude-cycle-permission-prompt "Cycle perms")
+    ("p" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-permissions))
+         "View perms")
 
     ;; OpenCode: config (guarded — require opencode backend)
     ("F" (lambda () (interactive)
@@ -548,7 +552,7 @@ Otherwise display a message that the key requires the OpenCode backend."
 
     ;; Help / Quit
     ("h" (lambda () (interactive)
-           (message "AI REPL [%s]: B=switch backend, l=browse sessions, n=new, d=delete. OpenCode keys (F/D/A/V/L/I/P/W/R/X/G/N) require backend=opencode."
+           (message "AI REPL [%s]: B=switch backend, l=browse sessions, n=new, d=delete, p=view perms. OpenCode keys (F/D/A/V/L/I/P/p/W/R/X/G/N) require backend=opencode."
                     (tiqsi-claude--backend-label)))
          "Help" :exit t)
     ("q" nil "Quit" :exit t))

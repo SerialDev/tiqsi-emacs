@@ -1895,7 +1895,146 @@
         (setq tiqsi-repl-backend orig)))))
 
 ;; ---------------------------------------------------------------------------
-;; 13. Source syntax (including server module)
+;; 13. Permission introspection
+;; ---------------------------------------------------------------------------
+
+(tiqsi-test-suite "OpenCode: Permission Introspection")
+
+;; Test: format-permission-rule produces correct output
+(let ((rule (make-hash-table :test 'equal)))
+  (puthash "permission" "bash" rule)
+  (puthash "pattern" "*" rule)
+  (puthash "action" "allow" rule)
+  (let ((result (tiqsi-opencode-server--format-permission-rule rule)))
+    (tiqsi-test-assert (stringp result) "format-permission-rule returns string")
+    (tiqsi-test-assert (string-match-p "bash" result) "format-permission-rule contains tool name")
+    (tiqsi-test-assert (string-match-p "ALLOW" result) "format-permission-rule shows ALLOW")))
+
+;; Test: format-permission-rule with deny action
+(let ((rule (make-hash-table :test 'equal)))
+  (puthash "permission" "edit" rule)
+  (puthash "pattern" "*.el" rule)
+  (puthash "action" "deny" rule)
+  (let ((result (tiqsi-opencode-server--format-permission-rule rule)))
+    (tiqsi-test-assert (string-match-p "DENY" result) "format-permission-rule shows DENY for deny action")
+    (tiqsi-test-assert (string-match-p "edit" result) "format-permission-rule shows tool name for deny")))
+
+;; Test: format-permission-rule with non-hash returns nil
+(tiqsi-test-assert (null (tiqsi-opencode-server--format-permission-rule "not a hash"))
+                   "format-permission-rule returns nil for non-hash")
+
+;; Test: format-permission-summary with mixed allow/deny
+(let ((perms (list (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "allow" h) h)
+                   (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "deny" h) h)
+                   (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "allow" h) h))))
+  (let ((summary (tiqsi-opencode-server--format-permission-summary perms)))
+    (tiqsi-test-assert (string-match-p "2 allow" summary) "format-permission-summary counts allows correctly")
+    (tiqsi-test-assert (string-match-p "1 deny" summary) "format-permission-summary counts denies correctly")))
+
+;; Test: format-permission-summary with only allows
+(let ((perms (list (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "allow" h) h))))
+  (tiqsi-test-assert (equal "1 allow" (tiqsi-opencode-server--format-permission-summary perms))
+                     "format-permission-summary shows only allow count when no denies"))
+
+;; Test: format-permission-summary with only denies
+(let ((perms (list (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "deny" h) h)
+                   (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "deny" h) h))))
+  (tiqsi-test-assert (equal "2 deny" (tiqsi-opencode-server--format-permission-summary perms))
+                     "format-permission-summary shows only deny count when no allows"))
+
+;; Test: format-permission-summary with empty list
+(tiqsi-test-assert (equal "no rules" (tiqsi-opencode-server--format-permission-summary nil))
+                   "format-permission-summary returns 'no rules' for nil")
+(tiqsi-test-assert (equal "no rules" (tiqsi-opencode-server--format-permission-summary '()))
+                   "format-permission-summary returns 'no rules' for empty list")
+
+;; Test: get-session-permissions finds the right session
+(let ((sessions-mock nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--list-sessions)
+             (lambda ()
+               (let ((s1 (make-hash-table :test 'equal))
+                     (s2 (make-hash-table :test 'equal))
+                     (perm (make-hash-table :test 'equal)))
+                 (puthash "permission" "bash" perm)
+                 (puthash "pattern" "*" perm)
+                 (puthash "action" "allow" perm)
+                 (puthash "id" "ses_abc" s1)
+                 (puthash "permission" (vector perm) s1)
+                 (puthash "id" "ses_xyz" s2)
+                 (list s1 s2)))))
+    (let ((tiqsi-opencode-server--session-id "ses_abc"))
+      (let ((perms (tiqsi-opencode-server--get-session-permissions)))
+        (tiqsi-test-assert (= 1 (length perms))
+                           "get-session-permissions finds perms for current session")
+        (tiqsi-test-assert (hash-table-p (car perms))
+                           "get-session-permissions returns hash-table entries")))
+    (let ((tiqsi-opencode-server--session-id "ses_xyz"))
+      (let ((perms (tiqsi-opencode-server--get-session-permissions)))
+        (tiqsi-test-assert (null perms)
+                           "get-session-permissions returns nil when session has no perms")))))
+
+;; Test: get-session-permissions with explicit session-id parameter
+(cl-letf (((symbol-function 'tiqsi-opencode-server--list-sessions)
+           (lambda ()
+             (let ((s1 (make-hash-table :test 'equal))
+                   (perm (make-hash-table :test 'equal)))
+               (puthash "permission" "read" perm)
+               (puthash "action" "deny" perm)
+               (puthash "id" "ses_target" s1)
+               (puthash "permission" (vector perm) s1)
+               (list s1)))))
+  (let ((tiqsi-opencode-server--session-id "ses_other"))
+    (let ((perms (tiqsi-opencode-server--get-session-permissions "ses_target")))
+      (tiqsi-test-assert (= 1 (length perms))
+                         "get-session-permissions uses explicit session-id over current"))))
+
+;; Test: session browser entry includes permission summary
+(let ((session (make-hash-table :test 'equal))
+      (time-obj (make-hash-table :test 'equal))
+      (perm1 (make-hash-table :test 'equal))
+      (perm2 (make-hash-table :test 'equal)))
+  (puthash "action" "allow" perm1)
+  (puthash "action" "deny" perm2)
+  (puthash "id" "ses_test1234567890" session)
+  (puthash "title" "Test Session" session)
+  (puthash "created" (* (float-time) 1000) time-obj)
+  (puthash "time" time-obj session)
+  (puthash "permission" (vector perm1 perm2) session)
+  (let ((entry (tiqsi-opencode-server--format-session-entry session)))
+    (tiqsi-test-assert (string-match-p "1 allow" entry)
+                       "session browser entry includes allow count")
+    (tiqsi-test-assert (string-match-p "1 deny" entry)
+                       "session browser entry includes deny count")))
+
+;; Test: session browser entry without permissions shows no bracket
+(let ((session (make-hash-table :test 'equal))
+      (time-obj (make-hash-table :test 'equal)))
+  (puthash "id" "ses_noperm123456789" session)
+  (puthash "title" "No Perms" session)
+  (puthash "created" (* (float-time) 1000) time-obj)
+  (puthash "time" time-obj session)
+  (let ((entry (tiqsi-opencode-server--format-session-entry session)))
+    (tiqsi-test-assert (not (string-match-p "\\[" entry))
+                       "session browser entry without perms has no brackets")))
+
+;; Test: show-permissions function is bound
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-permissions
+                           "show-permissions function exists")
+
+;; Test: hydra key p is bound in hydra-claude keymap
+(tiqsi-test-assert (and (boundp 'hydra-claude/keymap)
+                        (keymapp hydra-claude/keymap)
+                        (lookup-key hydra-claude/keymap "p"))
+                   "hydra-claude has 'p' key for permission viewer")
+
+;; ---------------------------------------------------------------------------
+;; 14. Source syntax (including server module)
 ;; ---------------------------------------------------------------------------
 
 (tiqsi-test-suite "OpenCode: Source Syntax")

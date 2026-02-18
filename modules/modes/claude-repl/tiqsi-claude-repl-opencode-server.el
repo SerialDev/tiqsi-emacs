@@ -1102,6 +1102,112 @@ Starts `opencode serve', connects SSE, creates a session."
   (message "OpenCode permissions: %s" tiqsi-opencode-permission-prompt))
 
 ;; ---------------------------------------------------------------------------
+;; Permission introspection
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-opencode-server--get-session-permissions (&optional session-id)
+  "Get the permission rules for SESSION-ID from the session list.
+If SESSION-ID is nil, uses the current session.
+Returns a list of alists with keys: permission, pattern, action.
+Note: the permission field is only available from the session list
+endpoint (GET /session), not from the individual session detail."
+  (let* ((target-id (or session-id tiqsi-opencode-server--session-id))
+         (sessions (tiqsi-opencode-server--list-sessions))
+         (session (cl-find-if
+                   (lambda (s) (equal (gethash "id" s) target-id))
+                   sessions)))
+    (when session
+      (let ((perms (gethash "permission" session)))
+        (cond
+         ((vectorp perms) (append perms nil))
+         ((listp perms) perms)
+         (t nil))))))
+
+(defun tiqsi-opencode-server--format-permission-rule (rule)
+  "Format a single permission RULE hash-table into a display string.
+RULE has keys: permission, pattern, action."
+  (when (hash-table-p rule)
+    (let ((perm (gethash "permission" rule "?"))
+          (pattern (gethash "pattern" rule "*"))
+          (action (gethash "action" rule "?")))
+      (format "  %-20s %-8s %s"
+              perm
+              (if (equal action "allow") "ALLOW" "DENY")
+              pattern))))
+
+(defun tiqsi-opencode-server--format-permission-summary (perms)
+  "Format a short summary of PERMS list for inline display.
+Returns something like: '3 allow, 2 deny' or 'no rules'."
+  (if (or (null perms) (= (length perms) 0))
+      "no rules"
+    (let ((allow 0) (deny 0))
+      (dolist (rule perms)
+        (when (hash-table-p rule)
+          (let ((action (gethash "action" rule "")))
+            (cond
+             ((equal action "allow") (cl-incf allow))
+             ((equal action "deny") (cl-incf deny))))))
+      (cond
+       ((and (> allow 0) (> deny 0))
+        (format "%d allow, %d deny" allow deny))
+       ((> allow 0) (format "%d allow" allow))
+       ((> deny 0) (format "%d deny" deny))
+       (t "no rules")))))
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-permissions ()
+  "Display the permission rules for the current session.
+Shows which tools/patterns are set to allow-always or deny in a
+formatted buffer or message."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (unless tiqsi-opencode-server--session-id
+    (error "No active session"))
+  (let ((perms (tiqsi-opencode-server--get-session-permissions)))
+    (if (or (null perms) (= (length perms) 0))
+        (message "No permission rules set for current session (%s)"
+                 tiqsi-opencode-server--session-id)
+      ;; Show in REPL buffer for visibility
+      (when (and tiqsi-opencode-server--repl-buffer
+                 (buffer-live-p tiqsi-opencode-server--repl-buffer))
+        (with-current-buffer tiqsi-opencode-server--repl-buffer
+          (let ((inhibit-read-only t))
+            (goto-char (point-max))
+            (unless (bolp) (insert "\n"))
+            (insert (tiqsi-claude-repl--make-separator) "\n")
+            (insert (tiqsi-claude-repl--colorize
+                     (format "Permission rules for session %s:"
+                             (substring tiqsi-opencode-server--session-id
+                                        0 (min 18 (length tiqsi-opencode-server--session-id))))
+                     'tiqsi-claude-repl-info) "\n")
+            (insert (tiqsi-claude-repl--colorize
+                     (format "  %-20s %-8s %s" "TOOL" "ACTION" "PATTERN")
+                     'tiqsi-claude-repl-status) "\n")
+            (insert (tiqsi-claude-repl--colorize
+                     (make-string 44 ?─)
+                     'tiqsi-claude-repl-status) "\n")
+            (dolist (rule perms)
+              (let ((line (tiqsi-opencode-server--format-permission-rule rule)))
+                (when line
+                  (let* ((action (when (hash-table-p rule)
+                                   (gethash "action" rule "")))
+                         (face (if (equal action "allow")
+                                   'tiqsi-claude-repl-success
+                                 'tiqsi-claude-repl-error)))
+                    (insert (tiqsi-claude-repl--colorize line face) "\n")))))
+            (insert (tiqsi-claude-repl--make-separator) "\n")
+            (insert (tiqsi-claude-repl--colorize
+                     (format "  Local mode: %s │ Total: %s"
+                             tiqsi-opencode-permission-prompt
+                             (tiqsi-opencode-server--format-permission-summary perms))
+                     'tiqsi-claude-repl-status) "\n\n")
+            (goto-char (point-max)))))
+      (message "Session permissions: %s (%d rules)"
+               (tiqsi-opencode-server--format-permission-summary perms)
+               (length perms)))))
+
+;; ---------------------------------------------------------------------------
 ;; Session browser
 ;; ---------------------------------------------------------------------------
 
@@ -1151,16 +1257,25 @@ Returns a string like:
             ""))
          (parent (gethash "parentID" session))
          (current-marker (if (equal id tiqsi-opencode-server--session-id) " *" ""))
+         ;; Permission summary
+         (perms-raw (gethash "permission" session))
+         (perms (cond ((vectorp perms-raw) (append perms-raw nil))
+                      ((listp perms-raw) perms-raw)
+                      (t nil)))
+         (perms-str (if perms
+                        (tiqsi-opencode-server--format-permission-summary perms)
+                      ""))
          ;; Truncate title to keep the line reasonable
          (title-display (if (> (length title) 50)
                             (concat (substring title 0 47) "...")
                           title)))
-    (format "%-18s │ %-50s │ %8s │ %s%s%s"
+    (format "%-18s │ %-50s │ %8s │ %s%s%s%s"
             (substring id 0 (min 18 (length id)))
             title-display
             age
             summary-str
             (if parent " (fork)" "")
+            (if (> (length perms-str) 0) (format " [%s]" perms-str) "")
             current-marker)))
 
 (defun tiqsi-opencode-server--session-entry-to-id (entry sessions)
