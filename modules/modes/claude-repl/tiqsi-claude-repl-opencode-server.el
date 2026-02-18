@@ -165,6 +165,20 @@ Populated when we reply \"always\" or \"once\" to a permission.asked event.
 This is the client-side cache — the server API does not expose
 interactive grants, only upfront overrides from session creation.")
 
+(defvar tiqsi-opencode-server--tool-call-log nil
+  "Persistent log of all tool calls in the current session.
+Each entry is a plist: (:tool NAME :input HASH :status STATUS :time TIME-STRING :call-id ID).
+Unlike `--tool-calls', this is not cleared after each response.")
+
+(defvar tiqsi-opencode-server--cost-log nil
+  "Per-step cost log for the current session.
+Each entry is a plist: (:cost FLOAT :tokens-total INT :tokens-in INT
+:tokens-out INT :cache-read INT :time TIME-STRING).")
+
+(defvar tiqsi-opencode-server--file-references nil
+  "Files referenced by tool calls in the current session.
+Each entry is a plist: (:path PATH :tool TOOL-NAME :time TIME-STRING :action read|edit|write).")
+
 ;; ---------------------------------------------------------------------------
 ;; Internal faces (reuse from opencode.el where possible)
 ;; ---------------------------------------------------------------------------
@@ -473,24 +487,33 @@ PROPS contains `part' with type, text, cost, tokens, etc."
                 (setq tiqsi-opencode-server--output-start (point-marker)))))))
 
        ;; Step finish (cost/tokens)
-       ((equal part-type "step-finish")
-        (when tiqsi-opencode-show-cost
-          (let* ((cost (gethash "cost" part 0))
-                 (tokens (gethash "tokens" part))
-                 (total-tok (if tokens (gethash "total" tokens 0) 0))
-                 (input-tok (if tokens (gethash "input" tokens 0) 0))
-                 (output-tok (if tokens (gethash "output" tokens 0) 0))
-                 (cache (if tokens (gethash "cache" tokens) nil))
-                 (cache-read (if cache (gethash "read" cache 0) 0)))
-            (cl-incf tiqsi-opencode-server--total-cost cost)
-            (cl-incf tiqsi-opencode-server--total-tokens total-tok)
-            (tiqsi-opencode-server--repl-insert
-             "\n"
-             (tiqsi-claude-repl--colorize
-              (format "── $%.4f │ %d tok (in:%d out:%d cache:%d) ──"
-                      cost total-tok input-tok output-tok cache-read)
-              'tiqsi-opencode-cost)
-             "\n"))))
+        ((equal part-type "step-finish")
+         (let* ((cost (gethash "cost" part 0))
+                (tokens (gethash "tokens" part))
+                (total-tok (if tokens (gethash "total" tokens 0) 0))
+                (input-tok (if tokens (gethash "input" tokens 0) 0))
+                (output-tok (if tokens (gethash "output" tokens 0) 0))
+                (cache (if tokens (gethash "cache" tokens) nil))
+                (cache-read (if cache (gethash "read" cache 0) 0)))
+           ;; Always accumulate totals and log
+           (cl-incf tiqsi-opencode-server--total-cost cost)
+           (cl-incf tiqsi-opencode-server--total-tokens total-tok)
+           (push (list :cost cost
+                       :tokens-total total-tok
+                       :tokens-in input-tok
+                       :tokens-out output-tok
+                       :cache-read cache-read
+                       :time (format-time-string "%H:%M:%S"))
+                 tiqsi-opencode-server--cost-log)
+           ;; Render if display is on
+           (when tiqsi-opencode-show-cost
+             (tiqsi-opencode-server--repl-insert
+              "\n"
+              (tiqsi-claude-repl--colorize
+               (format "── $%.4f │ %d tok (in:%d out:%d cache:%d) ──"
+                       cost total-tok input-tok output-tok cache-read)
+               'tiqsi-opencode-cost)
+              "\n"))))
 
        ;; Tool part — from the server API (type="tool" with callID, tool name, state)
        ;; Cache the tool call details for permission prompts, and render progress.
@@ -500,14 +523,37 @@ PROPS contains `part' with type, text, cost, tokens, etc."
                (state (gethash "state" part))
                (status (when state (gethash "status" state)))
                (input (when state (gethash "input" state))))
-          ;; Cache tool call details by callID
-          (when call-id
-            (puthash call-id
-                     (list :tool tool-name
-                           :input input
-                           :status status
-                           :part-id (gethash "id" part))
-                     tiqsi-opencode-server--tool-calls))
+           ;; Cache tool call details by callID
+           (when call-id
+             (puthash call-id
+                      (list :tool tool-name
+                            :input input
+                            :status status
+                            :part-id (gethash "id" part))
+                      tiqsi-opencode-server--tool-calls))
+           ;; Persistent tool call log (record on first appearance: "running")
+           (when (and call-id (equal status "running"))
+             (push (list :tool tool-name
+                         :input input
+                         :status status
+                         :time (format-time-string "%H:%M:%S")
+                         :call-id call-id)
+                   tiqsi-opencode-server--tool-call-log)
+             ;; Track file references from file-related tools
+             (when (and (hash-table-p input)
+                        (member tool-name '("read" "edit" "write" "glob" "grep")))
+               (let ((path (or (gethash "filePath" input)
+                               (gethash "path" input)
+                               (gethash "pattern" input))))
+                 (when path
+                   (push (list :path path
+                               :tool tool-name
+                               :time (format-time-string "%H:%M:%S")
+                               :action (cond ((equal tool-name "read") "read")
+                                             ((equal tool-name "edit") "edit")
+                                             ((equal tool-name "write") "write")
+                                             (t "search")))
+                         tiqsi-opencode-server--file-references)))))
           ;; Render tool use in REPL when status changes to "running"
           (when (and tiqsi-opencode-show-tool-use
                      (equal status "running"))
@@ -1078,6 +1124,9 @@ Starts `opencode serve', connects SSE, creates a session."
   (setq tiqsi-opencode-server--total-tokens 0)
   (setq tiqsi-opencode-server--message-count 0)
   (setq tiqsi-opencode-server--permission-grants nil)
+  (setq tiqsi-opencode-server--tool-call-log nil)
+  (setq tiqsi-opencode-server--cost-log nil)
+  (setq tiqsi-opencode-server--file-references nil)
   (message "OpenCode server stopped"))
 
 ;;;###autoload
@@ -1382,6 +1431,9 @@ Updates the REPL buffer header and resets per-session counters."
   (setq tiqsi-opencode-server--request-start-time nil)
   (setq tiqsi-opencode-server--output-start nil)
   (setq tiqsi-opencode-server--permission-grants nil)
+  (setq tiqsi-opencode-server--tool-call-log nil)
+  (setq tiqsi-opencode-server--cost-log nil)
+  (setq tiqsi-opencode-server--file-references nil)
   (clrhash tiqsi-opencode-server--tool-calls)
   ;; Fetch session info for the title
   (let* ((info (condition-case nil
@@ -1499,6 +1551,9 @@ Optionally provide a TITLE."
       (setq tiqsi-opencode-server--total-tokens 0)
       (setq tiqsi-opencode-server--message-count 0)
       (setq tiqsi-opencode-server--permission-grants nil)
+      (setq tiqsi-opencode-server--tool-call-log nil)
+      (setq tiqsi-opencode-server--cost-log nil)
+      (setq tiqsi-opencode-server--file-references nil)
       (clrhash tiqsi-opencode-server--tool-calls)
       ;; Update REPL buffer
       (when (and tiqsi-opencode-server--repl-buffer
@@ -1515,6 +1570,445 @@ Optionally provide a TITLE."
             (insert (tiqsi-claude-repl--format-prompt "oc"))
             (goto-char (point-max)))))
       (message "Created new session: %s (%s)" session-title id))))
+
+;; ---------------------------------------------------------------------------
+;; Session history browser
+;; ---------------------------------------------------------------------------
+
+(defvar tiqsi-opencode-history-browser-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map tabulated-list-mode-map)
+    (define-key map (kbd "RET") #'tiqsi-opencode-history--view-message)
+    (define-key map (kbd "g")   #'tiqsi-opencode-history--refresh)
+    (define-key map (kbd "q")   #'quit-window)
+    map)
+  "Keymap for the session history browser.")
+
+(define-derived-mode tiqsi-opencode-history-browser-mode tabulated-list-mode
+  "OC-History"
+  "Major mode for browsing message history of the current session."
+  (setq tabulated-list-format
+        [("" 3 nil)          ; role marker
+         ("Role" 10 t)
+         ("Preview" 80 nil)
+         ("Parts" 8 t)])
+  (setq tabulated-list-padding 1)
+  (tabulated-list-init-header))
+
+(defun tiqsi-opencode-history--fetch-messages ()
+  "Fetch messages for the current session from the server API."
+  (when tiqsi-opencode-server--session-id
+    (let ((resp (condition-case nil
+                    (tiqsi-opencode-server--http-request
+                     "GET" (format "/session/%s/message"
+                                   tiqsi-opencode-server--session-id))
+                  (error nil))))
+      (cond
+       ((vectorp resp) (append resp nil))
+       ((listp resp) resp)
+       (t nil)))))
+
+(defun tiqsi-opencode-history--entries ()
+  "Build tabulated-list entries from session messages."
+  (let ((messages (tiqsi-opencode-history--fetch-messages))
+        (idx 0))
+    (mapcar
+     (lambda (msg)
+       (cl-incf idx)
+       (let* ((id (or (gethash "id" msg) (format "msg-%d" idx)))
+              (info (gethash "info" msg))
+              (role (if (hash-table-p info) (gethash "role" info "?") "?"))
+              (parts (gethash "parts" msg))
+              (parts-list (if (vectorp parts) (append parts nil) parts))
+              (part-count (length parts-list))
+              (text-part (cl-find-if
+                          (lambda (p)
+                            (and (hash-table-p p)
+                                 (equal (gethash "type" p) "text")))
+                          parts-list))
+              (text (when text-part (gethash "text" text-part "")))
+              (preview (if (and text (> (length text) 0))
+                           (let ((clean (replace-regexp-in-string "[\n\r]+" " " text)))
+                             (if (> (length clean) 78)
+                                 (concat (substring clean 0 75) "...")
+                               clean))
+                         "(no text)"))
+              (marker (cond ((equal role "user") ">")
+                            ((equal role "assistant") "<")
+                            (t " "))))
+         (list id (vector marker role preview (format "%d" part-count)))))
+     messages)))
+
+(defun tiqsi-opencode-history--view-message ()
+  "View full message at point in a dedicated buffer."
+  (interactive)
+  (let* ((id (tabulated-list-get-id))
+         (messages (tiqsi-opencode-history--fetch-messages))
+         (msg (cl-find-if (lambda (m) (equal (gethash "id" m) id)) messages)))
+    (if (not msg)
+        (message "Message not found: %s" id)
+      (let ((buf (get-buffer-create (format "*OC Message: %s*" (substring id 0 (min 12 (length id)))))))
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (let* ((info (gethash "info" msg))
+                   (role (if (hash-table-p info) (gethash "role" info "?") "?"))
+                   (parts (gethash "parts" msg))
+                   (parts-list (if (vectorp parts) (append parts nil) parts)))
+              (insert (format "Message: %s\nRole: %s\nParts: %d\n" id role (length parts-list)))
+              (insert (make-string 60 ?─) "\n\n")
+              (dolist (part parts-list)
+                (when (hash-table-p part)
+                  (let ((ptype (gethash "type" part "?")))
+                    (insert (format "── %s ──\n" ptype))
+                    (cond
+                     ((equal ptype "text")
+                      (insert (or (gethash "text" part "") "") "\n\n"))
+                     ((equal ptype "tool")
+                      (insert (format "Tool: %s\nStatus: %s\n"
+                                      (or (gethash "tool" part) "?")
+                                      (let ((st (gethash "state" part)))
+                                        (if (hash-table-p st) (gethash "status" st "?") "?")))
+                              "\n"))
+                     (t (insert (format "%s\n\n" (json-serialize part)))))))))
+            (goto-char (point-min))
+            (special-mode)))
+        (pop-to-buffer buf)))))
+
+(defun tiqsi-opencode-history--refresh ()
+  "Refresh the history browser."
+  (interactive)
+  (setq tabulated-list-entries (tiqsi-opencode-history--entries))
+  (tabulated-list-print t)
+  (message "Refreshed (%d messages)" (length tabulated-list-entries)))
+
+;;;###autoload
+(defun tiqsi-opencode-session-history ()
+  "Browse the message history of the current server session."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (unless tiqsi-opencode-server--session-id
+    (error "No active session"))
+  (let ((buf (get-buffer-create "*OpenCode History*")))
+    (with-current-buffer buf
+      (tiqsi-opencode-history-browser-mode)
+      (setq tabulated-list-entries (tiqsi-opencode-history--entries))
+      (tabulated-list-print t))
+    (pop-to-buffer buf)
+    (message "RET=view message  g=refresh  q=quit")))
+
+;; ---------------------------------------------------------------------------
+;; Tool call log viewer
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-tool-log ()
+  "Display all tool calls made during the current session."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (if (null tiqsi-opencode-server--tool-call-log)
+      (message "No tool calls recorded this session")
+    (let ((buf (get-buffer-create "*OpenCode Tool Log*")))
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert (format "Tool Call Log (%d calls)\n" (length tiqsi-opencode-server--tool-call-log)))
+          (insert (make-string 60 ?─) "\n\n")
+          (dolist (entry (reverse tiqsi-opencode-server--tool-call-log))
+            (let ((tool (plist-get entry :tool))
+                  (status (plist-get entry :status))
+                  (time (plist-get entry :time))
+                  (input (plist-get entry :input)))
+              (insert (format "  %s  %-15s  %s" time tool (or status "?")))
+              (when (hash-table-p input)
+                (let ((input-str (tiqsi-opencode-server--format-tool-input tool input)))
+                  (when (> (length input-str) 0)
+                    (insert (format "\n         %s"
+                                    (if (> (length input-str) 70)
+                                        (concat (substring input-str 0 67) "...")
+                                      input-str))))))
+              (insert "\n")))
+          (insert "\n" (make-string 60 ?─) "\n")
+          (insert (format "Total: %d calls\n" (length tiqsi-opencode-server--tool-call-log)))
+          (goto-char (point-min))
+          (special-mode)))
+      (pop-to-buffer buf))))
+
+;; ---------------------------------------------------------------------------
+;; File context viewer
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-files ()
+  "Display files referenced by tool calls in the current session."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (if (null tiqsi-opencode-server--file-references)
+      (message "No file references recorded this session")
+    ;; Deduplicate by path, keep latest action
+    (let ((seen (make-hash-table :test 'equal))
+          (unique nil))
+      (dolist (ref (reverse tiqsi-opencode-server--file-references))
+        (let ((path (plist-get ref :path)))
+          (unless (gethash path seen)
+            (puthash path t seen)
+            (push ref unique))))
+      (let ((buf (get-buffer-create "*OpenCode Files*")))
+        (with-current-buffer buf
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (format "Files Referenced (%d unique, %d total operations)\n"
+                            (length unique)
+                            (length tiqsi-opencode-server--file-references)))
+            (insert (make-string 60 ?─) "\n\n")
+            (insert (format "  %-6s %-8s %-6s %s\n" "TIME" "ACTION" "TOOL" "PATH"))
+            (insert (make-string 60 ?─) "\n")
+            (dolist (ref (reverse unique))
+              (insert (format "  %-6s %-8s %-6s %s\n"
+                              (or (plist-get ref :time) "?")
+                              (or (plist-get ref :action) "?")
+                              (or (plist-get ref :tool) "?")
+                              (or (plist-get ref :path) "?"))))
+            (insert "\n")
+            ;; Attached files
+            (when (and (boundp 'tiqsi-opencode--attached-files)
+                       tiqsi-opencode--attached-files)
+              (insert (make-string 60 ?─) "\n")
+              (insert (format "Attached files (%d):\n" (length tiqsi-opencode--attached-files)))
+              (dolist (f tiqsi-opencode--attached-files)
+                (insert (format "  📎 %s\n" f))))
+            (goto-char (point-min))
+            (special-mode)))
+        (pop-to-buffer buf)))))
+
+;; ---------------------------------------------------------------------------
+;; Cost/token breakdown
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-cost-breakdown ()
+  "Display per-step cost and token breakdown for the current session."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (if (null tiqsi-opencode-server--cost-log)
+      (message "No cost data recorded this session")
+    (let ((buf (get-buffer-create "*OpenCode Costs*")))
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert (format "Cost Breakdown (%d steps)\n"
+                          (length tiqsi-opencode-server--cost-log)))
+          (insert (make-string 60 ?─) "\n\n")
+          (insert (format "  %-6s %10s %8s %8s %8s %8s\n"
+                          "TIME" "COST" "TOTAL" "INPUT" "OUTPUT" "CACHE"))
+          (insert (make-string 60 ?─) "\n")
+          (dolist (entry (reverse tiqsi-opencode-server--cost-log))
+            (insert (format "  %-6s $%9.4f %8d %8d %8d %8d\n"
+                            (or (plist-get entry :time) "?")
+                            (or (plist-get entry :cost) 0)
+                            (or (plist-get entry :tokens-total) 0)
+                            (or (plist-get entry :tokens-in) 0)
+                            (or (plist-get entry :tokens-out) 0)
+                            (or (plist-get entry :cache-read) 0))))
+          (insert (make-string 60 ?─) "\n")
+          (insert (format "  TOTAL  $%9.4f %8d\n"
+                          tiqsi-opencode-server--total-cost
+                          tiqsi-opencode-server--total-tokens))
+          (insert (format "  Messages: %d\n" tiqsi-opencode-server--message-count))
+          (when (> tiqsi-opencode-server--message-count 0)
+            (insert (format "  Avg cost/msg: $%.4f\n"
+                            (/ tiqsi-opencode-server--total-cost
+                               (float tiqsi-opencode-server--message-count)))))
+          (goto-char (point-min))
+          (special-mode)))
+      (pop-to-buffer buf))))
+
+;; ---------------------------------------------------------------------------
+;; Server health/diagnostics
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-health ()
+  "Display server health and connection diagnostics."
+  (interactive)
+  (let* ((server-alive (and tiqsi-opencode-server--process
+                            (process-live-p tiqsi-opencode-server--process)))
+         (sse-alive (and tiqsi-opencode-server--sse-process
+                         (process-live-p tiqsi-opencode-server--sse-process)))
+         (session-id tiqsi-opencode-server--session-id)
+         (base-url tiqsi-opencode-server--base-url)
+         (busy tiqsi-opencode-server--busy)
+         (reconnects tiqsi-opencode-server--sse-reconnect-count)
+         (max-reconnects tiqsi-opencode-server--sse-max-reconnects)
+         ;; Try health check
+         (healthy (when server-alive
+                    (condition-case nil
+                        (let ((resp (tiqsi-opencode-server--http-request
+                                     "GET" "/global/health")))
+                          (and resp t))
+                      (error nil)))))
+    (let ((buf (get-buffer-create "*OpenCode Health*")))
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert "OpenCode Server Diagnostics\n")
+          (insert (make-string 40 ?─) "\n\n")
+          (insert (format "  Server process:  %s\n"
+                          (if server-alive "RUNNING" "STOPPED")))
+          (insert (format "  Health check:    %s\n"
+                          (cond (healthy "HEALTHY")
+                                (server-alive "UNHEALTHY")
+                                (t "N/A"))))
+          (insert (format "  SSE connection:  %s\n"
+                          (if sse-alive "CONNECTED" "DISCONNECTED")))
+          (insert (format "  SSE reconnects:  %d / %d\n" reconnects max-reconnects))
+          (insert (format "  Base URL:        %s\n" (or base-url "not set")))
+          (insert (format "  Session:         %s\n" (or session-id "none")))
+          (insert (format "  Status:          %s\n" (if busy "BUSY" "IDLE")))
+          (insert "\n")
+          (insert (format "  Messages sent:   %d\n" tiqsi-opencode-server--message-count))
+          (insert (format "  Total cost:      $%.4f\n" tiqsi-opencode-server--total-cost))
+          (insert (format "  Total tokens:    %d\n" tiqsi-opencode-server--total-tokens))
+          (insert (format "  Tool calls:      %d\n" (length tiqsi-opencode-server--tool-call-log)))
+          (insert (format "  Files touched:   %d\n" (length tiqsi-opencode-server--file-references)))
+          (insert (format "  Perm grants:     %d\n" (length tiqsi-opencode-server--permission-grants)))
+          (insert (format "  Perm mode:       %s\n" tiqsi-opencode-permission-prompt))
+          (when (boundp 'tiqsi-opencode-model)
+            (insert (format "  Model:           %s\n" (or tiqsi-opencode-model "default"))))
+          (when (boundp 'tiqsi-opencode-agent)
+            (insert (format "  Agent:           %s\n" (or tiqsi-opencode-agent "default"))))
+          (goto-char (point-min))
+          (special-mode)))
+      (pop-to-buffer buf))))
+
+;; ---------------------------------------------------------------------------
+;; Quick model picker
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-pick-model ()
+  "Fetch available models and pick one via completing-read."
+  (interactive)
+  (let* ((output (with-temp-buffer
+                   (let ((default-directory (tiqsi-claude-repl--get-project-root))
+                         (process-environment
+                          (append (when tiqsi-opencode-tls-bypass
+                                    '("NODE_TLS_REJECT_UNAUTHORIZED=0"))
+                                  process-environment)))
+                     (call-process (or tiqsi-opencode-program "opencode")
+                                   nil t nil "models"))
+                   (buffer-string)))
+         (lines (split-string output "\n" t))
+         ;; Filter to lines that look like model entries (contain /)
+         (models (cl-remove-if-not
+                  (lambda (l) (string-match-p "/" (string-trim l)))
+                  lines))
+         (cleaned (mapcar #'string-trim models)))
+    (if (null cleaned)
+        (message "No models found (raw output: %s)" (substring output 0 (min 200 (length output))))
+      (let ((choice (completing-read
+                     (format "Model [current: %s]: " (or tiqsi-opencode-model "default"))
+                     cleaned nil nil)))
+        (when (and choice (> (length choice) 0))
+          (setq tiqsi-opencode-model choice)
+          (message "Model set to: %s" choice))))))
+
+;; ---------------------------------------------------------------------------
+;; MCP tool browser
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-server-show-mcp ()
+  "Display installed MCP servers and their tools."
+  (interactive)
+  (let* ((output (with-temp-buffer
+                   (let ((default-directory (tiqsi-claude-repl--get-project-root))
+                         (process-environment
+                          (append (when tiqsi-opencode-tls-bypass
+                                    '("NODE_TLS_REJECT_UNAUTHORIZED=0"))
+                                  process-environment)))
+                     (call-process (or tiqsi-opencode-program "opencode")
+                                   nil t nil "mcp" "list"))
+                   (buffer-string))))
+    (let ((buf (get-buffer-create "*OpenCode MCP*")))
+      (with-current-buffer buf
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert "MCP Servers\n")
+          (insert (make-string 40 ?─) "\n\n")
+          (if (or (null output) (string-empty-p (string-trim output)))
+              (insert "  No MCP servers configured.\n")
+            (insert output))
+          (insert "\n")
+          (goto-char (point-min))
+          (special-mode)))
+      (pop-to-buffer buf))))
+
+;; ---------------------------------------------------------------------------
+;; Keybinding reference
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-opencode-show-keybinding-reference ()
+  "Display a complete keybinding reference for the AI REPL hydra."
+  (interactive)
+  (let ((buf (get-buffer-create "*OpenCode Keys*")))
+    (with-current-buffer buf
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert "AI REPL Keybinding Reference\n")
+        (insert (make-string 50 ?═) "\n\n")
+        (insert "MAIN HYDRA (M-c)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  c  Start/connect session     a  Ask (freeform)\n")
+        (insert "  s  Session management...      S  Send content...\n")
+        (insert "  i  Inspect/status...          e  Fix error\n")
+        (insert "  o  Optimize code              x  Explain code\n")
+        (insert "  T  Generate tests             t  Toggle REPL\n")
+        (insert "  M  Cycle permission mode      B  Switch backend\n")
+        (insert "  ?  This reference             q  Quit\n")
+        (insert "\n")
+        (insert "SESSION HYDRA (M-c s)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  l  Browse sessions            n  New session\n")
+        (insert "  d  Delete session             h  Message history\n")
+        (insert "  k  Kill session               C  Clear buffer\n")
+        (insert "  f  Fork session               E  Export session\n")
+        (insert "  I  Import session             q  Back\n")
+        (insert "\n")
+        (insert "SEND HYDRA (M-c S)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  r  Region                     f  Function/defun\n")
+        (insert "  b  Entire buffer              s  Paragraph\n")
+        (insert "  a  Ask (freeform)             F  Attach file\n")
+        (insert "  q  Back\n")
+        (insert "\n")
+        (insert "INSPECT HYDRA (M-c i)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  p  Permissions (granted)      c  Cost breakdown\n")
+        (insert "  t  Tool call log              f  Files referenced\n")
+        (insert "  s  Session stats              h  Server health\n")
+        (insert "  D  Model info                 m  MCP servers\n")
+        (insert "  G  Agents/tools               q  Back\n")
+        (insert "\n")
+        (insert "SETTINGS (from main)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  M  Cycle perms (ask/always/reject)\n")
+        (insert "  B  Switch backend (claude/opencode)\n")
+        (insert "  D  Set model (via main or inspect)\n")
+        (insert "\n")
+        (insert "SESSION BROWSER (*OpenCode Sessions*)\n")
+        (insert (make-string 50 ?─) "\n")
+        (insert "  RET  Switch to session        d  Delete session\n")
+        (insert "  n    New session              p  Show permissions\n")
+        (insert "  g    Refresh list             q  Quit\n")
+        (goto-char (point-min))
+        (special-mode)))
+    (pop-to-buffer buf)))
 
 ;; ---------------------------------------------------------------------------
 ;; Tabulated session browser

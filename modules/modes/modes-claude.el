@@ -405,157 +405,167 @@ Otherwise display a message that the key requires the OpenCode backend."
              (tiqsi-claude--backend-label))))
 
 ;; ---------------------------------------------------------------------------
-;; Modes sub-hydra — display/tool settings for both backends
+;; Sub-hydra: Session management
 ;; ---------------------------------------------------------------------------
 
-(defhydra hydra-claude-modes (:color blue :hint nil)
+(defhydra hydra-claude-session (:color blue :hint nil)
   "
-╭─────────────────────────────────────────╮
-│  AI REPL Settings                       │
-├─────────────────────────────────────────┤
-│  _t_: Toggle tool display               │
-│  _c_: Toggle cost display               │
-│  _k_: Toggle thinking blocks            │
-│  _M_: Cycle permission mode             │
-│  _B_: Switch backend                    │
-│  _q_: Back                              │
-╰─────────────────────────────────────────╯
+╭──────────────────────────────────────────╮
+│  Session Management                      │
+├──────────────────────────────────────────┤
+│  _l_: Browse sessions    _n_: New        │
+│  _d_: Delete session     _h_: History    │
+│  _k_: Kill session       _C_: Clear buf  │
+│  _f_: Fork session       _E_: Export     │
+│  _I_: Import session                     │
+│  _q_: Back                               │
+╰──────────────────────────────────────────╯
 "
-  ("t" (lambda () (interactive)
-         (setq tiqsi-opencode-show-tool-use (not tiqsi-opencode-show-tool-use))
-         (message "Tool display: %s" (if tiqsi-opencode-show-tool-use "ON" "OFF")))
-       "Toggle tools")
+  ("l" tiqsi-claude-list-sessions "Browse")
+  ("n" tiqsi-claude-new-session "New")
+  ("d" tiqsi-claude-delete-session "Delete")
+  ("h" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-session-history))
+       "History")
+  ("k" tiqsi-claude-kill "Kill")
+  ("C" tiqsi-claude-clear "Clear")
+  ("f" tiqsi-claude-fork-session "Fork")
+  ("E" tiqsi-claude-export-session "Export")
+  ("I" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-import-session))
+       "Import")
+  ("q" nil "Back"))
+
+;; ---------------------------------------------------------------------------
+;; Sub-hydra: Send content
+;; ---------------------------------------------------------------------------
+
+(defhydra hydra-claude-send (:color blue :hint nil)
+  "
+╭──────────────────────────────────────────╮
+│  Send Content                            │
+├──────────────────────────────────────────┤
+│  _r_: Region             _f_: Function   │
+│  _b_: Entire buffer      _s_: Paragraph  │
+│  _a_: Ask (freeform)     _F_: Attach file│
+│  _q_: Back                               │
+╰──────────────────────────────────────────╯
+"
+  ("r" tiqsi-claude-send-region "Region")
+  ("f" tiqsi-claude-send-function "Function")
+  ("b" tiqsi-claude-send-buffer "Buffer")
+  ("s" tiqsi-claude-send-paragraph "Paragraph")
+  ("a" tiqsi-claude-ask-question "Ask")
+  ("F" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-attach-file))
+       "Attach file")
+  ("q" nil "Back"))
+
+;; ---------------------------------------------------------------------------
+;; Sub-hydra: Inspect / Status
+;; ---------------------------------------------------------------------------
+
+(defhydra hydra-claude-inspect (:color blue :hint nil)
+  "
+╭──────────────────────────────────────────╮
+│  Inspect / Status                        │
+├──────────────────────────────────────────┤
+│  _p_: Permissions        _c_: Cost       │
+│  _t_: Tool call log      _f_: Files      │
+│  _s_: Session stats      _h_: Health     │
+│  _D_: Pick model         _m_: MCP        │
+│  _G_: Agents/tools                       │
+│  _q_: Back                               │
+╰──────────────────────────────────────────╯
+"
+  ("p" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-permissions))
+       "Permissions")
   ("c" (lambda () (interactive)
-         (setq tiqsi-opencode-show-cost (not tiqsi-opencode-show-cost))
-         (message "Cost display: %s" (if tiqsi-opencode-show-cost "ON" "OFF")))
-       "Toggle cost")
-  ("k" (lambda () (interactive)
-         (setq tiqsi-opencode-show-thinking (not tiqsi-opencode-show-thinking))
-         (message "Thinking blocks: %s" (if tiqsi-opencode-show-thinking "ON" "OFF")))
-       "Toggle thinking")
-  ("M" tiqsi-claude-cycle-permission-prompt "Cycle perms")
-  ("B" tiqsi-opencode-switch "Switch backend")
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-cost-breakdown))
+       "Cost breakdown")
+  ("t" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-tool-log))
+       "Tool log")
+  ("f" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-files))
+       "Files")
+  ("s" tiqsi-claude-session-stats "Stats")
+  ("h" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-health))
+       "Health")
+  ("D" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-pick-model))
+       "Pick model")
+  ("m" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-mcp))
+       "MCP servers")
+  ("G" (lambda () (interactive)
+         (tiqsi-claude--require-opencode #'tiqsi-opencode-agent-list))
+       "Agents")
   ("q" nil "Back"))
 
 ;; ---------------------------------------------------------------------------
 ;; Main AI REPL Hydra
 ;; ---------------------------------------------------------------------------
-;; Every command goes through the smart-dispatch wrappers above, so the
-;; active backend (`tiqsi-repl-backend') determines where they route.
-;; OpenCode-only keys (F/D/A/V/L/I/P/p/W/R/X/G/N) are guarded and will
-;; show a helpful message when the Claude backend is active.
+;; Top-level dispatcher. Frequently used actions are direct keys,
+;; everything else is organized into sub-hydras.
 
 (defhydra hydra-claude (:color pink :hint nil)
     "
-╭────────────────────────────────────────────────────────────────────╮
-│              Tiqsi AI REPL  [backend: %(tiqsi-claude--backend-label)]
-├────────────────────────────────────────────────────────────────────┤
-│                                                                    │
-│  Session        │  Send Content     │  AI Features                 │
-│  ────────────   │  ─────────────    │  ─────────────               │
-│  _c_: Start     │  _r_: Region      │  _e_: Fix Error              │
-│  _k_: Kill      │  _f_: Function    │  _o_: Optimize               │
-│  _l_: Browse    │  _b_: Buffer      │  _x_: Explain                │
-│  _t_: Toggle    │  _a_: Ask         │  _T_: Tests                  │
-│  _C_: Clear     │  _s_: Paragraph   │                              │
-│  _n_: New       │                   │  Backend / Settings           │
-│  _d_: Delete    │                   │  _B_: Switch backend          │
-│                 │                   │  _m_: Modes menu              │
-│                 │                   │  _M_: Cycle perms             │
-│                 │                   │  _p_: View perms              │
-│                                                                    │
-│  OpenCode                          perms: %(symbol-name tiqsi-opencode-permission-prompt)
-│  _F_: Attach file  │  _S_: Stats      │  _D_: Set model            │
-│  _A_: Set agent    │  _L_: Models     │  _E_: Export               │
-│  _V_: Variant      │  _K_: Fork       │  _P_: PR review            │
-│  _W_: Web UI       │  _I_: Import     │  _G_: Agents               │
-│  _N_: MCP servers  │  _R_: Serve      │  _X_: Attach server        │
-│                                                                    │
-│  _q_: Quit      │  _h_: Help                                       │
-╰────────────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────────────────────────╮
+│          Tiqsi AI REPL  [%(tiqsi-claude--backend-label)]  %(if tiqsi-opencode-server--busy \"BUSY\" \"idle\")
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  _c_: Start/connect       _a_: Ask (freeform)              │
+│  _s_: Session...          _S_: Send content...              │
+│  _i_: Inspect/status...   _t_: Toggle REPL                 │
+│                                                             │
+│  AI Actions               Settings                         │
+│  ──────────               ──────────                       │
+│  _e_: Fix error           _M_: Perms (%`tiqsi-opencode-permission-prompt)
+│  _o_: Optimize code       _B_: Backend                     │
+│  _x_: Explain code        _1_: Tools %s(if tiqsi-opencode-show-tool-use \"ON\" \"off\")
+│  _T_: Generate tests      _2_: Cost %s(if tiqsi-opencode-show-cost \"ON\" \"off\")
+│                           _3_: Thinking %s(if tiqsi-opencode-show-thinking \"ON\" \"off\")
+│                                                             │
+│  _?_: Key reference       _q_: Quit                        │
+╰─────────────────────────────────────────────────────────────╯
 "
-    ;; Session management (dispatched)
+    ;; Core actions
     ("c" tiqsi-claude-start "Start")
-    ("k" tiqsi-claude-kill "Kill")
-    ("l" tiqsi-claude-list-sessions "Browse")
-    ("t" tiqsi-claude-toggle "Toggle")
-    ("C" tiqsi-claude-clear "Clear")
-    ("n" tiqsi-claude-new-session "New session")
-    ("d" tiqsi-claude-delete-session "Delete session")
-
-    ;; Send content (dispatched)
-    ("r" tiqsi-claude-send-region "Region")
-    ("f" tiqsi-claude-send-function "Function")
-    ("b" tiqsi-claude-send-buffer "Buffer")
     ("a" tiqsi-claude-ask-question "Ask")
-    ("s" tiqsi-claude-send-paragraph "Paragraph")
+    ("t" tiqsi-claude-toggle "Toggle")
 
-    ;; AI features (dispatched)
+    ;; Sub-hydras
+    ("s" hydra-claude-session/body "Session..." :exit t)
+    ("S" hydra-claude-send/body "Send..." :exit t)
+    ("i" hydra-claude-inspect/body "Inspect..." :exit t)
+
+    ;; AI features (direct — these are used constantly)
     ("e" tiqsi-claude-fix-error "Fix Error")
     ("o" tiqsi-claude-optimize-code "Optimize")
     ("x" tiqsi-claude-explain-code "Explain")
     ("T" tiqsi-claude-generate-tests "Tests")
 
-    ;; Backend switching
-    ("B" tiqsi-opencode-switch "Switch backend")
-
-    ;; Settings
-    ("m" hydra-claude-modes/body "Modes" :exit t)
+    ;; Settings (direct — quick toggles)
     ("M" tiqsi-claude-cycle-permission-prompt "Cycle perms")
-    ("p" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-server-show-permissions))
-         "View perms")
-
-    ;; OpenCode: config (guarded — require opencode backend)
-    ("F" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-attach-file))
-         "Attach file")
-    ("S" tiqsi-claude-session-stats "Stats")
-    ("D" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-model))
-         "Set model")
-    ("A" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-agent))
-         "Set agent")
-    ("V" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-variant))
-         "Set variant")
-    ("L" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-list-models))
-         "List models")
-    ("E" tiqsi-claude-export-session "Export")
-
-    ;; OpenCode: session ops (guarded)
-    ("K" tiqsi-claude-fork-session "Fork session")
-    ("I" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-import-session))
-         "Import session")
-    ("P" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-pr))
-         "PR review")
-
-    ;; OpenCode: server / infra (guarded)
-    ("W" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-web))
-         "Web UI")
-    ("R" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-serve))
-         "Serve")
-    ("X" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-attach))
-         "Attach server")
-    ("G" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-agent-list))
-         "Agents")
-    ("N" (lambda () (interactive)
-           (tiqsi-claude--require-opencode #'tiqsi-opencode-mcp-list))
-         "MCP servers")
+    ("B" tiqsi-opencode-switch "Switch backend")
+    ("1" (lambda () (interactive)
+           (setq tiqsi-opencode-show-tool-use (not tiqsi-opencode-show-tool-use))
+           (message "Tool display: %s" (if tiqsi-opencode-show-tool-use "ON" "OFF")))
+         "Toggle tools")
+    ("2" (lambda () (interactive)
+           (setq tiqsi-opencode-show-cost (not tiqsi-opencode-show-cost))
+           (message "Cost display: %s" (if tiqsi-opencode-show-cost "ON" "OFF")))
+         "Toggle cost")
+    ("3" (lambda () (interactive)
+           (setq tiqsi-opencode-show-thinking (not tiqsi-opencode-show-thinking))
+           (message "Thinking blocks: %s" (if tiqsi-opencode-show-thinking "ON" "OFF")))
+         "Toggle thinking")
 
     ;; Help / Quit
-    ("h" (lambda () (interactive)
-           (message "AI REPL [%s]: B=switch backend, l=browse sessions, n=new, d=delete, p=view perms. OpenCode keys (F/D/A/V/L/I/P/p/W/R/X/G/N) require backend=opencode."
-                    (tiqsi-claude--backend-label)))
-         "Help" :exit t)
+    ("?" tiqsi-opencode-show-keybinding-reference "Key reference" :exit t)
     ("q" nil "Quit" :exit t))
 
 ;; Debug: Check if hydra was created

@@ -2027,11 +2027,11 @@
 (tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-permissions
                            "show-permissions function exists")
 
-;; Test: hydra key p is bound in hydra-claude keymap
-(tiqsi-test-assert (and (boundp 'hydra-claude/keymap)
-                        (keymapp hydra-claude/keymap)
-                        (lookup-key hydra-claude/keymap "p"))
-                   "hydra-claude has 'p' key for permission viewer")
+;; Test: hydra key p is bound in inspect sub-hydra keymap
+(tiqsi-test-assert (and (boundp 'hydra-claude-inspect/keymap)
+                        (keymapp hydra-claude-inspect/keymap)
+                        (lookup-key hydra-claude-inspect/keymap "p"))
+                   "hydra-claude-inspect has 'p' key for permission viewer")
 
 ;; ---------------------------------------------------------------------------
 ;; 14. Permission grant cache
@@ -2210,7 +2210,172 @@
                          "list-sessions dispatches to tabulated browser when server active"))))
 
 ;; ---------------------------------------------------------------------------
-;; 16. Source syntax (including server module)
+;; 16. New viewer functions
+;; ---------------------------------------------------------------------------
+
+(tiqsi-test-suite "OpenCode: Viewer Functions")
+
+;; Functions exist
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-session-history "session history browser defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-tool-log "tool log viewer defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-files "file context viewer defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-cost-breakdown "cost breakdown viewer defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-health "health diagnostics defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-pick-model "quick model picker defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-server-show-mcp "MCP browser defined")
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-show-keybinding-reference "keybinding reference defined")
+
+;; State variables exist
+(tiqsi-test-assert (boundp 'tiqsi-opencode-server--tool-call-log) "tool-call-log var exists")
+(tiqsi-test-assert (boundp 'tiqsi-opencode-server--cost-log) "cost-log var exists")
+(tiqsi-test-assert (boundp 'tiqsi-opencode-server--file-references) "file-references var exists")
+
+;; History browser mode exists
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-history-browser-mode "history browser mode defined")
+(tiqsi-test-assert (keymapp tiqsi-opencode-history-browser-mode-map) "history browser keymap exists")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-history-browser-mode-map (kbd "RET"))
+                   "history browser has RET key")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-history-browser-mode-map (kbd "g"))
+                   "history browser has g for refresh")
+
+;; Tool log viewer shows data from the log
+(let ((tiqsi-opencode-server--tool-call-log
+       (list (list :tool "bash" :status "running" :time "12:00:00" :call-id "c1" :input nil)
+             (list :tool "read" :status "running" :time "12:00:01" :call-id "c2" :input nil))))
+  ;; Mock server active check
+  (cl-letf (((symbol-function 'tiqsi-opencode-server-active-p) (lambda () t)))
+    (tiqsi-opencode-server-show-tool-log)
+    (let ((buf (get-buffer "*OpenCode Tool Log*")))
+      (tiqsi-test-assert (buffer-live-p buf) "tool log creates buffer")
+      (with-current-buffer buf
+        (tiqsi-test-assert (string-match-p "bash" (buffer-string)) "tool log contains bash entry")
+        (tiqsi-test-assert (string-match-p "read" (buffer-string)) "tool log contains read entry")
+        (tiqsi-test-assert (string-match-p "2 calls" (buffer-string)) "tool log shows total count"))
+      (kill-buffer buf))))
+
+;; Cost breakdown viewer shows data from cost log
+(let ((tiqsi-opencode-server--cost-log
+       (list (list :cost 0.005 :tokens-total 100 :tokens-in 80 :tokens-out 20
+                   :cache-read 0 :time "12:00:00")))
+      (tiqsi-opencode-server--total-cost 0.005)
+      (tiqsi-opencode-server--total-tokens 100)
+      (tiqsi-opencode-server--message-count 1))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server-active-p) (lambda () t)))
+    (tiqsi-opencode-server-show-cost-breakdown)
+    (let ((buf (get-buffer "*OpenCode Costs*")))
+      (tiqsi-test-assert (buffer-live-p buf) "cost breakdown creates buffer")
+      (with-current-buffer buf
+        (tiqsi-test-assert (string-match-p "0.005" (buffer-string)) "cost breakdown shows cost value")
+        (tiqsi-test-assert (string-match-p "1 steps" (buffer-string)) "cost breakdown shows step count"))
+      (kill-buffer buf))))
+
+;; File viewer shows references
+(let ((tiqsi-opencode-server--file-references
+       (list (list :path "/foo/bar.el" :tool "read" :time "12:00:00" :action "read")
+             (list :path "/foo/baz.py" :tool "edit" :time "12:00:01" :action "edit"))))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server-active-p) (lambda () t)))
+    (tiqsi-opencode-server-show-files)
+    (let ((buf (get-buffer "*OpenCode Files*")))
+      (tiqsi-test-assert (buffer-live-p buf) "file viewer creates buffer")
+      (with-current-buffer buf
+        (tiqsi-test-assert (string-match-p "bar.el" (buffer-string)) "file viewer shows bar.el")
+        (tiqsi-test-assert (string-match-p "baz.py" (buffer-string)) "file viewer shows baz.py")
+        (tiqsi-test-assert (string-match-p "2 unique" (buffer-string)) "file viewer shows unique count"))
+      (kill-buffer buf))))
+
+;; Health viewer works without server running
+(let ((tiqsi-opencode-server--process nil)
+      (tiqsi-opencode-server--sse-process nil)
+      (tiqsi-opencode-server--session-id nil)
+      (tiqsi-opencode-server--base-url nil)
+      (tiqsi-opencode-server--busy nil)
+      (tiqsi-opencode-server--sse-reconnect-count 0)
+      (tiqsi-opencode-server--message-count 0)
+      (tiqsi-opencode-server--total-cost 0.0)
+      (tiqsi-opencode-server--total-tokens 0)
+      (tiqsi-opencode-server--tool-call-log nil)
+      (tiqsi-opencode-server--file-references nil)
+      (tiqsi-opencode-server--permission-grants nil))
+  (tiqsi-opencode-server-show-health)
+  (let ((buf (get-buffer "*OpenCode Health*")))
+    (tiqsi-test-assert (buffer-live-p buf) "health viewer creates buffer")
+    (with-current-buffer buf
+      (tiqsi-test-assert (string-match-p "STOPPED" (buffer-string)) "health shows STOPPED when no process")
+      (tiqsi-test-assert (string-match-p "Diagnostics" (buffer-string)) "health shows diagnostics header"))
+    (kill-buffer buf)))
+
+;; Keybinding reference opens buffer
+(tiqsi-opencode-show-keybinding-reference)
+(let ((buf (get-buffer "*OpenCode Keys*")))
+  (tiqsi-test-assert (buffer-live-p buf) "keybinding reference creates buffer")
+  (with-current-buffer buf
+    (tiqsi-test-assert (string-match-p "Session" (buffer-string)) "keybinding ref shows Session section")
+    (tiqsi-test-assert (string-match-p "Inspect" (buffer-string)) "keybinding ref shows Inspect section")
+    (tiqsi-test-assert (string-match-p "Send" (buffer-string)) "keybinding ref shows Send section"))
+  (kill-buffer buf))
+
+;; ---------------------------------------------------------------------------
+;; 17. Nested hydra structure
+;; ---------------------------------------------------------------------------
+
+(tiqsi-test-suite "OpenCode: Nested Hydras")
+
+;; All sub-hydra bodies exist
+(tiqsi-test-assert (fboundp 'hydra-claude-session/body) "session sub-hydra exists")
+(tiqsi-test-assert (fboundp 'hydra-claude-send/body) "send sub-hydra exists")
+(tiqsi-test-assert (fboundp 'hydra-claude-inspect/body) "inspect sub-hydra exists")
+(tiqsi-test-assert (fboundp 'hydra-claude/body) "main hydra exists")
+
+;; Main hydra has keys for sub-hydras
+(tiqsi-test-assert (and (boundp 'hydra-claude/keymap)
+                        (lookup-key hydra-claude/keymap "s"))
+                   "main hydra has 's' for session sub-hydra")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "S")
+                   "main hydra has 'S' for send sub-hydra")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "i")
+                   "main hydra has 'i' for inspect sub-hydra")
+
+;; Main hydra has direct action keys
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "c") "main hydra has 'c' for start")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "a") "main hydra has 'a' for ask")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "e") "main hydra has 'e' for fix error")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "o") "main hydra has 'o' for optimize")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "x") "main hydra has 'x' for explain")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "T") "main hydra has 'T' for tests")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "t") "main hydra has 't' for toggle")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "M") "main hydra has 'M' for perms")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "B") "main hydra has 'B' for backend")
+(tiqsi-test-assert (lookup-key hydra-claude/keymap "?") "main hydra has '?' for keybinding ref")
+
+;; Session sub-hydra keys
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "l") "session hydra has 'l' for browse")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "n") "session hydra has 'n' for new")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "d") "session hydra has 'd' for delete")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "h") "session hydra has 'h' for history")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "k") "session hydra has 'k' for kill")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "f") "session hydra has 'f' for fork")
+(tiqsi-test-assert (lookup-key hydra-claude-session/keymap "E") "session hydra has 'E' for export")
+
+;; Send sub-hydra keys
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "r") "send hydra has 'r' for region")
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "f") "send hydra has 'f' for function")
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "b") "send hydra has 'b' for buffer")
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "s") "send hydra has 's' for paragraph")
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "a") "send hydra has 'a' for ask")
+(tiqsi-test-assert (lookup-key hydra-claude-send/keymap "F") "send hydra has 'F' for attach file")
+
+;; Inspect sub-hydra keys
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "p") "inspect hydra has 'p' for perms")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "c") "inspect hydra has 'c' for cost")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "t") "inspect hydra has 't' for tool log")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "f") "inspect hydra has 'f' for files")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "s") "inspect hydra has 's' for stats")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "h") "inspect hydra has 'h' for health")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "D") "inspect hydra has 'D' for model picker")
+(tiqsi-test-assert (lookup-key hydra-claude-inspect/keymap "m") "inspect hydra has 'm' for MCP")
+
+;; ---------------------------------------------------------------------------
+;; 18. Source syntax (including server module)
 ;; ---------------------------------------------------------------------------
 
 (tiqsi-test-suite "OpenCode: Source Syntax")
