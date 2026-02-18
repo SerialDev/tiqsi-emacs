@@ -69,7 +69,9 @@
     (s-prepend "zig run " (buffer-name))
     "*zig-test*" "*Zig-error*"))
 
-(setq default-zig-scratch-path "/Users/amariscalcloudflare.com/Documents/workdir/personal/repos/")
+(defvar default-zig-scratch-path
+  (expand-file-name "repos/" (or (getenv "WORKDIR") "~/Documents/workdir/personal/"))
+  "Default path for Zig scratch projects. Set via WORKDIR env var or override in modules/private/.")
 
 (defun create-folder-in-path (folder-name path)
   "Create a folder with FOLDER-NAME in PATH.
@@ -110,7 +112,9 @@ USAGE: (delete-zig-scratch-folder)"
 
 
 
-(global-auto-revert-mode 1)
+;; NOTE: global-auto-revert-mode removed from here — it's a global setting
+;; that belongs in core config, not a language-specific module.
+;; If you need it, add (global-auto-revert-mode 1) to core-editing.el or init-lite.el.
 (setq load-physically t)
 (setq load-prefer-newer t)
 

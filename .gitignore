@@ -6,3 +6,6 @@
 
 # Emacs undo
 *.~undo-tree~
+
+# AI session summaries
+CLAUDE-HYDRA-FIX-SUMMARY.md

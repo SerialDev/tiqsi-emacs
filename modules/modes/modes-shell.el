@@ -45,11 +45,13 @@
 ; ------------------------------------------------------------------------- ;
 
 
-(multiple-async-shell-commands "*Output*"
-			       "echo 1; sleep 1"
-			       "echo 2; sleep 1"
-			       "echo 2; sleep 1"
-			       "echo 3; sleep 1")
+;; NOTE: Removed bare top-level call that spawned 4 shell processes on every
+;; Emacs startup. Use M-x multiple-async-shell-commands interactively instead.
+;; (multiple-async-shell-commands "*Output*"
+;; 			       "echo 1; sleep 1"
+;; 			       "echo 2; sleep 1"
+;; 			       "echo 2; sleep 1"
+;; 			       "echo 3; sleep 1")
 
 
 ; ------------------------------------------------------------------------- ;

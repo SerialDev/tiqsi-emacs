@@ -30,10 +30,24 @@
 (setq tiqsi-python-buffer "*Python*")
 
 (defun send-py-line ()
+  "Get the current line, trim leading spaces, and send to the Python buffer."
   (interactive)
-  (let ((py-temp (thing-at-point 'line t)) )
-    (comint-send-string tiqsi-python-buffer py-temp)))
-
+  ;; Ensure we actually have a line to grab
+  (when-let ((raw-line (thing-at-point 'line t)))
+    (let* (;; Trim starting spaces and tabs using regex
+            (trimmed-line (replace-regexp-in-string "^[ \t]+" "" raw-line)))
+      
+      ;; Check if the target buffer exists and has a running process
+      (if (get-buffer-process tiqsi-python-buffer)
+        (progn
+          (comint-send-string tiqsi-python-buffer 
+            ;; Append a newline explicitly to force execution
+            (if (string-suffix-p "\n" trimmed-line)
+              trimmed-line
+              (concat trimmed-line "\n")))
+          ;; Optional: move point to next line in source buffer for easier distinct sending
+          (forward-line 1))
+        (message "Buffer '%s' is not running a process." tiqsi-python-buffer)))))
 
 
 (defun send-py-line-p ()
@@ -1479,7 +1493,10 @@ else:
         (setenv "PATH" (mapconcat #'identity exec-path ":"))
         (setenv "VIRTUAL_ENV" venv-root))))
   (define-minor-mode my/python-autoenv-mode
-    "" nil "" nil
+    "Automatically activate Python virtual environments."
+    :init-value nil
+    :lighter ""
+    :keymap nil
     (if my/python-autoenv-mode
       (progn
         (my/bootstrap-python)
@@ -1814,6 +1831,7 @@ Echoes which backend the jump is from."
 (define-key python-mode-map (kbd "C-c >") 'sdev/goto-next-diagnostic)
 
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
+
 (define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 
 (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)

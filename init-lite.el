@@ -116,8 +116,7 @@ of an error, just add the package to a list of missing packages."
   (if (not (string-equal (ad-get-arg 0) "%s%s"))
     (let ((deactivate-mark nil)
            (inhibit-read-only t))
-      (save-excursion
-        (set-buffer "*Messages*")
+      (with-current-buffer "*Messages*"
         (goto-char (point-max))
         (if (not (bolp))
           (newline))

@@ -113,6 +113,12 @@ Set to nil to use the default model."
 ;; Load simple syntax highlighting
 (load-expand "modules/modes/claude-repl/tiqsi-claude-repl-simple-highlight.el")
 
+;; Load OpenCode backend
+(load-expand "modules/modes/claude-repl/tiqsi-claude-repl-opencode.el")
+
+;; Load OpenCode server transport (serve + SSE + HTTP)
+(load-expand "modules/modes/claude-repl/tiqsi-claude-repl-opencode-server.el")
+
 ;; Provide the main feature
 (provide 'tiqsi-claude-repl)
 

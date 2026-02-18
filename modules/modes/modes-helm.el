@@ -103,9 +103,8 @@
 (straight-require 'helm-projectile)
 
 (with-system darwin
-  (setq helm-rg-ripgrep-executable "/usr/local/bin/rg")
-  (setq helm-rg-default-directory 'git-root)
-  )
+  (setq helm-rg-ripgrep-executable (or (executable-find "rg") "/usr/local/bin/rg"))
+  (setq helm-rg-default-directory 'git-root))
 
 (straight-require 'helm-etags-plus) ;; Helm Etags support
 (straight-require 'ac-helm) ;; Interactive ac with Helm

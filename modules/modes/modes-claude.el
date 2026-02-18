@@ -70,25 +70,85 @@
      :repo "abo-abo/hydra"
      ))
 
-;; New Claude REPL Integration - Backwards compatible wrapper functions
+;; ---------------------------------------------------------------------------
+;; Backend availability and fallback
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude--ensure-backend ()
+  "Ensure the selected backend's CLI is available.
+If not, switch to the other backend automatically.  Signals an
+error only when neither CLI is found."
+  (cond
+   ((and (eq tiqsi-repl-backend 'opencode)
+         (not (tiqsi-opencode--executable-available-p)))
+    (if (tiqsi-claude-repl--executable-available-p)
+        (progn (message "OpenCode CLI not found — switching to Claude")
+               (setq tiqsi-repl-backend 'claude))
+      (error "Neither OpenCode nor Claude CLI found")))
+   ((and (eq tiqsi-repl-backend 'claude)
+         (not (tiqsi-claude-repl--executable-available-p)))
+    (if (tiqsi-opencode--executable-available-p)
+        (progn (message "Claude CLI not found — switching to OpenCode")
+               (setq tiqsi-repl-backend 'opencode))
+      (error "Neither Claude nor OpenCode CLI found")))))
+
+;; ---------------------------------------------------------------------------
+;; Smart dispatch wrappers
+;; ---------------------------------------------------------------------------
+;;
+;; Every wrapper checks `tiqsi-repl-backend' and routes to either Claude or
+;; OpenCode.  All existing keybindings (hydra, mode hooks, flycheck) call
+;; these wrappers, so switching backend is seamless — change the variable
+;; and every keybinding follows.
 
 ;;;###autoload
 (defun tiqsi-claude-start ()
-  "Start Claude REPL session (wrapper for new implementation)."
+  "Start AI REPL session (dispatches by `tiqsi-repl-backend').
+If the selected backend's CLI is not installed, automatically falls
+back to the other backend.  For OpenCode, uses the server transport
+(opencode serve + SSE) which supports interactive permission prompts."
   (interactive)
-  (tiqsi-claude-repl-start))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (condition-case err
+          (tiqsi-opencode-server-start)
+        (error
+         (message "Server transport failed (%s), falling back to run mode"
+                  (error-message-string err))
+         (tiqsi-opencode-start)))
+    (tiqsi-claude-repl-start)))
 
 ;;;###autoload
 (defun tiqsi-claude-kill ()
-  "Kill Claude REPL session (wrapper for new implementation)."
+  "Kill AI REPL session (dispatches by `tiqsi-repl-backend').
+For OpenCode, stops the server transport if active, then the run
+transport."
   (interactive)
-  (tiqsi-claude-repl-kill))
+  (if (eq tiqsi-repl-backend 'opencode)
+      (progn
+        ;; Stop server transport if active
+        (when (tiqsi-opencode-server-active-p)
+          (tiqsi-opencode-server-stop))
+        ;; Also kill run-based process if any
+        (tiqsi-opencode-kill))
+    (tiqsi-claude-repl-kill)))
 
-;;;###autoload  
+;;;###autoload
 (defun tiqsi-claude-toggle ()
-  "Toggle Claude REPL window."
+  "Toggle AI REPL window (dispatches by `tiqsi-repl-backend').
+For OpenCode, prefers the server transport REPL buffer if active."
   (interactive)
-  (let* ((repl-buffer (tiqsi-claude-repl--get-or-create-buffer))
+  (let* ((repl-buffer
+          (cond
+           ((and (eq tiqsi-repl-backend 'opencode)
+                 (tiqsi-opencode-server-active-p)
+                 tiqsi-opencode-server--repl-buffer
+                 (buffer-live-p tiqsi-opencode-server--repl-buffer))
+            tiqsi-opencode-server--repl-buffer)
+           ((eq tiqsi-repl-backend 'opencode)
+            (tiqsi-opencode--get-or-create-buffer))
+           (t
+            (tiqsi-claude-repl--get-or-create-buffer))))
          (repl-window (get-buffer-window repl-buffer)))
     (if repl-window
         (delete-window repl-window)
@@ -96,53 +156,215 @@
 
 ;;;###autoload
 (defun tiqsi-claude-send-region ()
-  "Send region to Claude (wrapper for new implementation)."
+  "Send region to AI REPL (dispatches by `tiqsi-repl-backend')."
   (interactive)
   (if (region-active-p)
-      (tiqsi-claude-repl-send-region (region-beginning) (region-end))
+      (progn
+        (tiqsi-claude--ensure-backend)
+        (if (eq tiqsi-repl-backend 'opencode)
+            (tiqsi-opencode-send-region (region-beginning) (region-end))
+          (tiqsi-claude-repl-send-region (region-beginning) (region-end))))
     (message "No region selected")))
 
 ;;;###autoload
 (defun tiqsi-claude-send-function ()
-  "Send function to Claude (wrapper for new implementation)."
+  "Send function to AI REPL (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-send-function))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-send-function)
+    (tiqsi-claude-repl-send-function)))
 
 ;;;###autoload
 (defun tiqsi-claude-send-buffer ()
-  "Send buffer to Claude (wrapper for new implementation)."
+  "Send buffer to AI REPL (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-send-buffer))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-send-buffer)
+    (tiqsi-claude-repl-send-buffer)))
+
+;;;###autoload
+(defun tiqsi-claude-send-paragraph ()
+  "Send paragraph to AI REPL (dispatches by `tiqsi-repl-backend')."
+  (interactive)
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-send-paragraph)
+    (tiqsi-claude-repl-send-paragraph)))
 
 ;;;###autoload
 (defun tiqsi-claude-ask-question (question)
-  "Ask Claude a question (wrapper for new implementation)."
-  (interactive "sAsk Claude: ")
-  (tiqsi-claude-repl-ask-question question))
+  "Ask a question to AI REPL (dispatches by `tiqsi-repl-backend').
+Falls back to the other backend if the selected one is unavailable."
+  (interactive (list (read-string
+                      (format "Ask %s: "
+                              (if (eq tiqsi-repl-backend 'opencode)
+                                  "OpenCode" "Claude")))))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-ask question)
+    (tiqsi-claude-repl-ask-question question)))
 
 ;;;###autoload
 (defun tiqsi-claude-fix-error ()
-  "Fix error at point (wrapper for new implementation)."
+  "Fix error at point (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-fix-error-at-point))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-fix-error)
+    (tiqsi-claude-repl-fix-error-at-point)))
 
 ;;;###autoload
 (defun tiqsi-claude-optimize-code ()
-  "Optimize code (wrapper for new implementation)."
+  "Optimize code (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-optimize-code))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-optimize-code)
+    (tiqsi-claude-repl-optimize-code)))
 
 ;;;###autoload
 (defun tiqsi-claude-explain-code ()
-  "Explain code (wrapper for new implementation)."
+  "Explain code (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-explain-code))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-explain-code)
+    (tiqsi-claude-repl-explain-code)))
 
 ;;;###autoload
 (defun tiqsi-claude-generate-tests ()
-  "Generate tests (wrapper for new implementation)."
+  "Generate tests (dispatches by `tiqsi-repl-backend')."
   (interactive)
-  (tiqsi-claude-repl-generate-tests))
+  (tiqsi-claude--ensure-backend)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-generate-tests)
+    (tiqsi-claude-repl-generate-tests)))
+
+;;;###autoload
+(defun tiqsi-claude-list-sessions ()
+  "List and browse sessions (dispatches by `tiqsi-repl-backend').
+When the OpenCode server transport is active, opens an interactive
+session picker.  Otherwise falls back to `opencode session list' CLI
+or Claude's buffer-based session list."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (if (tiqsi-opencode-server-active-p)
+          (tiqsi-opencode-server-list-sessions)
+        (tiqsi-opencode-list-sessions))
+    (tiqsi-claude-repl-list-sessions)))
+
+;;;###autoload
+(defun tiqsi-claude-new-session ()
+  "Create a new AI REPL session (dispatches by `tiqsi-repl-backend').
+For OpenCode server transport, creates a new session via API.
+For Claude, starts a fresh REPL."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (if (tiqsi-opencode-server-active-p)
+          (tiqsi-opencode-server-new-session)
+        (tiqsi-opencode-start))
+    (tiqsi-claude-repl-new-session)))
+
+;;;###autoload
+(defun tiqsi-claude-delete-session ()
+  "Delete an AI session (dispatches by `tiqsi-repl-backend').
+Only available for OpenCode server transport."
+  (interactive)
+  (if (and (eq tiqsi-repl-backend 'opencode)
+           (tiqsi-opencode-server-active-p))
+      (call-interactively #'tiqsi-opencode-server-delete-session)
+    (message "Session deletion requires OpenCode server transport")))
+
+;;;###autoload
+(defun tiqsi-claude-session-stats ()
+  "Show session statistics (dispatches by `tiqsi-repl-backend').
+For OpenCode, uses server transport stats when the server is active,
+otherwise falls back to the run-based transport stats."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (if (tiqsi-opencode-server-active-p)
+          (tiqsi-opencode-server-session-stats)
+        (tiqsi-opencode-session-stats))
+    ;; Claude backend — show session summary if available
+    (if (fboundp 'tiqsi-claude-repl-show-session-summary)
+        (tiqsi-claude-repl-show-session-summary)
+      (message "No stats available for Claude backend"))))
+
+;;;###autoload
+(defun tiqsi-claude-export-session ()
+  "Export session (dispatches by `tiqsi-repl-backend').
+For OpenCode server transport, uses the server session ID."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (if (and (tiqsi-opencode-server-active-p)
+               tiqsi-opencode-server--session-id)
+          ;; Export using server session ID via CLI
+          (let ((process-environment (tiqsi-opencode--build-env)))
+             (async-shell-command
+              (format "%s export %s"
+                      (shell-quote-argument tiqsi-opencode-program)
+                      (shell-quote-argument tiqsi-opencode-server--session-id))
+              "*OpenCode Export*"))
+        (tiqsi-opencode-export-session))
+    (message "Export not available for Claude backend")))
+
+;;;###autoload
+(defun tiqsi-claude-fork-session ()
+  "Fork session (dispatches by `tiqsi-repl-backend').
+For OpenCode server transport, uses the server session ID."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (if (and (tiqsi-opencode-server-active-p)
+               tiqsi-opencode-server--session-id)
+          ;; Fork via CLI using server session ID, then switch to it
+          (let ((process-environment (tiqsi-opencode--build-env))
+                (old-sid tiqsi-opencode-server--session-id))
+            (message "Forking server session %s..." old-sid)
+            ;; Create a new session on the server as the fork destination
+            (let ((new-sid (tiqsi-opencode-server--create-session
+                            (format "fork of %s" old-sid))))
+              (when new-sid
+                (tiqsi-opencode-server-switch-session new-sid)
+                (tiqsi-opencode-server-send
+                 (format "Continue from session %s. This is a forked session."
+                         old-sid))
+                (message "Forked to new session: %s" new-sid))))
+        (tiqsi-opencode-fork-session))
+    (message "Fork not available for Claude backend")))
+
+;;;###autoload
+(defun tiqsi-claude-cycle-permission-prompt ()
+  "Cycle the OpenCode permission prompt mode and sync both transports.
+Cycles: ask -> always -> reject -> ask.
+For the server transport, this controls interactive permission prompts.
+For the run transport, this syncs `tiqsi-opencode-auto-approve'."
+  (interactive)
+  ;; Cycle the server transport permission mode
+  (tiqsi-opencode-cycle-permission-prompt)
+  ;; Sync run transport auto-approve
+  (setq tiqsi-opencode-auto-approve
+        (eq tiqsi-opencode-permission-prompt 'always))
+  ;; Provide clear feedback about what each transport will do
+  (let ((mode tiqsi-opencode-permission-prompt))
+    (message "Permissions: %s │ Server: %s │ Run: %s"
+             mode
+             (pcase mode
+               ('ask "interactive prompts")
+               ('always "auto-approve all")
+               ('reject "auto-reject all"))
+             (if tiqsi-opencode-auto-approve
+                 "auto-approve (OPENCODE_PERMISSION)"
+               "auto-reject (no OPENCODE_PERMISSION)"))))
+
+;;;###autoload
+(defun tiqsi-claude-clear ()
+  "Clear REPL buffer (dispatches by `tiqsi-repl-backend')."
+  (interactive)
+  (if (eq tiqsi-repl-backend 'opencode)
+      (tiqsi-opencode-clear)
+    (tiqsi-claude-repl-clear)))
 
 ;; Ensure hydra is loaded before defining the hydra
 (unless (featurep 'hydra)
@@ -161,50 +383,173 @@
   (error "ERROR: defhydra macro is NOT available! Cannot proceed without hydra."))
 
 
-;; Enhanced Tiqsi Claude Hydra - now using the new REPL system
+;; ---------------------------------------------------------------------------
+;; Helper for backend indicator in hydra hint
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude--backend-label ()
+  "Return a label for the current backend (for hydra hint)."
+  (if (eq tiqsi-repl-backend 'opencode) "OpenCode" "Claude"))
+
+;; ---------------------------------------------------------------------------
+;; Backend guard helper
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude--require-opencode (fn)
+  "Call FN interactively if the active backend is opencode.
+Otherwise display a message that the key requires the OpenCode backend."
+  (if (eq tiqsi-repl-backend 'opencode)
+      (call-interactively fn)
+    (message "Requires OpenCode backend (current: %s). Press B to switch."
+             (tiqsi-claude--backend-label))))
+
+;; ---------------------------------------------------------------------------
+;; Modes sub-hydra — display/tool settings for both backends
+;; ---------------------------------------------------------------------------
+
+(defhydra hydra-claude-modes (:color blue :hint nil)
+  "
+╭─────────────────────────────────────────╮
+│  AI REPL Settings                       │
+├─────────────────────────────────────────┤
+│  _t_: Toggle tool display               │
+│  _c_: Toggle cost display               │
+│  _k_: Toggle thinking blocks            │
+│  _M_: Cycle permission mode             │
+│  _B_: Switch backend                    │
+│  _q_: Back                              │
+╰─────────────────────────────────────────╯
+"
+  ("t" (lambda () (interactive)
+         (setq tiqsi-opencode-show-tool-use (not tiqsi-opencode-show-tool-use))
+         (message "Tool display: %s" (if tiqsi-opencode-show-tool-use "ON" "OFF")))
+       "Toggle tools")
+  ("c" (lambda () (interactive)
+         (setq tiqsi-opencode-show-cost (not tiqsi-opencode-show-cost))
+         (message "Cost display: %s" (if tiqsi-opencode-show-cost "ON" "OFF")))
+       "Toggle cost")
+  ("k" (lambda () (interactive)
+         (setq tiqsi-opencode-show-thinking (not tiqsi-opencode-show-thinking))
+         (message "Thinking blocks: %s" (if tiqsi-opencode-show-thinking "ON" "OFF")))
+       "Toggle thinking")
+  ("M" tiqsi-claude-cycle-permission-prompt "Cycle perms")
+  ("B" tiqsi-opencode-switch "Switch backend")
+  ("q" nil "Back"))
+
+;; ---------------------------------------------------------------------------
+;; Main AI REPL Hydra
+;; ---------------------------------------------------------------------------
+;; Every command goes through the smart-dispatch wrappers above, so the
+;; active backend (`tiqsi-repl-backend') determines where they route.
+;; OpenCode-only keys (F/D/A/V/L/I/P/W/R/X/G/N) are guarded and will
+;; show a helpful message when the Claude backend is active.
+
 (defhydra hydra-claude (:color pink :hint nil)
     "
-╭──────────────────────────────────────────────────────────╮
-│                 Tiqsi Claude REPL Assistant              │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Session      │  Send Content     │  AI Features        │
-│  ──────────   │  ─────────────    │  ─────────────      │
-│  _c_: Start   │  _r_: Region      │  _e_: Fix Error     │
-│  _k_: Kill    │  _f_: Function    │  _o_: Optimize      │
-│  _l_: List    │  _b_: Buffer      │  _x_: Explain       │
-│  _t_: Toggle  │  _a_: Ask         │  _T_: Tests         │
-│  _C_: Clear   │  _s_: Paragraph   │                     │
-│               │                   │  Settings           │
-│               │                   │  _m_: Modes menu    │
-│               │                   │  _M_: Cycle perms   │
-│                                                          │
-│  _q_: Quit    │  _h_: Help                              │
-╰──────────────────────────────────────────────────────────╯
+╭────────────────────────────────────────────────────────────────────╮
+│              Tiqsi AI REPL  [backend: %(tiqsi-claude--backend-label)]
+├────────────────────────────────────────────────────────────────────┤
+│                                                                    │
+│  Session        │  Send Content     │  AI Features                 │
+│  ────────────   │  ─────────────    │  ─────────────               │
+│  _c_: Start     │  _r_: Region      │  _e_: Fix Error              │
+│  _k_: Kill      │  _f_: Function    │  _o_: Optimize               │
+│  _l_: Browse    │  _b_: Buffer      │  _x_: Explain                │
+│  _t_: Toggle    │  _a_: Ask         │  _T_: Tests                  │
+│  _C_: Clear     │  _s_: Paragraph   │                              │
+│  _n_: New       │                   │  Backend / Settings           │
+│  _d_: Delete    │                   │  _B_: Switch backend          │
+│                 │                   │  _m_: Modes menu              │
+│                 │                   │  _M_: Cycle perms             │
+│                                                                    │
+│  OpenCode                          perms: %(symbol-name tiqsi-opencode-permission-prompt)
+│  _F_: Attach file  │  _S_: Stats      │  _D_: Set model            │
+│  _A_: Set agent    │  _L_: Models     │  _E_: Export               │
+│  _V_: Variant      │  _K_: Fork       │  _P_: PR review            │
+│  _W_: Web UI       │  _I_: Import     │  _G_: Agents               │
+│  _N_: MCP servers  │  _R_: Serve      │  _X_: Attach server        │
+│                                                                    │
+│  _q_: Quit      │  _h_: Help                                       │
+╰────────────────────────────────────────────────────────────────────╯
 "
-    ("c" tiqsi-claude-start "Start Claude")
-    ("k" tiqsi-claude-kill "Kill Session")
-    ("l" tiqsi-claude-repl-list-sessions "List Sessions")
-    ("t" tiqsi-claude-toggle "Toggle Window")
-    ("C" tiqsi-claude-repl-clear "Clear Buffer")
-    ("r" tiqsi-claude-send-region "Send Region")
-    ("f" tiqsi-claude-send-function "Send Function")
-    ("b" tiqsi-claude-send-buffer "Send Buffer")
-    ("a" tiqsi-claude-ask-question "Ask Question")
-    ("s" tiqsi-claude-repl-send-paragraph "Send Paragraph")
+    ;; Session management (dispatched)
+    ("c" tiqsi-claude-start "Start")
+    ("k" tiqsi-claude-kill "Kill")
+    ("l" tiqsi-claude-list-sessions "Browse")
+    ("t" tiqsi-claude-toggle "Toggle")
+    ("C" tiqsi-claude-clear "Clear")
+    ("n" tiqsi-claude-new-session "New session")
+    ("d" tiqsi-claude-delete-session "Delete session")
+
+    ;; Send content (dispatched)
+    ("r" tiqsi-claude-send-region "Region")
+    ("f" tiqsi-claude-send-function "Function")
+    ("b" tiqsi-claude-send-buffer "Buffer")
+    ("a" tiqsi-claude-ask-question "Ask")
+    ("s" tiqsi-claude-send-paragraph "Paragraph")
+
+    ;; AI features (dispatched)
     ("e" tiqsi-claude-fix-error "Fix Error")
-    ("o" tiqsi-claude-optimize-code "Optimize Code")
-    ("x" tiqsi-claude-explain-code "Explain Code")
-    ("T" tiqsi-claude-generate-tests "Generate Tests")
-    ("m" (lambda () 
-           (interactive)
-           (if (fboundp 'hydra-claude-modes/body)
-               (hydra-claude-modes/body)
-             (message "Modes hydra not yet loaded. Try again in a moment.")))
-         "Modes" :exit t)
-    ("M" tiqsi-claude-repl-cycle-permission-mode "Cycle Perms")
-    ("h" (lambda () (interactive) 
-           (message "Claude REPL: Enhanced with history, syntax highlighting, and more!"))
+    ("o" tiqsi-claude-optimize-code "Optimize")
+    ("x" tiqsi-claude-explain-code "Explain")
+    ("T" tiqsi-claude-generate-tests "Tests")
+
+    ;; Backend switching
+    ("B" tiqsi-opencode-switch "Switch backend")
+
+    ;; Settings
+    ("m" hydra-claude-modes/body "Modes" :exit t)
+    ("M" tiqsi-claude-cycle-permission-prompt "Cycle perms")
+
+    ;; OpenCode: config (guarded — require opencode backend)
+    ("F" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-attach-file))
+         "Attach file")
+    ("S" tiqsi-claude-session-stats "Stats")
+    ("D" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-model))
+         "Set model")
+    ("A" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-agent))
+         "Set agent")
+    ("V" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-set-variant))
+         "Set variant")
+    ("L" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-list-models))
+         "List models")
+    ("E" tiqsi-claude-export-session "Export")
+
+    ;; OpenCode: session ops (guarded)
+    ("K" tiqsi-claude-fork-session "Fork session")
+    ("I" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-import-session))
+         "Import session")
+    ("P" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-pr))
+         "PR review")
+
+    ;; OpenCode: server / infra (guarded)
+    ("W" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-web))
+         "Web UI")
+    ("R" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-serve))
+         "Serve")
+    ("X" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-attach))
+         "Attach server")
+    ("G" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-agent-list))
+         "Agents")
+    ("N" (lambda () (interactive)
+           (tiqsi-claude--require-opencode #'tiqsi-opencode-mcp-list))
+         "MCP servers")
+
+    ;; Help / Quit
+    ("h" (lambda () (interactive)
+           (message "AI REPL [%s]: B=switch backend, l=browse sessions, n=new, d=delete. OpenCode keys (F/D/A/V/L/I/P/W/R/X/G/N) require backend=opencode."
+                    (tiqsi-claude--backend-label)))
          "Help" :exit t)
     ("q" nil "Quit" :exit t))
 
@@ -213,13 +558,13 @@
 
 ;; Wrapper function for debugging
 (defun tiqsi-claude-hydra ()
-  "Launch Claude hydra with debugging."
+  "Launch the AI REPL hydra."
   (interactive)
   (if (fboundp 'hydra-claude/body)
       (hydra-claude/body)
     (message "ERROR: hydra-claude/body is not defined! Check *Messages* buffer.")))
 
-;; Global keybindings for Claude integration
+;; Global keybindings for AI REPL integration
 (global-set-key (kbd "M-c") 'tiqsi-claude-hydra)
 (global-set-key (kbd "C-c a") 'hydra-claude/body) ; Alternative (as documented in CLAUDE.md)
 (global-set-key (kbd "C-c i") 'hydra-claude/body) ; Alternative
@@ -229,33 +574,28 @@
 (when (fboundp 'global-tiqsi-claude-repl-mode)
   (global-tiqsi-claude-repl-mode 1))
 
-;; Define when-available if not already defined
-(unless (fboundp 'when-available)
-  (defmacro when-available (feature &rest body)
-    "When FEATURE is available, evaluate BODY."
-    `(when (require ,feature nil 'noerror)
-       ,@body)))
-
 ;; Integration with programming modes - seamless like python-mode
-(when-available 'python-mode
+;; All hooks go through the smart-dispatch wrappers, so the active
+;; backend determines whether Claude or OpenCode handles the request.
+;; Use `with-eval-after-load' with the correct feature names (not mode
+;; names) to ensure hooks are added when the mode is actually loaded.
+(with-eval-after-load 'python
   (add-hook 'python-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c C-e") 'tiqsi-claude-fix-error)
               (local-set-key (kbd "C-c C-a") 'tiqsi-claude-fix-error))))
 
-(when-available 'rust-mode
+(with-eval-after-load 'rust-mode
   (add-hook 'rust-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c C-e") 'tiqsi-claude-fix-error)
               (local-set-key (kbd "C-c C-a") 'tiqsi-claude-fix-error))))
 
-(when-available 'c-mode
+(with-eval-after-load 'cc-mode
   (add-hook 'c-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c C-e") 'tiqsi-claude-fix-error)
-              (local-set-key (kbd "C-c C-a") 'tiqsi-claude-fix-error))))
-
-(when-available 'c++-mode
+              (local-set-key (kbd "C-c C-a") 'tiqsi-claude-fix-error)))
   (add-hook 'c++-mode-hook
             (lambda ()
               (local-set-key (kbd "C-c C-e") 'tiqsi-claude-fix-error)
@@ -265,13 +605,11 @@
 (with-eval-after-load 'flycheck
   (define-key flycheck-mode-map (kbd "C-c C-e") 'tiqsi-claude-fix-error))
 
-;; Debug: Check if hydra was defined
+;; Startup info
 (if (fboundp 'hydra-claude/body)
-    (message "Tiqsi Claude REPL integration loaded. Hydra defined. Use M-c for hydra menu.")
+    (message "Tiqsi AI REPL loaded [backend: %s]. Use M-c for hydra menu."
+             (tiqsi-claude--backend-label))
   (message "ERROR: hydra-claude/body is not defined!"))
-
-;; Debug: Check keybinding
-(message "M-c is bound to: %s" (key-binding (kbd "M-c")))
 
 (provide 'modes-claude)
 

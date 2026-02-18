@@ -483,21 +483,28 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 
 
-(setq lsp-eldoc-enable-hover nil)
-(setq lsp-ui-sideline-show-hover nil)
-(setq lsp-modeline-code-actions-enable nil)
-(setq lsp-headerline-breadcrumb-enable t)
-(setq lsp-modeline-diagnostics-enable nil)
+;; Rust-specific LSP settings — scoped to eval-after-load so they don't
+;; clobber global LSP settings for other languages.
+(with-eval-after-load 'lsp-mode
+  (setq lsp-rust-all-features t)
+  (setq lsp-rust-analyzer-diagnostics-disabled ["unresolved-macro-call"])
+  (setq lsp-rust-analyzer-display-chaining-hints t)
+  (setq lsp-rust-analyzer-display-parameter-hints t)
+  (setq lsp-rust-server 'rust-analyzer))
 
-(setq lsp-lens-enable nil)
-(setq lsp-signature-auto-activate nil) ;; you could manually request them via `lsp-signature-activate`
-(setq lsp-signature-render-documentation nil)
-(setq lsp-rust-all-features t)
-(setq lsp-rust-analyzer-diagnostics-disabled ["unresolved-macro-call"])
-(setq lsp-rust-analyzer-display-chaining-hints t)
-(setq lsp-rust-analyzer-display-parameter-hints t)
-(setq lsp-rust-server 'rust-analyzer)
-(setq lsp-ui-doc-show-with-cursor nil)
+;; General LSP UI preferences (apply to all LSP modes)
+(with-eval-after-load 'lsp-mode
+  (setq lsp-eldoc-enable-hover nil)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-modeline-diagnostics-enable nil)
+  (setq lsp-lens-enable nil)
+  (setq lsp-signature-auto-activate nil) ;; you could manually request them via `lsp-signature-activate`
+  (setq lsp-signature-render-documentation nil))
+
+(with-eval-after-load 'lsp-ui
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-doc-show-with-cursor nil))
 ;; Enable cache busting, depending on if your server returns
 ;; sufficiently many candidates in the first place.
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
@@ -535,7 +542,8 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 (use-package exec-path-from-shell
   :ensure
-  :init (exec-path-from-shell-initialize))
+  :defer 3
+  :config (exec-path-from-shell-initialize))
 
 (use-package dap-mode
   :ensure

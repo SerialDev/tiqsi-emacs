@@ -33,8 +33,11 @@
   :group 'editing)
 
 (defcustom copilot-bin
-  "/Users/amariscalcloudflare.com/Documents/workdir/personal/llms/models/wizardcoder-python-34b-v1.0.Q5_K_M.llamafile"
-  "Path of llamafile executable with LLM weights."
+  (expand-file-name
+   "llms/models/wizardcoder-python-34b-v1.0.Q5_K_M.llamafile"
+   (or (getenv "WORKDIR") "~/Documents/workdir/personal/"))
+  "Path of llamafile executable with LLM weights.
+Override via `customize' or set the WORKDIR environment variable."
   :type 'string
   :group 'copilot)
 
@@ -117,12 +120,19 @@ Writing English explanations is forbidden. ")
   (let ((openai-key (getenv "OPENAI_KEY")))
     (if openai-key
       openai-key
-      (error "The OPENAI_KEY environment variable is not set."))))
+      (message "Warning: The OPENAI_KEY environment variable is not set. LLM features will be unavailable.")
+      nil)))
 
 (setq openai-key (get-openai-key))
 
-;; Ensure the 'shell-command' uses an interactive shell
-(setq shell-command-switch "-ic")
+;; Use interactive shell only within cai-flow commands, not globally.
+;; Setting shell-command-switch globally to "-ic" causes every shell-command
+;; in Emacs to use interactive mode, adding latency and causing batch/daemon hangs.
+(defmacro with-interactive-shell (&rest body)
+  "Execute BODY with `shell-command-switch' set to \"-ic\" for interactive shell.
+This enables `source ~/.zshrc' to work in shell-command calls."
+  `(let ((shell-command-switch "-ic"))
+     ,@body))
 
 (defun escape-shell-args (input-string)
   "Escape special characters in INPUT-STRING to safely use in shell commands."
@@ -154,7 +164,8 @@ Writing English explanations is forbidden. ")
     (with-current-buffer output-buffer
       (erase-buffer)
       ;; Use `shell-command` with properly directed output
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; More robust handling for potential lack of output lines
       (goto-char (point-min))
@@ -200,7 +211,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Delete the first 10 lines (assumed to be sourcing output, etc.)
@@ -246,7 +258,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai  " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -295,7 +308,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -331,7 +345,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -371,7 +386,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -416,7 +432,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -467,7 +484,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -504,7 +522,8 @@ Writing English explanations is forbidden. ")
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -540,7 +559,8 @@ Writing English explanations is forbidden. \n "
           (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
-      (shell-command shell-command-string (current-buffer) (current-buffer))
+      (with-interactive-shell
+        (shell-command shell-command-string (current-buffer) (current-buffer)))
       ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -572,7 +592,8 @@ Writing English explanations is forbidden. \n "
             (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
       (with-current-buffer output-buffer
 	(erase-buffer)
-	(shell-command shell-command-string (current-buffer) (current-buffer))
+	(with-interactive-shell
+	  (shell-command shell-command-string (current-buffer) (current-buffer)))
 	;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
 	(ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
 	;; Optionally delete unwanted output, e.g., the first 10 lines
@@ -609,7 +630,8 @@ Writing English explanations is forbidden. \n "
             (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
       (with-current-buffer output-buffer
         (erase-buffer)
-	(shell-command shell-command-string (current-buffer) (current-buffer))
+	(with-interactive-shell
+	  (shell-command shell-command-string (current-buffer) (current-buffer)))
         ;; (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
         (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
         ;; Optionally delete unwanted output, e.g., the first 10 lines

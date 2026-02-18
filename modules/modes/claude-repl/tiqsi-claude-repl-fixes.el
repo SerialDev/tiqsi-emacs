@@ -66,7 +66,8 @@
          (inhibit-read-only t))
     
     ;; Debug logging - always log for now to diagnose
-    (message "Claude JSON: type=%s, obj=%s" type (substring (prin1-to-string json-obj) 0 100))
+    (let ((repr (prin1-to-string json-obj)))
+      (message "Claude JSON: type=%s, obj=%s" type (substring repr 0 (min 100 (length repr)))))
     
     (cond
      ;; System initialization

@@ -463,6 +463,7 @@ If there's no region, the current line will be duplicated."
 ;; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Toggle ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
+(straight-require-lazy 'origami)
 (try-require 'origami)
 
 (eval-after-load 'origami

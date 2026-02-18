@@ -611,6 +611,306 @@
     (while (re-search-forward "^\\(#+\\) \\(.+\\)$" end t)
       (replace-match (propertize (match-string 2) 'face 'tiqsi-claude-repl-markdown-header) t t))))
 
+;; ---------------------------------------------------------------------------
+;; Context file management (ported from monolithic tiqsi-claude-repl.el)
+;; ---------------------------------------------------------------------------
+
+(defvar tiqsi-claude-repl-context-files nil
+  "List of files to include as context for Claude.")
+
+(defun tiqsi-claude-repl-add-context-file (file)
+  "Add FILE to the context for Claude."
+  (interactive "fAdd file to context: ")
+  (add-to-list 'tiqsi-claude-repl-context-files file)
+  (tiqsi-claude-repl--log-operation "Context Added"
+    (format "File: %s" (file-name-nondirectory file)))
+  (message "%s" (tiqsi-claude-repl--format-status "Success"
+                  (format "Added %s to context" file))))
+
+(defun tiqsi-claude-repl-clear-context-files ()
+  "Clear all context files."
+  (interactive)
+  (let ((count (length tiqsi-claude-repl-context-files)))
+    (setq tiqsi-claude-repl-context-files nil)
+    (tiqsi-claude-repl--log-operation "Context Cleared"
+      (format "%d files removed" count))
+    (message "%s" (tiqsi-claude-repl--format-status "Success" "Context files cleared"))))
+
+;; ---------------------------------------------------------------------------
+;; History browsing and search
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude-repl--generate-history-filename ()
+  "Generate a unique filename for saving conversation history."
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+         (project-name (file-name-nondirectory (directory-file-name project-root)))
+         (timestamp (format-time-string "%Y%m%d-%H%M%S")))
+    (format "%s-%s.claude" project-name timestamp)))
+
+(defun tiqsi-claude-repl--list-history-files ()
+  "List all history files, sorted by date (newest first)."
+  (when (file-exists-p tiqsi-claude-repl-history-directory)
+    (sort (directory-files tiqsi-claude-repl-history-directory t "\\.claude$")
+      'file-newer-than-file-p)))
+
+;;;###autoload
+(defun tiqsi-claude-repl-browse-history ()
+  "Browse Claude conversation history."
+  (interactive)
+  (let ((history-files (tiqsi-claude-repl--list-history-files)))
+    (if history-files
+      (let* ((files-info (mapcar (lambda (f)
+                                   (cons (format "%s - %s"
+                                           (file-name-nondirectory f)
+                                           (format-time-string "%Y-%m-%d %H:%M"
+                                             (nth 5 (file-attributes f))))
+                                     f))
+                           history-files))
+             (selected (completing-read "Select conversation: " files-info nil t))
+             (file (cdr (assoc selected files-info))))
+        (when file
+          (find-file-read-only file)
+          (tiqsi-claude-repl-history-mode)))
+      (message "No conversation history found"))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-search-history (query)
+  "Search through Claude conversation history for QUERY."
+  (interactive "sSearch history for: ")
+  (let ((history-files (tiqsi-claude-repl--list-history-files))
+        (results '()))
+    (dolist (file history-files)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (goto-char (point-min))
+        (when (search-forward query nil t)
+          (push (cons file (count-matches query (point-min) (point-max))) results))))
+    (if results
+      (let* ((sorted-results (sort results (lambda (a b) (> (cdr a) (cdr b)))))
+             (choices (mapcar (lambda (r)
+                                (format "%s (%d matches)"
+                                  (file-name-nondirectory (car r))
+                                  (cdr r)))
+                        sorted-results))
+             (selected (completing-read "Select result: " choices nil t))
+             (index (cl-position selected choices :test 'string=))
+             (file (car (nth index sorted-results))))
+        (find-file-read-only file)
+        (goto-char (point-min))
+        (search-forward query nil t)
+        (tiqsi-claude-repl-history-mode))
+      (message "No results found for: %s" query))))
+
+;; History viewing mode
+(define-derived-mode tiqsi-claude-repl-history-mode special-mode "Claude-History"
+  "Major mode for viewing Claude conversation history."
+  (setq-local buffer-read-only t)
+  (local-set-key (kbd "q") 'quit-window)
+  (local-set-key (kbd "n") 'tiqsi-claude-repl-history-next)
+  (local-set-key (kbd "p") 'tiqsi-claude-repl-history-previous))
+
+(defun tiqsi-claude-repl-history-next ()
+  "Go to next conversation in history."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+         (history-files (tiqsi-claude-repl--list-history-files))
+         (current-index (cl-position current-file history-files :test 'string=)))
+    (when (and current-index (< (1+ current-index) (length history-files)))
+      (find-file-read-only (nth (1+ current-index) history-files))
+      (tiqsi-claude-repl-history-mode))))
+
+(defun tiqsi-claude-repl-history-previous ()
+  "Go to previous conversation in history."
+  (interactive)
+  (let* ((current-file (buffer-file-name))
+         (history-files (tiqsi-claude-repl--list-history-files))
+         (current-index (cl-position current-file history-files :test 'string=)))
+    (when (and current-index (> current-index 0))
+      (find-file-read-only (nth (1- current-index) history-files))
+      (tiqsi-claude-repl-history-mode))))
+
+;; ---------------------------------------------------------------------------
+;; Session management
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle ()
+  "Toggle Claude REPL window visibility."
+  (interactive)
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+         (buffer-name (format "*Claude REPL (%s)*"
+                        (file-name-nondirectory (directory-file-name project-root)))))
+    (if-let* ((window (get-buffer-window buffer-name)))
+      (delete-window window)
+      (tiqsi-claude-repl-start))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-new-session ()
+  "Start a new Claude REPL session (kills existing one if any)."
+  (interactive)
+  (let* ((project-root (tiqsi-claude-repl--get-project-root))
+         (buffer-name (format "*Claude REPL (%s)*"
+                        (file-name-nondirectory (directory-file-name project-root)))))
+    (when-let* ((buffer (get-buffer buffer-name)))
+      (with-current-buffer buffer
+        (when (and tiqsi-claude-repl--current-process
+                (process-live-p tiqsi-claude-repl--current-process))
+          (delete-process tiqsi-claude-repl--current-process)))
+      (kill-buffer buffer)))
+  (tiqsi-claude-repl-start)
+  (message "Started new Claude REPL session"))
+
+;;;###autoload
+(defun tiqsi-claude-repl-recover-session ()
+  "Recover session state after a disconnection."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (unless tiqsi-claude-repl--session-id
+      (setq-local tiqsi-claude-repl--session-id
+        (tiqsi-claude-repl--generate-session-id)))
+    (unless tiqsi-claude-repl--session-start-time
+      (setq-local tiqsi-claude-repl--session-start-time (current-time)))
+    (setq-local tiqsi-claude-repl--last-interaction-time (current-time))
+    (tiqsi-claude-repl--ensure-prompt)
+    (goto-char (point-max))
+    (tiqsi-claude-repl--log-operation "Session Recovered"
+      (format "Session %s restored" tiqsi-claude-repl--session-id))
+    (message "%s" (tiqsi-claude-repl--format-status "Success" "Session recovered"))))
+
+;; ---------------------------------------------------------------------------
+;; Toggle commands
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-thinking ()
+  "Toggle showing Claude's thinking process."
+  (interactive)
+  (setq tiqsi-claude-repl-show-thinking (not tiqsi-claude-repl-show-thinking))
+  (message "Claude thinking process: %s"
+    (if tiqsi-claude-repl-show-thinking "enabled" "disabled")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-syntax-highlighting ()
+  "Toggle syntax highlighting in Claude responses."
+  (interactive)
+  (setq tiqsi-claude-repl-highlight-code (not tiqsi-claude-repl-highlight-code))
+  (message "Claude syntax highlighting: %s"
+    (if tiqsi-claude-repl-highlight-code "enabled" "disabled")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-toggle-line-wrapping ()
+  "Toggle automatic line wrapping in Claude responses."
+  (interactive)
+  (setq tiqsi-claude-repl-auto-wrap (not tiqsi-claude-repl-auto-wrap))
+  (message "Claude line wrapping: %s (at column %d)"
+    (if tiqsi-claude-repl-auto-wrap "enabled" "disabled")
+    tiqsi-claude-repl-wrap-column))
+
+;;;###autoload
+(defun tiqsi-claude-repl-set-wrap-column (column)
+  "Set the COLUMN at which to wrap long lines."
+  (interactive "nWrap at column: ")
+  (setq tiqsi-claude-repl-wrap-column column)
+  (message "Claude line wrapping set to column %d" column))
+
+;; ---------------------------------------------------------------------------
+;; Status and summary
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-claude-repl-show-session-summary ()
+  "Show a summary of the current Claude session."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (let* ((total-chars (buffer-size))
+           (prompts (count-matches "^λ " (point-min) (point-max)))
+           (responses (/ prompts 2))
+           (runtime (if tiqsi-claude-repl--session-start-time
+                      (format-seconds "%h hours, %m minutes, %s seconds"
+                        (float-time (time-subtract (current-time)
+                          tiqsi-claude-repl--session-start-time)))
+                      "N/A"))
+           (idle-time (if tiqsi-claude-repl--last-interaction-time
+                        (format-seconds "%m minutes, %s seconds"
+                          (float-time (time-subtract (current-time)
+                            tiqsi-claude-repl--last-interaction-time)))
+                        "N/A")))
+      (message "%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+        (tiqsi-claude-repl--format-status "Session Summary" "")
+        (format "  Internal Session ID: %s" (or tiqsi-claude-repl--session-id "unknown"))
+        (format "  Claude Session ID: %s" (or tiqsi-claude-repl--claude-session-id "not yet initialized"))
+        (format "  Total characters: %d" total-chars)
+        (format "  Total prompts: %d" prompts)
+        (format "  Messages exchanged: %d" tiqsi-claude-repl--message-count)
+        (format "  Estimated responses: %d" responses)
+        (format "  Session runtime: %s" runtime)
+        (format "  Idle for: %s" idle-time)))))
+
+;;;###autoload
+(defun tiqsi-claude-repl-show-status ()
+  "Show the current status of Claude REPL."
+  (interactive)
+  (let ((status-items
+          (list
+            (cons "Claude CLI" (if (tiqsi-claude-repl--executable-available-p)
+                                 (tiqsi-claude-repl--colorize "Available" 'tiqsi-claude-repl-success)
+                                 (tiqsi-claude-repl--colorize "Not found" 'tiqsi-claude-repl-error)))
+            (cons "Active sessions" (format "%d" (length (cl-remove-if-not
+                                                           (lambda (buf)
+                                                             (with-current-buffer buf
+                                                               (eq major-mode 'tiqsi-claude-repl-mode)))
+                                                           (buffer-list)))))
+            (cons "Thinking mode" (if tiqsi-claude-repl-show-thinking
+                                    (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+                                    (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+            (cons "Syntax highlighting" (if tiqsi-claude-repl-highlight-code
+                                          (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+                                          (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+            (cons "History saving" (if tiqsi-claude-repl-save-history
+                                     (tiqsi-claude-repl--colorize "Enabled" 'tiqsi-claude-repl-success)
+                                     (tiqsi-claude-repl--colorize "Disabled" 'tiqsi-claude-repl-warning)))
+            (cons "Context files" (format "%d" (length tiqsi-claude-repl-context-files))))))
+    (message "%s\n%s"
+      (tiqsi-claude-repl--format-status "Claude REPL Status" "")
+      (mapconcat (lambda (item)
+                   (format "  %s: %s" (car item) (cdr item)))
+        status-items "\n"))))
+
+;; ---------------------------------------------------------------------------
+;; Buffer reformatting
+;; ---------------------------------------------------------------------------
+
+;;;###autoload
+(defun tiqsi-claude-repl-reformat-buffer ()
+  "Re-apply formatting to the entire Claude REPL buffer."
+  (interactive)
+  (when (eq major-mode 'tiqsi-claude-repl-mode)
+    (save-excursion
+      (let ((inhibit-read-only t))
+        (remove-text-properties (point-min) (point-max) '(face nil invisible nil))
+        (goto-char (point-min))
+        (while (re-search-forward "^> .+\n\n" nil t)
+          (let ((response-start (point))
+                (response-end (if (re-search-forward "^> " nil t)
+                                (progn (beginning-of-line) (point))
+                                (point-max))))
+            (when (< response-start response-end)
+              (tiqsi-claude-repl--apply-markdown-formatting response-start response-end))
+            (goto-char response-end)))))
+    (message "Claude REPL buffer reformatted")))
+
+;;;###autoload
+(defun tiqsi-claude-repl-test-highlighting ()
+  "Test syntax highlighting with a sample response."
+  (interactive)
+  (tiqsi-claude-repl-start)
+  (tiqsi-claude-repl--log-operation "Test Mode" "Running syntax highlighting test")
+  (let ((test-input "Show me a Python function with markdown formatting"))
+    (with-current-buffer (tiqsi-claude-repl--get-or-create-buffer)
+      (goto-char (point-max))
+      (insert test-input)
+      (tiqsi-claude-repl-send-input))))
+
 (provide 'tiqsi-claude-repl-features)
 
 ;;; tiqsi-claude-repl-features.el ends here

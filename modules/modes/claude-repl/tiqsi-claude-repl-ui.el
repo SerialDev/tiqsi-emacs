@@ -191,6 +191,114 @@
    (when args
      (concat " " (tiqsi-claude-repl--colorize args 'tiqsi-claude-repl-timestamp)))))
 
+;; ---------------------------------------------------------------------------
+;; Code block syntax highlighting (ported from monolithic tiqsi-claude-repl.el)
+;; ---------------------------------------------------------------------------
+
+(declare-function tiqsi-claude-repl--get-language-mode "tiqsi-claude-repl-core")
+(declare-function tiqsi-claude-repl--safe-mode-available-p "tiqsi-claude-repl-core")
+
+(defun tiqsi-claude-repl--highlight-code-block (start end lang)
+  "Apply syntax highlighting to code block from START to END with language LANG.
+Uses a temp buffer with the appropriate major mode to fontify the code,
+then copies the fontified text back with line numbers."
+  (when tiqsi-claude-repl-highlight-code
+    (let* ((mode (tiqsi-claude-repl--get-language-mode lang))
+           (code (buffer-substring-no-properties start end))
+           (highlighted-code nil))
+      (setq highlighted-code
+        (with-temp-buffer
+          (insert code)
+          (when (tiqsi-claude-repl--safe-mode-available-p mode)
+            (condition-case _err
+              (progn
+                (delay-mode-hooks (funcall mode))
+                (font-lock-mode 1)
+                (setq font-lock-verbose nil)
+                (if (fboundp 'font-lock-ensure)
+                  (font-lock-ensure)
+                  (with-no-warnings (font-lock-fontify-buffer))))
+              (error
+                (when (fboundp 'prog-mode)
+                  (prog-mode)
+                  (font-lock-mode 1)
+                  (if (fboundp 'font-lock-ensure)
+                    (font-lock-ensure)
+                    (with-no-warnings (font-lock-fontify-buffer)))))))
+          (let ((result "")
+                (line-count (count-lines (point-min) (point-max)))
+                (line-num 1))
+            (when (> line-count 0)
+              (let ((max-line-width (length (number-to-string line-count))))
+                (goto-char (point-min))
+                (while (not (eobp))
+                  (let ((line-start (point))
+                        (line-end (line-end-position)))
+                    (when tiqsi-claude-repl-show-line-numbers
+                      (setq result
+                        (concat result
+                          (propertize (format (concat "%" (number-to-string max-line-width) "d │ ") line-num)
+                            'face 'tiqsi-claude-repl-line-number))))
+                    (setq result
+                      (concat result (buffer-substring line-start line-end)))
+                    (forward-line 1)
+                    (when (not (eobp))
+                      (setq result (concat result "\n")))
+                    (setq line-num (1+ line-num))))))
+            result)))
+      ;; Insert the highlighted code back
+      (when highlighted-code
+        (save-excursion
+          (goto-char start)
+          (delete-region start end)
+          (insert highlighted-code)
+          (add-face-text-property start (point) 'tiqsi-claude-repl-code-block t)
+          (point))))))
+
+(defun tiqsi-claude-repl--highlight-inline-code (start end code-text)
+  "Apply basic syntax highlighting to inline CODE-TEXT from START to END.
+Highlights common programming constructs: keywords, numbers, strings,
+function calls, and comments."
+  (save-excursion
+    (goto-char start)
+    (let ((case-fold-search nil))
+      ;; Keywords
+      (when (string-match "\\b\\(def\\|function\\|class\\|if\\|else\\|for\\|while\\|return\\|import\\|from\\|const\\|let\\|var\\|async\\|await\\)\\b" code-text)
+        (let ((keyword-start (+ start (match-beginning 1)))
+              (keyword-end (+ start (match-end 1))))
+          (when (and (>= keyword-start start) (<= keyword-end end))
+            (add-face-text-property keyword-start keyword-end
+              '(:foreground "#81a1c1" :weight bold) t))))
+      ;; Numbers
+      (when (string-match "\\b[0-9]+\\(?:\\.[0-9]+\\)?\\b" code-text)
+        (let ((num-start (+ start (match-beginning 0)))
+              (num-end (+ start (match-end 0))))
+          (when (and (>= num-start start) (<= num-end end))
+            (add-face-text-property num-start num-end
+              '(:foreground "#b48ead") t))))
+      ;; Strings
+      (when (or (string-match "\"[^\"]*\"" code-text)
+              (string-match "'[^']*'" code-text))
+        (let ((str-start (+ start (match-beginning 0)))
+              (str-end (+ start (match-end 0))))
+          (when (and (>= str-start start) (<= str-end end))
+            (add-face-text-property str-start str-end
+              '(:foreground "#a3be8c") t))))
+      ;; Function calls
+      (when (string-match "\\([a-zA-Z_][a-zA-Z0-9_]*\\)\\s-*(" code-text)
+        (let ((func-start (+ start (match-beginning 1)))
+              (func-end (+ start (match-end 1))))
+          (when (and (>= func-start start) (<= func-end end))
+            (add-face-text-property func-start func-end
+              '(:foreground "#88c0d0") t))))
+      ;; Comments
+      (when (string-match "\\(#\\|//\\).*$" code-text)
+        (let ((comment-start (+ start (match-beginning 0)))
+              (comment-end (+ start (match-end 0))))
+          (when (and (>= comment-start start) (<= comment-end end))
+            (add-face-text-property comment-start comment-end
+              '(:foreground "#4c566a" :slant italic) t)))))))
+
 (provide 'tiqsi-claude-repl-ui)
 
 ;;; tiqsi-claude-repl-ui.el ends here

@@ -481,12 +481,20 @@
 
 ;;; Mode Definition
 
+;; Declare smart dispatchers (defined in tiqsi-claude-repl-opencode.el which
+;; loads after this file; the bindings resolve at key-press time, not load time).
+(declare-function tiqsi-repl-smart-send-input "tiqsi-claude-repl-opencode")
+(declare-function tiqsi-repl-smart-cancel "tiqsi-claude-repl-opencode")
+(declare-function tiqsi-repl-smart-clear "tiqsi-claude-repl-opencode")
+
 (defvar tiqsi-claude-repl-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "RET") 'tiqsi-claude-repl-send-input)
-    (define-key map (kbd "C-c C-c") 'tiqsi-claude-repl-send-input)
-    (define-key map (kbd "C-g") 'tiqsi-claude-repl-cancel)
-    (define-key map (kbd "C-c C-k") 'tiqsi-claude-repl-clear)
+    ;; RET / C-c C-c / C-g / C-c C-k use smart dispatchers so the correct
+    ;; backend (Claude or OpenCode) handles the request.
+    (define-key map (kbd "RET") 'tiqsi-repl-smart-send-input)
+    (define-key map (kbd "C-c C-c") 'tiqsi-repl-smart-send-input)
+    (define-key map (kbd "C-g") 'tiqsi-repl-smart-cancel)
+    (define-key map (kbd "C-c C-k") 'tiqsi-repl-smart-clear)
     (define-key map (kbd "C-c C-q") 'tiqsi-claude-repl-quit)
     (define-key map (kbd "C-c C-h") 'tiqsi-claude-highlight-all-code-blocks)
     (define-key map (kbd "C-c C-l") 'tiqsi-claude-repl-list-sessions)
@@ -502,6 +510,120 @@
   (setq-local comment-start "# ")
   (setq-local comment-end "")
   (setq-local tiqsi-claude-repl--session-started nil))
+
+;; ---------------------------------------------------------------------------
+;; Language mode mapping (ported from monolithic tiqsi-claude-repl.el)
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude-repl--get-language-mode (lang)
+  "Get the major mode for language LANG.
+Maps language names and file extensions to Emacs major modes."
+  (let ((lang-lower (downcase (string-trim (or lang "")))))
+    (cond
+      ;; Lisp family
+      ((member lang-lower '("elisp" "emacs-lisp" "el")) 'emacs-lisp-mode)
+      ((member lang-lower '("lisp" "common-lisp" "cl")) 'lisp-mode)
+      ((member lang-lower '("clojure" "clj" "cljs")) 'clojure-mode)
+      ((member lang-lower '("scheme" "scm")) 'scheme-mode)
+      ((member lang-lower '("racket" "rkt")) 'racket-mode)
+      ;; Common programming languages
+      ((member lang-lower '("python" "py" "python3")) 'python-mode)
+      ((member lang-lower '("javascript" "js" "node")) 'js-mode)
+      ((member lang-lower '("typescript" "ts" "tsx")) 'typescript-mode)
+      ((member lang-lower '("jsx")) 'js-jsx-mode)
+      ((member lang-lower '("java")) 'java-mode)
+      ((member lang-lower '("c")) 'c-mode)
+      ((member lang-lower '("c++" "cpp" "cc" "cxx")) 'c++-mode)
+      ((member lang-lower '("csharp" "cs" "c#")) 'csharp-mode)
+      ((member lang-lower '("rust" "rs")) 'rust-mode)
+      ((member lang-lower '("go" "golang")) 'go-mode)
+      ((member lang-lower '("ruby" "rb")) 'ruby-mode)
+      ((member lang-lower '("perl" "pl")) 'perl-mode)
+      ((member lang-lower '("php")) 'php-mode)
+      ((member lang-lower '("swift")) 'swift-mode)
+      ((member lang-lower '("kotlin" "kt")) 'kotlin-mode)
+      ((member lang-lower '("scala")) 'scala-mode)
+      ((member lang-lower '("haskell" "hs")) 'haskell-mode)
+      ((member lang-lower '("ocaml" "ml")) 'tuareg-mode)
+      ((member lang-lower '("fsharp" "fs" "f#")) 'fsharp-mode)
+      ((member lang-lower '("r")) 'ess-mode)
+      ((member lang-lower '("julia" "jl")) 'julia-mode)
+      ((member lang-lower '("nim")) 'nim-mode)
+      ((member lang-lower '("zig")) 'zig-mode)
+      ((member lang-lower '("dart")) 'dart-mode)
+      ((member lang-lower '("lua")) 'lua-mode)
+      ((member lang-lower '("erlang" "erl")) 'erlang-mode)
+      ((member lang-lower '("elixir" "ex" "exs")) 'elixir-mode)
+      ;; Shell and system
+      ((member lang-lower '("shell" "bash" "sh" "zsh")) 'sh-mode)
+      ((member lang-lower '("fish")) 'fish-mode)
+      ((member lang-lower '("powershell" "ps1")) 'powershell-mode)
+      ((member lang-lower '("batch" "bat" "cmd")) 'bat-mode)
+      ;; Config and build files
+      ((member lang-lower '("dockerfile" "docker")) 'dockerfile-mode)
+      ((member lang-lower '("makefile" "make" "mk")) 'makefile-mode)
+      ((member lang-lower '("cmake")) 'cmake-mode)
+      ((member lang-lower '("gradle")) 'groovy-mode)
+      ((member lang-lower '("maven" "pom")) 'nxml-mode)
+      ;; Data formats
+      ((member lang-lower '("sql" "mysql" "postgresql" "sqlite")) 'sql-mode)
+      ((member lang-lower '("json" "jsonc")) 'json-mode)
+      ((member lang-lower '("yaml" "yml")) 'yaml-mode)
+      ((member lang-lower '("toml")) 'conf-toml-mode)
+      ((member lang-lower '("xml")) 'nxml-mode)
+      ((member lang-lower '("csv")) 'csv-mode)
+      ((member lang-lower '("ini" "conf" "config")) 'conf-mode)
+      ;; Web technologies
+      ((member lang-lower '("html" "htm")) 'html-mode)
+      ((member lang-lower '("css" "scss" "sass" "less")) 'css-mode)
+      ((member lang-lower '("vue")) 'vue-mode)
+      ((member lang-lower '("svelte")) 'svelte-mode)
+      ;; Documentation
+      ((member lang-lower '("markdown" "md")) 'markdown-mode)
+      ((member lang-lower '("org" "org-mode")) 'org-mode)
+      ((member lang-lower '("latex" "tex")) 'latex-mode)
+      ((member lang-lower '("rst" "restructuredtext")) 'rst-mode)
+      ((member lang-lower '("asciidoc" "adoc")) 'adoc-mode)
+      ;; Assembly
+      ((member lang-lower '("asm" "assembly" "nasm")) 'asm-mode)
+      ((member lang-lower '("mips")) 'mips-mode)
+      ;; Other
+      ((member lang-lower '("diff" "patch")) 'diff-mode)
+      ((member lang-lower '("nginx")) 'nginx-mode)
+      ((member lang-lower '("terraform" "tf")) 'terraform-mode)
+      ((member lang-lower '("graphql" "gql")) 'graphql-mode)
+      ((member lang-lower '("protobuf" "proto")) 'protobuf-mode)
+      ;; Fallback
+      (t (if (string-match-p "[a-z]+" lang-lower) 'prog-mode 'fundamental-mode)))))
+
+(defun tiqsi-claude-repl--safe-mode-available-p (mode)
+  "Check if MODE is available and can be safely called."
+  (and mode
+    (fboundp mode)
+    (or (functionp mode)
+      (ignore-errors (autoload-do-load (symbol-function mode) mode)))))
+
+;; ---------------------------------------------------------------------------
+;; Enhanced thinking animation
+;; ---------------------------------------------------------------------------
+
+(defun tiqsi-claude-repl--animate-thinking ()
+  "Animate the thinking indicator with braille spinner and elapsed time."
+  (when (and tiqsi-claude-repl--current-process
+          (process-live-p tiqsi-claude-repl--current-process))
+    (let* ((frames '("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏"))
+           (frame (nth (mod tiqsi-claude-repl--thinking-animation-state (length frames)) frames)))
+      (save-excursion
+        (goto-char (point-max))
+        (when (re-search-backward "⏳ Thinking\\.\\.\\..*$" nil t)
+          (let ((elapsed (if tiqsi-claude-repl--request-start-time
+                           (format " [%.1fs]" (float-time (time-since tiqsi-claude-repl--request-start-time)))
+                           "")))
+            (replace-match (tiqsi-claude-repl--colorize
+                             (format "%s Thinking...%s" frame elapsed)
+                             'tiqsi-claude-repl-thinking)))))
+      (setq tiqsi-claude-repl--thinking-animation-state
+        (1+ tiqsi-claude-repl--thinking-animation-state)))))
 
 (provide 'tiqsi-claude-repl-core)
 

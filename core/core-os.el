@@ -82,9 +82,13 @@
 
 
 (defmacro when-executable (executable-name &rest body)
-  `(if ,(executable-find executable-name)
-     ,@body
-     (message "executable not found: %s" executable-name)))
+  "Execute BODY if EXECUTABLE-NAME is found on PATH at runtime.
+Unlike the previous version, this evaluates `executable-find' at runtime
+rather than macro-expansion time, and correctly quotes the executable name
+in the else branch."
+  `(if (executable-find ,executable-name)
+     (progn ,@body)
+     (message "executable not found: %s" ,executable-name)))
 
 
 ;;                                          Determine Emacs                                          ;
@@ -444,6 +448,12 @@ Display progress in the mode line instead."
 
 (add-hook 'shell-mode-hook 'company-mode)
 (add-hook 'term-mode-hook 'company-mode)
+
+(with-eval-after-load 'vterm
+  ;; Replace "M-o" with whatever key you bind sdev/jump-window to
+  (define-key vterm-mode-map (kbd "M-w") #'sdev/jump-window)
+  (define-key vterm-mode-map (kbd "C-f") #'vterm-yank)
+  )
 
 
 ;;                                            Keybindings                                            ;

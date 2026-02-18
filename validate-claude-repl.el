@@ -38,4 +38,4 @@
           (message "Issues found:\n%s" (mapconcat 'identity issues "\n"))
         (message "File structure appears valid")))))
 
-(validate-file-structure "modules/modes/tiqsi-claude-repl.el")
+(validate-file-structure "modules/modes/claude-repl/tiqsi-claude-repl.el")
