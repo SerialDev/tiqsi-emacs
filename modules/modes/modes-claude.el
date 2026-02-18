@@ -245,13 +245,14 @@ Falls back to the other backend if the selected one is unavailable."
 ;;;###autoload
 (defun tiqsi-claude-list-sessions ()
   "List and browse sessions (dispatches by `tiqsi-repl-backend').
-When the OpenCode server transport is active, opens an interactive
-session picker.  Otherwise falls back to `opencode session list' CLI
-or Claude's buffer-based session list."
+When the OpenCode server transport is active, opens a tabulated
+session browser with keybindings for switch/delete/new/perms.
+Otherwise falls back to `opencode session list' CLI or Claude's
+buffer-based session list."
   (interactive)
   (if (eq tiqsi-repl-backend 'opencode)
       (if (tiqsi-opencode-server-active-p)
-          (tiqsi-opencode-server-list-sessions)
+          (tiqsi-opencode-session-browser)
         (tiqsi-opencode-list-sessions))
     (tiqsi-claude-repl-list-sessions)))
 

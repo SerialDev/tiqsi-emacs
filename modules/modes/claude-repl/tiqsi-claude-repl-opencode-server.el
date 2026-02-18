@@ -158,6 +158,13 @@ Each value is a plist with :tool (name), :input (hash-table),
 :status (string).  Populated from `tool' part updates so that
 `permission.asked' events can display rich context.")
 
+(defvar tiqsi-opencode-server--permission-grants nil
+  "List of permission grants made during the current session.
+Each entry is a hash-table with keys: permission, pattern, action, time.
+Populated when we reply \"always\" or \"once\" to a permission.asked event.
+This is the client-side cache — the server API does not expose
+interactive grants, only upfront overrides from session creation.")
+
 ;; ---------------------------------------------------------------------------
 ;; Internal faces (reuse from opencode.el where possible)
 ;; ---------------------------------------------------------------------------
@@ -732,7 +739,8 @@ patterns, metadata, always, tool."
           (tiqsi-claude-repl--colorize
            "   (auto-approve mode)" 'tiqsi-claude-repl-info)
           "\n")
-         (tiqsi-opencode-server--finalize-permission request-id "always"))
+         (tiqsi-opencode-server--finalize-permission
+          request-id "always" permission patterns))
         ('reject
          (tiqsi-opencode-server--repl-insert
           (tiqsi-claude-repl--colorize
@@ -751,11 +759,31 @@ patterns, metadata, always, tool."
 REQUEST-ID is the server permission ID to reply to."
   (let ((response (tiqsi-opencode-server--prompt-permission
                    permission patterns metadata always-patterns)))
-    (tiqsi-opencode-server--finalize-permission request-id response)))
+    (tiqsi-opencode-server--finalize-permission
+     request-id response permission patterns)))
 
-(defun tiqsi-opencode-server--finalize-permission (request-id response)
-  "Send RESPONSE for REQUEST-ID to server and display decision in REPL."
+(defun tiqsi-opencode-server--finalize-permission (request-id response
+                                                   &optional perm-type patterns)
+  "Send RESPONSE for REQUEST-ID to server and display decision in REPL.
+PERM-TYPE and PATTERNS are the permission name and pattern list from
+the original request, used to cache the grant locally."
   (tiqsi-opencode-server--reply-permission request-id response)
+  ;; Cache the grant so `show-permissions' can display it
+  (when (and (member response '("always" "once"))
+             perm-type)
+    (let ((entry (make-hash-table :test 'equal)))
+      (puthash "permission" perm-type entry)
+      (puthash "pattern"
+               (or (and (sequencep patterns)
+                        (> (length patterns) 0)
+                        (if (vectorp patterns)
+                            (mapconcat #'identity (append patterns nil) ", ")
+                          (mapconcat #'identity patterns ", ")))
+                   "*")
+               entry)
+      (puthash "action" (if (equal response "always") "allow" "allow-once") entry)
+      (puthash "time" (format-time-string "%H:%M:%S") entry)
+      (push entry tiqsi-opencode-server--permission-grants)))
   (tiqsi-opencode-server--repl-insert
    (tiqsi-claude-repl--colorize
     (format "  → %s"
@@ -1049,6 +1077,7 @@ Starts `opencode serve', connects SSE, creates a session."
   (setq tiqsi-opencode-server--total-cost 0.0)
   (setq tiqsi-opencode-server--total-tokens 0)
   (setq tiqsi-opencode-server--message-count 0)
+  (setq tiqsi-opencode-server--permission-grants nil)
   (message "OpenCode server stopped"))
 
 ;;;###autoload
@@ -1145,7 +1174,7 @@ Returns something like: '3 allow, 2 deny' or 'no rules'."
         (when (hash-table-p rule)
           (let ((action (gethash "action" rule "")))
             (cond
-             ((equal action "allow") (cl-incf allow))
+             ((string-match-p "allow" action) (cl-incf allow))
              ((equal action "deny") (cl-incf deny))))))
       (cond
        ((and (> allow 0) (> deny 0))
@@ -1157,18 +1186,21 @@ Returns something like: '3 allow, 2 deny' or 'no rules'."
 ;;;###autoload
 (defun tiqsi-opencode-server-show-permissions ()
   "Display the permission rules for the current session.
-Shows which tools/patterns are set to allow-always or deny in a
-formatted buffer or message."
+Merges server-side rules (from session creation) with client-side
+grants (from interactive permission prompts during this session)."
   (interactive)
   (unless (tiqsi-opencode-server-active-p)
     (error "OpenCode server is not running"))
   (unless tiqsi-opencode-server--session-id
     (error "No active session"))
-  (let ((perms (tiqsi-opencode-server--get-session-permissions)))
-    (if (or (null perms) (= (length perms) 0))
-        (message "No permission rules set for current session (%s)"
+  (let* ((server-perms (tiqsi-opencode-server--get-session-permissions))
+         (client-perms tiqsi-opencode-server--permission-grants)
+         (has-server (and server-perms (> (length server-perms) 0)))
+         (has-client (and client-perms (> (length client-perms) 0))))
+    (if (not (or has-server has-client))
+        (message "No permission rules for current session (%s)"
                  tiqsi-opencode-server--session-id)
-      ;; Show in REPL buffer for visibility
+      ;; Show in REPL buffer
       (when (and tiqsi-opencode-server--repl-buffer
                  (buffer-live-p tiqsi-opencode-server--repl-buffer))
         (with-current-buffer tiqsi-opencode-server--repl-buffer
@@ -1182,30 +1214,53 @@ formatted buffer or message."
                                         0 (min 18 (length tiqsi-opencode-server--session-id))))
                      'tiqsi-claude-repl-info) "\n")
             (insert (tiqsi-claude-repl--colorize
-                     (format "  %-20s %-8s %s" "TOOL" "ACTION" "PATTERN")
+                     (format "  %-20s %-12s %-8s %s" "TOOL" "SOURCE" "ACTION" "PATTERN")
                      'tiqsi-claude-repl-status) "\n")
             (insert (tiqsi-claude-repl--colorize
-                     (make-string 44 ?─)
+                     (make-string 58 ?─)
                      'tiqsi-claude-repl-status) "\n")
-            (dolist (rule perms)
-              (let ((line (tiqsi-opencode-server--format-permission-rule rule)))
-                (when line
-                  (let* ((action (when (hash-table-p rule)
-                                   (gethash "action" rule "")))
+            ;; Server-side rules (from session creation / config)
+            (when has-server
+              (dolist (rule server-perms)
+                (when (hash-table-p rule)
+                  (let* ((perm (gethash "permission" rule "?"))
+                         (pattern (gethash "pattern" rule "*"))
+                         (action (gethash "action" rule "?"))
+                         (line (format "  %-20s %-12s %-8s %s"
+                                       perm "config" (upcase action) pattern))
                          (face (if (equal action "allow")
                                    'tiqsi-claude-repl-success
                                  'tiqsi-claude-repl-error)))
                     (insert (tiqsi-claude-repl--colorize line face) "\n")))))
+            ;; Client-side grants (from interactive prompts this session)
+            (when has-client
+              (dolist (grant (reverse client-perms))
+                (when (hash-table-p grant)
+                  (let* ((perm (gethash "permission" grant "?"))
+                         (pattern (gethash "pattern" grant "*"))
+                         (action (gethash "action" grant "?"))
+                         (time (gethash "time" grant ""))
+                         (source (if (> (length time) 0)
+                                     (format "granted@%s" time)
+                                   "granted"))
+                         (line (format "  %-20s %-12s %-8s %s"
+                                       perm source (upcase action) pattern))
+                         (face (if (string-match-p "allow" action)
+                                   'tiqsi-claude-repl-success
+                                 'tiqsi-claude-repl-warning)))
+                    (insert (tiqsi-claude-repl--colorize line face) "\n")))))
             (insert (tiqsi-claude-repl--make-separator) "\n")
-            (insert (tiqsi-claude-repl--colorize
-                     (format "  Local mode: %s │ Total: %s"
-                             tiqsi-opencode-permission-prompt
-                             (tiqsi-opencode-server--format-permission-summary perms))
-                     'tiqsi-claude-repl-status) "\n\n")
+            (let* ((all-perms (append (or server-perms '()) (or client-perms '())))
+                   (summary (tiqsi-opencode-server--format-permission-summary all-perms)))
+              (insert (tiqsi-claude-repl--colorize
+                       (format "  Local mode: %s │ Total: %s"
+                               tiqsi-opencode-permission-prompt summary)
+                       'tiqsi-claude-repl-status) "\n\n"))
             (goto-char (point-max)))))
-      (message "Session permissions: %s (%d rules)"
-               (tiqsi-opencode-server--format-permission-summary perms)
-               (length perms)))))
+      (let* ((all-perms (append (or server-perms '()) (or client-perms '())))
+             (summary (tiqsi-opencode-server--format-permission-summary all-perms)))
+        (message "Session permissions: %s (%d rules)"
+                 summary (length all-perms))))))
 
 ;; ---------------------------------------------------------------------------
 ;; Session browser
@@ -1326,6 +1381,7 @@ Updates the REPL buffer header and resets per-session counters."
   (setq tiqsi-opencode-server--message-count 0)
   (setq tiqsi-opencode-server--request-start-time nil)
   (setq tiqsi-opencode-server--output-start nil)
+  (setq tiqsi-opencode-server--permission-grants nil)
   (clrhash tiqsi-opencode-server--tool-calls)
   ;; Fetch session info for the title
   (let* ((info (condition-case nil
@@ -1442,6 +1498,7 @@ Optionally provide a TITLE."
       (setq tiqsi-opencode-server--total-cost 0.0)
       (setq tiqsi-opencode-server--total-tokens 0)
       (setq tiqsi-opencode-server--message-count 0)
+      (setq tiqsi-opencode-server--permission-grants nil)
       (clrhash tiqsi-opencode-server--tool-calls)
       ;; Update REPL buffer
       (when (and tiqsi-opencode-server--repl-buffer
@@ -1458,6 +1515,158 @@ Optionally provide a TITLE."
             (insert (tiqsi-claude-repl--format-prompt "oc"))
             (goto-char (point-max)))))
       (message "Created new session: %s (%s)" session-title id))))
+
+;; ---------------------------------------------------------------------------
+;; Tabulated session browser
+;; ---------------------------------------------------------------------------
+
+(defvar tiqsi-opencode-session-browser-mode-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map tabulated-list-mode-map)
+    (define-key map (kbd "RET") #'tiqsi-opencode-session-browser--switch)
+    (define-key map (kbd "o")   #'tiqsi-opencode-session-browser--switch)
+    (define-key map (kbd "d")   #'tiqsi-opencode-session-browser--delete)
+    (define-key map (kbd "D")   #'tiqsi-opencode-session-browser--delete)
+    (define-key map (kbd "n")   #'tiqsi-opencode-session-browser--new)
+    (define-key map (kbd "g")   #'tiqsi-opencode-session-browser--refresh)
+    (define-key map (kbd "p")   #'tiqsi-opencode-session-browser--perms)
+    (define-key map (kbd "q")   #'quit-window)
+    map)
+  "Keymap for the OpenCode session browser.")
+
+(define-derived-mode tiqsi-opencode-session-browser-mode tabulated-list-mode
+  "OC-Sessions"
+  "Major mode for browsing OpenCode sessions.
+\\<tiqsi-opencode-session-browser-mode-map>
+\\[tiqsi-opencode-session-browser--switch]  Switch to session
+\\[tiqsi-opencode-session-browser--delete]  Delete session
+\\[tiqsi-opencode-session-browser--new]     New session
+\\[tiqsi-opencode-session-browser--refresh] Refresh list
+\\[tiqsi-opencode-session-browser--perms]   Show permissions
+\\[quit-window]                             Quit"
+  (setq tabulated-list-format
+        [("" 2 nil)                          ; current marker
+         ("Title" 40 t)
+         ("Age" 10 t)
+         ("Changes" 20 t)
+         ("Perms" 16 t)
+         ("ID" 22 t)])
+  (setq tabulated-list-padding 1)
+  (setq tabulated-list-sort-key '("Age" . nil))
+  (tabulated-list-init-header))
+
+(defun tiqsi-opencode-session-browser--entries ()
+  "Build tabulated-list entries from server sessions."
+  (let ((sessions (tiqsi-opencode-server--list-sessions)))
+    (mapcar
+     (lambda (session)
+       (let* ((id (gethash "id" session ""))
+              (title (or (gethash "title" session)
+                         (gethash "slug" session) "untitled"))
+              (time-obj (gethash "time" session))
+              (created (when (hash-table-p time-obj) (gethash "created" time-obj)))
+              (updated (when (hash-table-p time-obj) (gethash "updated" time-obj)))
+              (age (tiqsi-opencode-server--format-session-age (or updated created)))
+              (summary (gethash "summary" session))
+              (summary-str
+               (if (hash-table-p summary)
+                   (let ((adds (gethash "additions" summary 0))
+                         (dels (gethash "deletions" summary 0))
+                         (files (gethash "files" summary 0)))
+                     (if (> (+ adds dels files) 0)
+                         (format "+%d/-%d (%d files)" adds dels files)
+                       ""))
+                 ""))
+              (parent (gethash "parentID" session))
+              (perms-raw (gethash "permission" session))
+              (perms (cond ((vectorp perms-raw) (append perms-raw nil))
+                           ((listp perms-raw) perms-raw)
+                           (t nil)))
+              (perms-str (if perms
+                             (tiqsi-opencode-server--format-permission-summary perms)
+                           ""))
+              (current-p (equal id tiqsi-opencode-server--session-id))
+              (marker (if current-p "*" ""))
+              (title-display (concat
+                              (if (> (length title) 38)
+                                  (concat (substring title 0 35) "...")
+                                title)
+                              (if parent " (fork)" ""))))
+         (list id (vector marker title-display age summary-str perms-str
+                          (substring id 0 (min 22 (length id)))))))
+     sessions)))
+
+(defun tiqsi-opencode-session-browser--get-id ()
+  "Get the session ID at point."
+  (tabulated-list-get-id))
+
+(defun tiqsi-opencode-session-browser--switch ()
+  "Switch to the session at point."
+  (interactive)
+  (let ((id (tiqsi-opencode-session-browser--get-id)))
+    (when id
+      (tiqsi-opencode-server-switch-session id)
+      (quit-window)
+      (message "Switched to session: %s" id))))
+
+(defun tiqsi-opencode-session-browser--delete ()
+  "Delete the session at point."
+  (interactive)
+  (let ((id (tiqsi-opencode-session-browser--get-id)))
+    (when (and id (yes-or-no-p (format "Delete session %s? " id)))
+      (tiqsi-opencode-server--http-request
+       "DELETE" (format "/session/%s" id))
+      (when (equal id tiqsi-opencode-server--session-id)
+        (setq tiqsi-opencode-server--session-id nil))
+      (tiqsi-opencode-session-browser--refresh)
+      (message "Deleted session %s" id))))
+
+(defun tiqsi-opencode-session-browser--new ()
+  "Create a new session from the browser."
+  (interactive)
+  (let ((title (read-string "Session title: ")))
+    (tiqsi-opencode-server-new-session title)
+    (tiqsi-opencode-session-browser--refresh)))
+
+(defun tiqsi-opencode-session-browser--refresh ()
+  "Refresh the session list."
+  (interactive)
+  (setq tabulated-list-entries (tiqsi-opencode-session-browser--entries))
+  (tabulated-list-print t)
+  (message "Refreshed (%d sessions)" (length tabulated-list-entries)))
+
+(defun tiqsi-opencode-session-browser--perms ()
+  "Show permissions for the session at point."
+  (interactive)
+  (let* ((id (tiqsi-opencode-session-browser--get-id))
+         (perms (when id (tiqsi-opencode-server--get-session-permissions id))))
+    (if (and perms (> (length perms) 0))
+        (message "%s" (mapconcat
+                       (lambda (rule)
+                         (if (hash-table-p rule)
+                             (format "%s: %s (%s)"
+                                     (gethash "permission" rule "?")
+                                     (gethash "action" rule "?")
+                                     (gethash "pattern" rule "*"))
+                           ""))
+                       perms " │ "))
+      (message "No permission rules for session %s" (or id "?")))))
+
+;;;###autoload
+(defun tiqsi-opencode-session-browser ()
+  "Open the OpenCode session browser in a dedicated buffer.
+Provides a tabulated view of all sessions with keybindings for
+switching, deleting, and creating sessions."
+  (interactive)
+  (unless (tiqsi-opencode-server-active-p)
+    (error "OpenCode server is not running"))
+  (let ((buf (get-buffer-create "*OpenCode Sessions*")))
+    (with-current-buffer buf
+      (tiqsi-opencode-session-browser-mode)
+      (setq tabulated-list-entries (tiqsi-opencode-session-browser--entries))
+      (tabulated-list-print t))
+    (pop-to-buffer buf)
+    (message "RET=switch  d=delete  n=new  p=perms  g=refresh  q=quit")))
 
 (provide 'tiqsi-claude-repl-opencode-server)
 

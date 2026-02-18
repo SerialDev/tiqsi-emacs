@@ -1503,15 +1503,15 @@
 (let ((orig tiqsi-repl-backend))
   (unwind-protect
       (progn
-        ;; OpenCode + server active -> server-list-sessions
+        ;; OpenCode + server active -> session-browser
         (setq tiqsi-repl-backend 'opencode)
-        (let ((server-list-called nil))
+        (let ((browser-called nil))
           (cl-letf (((symbol-function 'tiqsi-opencode-server-active-p) (lambda () t))
-                    ((symbol-function 'tiqsi-opencode-server-list-sessions)
-                     (lambda () (setq server-list-called t))))
+                    ((symbol-function 'tiqsi-opencode-session-browser)
+                     (lambda () (setq browser-called t))))
             (tiqsi-claude-list-sessions)
-            (tiqsi-test-assert server-list-called
-                               "Dispatch l: opencode+server -> server-list-sessions")))
+            (tiqsi-test-assert browser-called
+                               "Dispatch l: opencode+server -> session-browser")))
         ;; OpenCode + no server -> run list-sessions
         (let ((run-list-called nil))
           (cl-letf (((symbol-function 'tiqsi-opencode-server-active-p) (lambda () nil))
@@ -2034,7 +2034,183 @@
                    "hydra-claude has 'p' key for permission viewer")
 
 ;; ---------------------------------------------------------------------------
-;; 14. Source syntax (including server module)
+;; 14. Permission grant cache
+;; ---------------------------------------------------------------------------
+
+(tiqsi-test-suite "OpenCode: Permission Grant Cache")
+
+;; Test: permission-grants variable exists
+(tiqsi-test-assert (boundp 'tiqsi-opencode-server--permission-grants)
+                   "permission-grants variable is defined")
+
+;; Test: finalize-permission caches "always" grants
+(let ((tiqsi-opencode-server--permission-grants nil))
+  ;; Mock reply-permission and repl-insert to no-op
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--reply-permission)
+             (lambda (&rest _) nil))
+            ((symbol-function 'tiqsi-opencode-server--repl-insert)
+             (lambda (&rest _) nil)))
+    (tiqsi-opencode-server--finalize-permission "req1" "always" "bash" ["*"])
+    (tiqsi-test-assert (= 1 (length tiqsi-opencode-server--permission-grants))
+                       "finalize-permission caches 'always' grant")
+    (let ((entry (car tiqsi-opencode-server--permission-grants)))
+      (tiqsi-test-assert (equal "bash" (gethash "permission" entry))
+                         "cached grant has correct permission type")
+      (tiqsi-test-assert (equal "allow" (gethash "action" entry))
+                         "cached 'always' grant has action=allow")
+      (tiqsi-test-assert (equal "*" (gethash "pattern" entry))
+                         "cached grant has correct pattern")
+      (tiqsi-test-assert (stringp (gethash "time" entry))
+                         "cached grant has timestamp"))))
+
+;; Test: finalize-permission caches "once" grants with allow-once action
+(let ((tiqsi-opencode-server--permission-grants nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--reply-permission)
+             (lambda (&rest _) nil))
+            ((symbol-function 'tiqsi-opencode-server--repl-insert)
+             (lambda (&rest _) nil)))
+    (tiqsi-opencode-server--finalize-permission "req2" "once" "edit" ["*.el"])
+    (tiqsi-test-assert (= 1 (length tiqsi-opencode-server--permission-grants))
+                       "finalize-permission caches 'once' grant")
+    (let ((entry (car tiqsi-opencode-server--permission-grants)))
+      (tiqsi-test-assert (equal "allow-once" (gethash "action" entry))
+                         "cached 'once' grant has action=allow-once"))))
+
+;; Test: finalize-permission does NOT cache "reject"
+(let ((tiqsi-opencode-server--permission-grants nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--reply-permission)
+             (lambda (&rest _) nil))
+            ((symbol-function 'tiqsi-opencode-server--repl-insert)
+             (lambda (&rest _) nil)))
+    (tiqsi-opencode-server--finalize-permission "req3" "reject" "bash" ["*"])
+    (tiqsi-test-assert (null tiqsi-opencode-server--permission-grants)
+                       "finalize-permission does not cache 'reject'")))
+
+;; Test: multiple grants accumulate
+(let ((tiqsi-opencode-server--permission-grants nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--reply-permission)
+             (lambda (&rest _) nil))
+            ((symbol-function 'tiqsi-opencode-server--repl-insert)
+             (lambda (&rest _) nil)))
+    (tiqsi-opencode-server--finalize-permission "r1" "always" "bash" ["*"])
+    (tiqsi-opencode-server--finalize-permission "r2" "always" "edit" ["*.py"])
+    (tiqsi-opencode-server--finalize-permission "r3" "once" "read" nil)
+    (tiqsi-test-assert (= 3 (length tiqsi-opencode-server--permission-grants))
+                       "multiple grants accumulate in cache")))
+
+;; Test: format-permission-summary counts allow-once as allow
+(let ((perms (list (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "allow-once" h) h)
+                   (let ((h (make-hash-table :test 'equal)))
+                     (puthash "action" "allow" h) h))))
+  (tiqsi-test-assert (equal "2 allow" (tiqsi-opencode-server--format-permission-summary perms))
+                     "format-permission-summary counts allow-once as allow"))
+
+;; Test: cache is cleared on session switch
+(let ((tiqsi-opencode-server--permission-grants (list (make-hash-table)))
+      (tiqsi-opencode-server--session-id "old-session")
+      (tiqsi-opencode-server--busy nil)
+      (tiqsi-opencode-server--total-cost 0.0)
+      (tiqsi-opencode-server--total-tokens 0)
+      (tiqsi-opencode-server--message-count 0)
+      (tiqsi-opencode-server--request-start-time nil)
+      (tiqsi-opencode-server--output-start nil)
+      (tiqsi-opencode-server--repl-buffer nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-server--http-request)
+             (lambda (&rest _) nil)))
+    (tiqsi-opencode-server-switch-session "new-session")
+    (tiqsi-test-assert (null tiqsi-opencode-server--permission-grants)
+                       "permission grants cache cleared on session switch")))
+
+;; ---------------------------------------------------------------------------
+;; 15. Tabulated session browser
+;; ---------------------------------------------------------------------------
+
+(tiqsi-test-suite "OpenCode: Session Browser Tabulated")
+
+;; Test: browser mode is defined
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-session-browser-mode
+                           "session browser mode is defined")
+
+;; Test: browser entry point is defined
+(tiqsi-test-assert-fboundp 'tiqsi-opencode-session-browser
+                           "session browser function exists")
+
+;; Test: browser mode keymap exists with expected keys
+(tiqsi-test-assert (keymapp tiqsi-opencode-session-browser-mode-map)
+                   "session browser keymap exists")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "RET"))
+                   "browser keymap has RET for switch")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "d"))
+                   "browser keymap has d for delete")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "n"))
+                   "browser keymap has n for new")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "g"))
+                   "browser keymap has g for refresh")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "p"))
+                   "browser keymap has p for perms")
+(tiqsi-test-assert (lookup-key tiqsi-opencode-session-browser-mode-map (kbd "q"))
+                   "browser keymap has q for quit")
+
+;; Test: browser entries builder produces correct format
+(cl-letf (((symbol-function 'tiqsi-opencode-server--list-sessions)
+           (lambda ()
+             (let ((s1 (make-hash-table :test 'equal))
+                   (time-obj (make-hash-table :test 'equal)))
+               (puthash "id" "ses_test12345678901234" s1)
+               (puthash "title" "Test Session" s1)
+               (puthash "created" (* (float-time) 1000) time-obj)
+               (puthash "time" time-obj s1)
+               (list s1)))))
+  (let ((entries (tiqsi-opencode-session-browser--entries)))
+    (tiqsi-test-assert (= 1 (length entries))
+                       "browser entries returns correct count")
+    (let ((entry (car entries)))
+      (tiqsi-test-assert (equal "ses_test12345678901234" (car entry))
+                         "browser entry has session ID as key")
+      (tiqsi-test-assert (vectorp (cadr entry))
+                         "browser entry has vector of column values")
+      (tiqsi-test-assert (= 6 (length (cadr entry)))
+                         "browser entry has 6 columns"))))
+
+;; Test: browser entries mark current session
+(cl-letf (((symbol-function 'tiqsi-opencode-server--list-sessions)
+           (lambda ()
+             (let ((s1 (make-hash-table :test 'equal))
+                   (s2 (make-hash-table :test 'equal))
+                   (t1 (make-hash-table :test 'equal))
+                   (t2 (make-hash-table :test 'equal)))
+               (puthash "id" "ses_current" s1)
+               (puthash "title" "Current" s1)
+               (puthash "created" (* (float-time) 1000) t1)
+               (puthash "time" t1 s1)
+               (puthash "id" "ses_other" s2)
+               (puthash "title" "Other" s2)
+               (puthash "created" (* (float-time) 1000) t2)
+               (puthash "time" t2 s2)
+               (list s1 s2)))))
+  (let* ((tiqsi-opencode-server--session-id "ses_current")
+         (entries (tiqsi-opencode-session-browser--entries))
+         (e1 (car entries))
+         (e2 (cadr entries)))
+    (tiqsi-test-assert (equal "*" (aref (cadr e1) 0))
+                       "current session marked with *")
+    (tiqsi-test-assert (equal "" (aref (cadr e2) 0))
+                       "non-current session has no marker")))
+
+;; Test: list-sessions dispatch uses session browser when server active
+(let ((browser-called nil))
+  (cl-letf (((symbol-function 'tiqsi-opencode-session-browser)
+             (lambda () (interactive) (setq browser-called t)))
+            ((symbol-function 'tiqsi-opencode-server-active-p)
+             (lambda () t)))
+    (let ((tiqsi-repl-backend 'opencode))
+      (tiqsi-claude-list-sessions)
+      (tiqsi-test-assert browser-called
+                         "list-sessions dispatches to tabulated browser when server active"))))
+
+;; ---------------------------------------------------------------------------
+;; 16. Source syntax (including server module)
 ;; ---------------------------------------------------------------------------
 
 (tiqsi-test-suite "OpenCode: Source Syntax")
