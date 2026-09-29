@@ -449,12 +449,21 @@ Display progress in the mode line instead."
 ;;                                            Keybindings                                            ;
 ;; - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ;
 
+(defun sdev/kill-buffer ()
+  (interactive)
+  (if (minibufferp)
+    (abort-recursive-edit)
+    (let ((proc (get-buffer-process (current-buffer))))
+      (when proc
+        (set-process-query-on-exit-flag proc nil))
+      (kill-buffer (current-buffer)))))
+
+
 (safe-execute(progn
 	       (define-key vterm-mode-map (kbd "M-w") 'sdev/jump-window)
 	       (define-key vterm-mode-map (kbd "M-f") 'ido-find-file)
 	       (define-key vterm-mode-map (kbd "C-f") 'yank)
-	       (define-key vterm-mode-map (kbd "M-k") 'kill-this-buffer)
-	       (define-key vterm-mode-map (kbd "M-k") 'kill-this-buffer)
+	       (define-key vterm-mode-map (kbd "M-k") 'sdev/kill-buffer)
 	       (define-key vterm-mode-map (kbd "S-<up>") 'previous-line)
 	       (define-key vterm-mode-map (kbd "M-<up>") 'previous-blank-line)
 	       (define-key vterm-mode-map (kbd "S-<down>") 'next-line)

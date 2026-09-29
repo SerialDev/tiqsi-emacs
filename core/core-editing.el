@@ -849,7 +849,7 @@ Insert 1 if it does, 0 if it doesn't."
 (define-key global-map "\e'" 'call-last-kbd-macro)
 ;; Buffers
 (define-key global-map "\er" 'revert-buffer)
-(define-key global-map "\ek" 'kill-this-buffer)
+(define-key global-map "\ek" 'sdev/kill-buffer)
 (define-key global-map "\es" 'save-buffer)
 
 (define-key global-map (kbd "S-<down>") 'open-line-below)
@@ -879,7 +879,7 @@ Insert 1 if it does, 0 if it doesn't."
   ;; A lot of these are to work well with remote jupyterhub terminals
   (define-key global-map (kbd "C-@") 'set-mark-command)
   (straight-require 'python)
-  (global-set-key (kbd "˚") 'kill-this-buffer)
+  (global-set-key (kbd "˚") 'sdev/kill-buffer)
   (global-set-key (kbd "ƒ") 'ido-find-file)
 
   (global-set-key (kbd "˘") 'end-of-buffer)
