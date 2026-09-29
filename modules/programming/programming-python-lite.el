@@ -151,7 +151,8 @@
   (sdev--set-python-interpreter "ssh" "-t root@135.181.198.90 /opt/conda/bin/python -i"))
 
 
-(sdev--set-python-interpreter "uv" "run python -i")
+(when (executable-find "uv")
+  (sdev-use-uv-ipython))
 
 
 ;; ------------------------------------------------------------------------- ;
@@ -859,6 +860,35 @@
   (insert "import pandas as pd\n\n# Reset display options to defaults\npd.reset_option('display.max_rows')\npd.reset_option('display.max_columns')\n"))
 
 
+(defvar tiqsi-python-language-server
+  '("uvx" "--from" "basedpyright" "basedpyright-langserver" "--stdio"))
+
+
+(defun tiqsi-python-completion-setup ()
+  (setq-local company-idle-delay 0.15
+    company-minimum-prefix-length 2
+    company-backends '((company-capf :with company-dabbrev-code) company-files))
+  (company-mode 1)
+  (when (and buffer-file-name (executable-find "uvx"))
+    (eglot-ensure)))
+
+
+(add-hook 'python-mode-hook #'tiqsi-python-completion-setup)
+(add-hook 'inferior-python-mode-hook #'company-mode)
+
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs (cons '(python-mode python-ts-mode) tiqsi-python-language-server))
+  (setq eglot-sync-connect nil
+    eglot-connect-timeout 120
+    eglot-autoshutdown t
+    eglot-send-changes-idle-time 0.3
+    eglot-events-buffer-config '(:size 0 :format short)
+    eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider :codeLensProvider
+                                         :documentOnTypeFormattingProvider :colorProvider :foldingRangeProvider))
+  (add-to-list 'completion-category-overrides '(eglot-capf (styles basic flex))))
+
+
 ;; ------------------------------------------------------------------------- ;
 ;;                                Keybindings                                ;
 ;; ------------------------------------------------------------------------- ;
@@ -874,6 +904,8 @@
 (define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 (define-key python-mode-map (kbd "C-c C-c") 'tiqsi-uv-compile)
+(define-key python-mode-map (kbd "C-c >") 'sdev/next-issue)
+(define-key python-mode-map (kbd "C-c <") 'sdev/previous-issue)
 
 (define-key compilation-mode-map (kbd "RET") 'custom-compile-go-to-error)
 (define-key compilation-mode-map (kbd "g") 'custom-compile-go-to-error)

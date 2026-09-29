@@ -148,8 +148,6 @@
   )
 
 
-(global-set-key (kbd "C-c >") 'tiqsi-comment--line-to-msg-centered-end)
-(global-set-key (kbd "C-c <") 'tiqsi-comment--line-to-msg-centered-begin)
 (global-set-key (kbd "C-M-=") 'sdev/sprintf-debug)
 ;; (define-key python-mode-map (kbd "C-c t e") 'sdev/py-try-catch)
 

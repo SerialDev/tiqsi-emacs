@@ -153,6 +153,8 @@ of an error, just add the package to a list of missing packages."
 ;; Bootstrap use-package
 
 (setq straight-use-package-by-default t)
+(dolist (pkg '(project xref))
+  (add-to-list 'straight-built-in-pseudo-packages pkg))
 (setq use-package-verbose t
   use-package-always-ensure t)
 
@@ -230,8 +232,24 @@ of an error, just add the package to a list of missing packages."
 
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-s") 'eval-last-sexp)
-(define-key global-map (kbd "C-c >") 'end-of-buffer)
-(define-key global-map (kbd "C-c <") 'beginning-of-buffer)
+(defun sdev/next-issue ()
+  (interactive)
+  (cond
+    ((bound-and-true-p flymake-mode) (call-interactively 'flymake-goto-next-error))
+    ((bound-and-true-p flycheck-mode) (call-interactively 'flycheck-next-error))
+    ((bound-and-true-p lsp-bridge-mode) (call-interactively 'lsp-bridge-diagnostic-jump-next))
+    (t (call-interactively 'next-error))))
+
+(define-key global-map (kbd "C-c >") 'sdev/next-issue)
+(defun sdev/previous-issue ()
+  (interactive)
+  (cond
+    ((bound-and-true-p flymake-mode) (call-interactively 'flymake-goto-prev-error))
+    ((bound-and-true-p flycheck-mode) (call-interactively 'flycheck-previous-error))
+    ((bound-and-true-p lsp-bridge-mode) (call-interactively 'lsp-bridge-diagnostic-jump-prev))
+    (t (call-interactively 'previous-error))))
+
+(define-key global-map (kbd "C-c <") 'sdev/previous-issue)
 
 
 (load-expand  "core/core-performance.el") ;; DONE
