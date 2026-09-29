@@ -119,7 +119,7 @@ Writing English explanations is forbidden. ")
       openai-key
       (error "The OPENAI_KEY environment variable is not set."))))
 
-(setq openai-key (get-openai-key))
+(setq openai-key (getenv "OPENAI_KEY"))
 
 ;; Ensure the 'shell-command' uses an interactive shell
 (setq shell-command-switch "-ic")

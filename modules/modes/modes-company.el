@@ -170,14 +170,21 @@ point."
 
 
 (defun activate-lsp-bridge-with-uv ()
-  "Set up lsp-bridge with uv virtual environment for Python files."
+  "Set up lsp-bridge with uv virtual environment for Python files.
+Fails softly: any error is caught and reported without breaking
+`python-mode' activation."
   (interactive)
-  (when (derived-mode-p 'python-mode)
-    (let ((default-directory (file-name-directory buffer-file-name)))
-      (setq-local lsp-bridge-python-command
-        (string-trim (shell-command-to-string "cd $PWD && uv_source && which python")))
-      (setq-local lsp-bridge-python-default-server 'pyright)
-      (lsp-bridge-mode 1))))
+  (condition-case err
+    (when (and (derived-mode-p 'python-mode)
+            (buffer-file-name)
+            (fboundp 'lsp-bridge-mode))
+      (let ((default-directory (file-name-directory buffer-file-name)))
+        (setq-local lsp-bridge-python-command
+          (string-trim (shell-command-to-string "cd $PWD && uv_source && which python")))
+        (setq-local lsp-bridge-python-default-server 'pyright)
+        (lsp-bridge-mode 1)))
+    (error (message "activate-lsp-bridge-with-uv: skipped (%s)"
+             (error-message-string err)))))
 
 
 
@@ -224,7 +231,7 @@ point."
       (message "Definition not found."))))
 
 
-(add-hook 'python-mode-hook 'lsp)
+(add-hook 'python-mode-hook 'activate-lsp-bridge-with-uv)
 (add-hook 'emacs-lisp-mode-hook 'company-mode)
 
 (defun insert-colored-print (text)

@@ -36,8 +36,8 @@
 
 (setq lisp-indent-offset 2)
 
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                          ("melpa" . "http://melpa.org/packages/")))
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                          ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
 
 ;; Debug?
@@ -53,8 +53,10 @@
 ;; change backup so that current directory does not clutter
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
+(defvar tiqsi-root (file-name-directory (or load-file-name buffer-file-name)))
+
 (defun load-expand(filename)
-  (load(expand-file-name filename)))
+  (load (expand-file-name filename tiqsi-root)))
 
 
 ;; attempt to load a feature/library, failing silently
@@ -189,35 +191,27 @@ of an error, just add the package to a list of missing packages."
                (nth 1 bt))))
     func))
 
+(defmacro try! (form)
+  `(let ((ok (ignore-errors ,form)))
+     (message "t:%s --%s-- form:%S l:%s path:%s"
+       (current-time-microseconds) (if ok "SUCCESS" "FAILURE") ',form
+       (format-mode-line "%l") buffer-file-name)
+     ok))
+
+
 (defmacro cond-require (item do-this)
   `(if (require ',item nil 'noerror)
-     (try! ',do-this)
-     (message (format "FAILURE-COND-CHECK %s: %s %s %s %s" ',item
-                (current-time-microseconds) (calling-function)
-                (format-mode-line "%l") buffer-file-name))))
-
-(defmacro try!( func)
-  `(if (ignore-errors
-         ,func)
-     (message (format "t:%s --SUCCESS-- argl:%s l:%s path:%s"
-                ,(current-time-microseconds)
-                ,(help-function-arglist 'func)
-                ,(format-mode-line "%l")
-                ,buffer-file-name))
-
-     (message (format "t:%s --FAILURE-- argl:%s l:%s path:%s"
-                ,(current-time-microseconds)
-                ,(help-function-arglist 'func)
-                ,(format-mode-line "%l")
-                ,buffer-file-name))
-     ))
+     (try! ,do-this)
+     (message "FAILURE-COND-CHECK %s: %s %s %s %s" ',item
+       (current-time-microseconds) (calling-function)
+       (format-mode-line "%l") buffer-file-name)))
 
 
+(straight-require 's)
+(straight-require 'dash)
 (straight-require 'evil)
-
 (straight-require 'company)
-(straight-require 'color)
-(straight-require 'evil)
+(require 'color)
 
 
 ;; (straight-use-package 'selectrum)
