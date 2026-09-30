@@ -32,11 +32,11 @@
 
 (defmacro tiqsi-comment--between ( &rest content)
   `(progn
-     (insert (s-trim comment-start))
+     (insert (s-trim (or comment-start "")))
      (insert " ")
      ,@content
      (insert " ")
-     (insert (s-trim comment-start))
+     (insert (s-trim (or comment-start "")))
      (newline)))
 
 (defun tiqsi-comment--insert-end ()
@@ -81,10 +81,10 @@
      (insert " ")
      ,@content
      (insert " ")
-     (insert (s-trim comment-start))
+     (insert (s-trim (or comment-start "")))
      (sdev/del-end-line)
      (move-beginning-of-line 1)
-     (insert (s-trim comment-start))
+     (insert (s-trim (or comment-start "")))
      ))
 
 

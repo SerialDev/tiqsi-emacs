@@ -130,11 +130,12 @@ point."
   (interactive)
   (message "Current company backends: %s" company-backends))
 
-(define-key global-map (kbd "M-q") 'company-quickhelp-manual-begin)
+(with-eval-after-load 'company-quickhelp
+  (define-key company-mode-map (kbd "M-q") 'company-quickhelp-manual-begin))
 
 ;; (define-key global-map (kbd "<tab>") 'tiqsi/indent-or-complete)
 ;; (define-key global-map (kbd "<tab>") 'indent-or-expand)
-(define-key global-map (kbd "<tab>") 'company-indent-or-complete-common)
+(define-key company-mode-map (kbd "<tab>") 'company-indent-or-complete-common)
 
 (use-package posframe
   :straight t

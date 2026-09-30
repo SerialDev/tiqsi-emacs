@@ -245,34 +245,13 @@ point.  This is essentially what
 `lsp-clients-extract-signature-on-hover'
 does, just as an extra function."
   (interactive)
-  (message
+  (message "%s"
     (slot/syntax-highlight-string
       (slot/lsp-get-type-signature-at-point)
       major-mode)))
 
 
 (advice-add #'lsp-eldoc-function :after (lambda (&rest _) (setq lsp--hover-saved-bounds nil)))
-;; extract and show short signature for rust-analyzer
-(cl-defmethod lsp-clients-extract-signature-on-hover (contents (_server-id (eql rust-analyzer)))
-  "Get LANGs type signature in STR.
-Original implementation from https://github.com/emacs-lsp/lsp-mode/pull/1740."
-  (let* ((value (if lsp-use-plists (plist-get contents :value) (gethash "value" contents)))
-          (groups (--partition-by (s-blank? it) (s-lines (s-trim value))))
-          (mod-group (cond ((s-equals? "```rust" (car (-fifth-item groups))) (-third-item groups))
-                       ((s-equals? "```rust" (car (-third-item groups))) (-first-item groups))
-                       (t nil)))
-          (cmt (if (null mod-group) "" (concat " // " (cadr mod-group))))
-          (sig-group (cond ((s-equals? "```rust" (car (-fifth-item groups))) (-fifth-item groups))
-                       ((s-equals? "```rust" (car (-third-item groups))) (-third-item groups))
-                       (t (-first-item groups))))
-          (sig (->> sig-group
-                 (--drop-while (s-equals? "```rust" it))
-                 (--take-while (not (s-equals? "```" it)))
-                 (--map (s-replace-regexp "//.*" "" it))
-                 (--map (s-trim it))
-                 (s-join " "))))
-    (lsp--render-element (concat "```rust\n" sig cmt "\n```"))))
-
 (defun slot/lsp-get-type-signature (lang str)
   (let* ((start (concat "```" lang))
           (groups (--filter (s-equals? start (car it))
@@ -308,7 +287,7 @@ Original implementation from https://github.com/emacs-lsp/lsp-mode/pull/1740."
   (contents (_server-id (eql rust-analyzer))) ; Only for Rust.
   "Display the type signature of the function at point."
   (slot/syntax-highlight-string
-    (slot/lsp-get-type-signature "rust" (plist-get contents :value))
+    (slot/lsp-get-type-signature "rust" (if lsp-use-plists (plist-get contents :value) (gethash "value" contents)))
     'rustic-mode))
 
 (defun slot/lsp-get-type-signature-at-point (&optional lang)
@@ -443,7 +422,6 @@ LANG is not given, get it from `lsp--buffer-language'."
     (lsp-rust-analyzer-display-chaining-hints t)
     (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
     (lsp-rust-analyzer-display-closure-return-type-hints t)
-    (lsp-rust-analyzer-display-parameter-hints nil)
     (lsp-rust-analyzer-display-reborrow-hints nil)
     (lsp-completion-provider :none) ;; we use Corfu!
     :init
@@ -484,7 +462,6 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 
 (setq lsp-eldoc-enable-hover nil)
-(setq lsp-ui-sideline-show-hover nil)
 (setq lsp-modeline-code-actions-enable nil)
 (setq lsp-headerline-breadcrumb-enable t)
 (setq lsp-modeline-diagnostics-enable nil)
