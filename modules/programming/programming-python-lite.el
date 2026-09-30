@@ -34,6 +34,81 @@
   (python-shell-send-string (buffer-substring-no-properties begin end) (tiqsi-python-process)))
 
 
+(defun tiqsi-python-defun-end (start)
+  (save-excursion
+    (goto-char start)
+    (python-nav-end-of-defun)
+    (skip-chars-backward " \t\n")
+    (point)))
+
+
+(defun tiqsi-python-enclosing-defun (start)
+  (save-excursion
+    (goto-char start)
+    (let ((indent (current-indentation))
+           (found nil))
+      (while (and (not found)
+               (> indent 0)
+               (re-search-backward "^[ \t]*\\(?:async[ \t]+def\\|def\\|class\\)[ \t]" nil t))
+        (when (< (current-indentation) indent)
+          (setq found (point))))
+      found)))
+
+
+(defun tiqsi-python-defun-bounds ()
+  (save-excursion
+    (python-nav-beginning-of-statement)
+    (beginning-of-line)
+    (while (looking-at-p "[ \t]*@")
+      (python-nav-end-of-statement)
+      (forward-line 1)
+      (beginning-of-line))
+    (let ((origin (point))
+           (best nil))
+      (end-of-line)
+      (when (python-nav-beginning-of-defun)
+        (setq best (point))
+        (while (and best (> origin (tiqsi-python-defun-end best)))
+          (setq best (tiqsi-python-enclosing-defun best)))
+        (when best
+          (let ((outer (tiqsi-python-enclosing-defun best)))
+            (while (and outer (<= origin (tiqsi-python-defun-end outer)))
+              (setq best outer
+                outer (tiqsi-python-enclosing-defun best))))))
+      (when best
+        (goto-char best)
+        (beginning-of-line)
+        (let ((start (point)))
+          (while (and (not (bobp))
+                   (progn (forward-line -1)
+                     (end-of-line)
+                     (python-nav-beginning-of-statement)
+                     (beginning-of-line)
+                     (looking-at-p "[ \t]*@")))
+            (setq start (point)))
+          (cons start (tiqsi-python-defun-end best)))))))
+
+
+(defun tiqsi-python-send-dwim (&optional send-main)
+  (interactive "P")
+  (let* ((proc (tiqsi-python-process))
+          (bounds (tiqsi-python-defun-bounds)))
+    (if bounds
+      (progn
+        (python-shell-send-region (car bounds) (cdr bounds))
+        (message "Sent %s"
+          (save-excursion
+            (goto-char (car bounds))
+            (while (looking-at-p "[ \t]*@") (forward-line 1))
+            (string-trim (buffer-substring-no-properties (point) (line-end-position))))))
+      (python-shell-send-buffer send-main)
+      (message "Sent %s" (file-name-nondirectory (or buffer-file-name (buffer-name)))))
+    (unless (get-buffer-window (process-buffer proc))
+      (condition-case nil
+        (display-buffer (process-buffer proc))
+        (error nil)))))
+
+
 (defun extract-python-functions-to-clipboard (start end)
   (interactive "r")
   (let* ((module (file-name-base (buffer-file-name)))
@@ -905,7 +980,8 @@
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
 (define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
-(define-key python-mode-map (kbd "C-c C-c") 'tiqsi-uv-compile)
+(define-key python-mode-map (kbd "C-c C-c") 'tiqsi-python-send-dwim)
+(define-key python-mode-map (kbd "C-c c") 'tiqsi-uv-compile)
 (define-key python-mode-map (kbd "C-c >") 'sdev/next-issue)
 (define-key python-mode-map (kbd "C-c <") 'sdev/previous-issue)
 
