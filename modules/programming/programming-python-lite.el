@@ -50,6 +50,8 @@
     (message "Copied to clipboard: %s" import-string)))
 
 
+(defvar tiqsi-compile--command nil)
+
 (defun tiqsi-uv-compile (compile-string)
   (interactive (list (read-string "String to compile: " "uv run ")))
   (let ((dir (or (locate-dominating-file default-directory "pyproject.toml") default-directory)))

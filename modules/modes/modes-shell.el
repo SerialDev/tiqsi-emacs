@@ -34,7 +34,7 @@
     (let ((process (get-buffer-process (current-buffer)))
           )
       (unless process
-        (error "No process in %s" buffer-or-name))
+        (error "No process in %s" (buffer-name)))
       (goto-char (process-mark process))
       (insert command-string)
       (comint-send-input nil t )
@@ -92,6 +92,8 @@
   ;; Ensure, if possible, that FRAME gets input focus.
   (when (memq (window-system frame) '(x w32 ns))
     (x-focus-frame frame)))
+
+(defvar tip-frame nil)
 
 (defun make-tip-frame (tip &rest args)
   (setq tip-frame (make-frame

@@ -67,7 +67,7 @@ Symbols matching the text at point are put first in the completion list."
   (imenu--make-index-alist)
   (let ((name-and-pos '())
          (symbol-names '()))
-    (flet ((addsymbols (symbol-list)
+    (cl-labels ((addsymbols (symbol-list)
              (when (listp symbol-list)
                (dolist (symbol symbol-list)
                  (let ((name nil) (position nil))

@@ -84,7 +84,7 @@
 (defmacro when-executable (executable-name &rest body)
   `(if ,(executable-find executable-name)
      ,@body
-     (message "executable not found: %s" executable-name)))
+     (message "executable not found: %s" ,executable-name)))
 
 
 ;;                                          Determine Emacs                                          ;

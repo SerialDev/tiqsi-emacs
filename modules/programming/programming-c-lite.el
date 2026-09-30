@@ -51,6 +51,9 @@
 
 
 
+(defvar tiqsi-compile--command nil)
+(defvar tiqsi-compile--executable nil)
+
 (defun tiqsi-compile-extract-executable (compile-string)
   "Extract the name of the executable from the compile string."
   (if (string-match "\\(?:-o\\s-+\\)\\([^\\s-]+\\)" compile-string)
@@ -139,7 +142,7 @@
     (let ((process (get-buffer-process (current-buffer)))
            )
       (unless process
-        (error "No process in %s" buffer-or-name))
+        (error "No process in %s" (buffer-name)))
       (goto-char (process-mark process))
       (insert command-string)
       (comint-send-input nil t )
@@ -151,7 +154,7 @@
     (let ((process (get-buffer-process (current-buffer)))
            )
       (unless process
-        (error "No process in %s" buffer-or-name))
+        (error "No process in %s" (buffer-name)))
       (goto-char (process-mark process))
       (insert command-string)
       (comint-send-input nil t )

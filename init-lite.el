@@ -34,6 +34,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (setq lisp-indent-offset 2)
 
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")

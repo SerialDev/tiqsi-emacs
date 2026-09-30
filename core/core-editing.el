@@ -221,8 +221,7 @@ sEnter b64 data: ")
 (defun duplicate-current-line (&optional num)
   "Duplicate the current line NUM times."
   (interactive "p")
-  (if (bound-and-true-p paredit-mode)
-    (paredit-duplicate-current-line)
+  (progn
     (save-excursion
       (when (eq (point-at-eol) (point-max))
         (goto-char (point-max))
@@ -461,7 +460,7 @@ If there's no region, the current line will be duplicated."
       (let ((fn (or (lookup-key (current-local-map) (kbd "TAB"))
                   'indent-for-tab-command)))
         (if (not (called-interactively-p 'any))
-          (fn arg)
+          (funcall fn arg)
           (setq this-command fn)
           (call-interactively fn))))))
 

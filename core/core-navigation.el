@@ -296,8 +296,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (cond ((not (= (count-windows) 2))
           (message "You need exactly 2 windows to do this."))
     (t
-      (let* ((w1 (first (window-list)))
-              (w2 (second (window-list)))
+      (let* ((w1 (car (window-list)))
+              (w2 (cadr (window-list)))
               (b1 (window-buffer w1))
               (b2 (window-buffer w2))
               (s1 (window-start w1))
@@ -314,8 +314,8 @@ Repeated invocations toggle between the two most recently open buffers."
   (cond ((not (> (count-windows)1))
           (message "You can't rotate a single window!"))
     (t
-      (setq i 1)
-      (setq numWindows (count-windows))
+      (let ((i 1)
+             (numWindows (count-windows)))
       (while  (< i numWindows)
         (let* (
                 (w1 (elt (window-list) i))
@@ -331,7 +331,7 @@ Repeated invocations toggle between the two most recently open buffers."
           (set-window-buffer w2 b1)
           (set-window-start w1 s2)
           (set-window-start w2 s1)
-          (setq i (1+ i)))))))
+          (setq i (1+ i))))))))
 
 (defun my-toggle-window-split ()
   "Vertical split shows more of each line, horizontal split shows

@@ -30,6 +30,8 @@
 
 ;;; Code:
 
+(defvar core-debug-on-error nil)
+
 (defun core-debug-on-error ()
   "Toggle variable `core-debug-on-error'."
   (interactive)
@@ -60,7 +62,7 @@
          (region-regex "^(def..")
          defs beg end)
     (goto-char (point-min))
-    (setq defs (loop while (search-forward-regexp region-regex nil t)
+    (setq defs (cl-loop while (search-forward-regexp region-regex nil t)
                  collect (point-at-bol)))
     ;; so it evals last definition
     (nconc defs (list (point-max)))

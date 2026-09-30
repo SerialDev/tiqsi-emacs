@@ -228,13 +228,14 @@
 
 (defun amitp/buffer-file-names ()
   "A list of filenames for the current buffers"
-  (loop for filename in (mapcar 'buffer-file-name (buffer-list))
+  (cl-loop for filename in (mapcar 'buffer-file-name (buffer-list))
     when filename
     collect filename))
 
 (defun amitp/helm-for-files ()
   "Global filename match, over all files I typically open"
   (interactive)
+  (require 'recentf)
   (let ((helm-ff-transformer-show-only-basename nil)
          (recentf-list
            (mapcar 'abbreviate-file-name

@@ -392,9 +392,9 @@ LANG is not given, get it from `lsp--buffer-language'."
 ;; (add-hook 'python-mode-hook #'corfu-mode)
 
 
-(define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down) ;; corfu-next
-(define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)  ;; corfu-previous
-(define-key corfu-map (kbd "M-.") #'corfu-doc-toggle)
+(define-key corfu-map (kbd "M-p") #'corfu-popupinfo-scroll-down) ;; corfu-next
+(define-key corfu-map (kbd "M-n") #'corfu-popupinfo-scroll-up)  ;; corfu-previous
+(define-key corfu-map (kbd "M-.") #'corfu-popupinfo-toggle)
 
 
 (use-package rustic

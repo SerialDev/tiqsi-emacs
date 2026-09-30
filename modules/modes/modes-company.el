@@ -219,7 +219,7 @@ Fails softly: any error is caught and reported without breaking
   "Open definition in a right side buffer, reusing an existing side window if available."
   (interactive)
   (condition-case nil
-    (let ((buf (save-window-excursion
+    (let* ((buf (save-window-excursion
                  (lsp-find-definition)
                  (current-buffer)))
            (right-window (or (window-in-direction 'right)
