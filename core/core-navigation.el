@@ -468,8 +468,8 @@ one, an error is signaled."
 (define-key global-map [f9] 'first-error)
 (define-key global-map [f10] 'previous-error)
 (define-key global-map [f11] 'next-error)
-(define-key global-map [M-n] 'next-error)
-(define-key global-map [M-N] 'previous-error)
+(define-key global-map (kbd "M-n") 'next-error)
+(define-key global-map (kbd "M-N") 'previous-error)
 (define-key global-map "\egl" 'goto-line)
 (define-key global-map "\ej" 'imenu)
 ;; remap C-a to `smarter-move-beginning-of-line'

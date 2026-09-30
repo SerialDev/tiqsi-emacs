@@ -238,8 +238,8 @@ sInsert str to search: ")
 
 ;;---{keybindings}---;
 
-(define-key global-map [M-t] 'load-todo)
-(define-key global-map [M-T] 'load-log)
+(define-key global-map (kbd "M-t") 'load-todo)
+(define-key global-map (kbd "M-T") 'load-log)
 
 
 (provide 'core-files)
