@@ -58,7 +58,9 @@
 
 (setq tiqsi-aquamacs (featurep 'aquamacs))
 (setq tiqsi-linux (featurep 'x))
-(setq tiqsi-win32 (not (or tiqsi-aquamacs tiqsi-linux)))
+(setq tiqsi-win32 (eq system-type 'windows-nt))
+(defvar tiqsi-font "Courier New")
+(defvar tiqsi-makescript "./build.sh")
 (setq tiqsi-console (eq (symbol-value 'window-system) nil))
 (setq tiqsi-not-console (eq (eq (symbol-value 'window-system) nil)nil))
 
@@ -82,8 +84,8 @@
 
 
 (defmacro when-executable (executable-name &rest body)
-  `(if ,(executable-find executable-name)
-     ,@body
+  `(if (executable-find ,executable-name)
+     (progn ,@body)
      (message "executable not found: %s" ,executable-name)))
 
 
@@ -212,7 +214,7 @@
       (if (shell-command-to-string "type -p guix > /dev/null")
         (message (concat "Guix System " (shell-command-to-string "guix system -V | awk 'NR==1{printf $5}'") " (using the " (replace-regexp-in-string "\n$" "" (shell-command-to-string "uname -r")) " kernel)"))
         (message "Cannot determine distro.")))
-    (message system-type)))
+    (message "%s" system-type)))
 
 
 (defmacro check-exec (exec &rest body)
@@ -429,15 +431,12 @@ Display progress in the mode line instead."
 (defun copy-cd-command-maybe-next-buffer ()
   "Get the directory path of the next buffer if in *vterm*, or current buffer otherwise, and copy it to the clipboard prepended by 'cd '. Then jump to *vterm* buffer and paste it."
   (interactive)
-  (let (path)
-    (if (string= (buffer-name) "*vterm*")
-      (progn
-        (other-window 1)
-        (setq path (file-name-directory (buffer-file-name)))
-        (other-window 1))
-      (setq path (file-name-directory (buffer-file-name))))
+  (let ((path (if (string= (buffer-name) "*vterm*")
+                (with-current-buffer (window-buffer (next-window nil 'nomini))
+                  (file-name-directory (or buffer-file-name default-directory)))
+                (file-name-directory (or buffer-file-name default-directory)))))
     (when path
-      (kill-new (concat "cd " path))
+      (kill-new (concat "cd " (shell-quote-argument (expand-file-name path))))
       (message "Copied 'cd %s' to clipboard" path))
     (call-interactively #'sdev/jump-to-vterm)
     ))

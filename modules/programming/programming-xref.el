@@ -12,7 +12,11 @@
 (setq dumb-jump-prefer-searcher (if (executable-find "rg") 'rg 'grep)
   dumb-jump-selector 'completing-read)
 
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+(defun sdev--dumb-jump-backend ()
+  (unless (or (bound-and-true-p tags-file-name) (bound-and-true-p tags-table-list))
+    (dumb-jump-xref-activate)))
+
+(add-hook 'xref-backend-functions #'sdev--dumb-jump-backend)
 
 (advice-add 'dumb-jump-get-project-root :around
   (lambda (orig filepath)
@@ -28,13 +32,17 @@
 
 
 (defun sdev--xref-find-definitions ()
-  (let ((this-command 'xref-find-definitions))
-    (call-interactively 'xref-find-definitions)))
+  (let ((id (xref-backend-identifier-at-point (xref-find-backend))))
+    (if id
+      (xref-find-definitions id)
+      (let ((this-command 'xref-find-definitions))
+        (call-interactively 'xref-find-definitions)))))
 
 
 (defun sdev/goto-definition ()
   (interactive)
   (cond
+    ((minibufferp) (user-error "No definition lookup in the minibuffer"))
     ((and (derived-mode-p 'vterm-mode) (fboundp 'vterm-send-key))
       (vterm-send-key "." nil t))
     ((and (derived-mode-p 'clojure-mode) (fboundp 'monroe-jump) (sdev--monroe-live-p))

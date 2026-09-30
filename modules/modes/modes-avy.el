@@ -35,17 +35,13 @@ selected frame."
 (defun sdev/other-window (&optional arg)
   "Wrap `other-window' and skip *vterm* buffer."
   (interactive "p")
-  (ignore-errors
-    (let
-      ((win (selected-window))
-	(start-win (selected-window)))
-      (catch 'done
-	(while t
-	  (setq win (other-window arg))
-	  (when (eq win start-win)
-	    (throw 'done nil))
-	  (unless (string= (buffer-name (window-buffer win)) "*vterm*")
-	    (throw 'done (select-window win))))))))
+  (let ((start-win (selected-window)))
+    (catch 'done
+      (dotimes (_ (count-windows))
+        (other-window (or arg 1))
+        (unless (string= (buffer-name (window-buffer (selected-window))) "*vterm*")
+          (throw 'done (selected-window))))
+      (select-window start-win))))
 
 
 
@@ -66,12 +62,13 @@ selected frame."
 
 
 (defun sdev/jump-to-vterm ()
-  "Jump to the *vterm* buffer."
+  "Jump to the *vterm* buffer, starting one if needed."
   (interactive)
   (let ((win (get-buffer-window "*vterm*")))
-    (if win
-      (select-window win)
-      (error "No *vterm* buffer found"))))
+    (cond
+      (win (select-window win))
+      ((get-buffer "*vterm*") (pop-to-buffer "*vterm*"))
+      (t (vterm)))))
 
 
 

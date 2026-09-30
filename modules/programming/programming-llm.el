@@ -142,7 +142,7 @@ Writing English explanations is forbidden. ")
     (setq cai-flow-model model-name)
     (message "cai-flow model set to %s" model-name)))
 
-(setq cai-flow-model "ll")
+(setq cai-flow-model " ll ")
 
 (defun cai-flow-call-region (begin end)
   "Call cai_flow with the selected text from BEGIN to END, formatted as a single line, and display output in a side buffer."

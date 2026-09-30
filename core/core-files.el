@@ -31,7 +31,7 @@
 
 ;;---{TODO related}--;
 
-(setq tiqsi-todo-file "/todo.txt")
+(setq tiqsi-todo-file (expand-file-name "~/todo.txt"))
 
 (defun load-todo ()
   (interactive)
@@ -39,7 +39,7 @@
 
 ;;---{LOG related}---;
 
-(setq tiqsi-log-file "/log.txt")
+(setq tiqsi-log-file (expand-file-name "~/log.txt"))
 
 (defun load-log ()
   (interactive)
@@ -47,7 +47,7 @@
   (visual-line-mode 1)
   (goto-char (point-max))
   (newline-and-indent)
-  (insert-timeofday)
+  (insert (format-time-string "%Y-%m-%d %H:%M"))
   (newline-and-indent)
   (newline-and-indent)
   (goto-char (point-max)))
@@ -116,10 +116,10 @@
 ;;
 (defun move-buffer-file (dir)
   "Moves both current buffer and file it's visiting to DIR." (interactive "DNew directory: ")
-  (let* ((name (buffer-name))
+  (let* ((name (file-name-nondirectory (or (buffer-file-name) (buffer-name))))
           (filename (buffer-file-name))
           (dir
-            (if (string-match dir "\\(?:/\\|\\\\)$")
+            (if (string-match "[/\\\\]$" dir)
               (substring dir 0 -1) dir))
           (newname (concat dir "/" name)))
 

@@ -127,7 +127,8 @@
   (insert
     (format "GNU Emacs %s (commit %s)"
       emacs-version
-      (substring (emacs-repository-get-version) 0 7))))
+      (let ((version (emacs-repository-get-version)))
+        (if version (substring version 0 7) "unknown")))))
 
                                         ;-----------------{gdb}----------------;
 

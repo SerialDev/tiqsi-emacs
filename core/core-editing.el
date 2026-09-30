@@ -173,9 +173,10 @@ sEnter b64 data: ")
 (defun add-full-stop ()
   "Terminate each line with a full stop."
   (interactive "*")
-  (while (re-search-forward "$")
+  (while (not (eobp))
+    (end-of-line)
     (insert ".")
-    (forward-char )))
+    (forward-line 1)))
 
 (defun sdev/timestamp()
   (interactive)
@@ -251,7 +252,7 @@ If there's no region, the current line will be duplicated."
     (let ((beg (region-beginning))
            (end (region-end)))
       (duplicate-region arg beg end)
-      (one-shot-keybinding "d" (? (duplicate-region 1 beg end))))
+      (one-shot-keybinding "d" (lambda () (interactive) (duplicate-region 1 beg end))))
     (duplicate-current-line arg)
     (one-shot-keybinding "d" 'duplicate-current-line)))
 
@@ -529,7 +530,7 @@ If there's no region, the current line will be duplicated."
 (defun remove-blank-lines ()
   "Delete blank lines from the current buffer."
   (interactive "*")
-  (while (re-search-forward "^$")
+  (while (and (re-search-forward "^$" nil t) (not (eobp)))
     (kill-line)))
 
 (defun flush-kill-lines (regex)
@@ -713,6 +714,7 @@ region if active."
     :config
     (progn
       (global-undo-tree-mode)
+      (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
       (setq undo-tree-visualizer-timestamps t)
       (setq undo-tree-visualizer-diff t)))
   )
@@ -833,7 +835,7 @@ Insert 1 if it does, 0 if it doesn't."
 (define-key global-map "" 'rotate-yank-pointer)
 (define-key global-map "\eu" 'undo)
 (define-key global-map "\e6" 'upcase-word)
-(define-key global-map "\e^" 'captilize-word)
+(define-key global-map "\e^" 'capitalize-word)
 (define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
 

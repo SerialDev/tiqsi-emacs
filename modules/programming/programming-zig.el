@@ -36,7 +36,7 @@
 
 (defun zig-file-coding-system ()
   (with-current-buffer (current-buffer)
-    (if (string-match "\\.d?zig\\'" buffer-file-name)
+    (if (and buffer-file-name (string-match "\\.d?zig\\'" buffer-file-name))
       (setq buffer-file-coding-system 'utf-8-unix)
       nil)
     ))
@@ -69,7 +69,7 @@
     (s-prepend "zig run " (buffer-name))
     "*zig-test*" "*Zig-error*"))
 
-(setq default-zig-scratch-path "/Users/amariscalcloudflare.com/Documents/workdir/personal/repos/")
+(setq default-zig-scratch-path (expand-file-name "~/Documents/workdir/personal/repos/"))
 
 (defun create-folder-in-path (folder-name path)
   "Create a folder with FOLDER-NAME in PATH.
@@ -105,13 +105,12 @@ If PATH doesn't exist, it will be created too."
 USAGE: (delete-zig-scratch-folder)"
   (interactive)
   (let ((zig-scratch-path (concat default-zig-scratch-path "scratch_zig")))
-    (async-shell-command (s-prepend "rm -rf " zig-scratch-path))
+    (async-shell-command (concat "rm -rf " (shell-quote-argument zig-scratch-path)))
     (message "Zig scratch folder deleted")))
 
 
 
 (global-auto-revert-mode 1)
-(setq load-physically t)
 (setq load-prefer-newer t)
 
 

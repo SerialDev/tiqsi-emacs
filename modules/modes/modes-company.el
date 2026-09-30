@@ -46,11 +46,11 @@
 
 
   :bind (:map company-active-map
-  	  ("[up]" . company-select-previous)
-  	  ("[down]" . company-select-next)
+  	  ("<up>" . company-select-previous)
+  	  ("<down>" . company-select-next)
   	  ("\C-w" . nil)
   	  :map company-mode-map
-  	  ("<M-SPC>" . company-complete-common))
+  	  ("M-SPC" . company-complete-common))
   :defer nil
   :diminish company-mode)
 
@@ -194,7 +194,7 @@ Fails softly: any error is caught and reported without breaking
   "Attempt to jump to definition, pushing to xref stack only if unsuccessful."
   (interactive)
   (condition-case nil
-    (lsp-find-definition)   ;; This pushes to xref stack on success
+    (sdev--xref-find-definitions)   ;; This pushes to xref stack on success
     (error
       (xref-push-marker-stack) ;; Push to stack only if definition fails
       (message "Definition not found."))))
@@ -205,7 +205,7 @@ Fails softly: any error is caught and reported without breaking
   (interactive)
   (condition-case nil
     (let ((buf (save-window-excursion
-                 (lsp-find-definition)
+                 (sdev--xref-find-definitions)
                  (current-buffer))))
       (display-buffer-in-side-window buf '((side . right) (slot . 1) (window-width . 0.5)))
       (select-window (get-buffer-window buf)))
@@ -220,7 +220,7 @@ Fails softly: any error is caught and reported without breaking
   (interactive)
   (condition-case nil
     (let* ((buf (save-window-excursion
-                 (lsp-find-definition)
+                 (sdev--xref-find-definitions)
                  (current-buffer)))
            (right-window (or (window-in-direction 'right)
                            (display-buffer-in-side-window buf '((side . right) (slot . 1) (window-width . 0.5))))))

@@ -12,10 +12,23 @@
 (setq python-shell-prompt-detect-failure-warning nil)
 
 
+(defun tiqsi-python-show-repl (proc)
+  (unless (get-buffer-window (process-buffer proc))
+    (condition-case nil
+      (display-buffer (process-buffer proc)
+        '((display-buffer-in-side-window)
+           (side . bottom)
+           (slot . 0)
+           (window-height . 0.3)))
+      (error nil))))
+
+
 (defun tiqsi-python-process ()
   (or (python-shell-get-process)
-    (progn (run-python nil nil t)
-      (python-shell-get-process))))
+    (progn (run-python nil nil nil)
+      (let ((proc (python-shell-get-process)))
+        (tiqsi-python-show-repl proc)
+        proc))))
 
 
 (defun send-py-line ()
@@ -103,10 +116,7 @@
             (string-trim (buffer-substring-no-properties (point) (line-end-position))))))
       (python-shell-send-buffer send-main)
       (message "Sent %s" (file-name-nondirectory (or buffer-file-name (buffer-name)))))
-    (unless (get-buffer-window (process-buffer proc))
-      (condition-case nil
-        (display-buffer (process-buffer proc))
-        (error nil)))))
+    (tiqsi-python-show-repl proc)))
 
 
 (defun extract-python-functions-to-clipboard (start end)
@@ -129,9 +139,11 @@
 
 (defun tiqsi-uv-compile (compile-string)
   (interactive (list (read-string "String to compile: " "uv run ")))
-  (let ((dir (or (locate-dominating-file default-directory "pyproject.toml") default-directory)))
+  (let ((dir (or (locate-dominating-file default-directory "pyproject.toml") default-directory))
+         (target (or (and (one-window-p t) (ignore-errors (split-window-right)))
+                   (next-window (selected-window) nil t))))
     (setq tiqsi-compile--command compile-string)
-    (with-selected-window (next-window (selected-window) nil t)
+    (with-selected-window target
       (let ((default-directory dir)
              (compilation-buffer-name-function (lambda (_mode) "*tiqsi-uv-compile*"))
              (display-buffer-alist
@@ -218,9 +230,12 @@
     (sdev--set-python-interpreter script "-i")))
 
 
+(defconst sdev--python-dir (file-name-directory (or load-file-name buffer-file-name)))
+
+
 (defun sdev-use-remote ()
   (interactive)
-  (sdev--set-python-interpreter "/tiqsi-emacs/modules/programming/remote-python.sh" "-i"))
+  (sdev--set-python-interpreter (expand-file-name "remote-python.sh" sdev--python-dir) "-i"))
 
 
 (defun sdev-use-hetzner ()
@@ -973,12 +988,14 @@
 
 (straight-require 'ruff-format)
 
-(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
+(add-hook 'python-mode-hook
+  (lambda ()
+    (when (executable-find "ruff")
+      (ruff-format-on-save-mode 1))))
 
 
 (define-key python-mode-map (kbd "C-c C-s") 'send-py-line-p)
 (define-key python-mode-map (kbd "C-c C-a") 'send-py-line)
-(define-key python-mode-map (kbd "C-c C-0") 'eval-last-sexp)
 (define-key python-mode-map (kbd "C-c C-r") 'send-py-region)
 (define-key python-mode-map (kbd "C-c C-c") 'tiqsi-python-send-dwim)
 (define-key python-mode-map (kbd "C-c c") 'tiqsi-uv-compile)

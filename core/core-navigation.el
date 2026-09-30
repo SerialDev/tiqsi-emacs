@@ -308,30 +308,21 @@ Repeated invocations toggle between the two most recently open buffers."
         (set-window-start w2 s1)))))
 
 
+(require 'windmove)
+
 (defun rotate-windows ()
   "Rotate your windows"
   (interactive)
-  (cond ((not (> (count-windows)1))
-          (message "You can't rotate a single window!"))
-    (t
-      (let ((i 1)
-             (numWindows (count-windows)))
-      (while  (< i numWindows)
-        (let* (
-                (w1 (elt (window-list) i))
-                (w2 (elt (window-list) (+ (% i numWindows) 1)))
-
-                (b1 (window-buffer w1))
-                (b2 (window-buffer w2))
-
-                (s1 (window-start w1))
-                (s2 (window-start w2))
-                )
-          (set-window-buffer w1  b2)
-          (set-window-buffer w2 b1)
-          (set-window-start w1 s2)
-          (set-window-start w2 s1)
-          (setq i (1+ i))))))))
+  (let ((windows (window-list nil 'nomini)))
+    (if (< (length windows) 2)
+      (message "You can't rotate a single window!")
+      (let ((buffers (mapcar #'window-buffer windows))
+             (starts (mapcar #'window-start windows)))
+        (cl-loop for w in windows
+          for b in (append (cdr buffers) (list (car buffers)))
+          for s in (append (cdr starts) (list (car starts)))
+          do (set-window-buffer w b)
+          (set-window-start w s))))))
 
 (defun my-toggle-window-split ()
   "Vertical split shows more of each line, horizontal split shows

@@ -110,10 +110,10 @@ of an error, just add the package to a list of missing packages."
 (defun current-time-microseconds ()
   (let* ((nowtime (current-time))
           (now-ms (nth 2 nowtime)))
-    (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%d] " now-ms))))
+    (concat (format-time-string "[%Y-%m-%dT%T" nowtime) (format ".%06d] " now-ms))))
 
 (defadvice message (before test-symbol activate)
-  (if (not (string-equal (ad-get-arg 0) "%s%s"))
+  (if (and (ad-get-arg 0) (not (string-equal (ad-get-arg 0) "%s%s")))
     (let ((deactivate-mark nil)
            (inhibit-read-only t))
       (save-excursion

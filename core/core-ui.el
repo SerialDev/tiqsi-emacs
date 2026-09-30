@@ -545,7 +545,7 @@ usage (pick-one test (1 2))
          auto-fill-mode ,auto-fill-function))
 
     (when whitespace-mode
-      whitespace-mode -1)
+      (whitespace-mode -1))
 
     ;; display newline characters with whitespace-mode
     (make-local-variable 'whitespace-style)

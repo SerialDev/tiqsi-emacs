@@ -375,7 +375,7 @@ LANG is not given, get it from `lsp--buffer-language'."
   :config
   
   (setq corfu-auto t
-    corf-auto-prefix 2
+    corfu-auto-prefix 2
     corfu-quit-no-match t
     corfu-auto-delay  0.05
     completion-cycle-threshold 3
@@ -652,14 +652,10 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
-(define-key rust-mode-map (kbd "C-t") 'racer-ui-tooltip )
-
-(define-key rust-mode-map (kbd "M-p") 'tiqsi--rust-print-src )
-(define-key rust-mode-map (kbd "M-i") 'tiqsi--racer-insert-struct-point )
 
 (define-key rust-mode-map (kbd "C-c c") 'tiqsi-compile--no-message)
 (define-key rust-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
-(define-key rust-mode-map (kbd "C-c n") 'flymake-goto-next-error)
+(define-key rust-mode-map (kbd "C-c n") 'sdev/next-issue)
 
 
 ;; ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯    \_ _ Keybindings _ _/¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯ ¯   ;

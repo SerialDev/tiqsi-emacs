@@ -64,6 +64,7 @@
   "Update the imenu index and then use ido to select a symbol to navigate to.
 Symbols matching the text at point are put first in the completion list."
   (interactive)
+  (require 'imenu)
   (imenu--make-index-alist)
   (let ((name-and-pos '())
          (symbol-names '()))
@@ -84,8 +85,8 @@ Symbols matching the text at point are put first in the completion list."
                        (setq position (get-text-property 1 'org-imenu-marker symbol))))
 
                    (unless (or (null position) (null name))
-                     (add-to-list 'symbol-names name)
-                     (add-to-list 'name-and-pos (cons name position))))))))
+                     (cl-pushnew name symbol-names :test #'equal)
+                     (push (cons name position) name-and-pos)))))))
       (addsymbols imenu--index-alist))
     ;; If there are matching symbols at point, put them at the beginning of `symbol-names'.
     (let ((symbol-at-point (thing-at-point 'symbol)))

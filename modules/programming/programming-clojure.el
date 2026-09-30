@@ -91,8 +91,7 @@
 
 
 (setq nrepl-hide-special-buffers t)
-(setq cider-cljs-repl-type "figwheel")
-(setq cider-default-cljs-repl "figwheel")
+(setq cider-default-cljs-repl 'figwheel)
 (setq cider-default-repl-command "lein")
 
 
@@ -174,15 +173,13 @@
 (defun lein-compile-uberjar()
   "Compile lein to jar."
   (interactive)
-  (message
-    (async-shell-command(message "lein uberjar"))))
+  (async-shell-command "lein uberjar"))
 
 
 (defun lein-run-uberjar()
   "Compile lein to jar."
   (interactive)
-  (message
-    (async-shell-command(message "java -jar target/uberjar/%s" (lein-project-file)))))
+  (async-shell-command (format "java -jar target/uberjar/%s" (lein-project-file))))
 
 
 (defun lein-project-file()
@@ -320,7 +317,7 @@ _C-s_: eval last sexp           ^ ^
   ("<f1>" lein-start-repl "start repl" :color red)
   ("<f2>" lein-connect-repl "connect repl" :color red)
   ("<f3>" lein-compile-uberjar "compile uberjar" :color blue)
-  ("<f3>" lein-run-uberjar "run uberjar" :color blue)
+  ("<f4>" lein-run-uberjar "run uberjar" :color blue)
   )
 
 (add-hook 'cider-repl-mode-hook #'company-mode)

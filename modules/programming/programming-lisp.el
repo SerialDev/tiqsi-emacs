@@ -146,10 +146,10 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
   '(eros
      :type git
      :host github
-     :repo "xiongtx/eros"
-     :config
-     (eros-mode 1)
-     ))
+     :repo "xiongtx/eros"))
+
+(when (require 'eros nil t)
+  (eros-mode 1))
 
 ;; ------------------------------------------------------------------------- ;
 
@@ -231,9 +231,11 @@ _kl_: Load/Compile Buffer-File   _kc_: Compile Buffer-File (no load)  _l_: Load 
               (when (= -1 (forward-line -1))
                 (error "elisp--preceding-sexp@multiline-comment error"))
               (goto-char (line-end-position))))
-          (cond (found sexp)
-            (error (signal (car error) (cdr error)))
-            (t (error "elisp--preceding-sexp@multiline-comment error"))))
+          (unwind-protect
+            (cond (found sexp)
+              (error (signal (car error) (cdr error)))
+              (t (error "elisp--preceding-sexp@multiline-comment error")))
+            (kill-buffer temp-buffer)))
         (signal (car err) (cdr err))))))
 
 (when tiqsi-linux

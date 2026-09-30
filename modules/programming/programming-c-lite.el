@@ -56,7 +56,7 @@
 
 (defun tiqsi-compile-extract-executable (compile-string)
   "Extract the name of the executable from the compile string."
-  (if (string-match "\\(?:-o\\s-+\\)\\([^\\s-]+\\)" compile-string)
+  (if (string-match "-o[ \t]+\\([^ \t]+\\)" compile-string)
     (match-string 1 compile-string)
     compile-string))
 
@@ -76,7 +76,7 @@
   (let* ((buffer-dir (or (and (boundp 'default-directory)
                            default-directory)
                        (file-name-directory buffer-file-name)))
-          (compile-command (concat "cd " buffer-dir " && " compile-string))
+          (compile-command (concat "cd " (shell-quote-argument buffer-dir) " && " compile-string))
           (executable (tiqsi-compile-extract-executable compile-string))
           (current-window (selected-window))
           (other-window (next-window current-window nil t)))
@@ -101,7 +101,7 @@
           (buffer-dir (or (and (boundp 'default-directory)
                             default-directory)
                         (file-name-directory buffer-file-name)))
-          (command (format "cd %s && chmod +x %s && ./%s" buffer-dir executable executable)))
+          (command (format "cd %s && chmod +x %s && ./%s" (shell-quote-argument buffer-dir) (shell-quote-argument executable) (shell-quote-argument executable))))
     (message "Running executable: %s" executable)
     (async-shell-command command "*tiqsi-run*")))
 
@@ -116,8 +116,9 @@
 
 (defun tiqsi-compile--no-message ()
   (interactive)
-  (tiqsi-compile tiqsi-compile--command)
-  )
+  (if tiqsi-compile--command
+    (tiqsi-compile tiqsi-compile--command)
+    (call-interactively 'tiqsi-compile)))
 
 
 ;; ------------------------------------------------------------------------- ;
@@ -443,8 +444,8 @@ header"
   (interactive)
   (grep
     (concat "grep -n -e "
-      (current-word)
-      " *.c *.cpp *.h *.rc NUL")))
+      (shell-quote-argument (or (current-word) (user-error "No word at point")))
+      " *.c *.cpp *.h *.rc /dev/null")))
 
 
 ;; ------------------------------------------------------------------------- ;
@@ -454,21 +455,16 @@ header"
 (defun tiqsi-find-corresponding-file ()
   "Find the file that corresponds to this one."
   (interactive)
-  (setq CorrespondingFileName nil)
-  (setq BaseFileName (file-name-sans-extension buffer-file-name))
-  (if (string-match "\\.c" buffer-file-name)
-    (setq CorrespondingFileName (concat BaseFileName ".h")))
-  (if (string-match "\\.h" buffer-file-name)
-    (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
-      (setq CorrespondingFileName (concat BaseFileName ".cpp"))))
-  (if (string-match "\\.hin" buffer-file-name)
-    (setq CorrespondingFileName (concat BaseFileName ".cin")))
-  (if (string-match "\\.cin" buffer-file-name)
-    (setq CorrespondingFileName (concat BaseFileName ".hin")))
-  (if (string-match "\\.cpp" buffer-file-name)
-    (setq CorrespondingFileName (concat BaseFileName ".h")))
-  (if CorrespondingFileName (find-file CorrespondingFileName)
-    (error "Unable to find a corresponding file")))
+  (let* ((base (file-name-sans-extension buffer-file-name))
+          (candidates (pcase (file-name-extension buffer-file-name)
+                        ("c" (list (concat base ".h")))
+                        ("h" (list (concat base ".c") (concat base ".cpp")))
+                        ("hin" (list (concat base ".cin")))
+                        ("cin" (list (concat base ".hin")))
+                        ("cpp" (list (concat base ".h"))))))
+    (find-file (or (seq-find #'file-exists-p candidates)
+                 (car (last candidates))
+                 (error "Unable to find a corresponding file")))))
 
 (defun tiqsi-find-corresponding-file-other-window ()
   "Find the file that corresponds to this one."

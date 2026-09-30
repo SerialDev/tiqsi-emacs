@@ -77,16 +77,6 @@
 
 (setq-default bidi-display-reordering nil)
 (setq redisplay-dont-pause t)
-(setq togle-truncate-lines t )
-
-
-(defun toggle-truncate-lines ()
-  "Toggle whether to wrap lines at right window border."
-  (interactive)
-  (if (eq truncate-lines nil)
-    (set-variable 'truncate-lines 't)
-    (set-variable 'truncate-lines nil)
-    ) )
 
 (defun toggle-line-spacing ()
   "Toggle line spacing between no extra space to extra half line height."
@@ -157,9 +147,12 @@
 
 
 
+(defvar long-printout-timer nil)
+
 (defun long-printout-teardown()
-  (run-with-timer
-    0 5 'clear-buffer-long-printouts))
+  (unless (timerp long-printout-timer)
+    (setq long-printout-timer
+      (run-with-timer 0 5 'clear-buffer-long-printouts))))
 
 
 ;;;###autoload
@@ -172,7 +165,6 @@
 ;;;###autoload
 (progn
   (add-hook 'comint-mode-hook 'clear-huge-repl-mode)
-  (add-hook 'inferior-python-mode 'clear-huge-repl-mode)
   (add-hook 'clear-huge-repl-mode-hook 'long-printout-teardown)
   )
 

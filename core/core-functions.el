@@ -70,7 +70,7 @@ enjoy using a lot.
 (defun empty-string-p (string)
   "Return true if the string is empty or nil. Expects string."
   (or (null string)
-      (zerop (length (trim string)))))
+      (zerop (length (string-trim string)))))
 
 (defun sdev/center-pad (len padding s)
   "If S is shorter than LEN, pad it with spaces so it is centered."
@@ -142,7 +142,7 @@ If the COUNT exeeds string length or is zero, whole string is returned."
   (interactive "XLisp symbol, list name: ")
   (mapcar
    (function
-    (lambda (x) (insert (2str x) "\n")))
+    (lambda (x) (insert (format "%s" x) "\n")))
    list))
 
 ;;; ----------------------------------------------------------------------
@@ -295,17 +295,10 @@ Adapted from `describe-function-or-variable'."
 (defun show-file-name ()
   "Show the full path file name in the minibuffer."
   (interactive)
-  (message (buffer-file-name)))
+  (message "%s" buffer-file-name))
 
 (defun current-buffer-path()
-  (file-name-directory (buffer-file-name)))
-
-(defmacro launch-in-other-buffer (&rest data)
-  `(progn
-    (other-window 1)
-    ,@data
-    (other-window 1)
-  ))
+  (file-name-directory (or buffer-file-name default-directory)))
 
 (defmacro launch-in-other-buffer(&rest data)
   `(let ((buf (current-buffer) ))

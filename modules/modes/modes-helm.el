@@ -55,9 +55,6 @@
       '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
 
 
-    (setq helm-boring-file-regexp-list
-      '("\\` " "\\*helm" "\\*helm-mode" "\\*Echo Area" "\\*tramp" "\\*Minibuf" "\\*epc"))
-
     ;; Horizontal
 
     (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
@@ -92,7 +89,7 @@
 (straight-require 'helm-projectile)
 
 (with-system darwin
-  (setq helm-rg-ripgrep-executable "/usr/local/bin/rg")
+  (setq helm-rg-ripgrep-executable (or (executable-find "rg") "rg"))
   (setq helm-rg-default-directory 'git-root)
   )
 
@@ -557,7 +554,7 @@ _j_: jedi:related-names
   
                                         ;-{Ag project root}-;
   ("sp" helm-ag-project-root :color blue)
-  ("c" nil "cancel")
+  ("<escape>" nil "cancel")
   ("q" quit-window "quit" :color blue))
 
 (define-key global-map (kbd "C-c h") 'hydra-helm-menu/body)
