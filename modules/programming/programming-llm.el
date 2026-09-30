@@ -33,14 +33,18 @@
   :group 'editing)
 
 (defcustom copilot-bin
-  "/Users/amariscalcloudflare.com/Documents/workdir/personal/llms/models/wizardcoder-python-34b-v1.0.Q5_K_M.llamafile"
+  nil
   "Path of llamafile executable with LLM weights."
-  :type 'string
+  :type '(choice (const :tag "None" nil) file)
   :group 'copilot)
 
 ;;;###autoload
 (defun copilot-complete ()
   (interactive)
+  (unless (and copilot-bin (file-executable-p copilot-bin))
+    (user-error "Set `copilot-bin' to an executable llamafile"))
+  (unless buffer-file-name
+    (user-error "copilot-complete needs a file buffer"))
   (let* ((spot (point))
           (inhibit-quit t)
           (curfile (buffer-file-name))
@@ -124,13 +128,6 @@ Writing English explanations is forbidden. ")
 ;; Ensure the 'shell-command' uses an interactive shell
 (setq shell-command-switch "-ic")
 
-(defun escape-shell-args (input-string)
-  "Escape special characters in INPUT-STRING to safely use in shell commands."
-  (replace-regexp-in-string
-    "[\\\\\"'`$;()&|*?~<>^[]{}!#% \n]"  ; Matches a broad set of special characters
-    "\\\\\\&"  ; Prefixes each matched character with a backslash
-    input-string))
-
 (straight-require 'ansi-color)
 
 (defun cai-flow-set-model ()
@@ -144,13 +141,19 @@ Writing English explanations is forbidden. ")
 
 (setq cai-flow-model " ll ")
 
+(defun cai-flow--strip-preamble ()
+  (goto-char (point-min))
+  (when (search-forward "__CAI_FLOW_BEGIN__" nil t)
+    (delete-region (point-min) (min (point-max) (1+ (line-end-position))))
+    (goto-char (point-min))))
+
 (defun cai-flow-call-region (begin end)
   "Call cai_flow with the selected text from BEGIN to END, formatted as a single line, and display output in a side buffer."
   (interactive "r")  ; 'r' uses the current region, or prompts to select one if not already set
   (let* ((region-text (buffer-substring-no-properties begin end))
           (arg-string (shell-quote-argument (replace-regexp-in-string "\\s-+" " " region-text)))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string)))
     (with-current-buffer output-buffer
       (erase-buffer)
       ;; Use `shell-command` with properly directed output
@@ -158,8 +161,7 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; More robust handling for potential lack of output lines
       (goto-char (point-min))
-      (when (>= (line-number-at-pos (point-max)) 10)
-        (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point)))))
+      (cai-flow--strip-preamble)
       ;; Handling window display
       (display-buffer-in-side-window output-buffer '((side . right)))))
   ;; Provide visual feedback that the command has executed
@@ -172,14 +174,14 @@ Writing English explanations is forbidden. ")
 ;;   (let* ((region-text (buffer-substring-no-properties begin end))
 ;;           (arg-string (shell-quote-argument  (replace-regexp-in-string "[ \t\n\r]+" " " region-text)))
 ;;           (output-buffer (get-buffer-create "*cai_flow-output*"))
-;;           (shell-command-string (concat "source ~/.zshrc && cai " arg-string)))
+;;           (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " arg-string)))
 ;;     (with-current-buffer output-buffer
 ;;       (erase-buffer)
 ;;       (shell-command shell-command-string (current-buffer) t)  ; t means insert output at point
 ;;       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
 ;;       ;; Delete the first 10 lines (assumed to be sourcing output, etc.)
 ;;       (goto-char (point-min))
-;;       (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+;;       (cai-flow--strip-preamble)
 ;;       ;; Find an existing side window or open a new side window if none is available
 ;;       (let ((side-window (or (get-window-with-predicate
 ;;                                (lambda (window)
@@ -197,7 +199,7 @@ Writing English explanations is forbidden. ")
   (let* ((input (read-string "Enter search query: "))
           (arg-string (shell-quote-argument (replace-regexp-in-string "[ \t\n\r]+" " " input)))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -205,15 +207,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Delete the first 10 lines (assumed to be sourcing output, etc.)
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right))))))
+      (display-buffer-in-side-window output-buffer '((side . right))))
     ;; Provide visual feedback that the command has executed
     (message "cai_flow executed with escaped and formatted input.")))
 
@@ -247,7 +243,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai  " cai-flow-model arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai  " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -255,15 +251,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -296,7 +286,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -304,15 +294,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -332,7 +316,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -340,15 +324,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -372,7 +350,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -380,15 +358,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -417,7 +389,7 @@ Writing English explanations is forbidden. ")
 						     "YOU are a copilot you MUST adhere to these maxims, and please always include USAGE, and introduce a \n after 100 chars max"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -425,15 +397,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -468,7 +434,7 @@ Writing English explanations is forbidden. ")
                                                      "* <CODE here>\n"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model  arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model  arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -476,15 +442,9 @@ Writing English explanations is forbidden. ")
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -504,7 +464,7 @@ Writing English explanations is forbidden. \n "
 						     "YOU are a copilot you MUST adhere to these maxims"
                                                      region-text "\n")))
           (output-buffer (get-buffer-create "*cai_flow-output*"))
-          (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+          (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string " " formatted-comment)))
     (with-current-buffer output-buffer
       (erase-buffer)
       (shell-command shell-command-string (current-buffer) (current-buffer))
@@ -512,15 +472,9 @@ Writing English explanations is forbidden. \n "
       (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
       ;; Optionally delete unwanted output, e.g., the first 10 lines
       (goto-char (point-min))
-      (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+      (cai-flow--strip-preamble)
       ;; Find an existing side window or open a new side window if none is available
-      (let ((side-window (or (get-window-with-predicate
-                               (lambda (window)
-                                 (equal (window-parameter window 'window-side) 'right)))
-                           (car (window-at-side-list nil 'right)))))
-        (if side-window
-          (set-window-buffer side-window output-buffer)  ; Use existing side window
-          (display-buffer-in-side-window output-buffer '((side . right)))))
+      (display-buffer-in-side-window output-buffer '((side . right)))
       ;; Provide visual feedback that the command has executed
       (message "cai_flow executed with escaped and formatted region."))))
 
@@ -536,7 +490,7 @@ Writing English explanations is forbidden. \n "
 						       "\nYOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                        region-text "\n")))
             (output-buffer (get-buffer-create "*cai_flow-output*"))
-            (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+            (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string " " formatted-comment)))
       (with-current-buffer output-buffer
 	(erase-buffer)
 	(shell-command shell-command-string (current-buffer) (current-buffer))
@@ -544,15 +498,9 @@ Writing English explanations is forbidden. \n "
 	(ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
 	;; Optionally delete unwanted output, e.g., the first 10 lines
 	(goto-char (point-min))
-	(dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+	(cai-flow--strip-preamble)
 	;; Find an existing side window or open a new side window if none is available
-	(let ((side-window (or (get-window-with-predicate
-				 (lambda (window)
-                                   (equal (window-parameter window 'window-side) 'right)))
-                             (car (window-at-side-list nil 'right)))))
-          (if side-window
-            (set-window-buffer side-window output-buffer)  ; Use existing side window
-            (display-buffer-in-side-window output-buffer '((side . right)))))
+	(display-buffer-in-side-window output-buffer '((side . right)))
 	;; Provide visual feedback that the command has executed
 	(message "cai_flow executed with escaped and formatted region.")))))
 
@@ -563,7 +511,7 @@ Writing English explanations is forbidden. \n "
   (kill-new (buffer-substring-no-properties begin end))  ; Copy the region to the clipboard
   (let ((custom-input (read-string "Enter custom text: ")))
     (let* ((region-text (buffer-substring-no-properties begin end))
-            (output-buffer (get-buffer "*cai_flow-output*"))
+            (output-buffer (get-buffer-create "*cai_flow-output*"))
             (conversation-context (with-current-buffer output-buffer
                                     (buffer-string)))
             (arg-string (shell-quote-argument (replace-regexp-in-string "[ \t\n\r]+" " " region-text)))
@@ -573,7 +521,7 @@ Writing English explanations is forbidden. \n "
                                                        "\nYOU are a copilot you MUST adhere to these maxims, and please always include USAGE"
                                                        conversation-context
                                                        region-text "\n")))
-            (shell-command-string (concat "source ~/.zshrc && cai " cai-flow-model arg-string " " formatted-comment)))
+            (shell-command-string (concat "source ~/.zshrc && echo __CAI_FLOW_BEGIN__ && cai " cai-flow-model arg-string " " formatted-comment)))
       (with-current-buffer output-buffer
         (erase-buffer)
 	(shell-command shell-command-string (current-buffer) (current-buffer))
@@ -581,15 +529,9 @@ Writing English explanations is forbidden. \n "
         (ansi-color-apply-on-region (point-min) (point-max))  ; Apply ANSI color to the entire buffer
         ;; Optionally delete unwanted output, e.g., the first 10 lines
         (goto-char (point-min))
-        (dotimes (_ 10) (delete-region (point) (progn (forward-line 1) (point))))
+        (cai-flow--strip-preamble)
         ;; Find an existing side window or open a new side window if none is available
-        (let ((side-window (or (get-window-with-predicate
-                                 (lambda (window)
-                                   (equal (window-parameter window 'window-side) 'right)))
-                             (car (window-at-side-list nil 'right)))))
-          (if side-window
-            (set-window-buffer side-window output-buffer)  ; Use existing side window
-            (display-buffer-in-side-window output-buffer '((side . right)))))
+        (display-buffer-in-side-window output-buffer '((side . right)))
         ;; Provide visual feedback that the command has executed
         (message "cai_flow executed with escaped and formatted region.")))))
 
@@ -621,9 +563,6 @@ Writing English explanations is forbidden. \n "
   (define-key c-mode-base-map (kbd "C-c C-k") 'copilot-complete))
 (add-hook 'c-mode-common-hook 'copilot-c-hook)
 
-(defun copilot-py-hook ()
-  (define-key python-mode-map (kbd "C-c C-k") 'copilot-complete))
-(add-hook 'python-common-hook 'copilot-py-hook)
 (global-set-key (kbd "C-c C-k") 'copilot-complete)
 
 (global-set-key (kbd "C-k") 'hydra-cai-flow/body)

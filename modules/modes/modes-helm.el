@@ -333,6 +333,8 @@
 
 ;;-----{HYDRAS!}-----;
 
+(use-package helm-gtags :straight t)
+
 (defhydra hydra-gtags (:color blue :hint nil)
   "
 ` ` _ _ _ _ _ _ _ _ _` ` ` ` | ^Symbols^                      ^History^

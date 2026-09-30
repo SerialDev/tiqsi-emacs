@@ -386,7 +386,8 @@ If there's no region, the current line will be duplicated."
 ;; _ _ _ _ _ _ _ _ _ _ _ _ _ _  /¯¯¯ Toggle ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _ _ _  ;
 
 ;;  http://www.mostlymaths.net/2016/09/more-emacs-configuration-tweaks.html
-(try-require 'origami)
+(use-package origami :straight t)
+(use-package minimap :straight t)
 
 (eval-after-load 'origami
   '(progn
