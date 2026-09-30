@@ -293,6 +293,7 @@ of an error, just add the package to a list of missing packages."
   )
 
 (load-expand  "modules/programming/programming-python-lite.el")
+(load-expand  "modules/programming/programming-xref.el")
 
 
 

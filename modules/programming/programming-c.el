@@ -1236,7 +1236,6 @@ _v_: Find virtuals at point
 (define-key c++-mode-map [C-tab] 'indent-region)
 ;; (define-key c++-mode-map "    " 'indent-region)
 (define-key c++-mode-map "\ej" 'imenu)
-(define-key c++-mode-map "\e." 'c-fill-paragraph)
 (define-key c++-mode-map "\e/" 'c-mark-function)
 (define-key c++-mode-map "\e " 'set-mark-command)
 (define-key c++-mode-map "\eq" 'append-as-kill)

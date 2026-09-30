@@ -835,7 +835,6 @@ Insert 1 if it does, 0 if it doesn't."
 (define-key global-map "\eu" 'undo)
 (define-key global-map "\e6" 'upcase-word)
 (define-key global-map "\e^" 'captilize-word)
-(define-key global-map "\e." 'fill-paragraph)
 (define-key global-map "\el" 'tiqsi-replace-in-region)
 (define-key global-map "\eo" 'query-replace)
 

@@ -176,5 +176,6 @@ of an error, just add the package to a list of missing packages."
 (load-expand "modules/modes/modes.el" )
 (load-expand "modules/programming/programming.el" )
 (load-expand "modules/private/private.el" )
+(load-expand "modules/programming/programming-xref.el")
 
 ;;; init.el ends here

@@ -65,16 +65,12 @@
 ;; ;; (setq tags-table-list '("/path/of/TAGS1"    "/path/of/TAG2"))
 
                                         ;---{Keybindings}---;
-(global-set-key (kbd "M-.") 'my-find-tag)
 
 ;;list all visited tags
 (global-set-key "\M-*" 'helm-etags-plus-history)
-;;go back directly rebinded instead of x-ref-pop-marker-stack
-(global-set-key "\M-," 'helm-etags-plus-history-go-back)
 ;;go forward directly
 (global-set-key "\M-/" 'helm-etags-plus-history-go-forward)
 
-(global-set-key "\M-." 'helm-etags-plus-select)
 
 
 (provide 'modes-ctags)
