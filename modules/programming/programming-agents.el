@@ -7,9 +7,44 @@
     (setq recipe (append recipe (list :local-repo checkout))))
   (straight-use-package recipe))
 
-(dolist (command '(agent-rig agent-rig-start agent-rig-start-team agent-rig-send-region))
+(require 'hydra)
+
+(dolist (command '(agent-rig agent-rig-start agent-rig-start-team agent-rig-switch
+                  agent-rig-send agent-rig-send-region agent-rig-send-buffer
+                  agent-rig-send-diff agent-rig-broadcast agent-rig-capture
+                  agent-rig-return-to-code agent-rig-help))
   (autoload command "agent-rig" nil t))
 
+(defhydra hydra-agents (:color blue :hint nil)
+  "
+Agents: _a_ dashboard  _n_ new  _t_ team  _s_ switch
+Context: _p_ prompt  _r_ region  _f_ buffer  _d_ diff  _b_ broadcast
+Navigate: _o_ output  _c_ code  _h_ help  _q_ quit
+"
+  ("a" agent-rig)
+  ("n" agent-rig-start)
+  ("t" agent-rig-start-team)
+  ("s" agent-rig-switch)
+  ("p" agent-rig-send)
+  ("r" agent-rig-send-region)
+  ("f" agent-rig-send-buffer)
+  ("d" agent-rig-send-diff)
+  ("b" agent-rig-broadcast)
+  ("o" agent-rig-capture)
+  ("c" agent-rig-return-to-code)
+  ("h" agent-rig-help)
+  ("q" nil))
+
+(with-eval-after-load 'agent-rig
+  (define-key agent-rig-terminal-map (kbd "C-c A") #'hydra-agents/body)
+  (when (fboundp 'evil-set-initial-state)
+    (evil-set-initial-state 'agent-rig-mode 'emacs)
+    (evil-set-initial-state 'agent-rig-prompt-mode 'insert)))
+
 (global-set-key (kbd "C-c a") #'agent-rig)
+(global-set-key (kbd "C-c A") #'hydra-agents/body)
+
+(with-eval-after-load 'which-key
+  (which-key-add-key-based-replacements "C-c a" "agent dashboard" "C-c A" "agent menu"))
 
 (provide 'programming-agents)

@@ -1,0 +1,26 @@
+name: agent integration
+on:
+  push:
+    paths:
+      - modules/programming/programming-agents.el
+      - test/programming-agents-test.el
+      - .github/workflows/agents.yml
+  pull_request:
+    paths:
+      - modules/programming/programming-agents.el
+      - test/programming-agents-test.el
+      - .github/workflows/agents.yml
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SerialDev/agent-rig.el
+          ref: codex/native-agent-manager
+          path: agent-package
+      - run: sudo apt-get update && sudo apt-get install -y emacs-nox elpa-hydra
+      - run: emacs --batch -L agent-package -l test/programming-agents-test.el -f ert-run-tests-batch-and-exit
