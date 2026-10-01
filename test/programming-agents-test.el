@@ -4,7 +4,10 @@
 (require 'hydra)
 (defvar tiqsi-root (file-name-directory (directory-file-name (file-name-directory load-file-name))))
 (defvar tiqsi-test-agent-recipe nil)
-(defun straight-use-package (recipe) (setq tiqsi-test-agent-recipe recipe))
+(defvar tiqsi-test-agent-dependencies nil)
+(defun straight-use-package (recipe)
+  (push recipe tiqsi-test-agent-dependencies)
+  (setq tiqsi-test-agent-recipe recipe))
 (load (expand-file-name "modules/programming/programming-agents.el" tiqsi-root) nil t)
 
 (ert-deftest tiqsi-agents-menu-autoloads-every-action ()
@@ -22,7 +25,8 @@
   (should (eq (lookup-key agent-rig-terminal-map (kbd "C-c A")) #'hydra-agents/body)))
 
 (ert-deftest tiqsi-agents-straight-recipe-resolves-package-modules ()
+  (should (memq 'websocket tiqsi-test-agent-dependencies))
   (should (eq (car tiqsi-test-agent-recipe) 'agent-rig))
   (should (equal (plist-get (cdr tiqsi-test-agent-recipe) :repo) "SerialDev/agent-rig.el"))
-  (dolist (feature '(agent-rig agent-rig-providers agent-rig-tmux))
+  (dolist (feature '(agent-rig agent-rig-providers agent-rig-tmux agent-rig-activity agent-rig-codex))
     (should (locate-library (symbol-name feature)))))

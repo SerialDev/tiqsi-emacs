@@ -1,3 +1,5 @@
+(straight-use-package 'websocket)
+
 (let* ((checkout (expand-file-name "../agent-rig.el" tiqsi-root))
        (recipe '(agent-rig :type git :host github
                           :repo "SerialDev/agent-rig.el"
