@@ -51,6 +51,7 @@ Workspace: _w_ worktree  _A_ adopt  _H_ handoff  _F_ focus
   (when (fboundp 'evil-set-initial-state)
     (evil-set-initial-state 'agent-rig-mode 'emacs)
     (evil-set-initial-state 'agent-rig-actions-mode 'emacs)
+    (evil-set-initial-state 'agent-rig-activity-mode 'emacs)
     (evil-set-initial-state 'agent-rig-prompt-mode 'insert)))
 
 (global-set-key (kbd "C-c a") #'agent-rig)
