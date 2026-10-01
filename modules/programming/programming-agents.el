@@ -12,7 +12,8 @@
 (dolist (command '(agent-rig agent-rig-start agent-rig-start-team agent-rig-switch
                   agent-rig-send agent-rig-send-region agent-rig-send-buffer
                   agent-rig-send-diff agent-rig-broadcast agent-rig-capture
-                  agent-rig-return-to-code agent-rig-help))
+                  agent-rig-return-to-code agent-rig-help agent-rig-save
+                  agent-rig-restore agent-rig-set-conversation))
   (autoload command "agent-rig" nil t))
 
 (defhydra hydra-agents (:color blue :hint nil)
@@ -20,6 +21,7 @@
 Agents: _a_ dashboard  _n_ new  _t_ team  _s_ switch
 Context: _p_ prompt  _r_ region  _f_ buffer  _d_ diff  _b_ broadcast
 Navigate: _o_ output  _c_ code  _h_ help  _q_ quit
+Recovery: _S_ save seats  _R_ restore  _i_ conversation ID
 "
   ("a" agent-rig)
   ("n" agent-rig-start)
@@ -33,6 +35,9 @@ Navigate: _o_ output  _c_ code  _h_ help  _q_ quit
   ("o" agent-rig-capture)
   ("c" agent-rig-return-to-code)
   ("h" agent-rig-help)
+  ("S" agent-rig-save)
+  ("R" agent-rig-restore)
+  ("i" agent-rig-set-conversation)
   ("q" nil))
 
 (with-eval-after-load 'agent-rig
