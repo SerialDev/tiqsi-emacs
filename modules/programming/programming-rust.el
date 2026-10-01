@@ -630,6 +630,9 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 (define-key rust-mode-map (kbd "C-c C-c") 'hydra-rust/body )
 
+(with-eval-after-load 'rustic
+  (define-key rustic-mode-map (kbd "C-c C-c h") 'hydra-rust/body))
+
 (define-key rust-mode-map (kbd "C-c c") 'tiqsi-compile--no-message)
 (define-key rust-mode-map (kbd "C-c C-r") 'tiqsi-compile--reset-string)
 (define-key rust-mode-map (kbd "C-c n") 'sdev/next-issue)
