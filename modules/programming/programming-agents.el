@@ -17,7 +17,7 @@
                   agent-rig-return-to-code agent-rig-help agent-rig-save
                   agent-rig-restore agent-rig-set-conversation agent-rig-handoff
                   agent-rig-worktree-start agent-rig-adopt agent-rig-toggle-focus
-                  agent-rig-activity agent-rig-overview))
+                  agent-rig-activity agent-rig-overview agent-rig-compact agent-rig-remove))
   (autoload command "agent-rig" nil t))
 
 (defhydra hydra-agents (:color blue :hint nil)
@@ -25,6 +25,7 @@
 Agents: _a_ dashboard  _n_ new  _t_ team  _s_ switch
 Context: _p_ prompt  _r_ region  _f_ buffer  _d_ diff  _b_ broadcast
 Navigate: _o_ output  _v_ activity  _c_ code  _h_ help  _q_ quit
+Manage: _C_ compact  _x_ remove
 Recovery: _S_ save seats  _R_ restore  _i_ conversation ID
 Workspace: _w_ worktree  _A_ adopt  _H_ handoff  _F_ focus
 "
@@ -41,6 +42,8 @@ Workspace: _w_ worktree  _A_ adopt  _H_ handoff  _F_ focus
   ("v" agent-rig-activity)
   ("c" agent-rig-return-to-code)
   ("h" agent-rig-help)
+  ("C" agent-rig-compact)
+  ("x" agent-rig-remove)
   ("S" agent-rig-save)
   ("R" agent-rig-restore)
   ("i" agent-rig-set-conversation)

@@ -28,5 +28,5 @@
   (should (memq 'websocket tiqsi-test-agent-dependencies))
   (should (eq (car tiqsi-test-agent-recipe) 'agent-rig))
   (should (equal (plist-get (cdr tiqsi-test-agent-recipe) :repo) "SerialDev/agent-rig.el"))
-  (dolist (feature '(agent-rig agent-rig-providers agent-rig-tmux agent-rig-activity agent-rig-codex agent-rig-opencode))
+  (dolist (feature '(agent-rig agent-rig-providers agent-rig-tmux agent-rig-activity agent-rig-codex agent-rig-opencode agent-rig-claude))
     (should (locate-library (symbol-name feature)))))
