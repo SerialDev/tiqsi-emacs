@@ -335,6 +335,38 @@
 
 (use-package helm-gtags :straight t)
 
+(when (and (eq system-type 'windows-nt) (file-directory-p "C:/msys64/usr/bin"))
+  (add-to-list 'exec-path "C:/msys64/usr/bin" t))
+
+(defun sdev--gtags-install-command ()
+  (pcase system-type
+    ('darwin
+      (and (executable-find "brew") "brew install global"))
+    ('windows-nt
+      (let ((pacman (or (executable-find "pacman")
+                      (car (file-expand-wildcards "C:/msys64/usr/bin/pacman.exe")))))
+        (and pacman (format "%s -S --noconfirm global" (shell-quote-argument pacman)))))
+    ('gnu/linux
+      (cond
+        ((executable-find "apt-get") "sudo apt-get install -y global")
+        ((executable-find "dnf") "sudo dnf install -y global")
+        ((executable-find "pacman") "sudo pacman -S --noconfirm global")
+        ((executable-find "zypper") "sudo zypper --non-interactive install global")
+        ((executable-find "apk") "sudo apk add global")))))
+
+(defun sdev/install-gtags ()
+  (interactive)
+  (if (executable-find "gtags")
+    (message "gtags already installed: %s" (executable-find "gtags"))
+    (let ((command (sdev--gtags-install-command)))
+      (unless command
+        (user-error "No supported package manager for %s: install GNU Global (package `global') manually%s"
+          system-type
+          (if (eq system-type 'windows-nt) ", for example through MSYS2 (https://www.msys2.org)" "")))
+      (when (y-or-n-p (format "Run `%s'? " command))
+        (async-shell-command command "*install-gtags*")))))
+
+
 (defhydra hydra-gtags (:color blue :hint nil)
   "
 ` ` _ _ _ _ _ _ _ _ _` ` ` ` | ^Symbols^                      ^History^
@@ -355,6 +387,7 @@
   ("p" helm-gtags-previous-history)
   ("n" helm-gtags-next-history)
   ("l" helm-gtags-tags-in-this-function)
+  ("I" sdev/install-gtags)
   ("ESC" nil "Exit"))
 
 

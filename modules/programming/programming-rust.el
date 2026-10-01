@@ -36,10 +36,7 @@
   '(evcxr
      :type git
      :host github
-     :repo "serialdev/evcxr-mode"
-     :config
-     (add-hook 'rust-mode-hook #'evcxr-minor-mode)
-     ))
+     :repo "serialdev/evcxr-mode"))
 
 ;; RACER HAS BEEN DEPRECATED
 ;; (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
@@ -516,6 +513,8 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 
 (use-package dap-mode
   :ensure
+  :defer t
+  :commands (dap-debug dap-debug-edit-template dap-hydra)
   :config
   (dap-ui-mode)
   (dap-ui-controls-mode 1)
@@ -622,8 +621,9 @@ Display a success message in the `*Messages*' buffer if the installation is succ
 ;; ​(global-tree-sitter-mode)  
 ;; ​(​add-hook​ ​'tree-sitter-after-on-hook​ ​#​'tree-sitter-hl-mode​)
 
-(define-key lsp-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-(define-key lsp-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+(with-eval-after-load 'lsp-mode
+  (define-key lsp-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+  (define-key lsp-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
 
 ;; _ _ _ _ _ _ _ _ _ _ _ _    /¯¯¯ Keybindings ¯¯¯\_ _ _ _ _ _ _ _ _ _ _ _   ;
 
