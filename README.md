@@ -234,8 +234,13 @@ Added repl support
 C# & F# Supported
 ```
 
+### Agent management in init-lite
+
+`C-c a` opens [Agent Rig](https://github.com/SerialDev/agent-rig.el/tree/codex/native-agent-manager), a native Emacs manager for Codex, Claude Code, and OpenCode. The Straight recipe uses a sibling `../agent-rig.el` checkout when available and clones from GitHub otherwise. See the package README for dependencies, commands, and lifecycle boundaries.
+
+The recipe targets the initial implementation branch while its PR is under review; switch it to `main` after merging that PR.
+
 Heavy use of hydras 
 
 
 <img align="right" width="100" height="100" src="gifs/tiqsi.jpeg">
-
