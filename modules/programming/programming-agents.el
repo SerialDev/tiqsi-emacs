@@ -13,7 +13,8 @@
                   agent-rig-send agent-rig-send-region agent-rig-send-buffer
                   agent-rig-send-diff agent-rig-broadcast agent-rig-capture
                   agent-rig-return-to-code agent-rig-help agent-rig-save
-                  agent-rig-restore agent-rig-set-conversation))
+                  agent-rig-restore agent-rig-set-conversation agent-rig-handoff
+                  agent-rig-worktree-start agent-rig-adopt agent-rig-toggle-focus))
   (autoload command "agent-rig" nil t))
 
 (defhydra hydra-agents (:color blue :hint nil)
@@ -22,6 +23,7 @@ Agents: _a_ dashboard  _n_ new  _t_ team  _s_ switch
 Context: _p_ prompt  _r_ region  _f_ buffer  _d_ diff  _b_ broadcast
 Navigate: _o_ output  _c_ code  _h_ help  _q_ quit
 Recovery: _S_ save seats  _R_ restore  _i_ conversation ID
+Workspace: _w_ worktree  _A_ adopt  _H_ handoff  _F_ focus
 "
   ("a" agent-rig)
   ("n" agent-rig-start)
@@ -38,6 +40,10 @@ Recovery: _S_ save seats  _R_ restore  _i_ conversation ID
   ("S" agent-rig-save)
   ("R" agent-rig-restore)
   ("i" agent-rig-set-conversation)
+  ("w" agent-rig-worktree-start)
+  ("A" agent-rig-adopt)
+  ("H" agent-rig-handoff)
+  ("F" agent-rig-toggle-focus)
   ("q" nil))
 
 (with-eval-after-load 'agent-rig
